@@ -237,7 +237,7 @@ this.Result = this.Parame * ra.Next(10, 100);
 
   然后通过EndInvoke方法获得方法的返回值（EndInvoke方法的返回值就是被调用方法的返回值），或是确定方法已经被成功调用。
 
-  使用BeginInvoke异步调用方法时，如果方法未执行完，EndInvoke方法就会一直阻塞，直到被调用的方法执行完毕。
+  使用BeginInvoke异步调用方法时，如果方法未执行完，EndInvoke方法就会**一直阻塞**，直到被调用的方法执行完毕。
 
 ```C#
 using System.Threading; 
