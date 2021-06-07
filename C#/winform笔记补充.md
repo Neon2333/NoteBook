@@ -90,7 +90,7 @@ https://blog.csdn.net/bluecard2008/article/details/103922589
   this.pictureBox1.Image = global::WindowsFormsApplication1.Properties.Resources.img01;
   ```
 
-* 窗体的资源/本地资源
+* 窗体资源/本地资源
 
   在Image属性那里，通过本地资源添加，图片将保存在Form.resx中
 
@@ -499,6 +499,8 @@ Checked——是否被选中
 
 ### （3）demo
 
+子窗口将参数用委托对象封装，主窗口将委托对象绑定getValue函数。
+
 ```C#
 /**
 根据题目要求，子窗口显示：用户权限包括“普通用户”“年卡用户”“VIP 用户”，因此需要 3 个单选按钮，按下确定，将字符串传到主窗体并显示
@@ -676,14 +678,19 @@ https://www.cnblogs.com/janeaiai/p/4913927.html
   }
   ```
 
+  ## *Items的类型是什么？*
+
+  是ObjectCollection。Object是“上帝基类”。
+
+  所以Items.Add填充的是什么变量类型，最后获取Items[i]时就是什么类型。
+
   ```C#
+  //这里，Add()填充的是"散步"等string，所以容器中的元素也是string
   foreach (string outstr in checkedListBox1.CheckedItems)
   {
        MessageBox.Show(outstr);
   }
   ```
-
-  
 
 * 用一个CheckBox设置全选/全不选
 
@@ -692,15 +699,15 @@ https://www.cnblogs.com/janeaiai/p/4913927.html
   private void select_all_CheckedChanged(object sender, EventArgs e)
   {
        if(select_all.Checked)
-  {
-            for (int j = 0; j < checkedListBox1.Items.Count; j++)	//遍历所有项
-                 checkedListBox1.SetItemChecked(j, true);
-  }
-  else
-  {
-  for (int j =0; j < checkedListBox1.Items.Count; j++)
-        checkedListBox1.SetItemChecked(j, false);
-  }
+  	{
+       	for (int j = 0; j < checkedListBox1.Items.Count; j++)	//遍历所有项
+           	checkedListBox1.SetItemChecked(j, true);
+  	}
+  	else
+  	{
+  		for (int j =0; j < checkedListBox1.Items.Count; j++)
+       		checkedListBox1.SetItemChecked(j, false);
+  	}
   }
   ```
 
