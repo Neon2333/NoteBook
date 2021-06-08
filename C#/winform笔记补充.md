@@ -62,13 +62,19 @@ https://blog.csdn.net/bluecard2008/article/details/103922589
 >
 > Opacity：透明度
 >
-> StartPosition：窗口启动时的位置
+> **StartPosition**：窗口启动时的位置
 >
 > Test：窗体标题
 >
 > TopMost：是否在最上层
 >
 > WindowState：窗体启动时是最大化/最小化/普通
+
+* 窗体初始位置
+
+  https://www.cnblogs.com/xinjian/archive/2011/09/21/2184306.html
+
+  https://www.cnblogs.com/roboot/p/7088070.html
 
 ### （1）*添加资源文件*
 
@@ -927,3 +933,20 @@ public partial class Form1 : Form
 
 * 启动Start
 * 停止Stop
+
+## 18. 导出form为dll
+
+https://blog.csdn.net/TimeFault/article/details/50206145
+
+### 按钮白边
+
+
+
+
+
+## 19. 创建用户控件
+
+* 控件项目路径不能有#等非Unicode字符，否则`用户控件测试容器`无法启动
+* https://blog.csdn.net/Codeeror/article/details/80380294
+* 生成控件时注意目标平台（any CPU）和目标框架
+* 
