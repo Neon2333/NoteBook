@@ -1020,6 +1020,8 @@ https://blog.csdn.net/wheredata/article/details/87191983
 
 ## 15.约束
 
+
+
 ## 16.视图
 
 将查询语句查询出来的表作为一个**虚拟表**进行封装。
@@ -1046,7 +1048,87 @@ FROM productscustomers
 WHERE prod_id='TN2';
 ```
 
-## 17. 存储过程
+## 17. 事务
+
+### （1）使用条件
+
+* 在 MySQL 中只有使用了 **Innodb数据库引擎的数据库或表才支持事务**。
+* 事务处理可以用来维护数据库的完整性，保证成批的 SQL 语句要么全部执行，要么全部不执行。
+* **事务只能用来管理 insert,update,delete 语句**，不能控制SELECT和DROP。
+
+### （2）几个概念
+
+* 事务——TRANSACTION
+* 回滚——ROLLBACK TO，回退到某个保留点
+* 提交——COMMIT，将未保存的动作写入数据库表
+* 保留点——SAVAPOINT，一系列语句中的**占位符**，当回退时，可以标记退回到什么位置。每个保留点都取**唯一的名字**。
+
+### （3）事务控制语句
+
+https://blog.csdn.net/weixin_39641173/article/details/113945257?utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-1.nonecase&depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-1.nonecase
+
+* START TRANSACTION或BEGIN——开启事务
+
+* COMMIT
+
+  将COMMIT与START TRANSACTION之间的动作提交，动作就提交到表，无法撤销了。**提交后事务被显式结束。**
+
+* ROLLBACK
+
+  将ROLLBACK与START TRANSACTION之间的部分撤销，回到START TRANSACTION事务开启时，**回滚后事务被显式结束。**
+
+* 使用保留点
+
+  SAVAPOINT P1
+
+  ROLLBACK TO P1
+
+  使用savepoint回滚难免有些性能消耗，一般可以用IF改写
+
+  savepoint的良好使用的场景之一是“嵌套事务”，你可能希望程序执行一个小的事务，但是不希望回滚外面更大的事务
+
+  
+
+* 保留点ROLLBACK或者COMMIT后就自动释放。也可用RELEASE P1手动释放。
+
+```mysql
+/**
+(1)在执行sql语句之前，我们要开启事务 start transaction;
+
+(2)正常执行我们的sql语句
+
+(3)当sql语句执行完毕，存在两种情况：
+
+1，全都成功，我们要将sql语句对数据库造成的影响提交到数据库中，committ
+
+2，某些sql语句失败，我们执行rollback(回滚)，将对数据库操作赶紧撤销
+*/
+
+SET AUTOCOMMIT=0
+BEGIN;
+UPDATE table1 SET field1='aaa' WHERE type=1;
+UPDATE table2 SET field2='bbb' WHERE type=1;
+COMMIT;//或ROLLBACK;
+```
+
+
+
+### （4）更改MySQL的自动提交行为
+
+MySQL默认情况下，只要表发生更改，就会立即提交。
+
+```mysql
+SET GLOBAL AUTOCOMMIT=0;	-- 关闭自动提交，直到AUTOCOMMIT置1时才提交
+SET GLOBAL AUTOCOMMIT=1;	-- 开启自动提交
+```
+
+### （5）隔离级别与脏读
+
+* 脏读——一个事务读到另一个事务还没有提交的数据（没有提交的数据一旦回滚到原数据，那读到的数据就是脏数据）
+
+
+
+## 18. 存储过程
 
 调用。变量用@表示。
 
@@ -1054,13 +1136,13 @@ WHERE prod_id='TN2';
 
 
 
-## 18. 游标
+## 19.  游标
 
 
 
 
 
-## 19. 账号管理
+## 20. 账号管理
 
 * 严肃对待root账号的使用，仅在绝对需要的时候才使用。
 
@@ -1130,7 +1212,7 @@ WHERE prod_id='TN2';
   SET PASSWORD FOR user_name = PASSWORD('password');
   ```
 
-## 19. 备份
+## 21. 备份
 
 https://www.cnblogs.com/chenbin93/p/14697451.html
 
@@ -1178,13 +1260,13 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
   
 
-## 20. 日志
+## 22. 日志
 
 https://blog.csdn.net/defonds/article/details/46858949
 
 需要配置启用日志。
 
-## 21.存储图片
+## 23.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
 
