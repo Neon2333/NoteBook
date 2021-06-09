@@ -4,6 +4,7 @@ http://c.biancheng.net/csharp/winform/
 
 winform窗体应用程序是事件驱动的。鼠标或键盘发出事件，通过窗体和控件的属性和响应相关事件完成业务逻辑。
 
+<<<<<<< HEAD
 属性设置一般写在Designer.cs中
 
 ## 用户控件UserControl和自定义控件CustomControl
@@ -23,6 +24,182 @@ https://blog.csdn.net/bluecard2008/article/details/103922589
   工具箱处右键，`添加选项卡`可新建控件分组。`添加项`将.dll添加到.NET Framework组件中，就可以使用自定义控件了。
 
   
+=======
+**属性设置一般写在Designer.cs中。一般不修改designer.cs，可打开看，看属性的赋值。然后在构造里写自己需要的属性设置。**
+
+## *注意点收集*
+
+### （1）按钮自动弹起
+
+用MouseDown和MouseUp
+
+ ```C#
+ public partial class Form1 : Form
+    {
+        //private bool m_btnState1 = false;//按钮按下状态
+        //private bool m_btnState2 = false;//按钮按下状态
+        private const string MSGOK = "确定按钮被点击";
+        private const string MSGCANCEL = "取消按钮被点击";
+
+        public Form1()
+        {
+            InitializeComponent();
+            //this.radioButton1.Checked = false;
+            //this.radioButton2.Checked = false;
+            //this.m_btnState1 = this.radioButton1.Checked;
+            //this.m_btnState2 = this.radioButton1.Checked;
+
+        }
+        public Form1(string str)
+        {
+            InitializeComponent();
+
+            
+            this.textBox_content.Text = str;
+            this.textBox_content.Font = new System.Drawing.Font("微软雅黑", 12F, System.Drawing.FontStyle.Bold);
+            this.textBox_content.ForeColor = System.Drawing.Color.Yellow;
+            this.textBox_content.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+
+        }
+    
+        ////毫秒延时函数
+        //public static void Delay(int milliSecond)
+        //{
+        //    int start = Environment.TickCount;
+        //    while (Math.Abs(Environment.TickCount - start) < milliSecond)
+        //    {
+        //        Application.DoEvents();
+        //    }
+        //}
+
+        //事件
+        public delegate void myDlg(string str);
+        public myDlg eventClickOk;
+        public myDlg eventClickCancel;
+
+
+        //    //按钮按下不会弹起，再按下弹起
+        //private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        //{
+        //    eventClickOk(sender, e);
+        //    if (this.m_btnState1 == false)
+        //    {
+        //        this.radioButton1.Checked = true;
+        //        this.m_btnState1 = true;
+        //        radioButton1.Image = global::demo1Form.Properties.Resources.OK;
+        //    }
+        //    else
+        //    {
+        //        this.radioButton1.Checked = true;
+        //        this.m_btnState1 = true;
+
+        //    }
+        //}
+
+        ////按钮按下自动弹起
+        //private void radioButton1_Click(object sender, EventArgs e)
+        //{
+        //    this.radioButton1.BackgroundImage = global::demo1Form.Properties.Resources.down;
+        //    //Delay(500);
+        //    eventClickOk(Form1.MSGOK);
+        //    this.radioButton1.BackgroundImage = global::demo1Form.Properties.Resources.up;
+        //    //Delay(500);
+        //    this.Dispose();
+        //}
+
+        //private void radioButton2_Click(object sender, EventArgs e)
+        //{
+        //    this.radioButton2.BackgroundImage = global::demo1Form.Properties.Resources.down;
+        //    //Delay(500);
+        //    eventClickOk(Form1.MSGCANCEL);
+        //    this.radioButton2.BackgroundImage = global::demo1Form.Properties.Resources.up;
+        //    //Delay(500);
+        //    this.Dispose();
+
+        //    //this.Invalidate();  //重绘
+        //}
+        
+        //窗体重绘时调用
+        private void Form1_Paint(object sender, PaintEventArgs e)
+        {
+            Graphics gp = this.CreateGraphics();
+            //gp.DrawLine(new Pen(Color.Red, 5), new Point(this.Location.X, this.Location.Y), new Point(this.Location.X + 500, this.Location.Y));
+            gp.DrawLine(new Pen(Color.Red, 4), new Point(0, 0), new Point(0, 350));
+            gp.DrawLine(new Pen(Color.Red, 4), new Point(0, 0), new Point(500, 0));
+        }
+
+        /**
+        Load事件是在窗体首次绘制之前调用的，所以调用Load时窗体还未绘制，所以无法显示。绘制图形还是用paint事件。
+        */
+        ////窗体加载时调用
+        //private void Form1_Load(object sender, EventArgs e)
+        //{
+        //    //Graphics gp = this.CreateGraphics();
+        //    ////gp.DrawLine(new Pen(Color.Red, 5), new Point(this.Location.X, this.Location.Y), new Point(this.Location.X + 500, this.Location.Y));
+        //    //gp.DrawLine(new Pen(Color.Red, 4), new Point(0, 0), new Point(0, 350));
+        //    //gp.DrawLine(new Pen(Color.Red, 4), new Point(0, 0), new Point(500, 0));
+        //}
+
+        //按钮的按下、弹起，用MouseDown和MouseUp
+        //不要用Click事件+延时模拟
+        private void radioButton1_MouseDown(object sender, MouseEventArgs e)
+        {
+            this.radioButton1.BackgroundImage = global::demo1Form.Properties.Resources.down;
+            eventClickOk(Form1.MSGOK);
+        }
+
+        private void radioButton1_MouseUp(object sender, MouseEventArgs e)
+        {
+            this.radioButton1.BackgroundImage = global::demo1Form.Properties.Resources.up;
+            this.Dispose();
+        }
+
+        private void radioButton2_MouseDown(object sender, MouseEventArgs e)
+        {
+            this.radioButton2.BackgroundImage = global::demo1Form.Properties.Resources.down;
+            eventClickOk(Form1.MSGCANCEL);
+        }
+
+        private void radioButton2_MouseUp(object sender, MouseEventArgs e)
+        {
+            this.radioButton2.BackgroundImage = global::demo1Form.Properties.Resources.up;
+            this.Dispose();
+        }
+ ```
+
+### （2）导出form为dll
+
+https://blog.csdn.net/TimeFault/article/details/50206145
+
+### （3）按钮白边
+
+用label作为按钮？
+
+### （4）窗体加载时绘图——放在构造中？放Load事件中？放Paint事件中？为什么GDI绘图放在Load事件中不显示？
+
+* 希望窗体加载时绘制图形，放在构造和Load中时，加载时都是空白。
+
+  这和windows的机理有关。在windows系统中所有的窗口，子窗口，控件等都是属于一种叫做"窗口"的对象。这个对象会接收很多消息，比如鼠标消息，绘画消息，定时消息等，对不同的消息的不同处理就形成了你所用的按钮，文本框等等各种控件。 但是"窗口"有个最基本的消息就是Paint消息，当有其他窗口层叠在它之上然后移开，或者它的大小改变，或它的显示模式改变都会自动触发这个消息，调用内部函数重新绘制"窗口"。 如果你没在paint消息里绘制，只是直接用draw绘制的东西，在用另一个窗口遮挡然后移开后，会变回原来的图案(一般就是空白)。
+
+*  Form_Load是窗体初始化时发生， Form_ Paint是当移动窗体、改变窗体大小，最大化，最小化，窗体被其他窗体遮住后再次显示，等等时都会发生。
+
+* 今天无意将一段绘图代码 写在form_load事件了，结果不能显示绘图。（代码：Graphics g = this.CreateGraphics();Pen pen = new Pen(Color.Red, 10);Rectangle r = new Rectangle(70, 20, 100, 60);*g.DrawEllipse(pen, r);。*
+
+  **经过查询得知：Form_Load事件是在窗体首次绘制前发生的。也就是说，在Form_Load过程中，这个Form里所有需要在屏幕上呈现的东西都还没开始绘制，所以你在Load中去绘制东西是看不到的。在Windows系统中，窗体的Load事件执行完毕后，系统才开始绘制窗体并显示在屏幕上。所以只有当Form_Load方法执行完后，我们才能看见窗体。当Form_Paint方法执行完后才显示出我们想要绘制的完整的图形。并且窗体Repaint后，窗体的Graphics就被清空了。每次刷新的时候都需要绘制，在窗体Load也会刷新。**
+
+* demo——用Paint实现渐变色
+
+  https://blog.csdn.net/weixin_33998125/article/details/93802524
+
+### （5）Invalidate()
+
+* Invalidate()是System.Windows.Forms命名空间下Control类的众多重载方法之一，调用还方法使控件的整个画面无效并导致重绘控件，是一个void类型的函数，这里的this表示该类是Control类或继承了Control类的实例 
+* Invalidate()函数的作用是使整个窗口客户区无效，窗口客户无效即需要重绘，这时Window系统会发送一WM_PAINT消息放在应用程序的消息队列中，WM_PAINT消息的优先级很低，所以不会立即重绘。
+  如果需要立即重绘，那么就使用UpdateWindow( )函数，该函数可使WM_PAINT被直接发送到目标窗口，从而导致窗口立即重绘。 
+* Invalidate()是通知区域无效,至于什么时候重画还要等消息排队
+  Update()是通知立刻重画,不用等消息排队! 
+*  Invalidate()是System.Windows.Forms.Form的一个成员，**它把客户窗口区域标记为无效，因此在需要重新绘制时，它可以确保引发Paint事件**。Invalidate()有两个重载方法：可以给它传送一个矩形，指定(使用页面坐标)需要重新绘制哪个窗口区域，如果**不提供任何参数，它就把整个客户区域标记为无效**。 
+>>>>>>> ac62793 (2021/6/9,winform笔记增加了注意点)
 
 ## 1. 窗体属性
 
@@ -932,6 +1109,7 @@ public partial class Form1 : Form
 * 定时器控件中常用的属性是 Interval，用于设置时间间隔，以毫秒为单位
 
 * 启动Start
+<<<<<<< HEAD
 * 停止Stop
 
 ## 18. 导出form为dll
@@ -950,3 +1128,32 @@ https://blog.csdn.net/TimeFault/article/details/50206145
 * https://blog.csdn.net/Codeeror/article/details/80380294
 * 生成控件时注意目标平台（any CPU）和目标框架
 * 
+=======
+
+* 停止Stop
+
+  
+
+## 18. 创建用户控件及使用
+
+* 控件项目路径不能有#等非Unicode字符，否则`用户控件测试容器`无法启动
+* https://blog.csdn.net/Codeeror/article/details/80380294
+* 生成控件时注意目标平台（any CPU）和目标框架
+
+### （1）用户控件UserControl和自定义控件CustomControl
+
+https://blog.csdn.net/bluecard2008/article/details/103922589
+
+* UserControl(用户控件)，也就是**复合控件**。继承自UserControl  主要用于开发Container控件。  
+  (Container控件：可以添加其他Controls控件, .net  自带很多Container  控件, 其实Form就是一个Container)   
+
+* CustomControl(自定义控件)继承自Control主要用于开发windows控件的最基本的类  象Text,Button都是。
+
+* 用户控件使用步骤：
+
+  新建`Windows窗体控件库`，然后在Release文件夹找到.dll文件。
+
+  用户控件的运行同项目不同，是在用户控件测试容器中运行的。
+
+  工具箱处右键，`添加选项卡`可新建控件分组。`添加项`将.dll添加到.NET Framework组件中，就可以使用自定义控件了。
+>>>>>>> ac62793 (2021/6/9,winform笔记增加了注意点)

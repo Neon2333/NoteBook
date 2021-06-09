@@ -458,6 +458,17 @@ listView同listBox，添加项为listView.Items.Add()，不同的是前者可以
   g.DrawLine(p,150,30,150,100);
   ```
 
+  **线有宽度，其实线就是一个实心矩形，起止坐标**
+
+  ```C#
+   //注意线宽和起止坐标，实现窗体边缘立体效果
+  Graphics gp = this.CreateGraphics();
+  gp.DrawLine(new Pen(Color.LightSkyBlue, 2), new Point(2, 0), new Point(2, 350));   
+  gp.DrawLine(new Pen(Color.LightSkyBlue, 2), new Point(0, 2), new Point(500, 2));
+  ```
+
+  
+
 * 矩形DrawRectangle
 
   public void DrawRectangle(Pen p,int x,int y, int width, int height);
