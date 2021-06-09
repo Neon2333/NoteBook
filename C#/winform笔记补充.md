@@ -24,6 +24,7 @@ https://blog.csdn.net/bluecard2008/article/details/103922589
   工具箱处右键，`添加选项卡`可新建控件分组。`添加项`将.dll添加到.NET Framework组件中，就可以使用自定义控件了。
 
   
+
 =======
 **属性设置一般写在Designer.cs中。一般不修改designer.cs，可打开看，看属性的赋值。然后在构造里写自己需要的属性设置。**
 
@@ -240,6 +241,8 @@ https://blog.csdn.net/TimeFault/article/details/50206145
 > Opacity：透明度
 >
 > **StartPosition**：窗口启动时的位置
+>
+> **FormBorderStyle**：窗体的边框和标题栏的的外观
 >
 > Test：窗体标题
 >
