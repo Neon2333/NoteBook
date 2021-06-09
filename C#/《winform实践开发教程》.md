@@ -24,5 +24,26 @@ this.LayoutMdi(MdiLayout.TileHorizontal);	//水平平铺
 this.LayoutMdi(MdiLayout.TileVertical);	//垂直平铺
 ```
 
-* MDI主窗口作为父窗体，非MDI窗体作为子窗体。子窗体之间的传值问题。
+### MDI主窗口作为父窗体，非MDI窗体作为子窗体。子窗体之间的传值问题。
 
+* 子窗体向子窗体传值——通过构造传值：new出来的子窗体要设置MdiParent
+
+```C#
+Form2 childForm = new Form2();
+childForm.MdiParent = this.MdiParent;	//表示两个子窗体父窗体相同
+childForm.Show();
+this.Close();
+```
+
+* B子窗体设置属性。A子窗体new出来B子窗体后，通过B的属性直接赋值
+
+  ```C#
+  this.Hide();
+  Form3 childFormB = new Form3();
+  childFormB.val1=this.textBox1.Text;
+  childFormB.val2=this.textBox2.Text;
+  childFormB.MdiParent=this.MdiParent;
+  childFormB.Show();
+  ```
+
+  
