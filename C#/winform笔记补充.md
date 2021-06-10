@@ -13,9 +13,16 @@ https://blog.csdn.net/bluecard2008/article/details/103922589
 
 * UserControl(用户控件)，也就是**复合控件**。继承自UserControl  主要用于开发Container控件。  
    (Container控件：可以添加其他Controls控件, .net  自带很多Container  控件, 其实Form就是一个Container)   
+   
 * CustomControl(自定义控件)继承自Control主要用于开发windows控件的最基本的类  象Text,Button都是。
 
-* 用户控件使用步骤：
+* 创建用户控件在当前项目使用
+
+   https://www.cnblogs.com/dawasai/p/4443899.html
+
+   生成以后，就会在工具箱中看到创建的用户控件，可添加到窗体上使用。
+
+* 用户控件dll使用步骤：
 
   新建`Windows窗体控件库`，然后在Release文件夹找到.dll文件。
 
@@ -200,6 +207,37 @@ https://blog.csdn.net/TimeFault/article/details/50206145
 * Invalidate()是通知区域无效,至于什么时候重画还要等消息排队
   Update()是通知立刻重画,不用等消息排队! 
 *  Invalidate()是System.Windows.Forms.Form的一个成员，**它把客户窗口区域标记为无效，因此在需要重新绘制时，它可以确保引发Paint事件**。Invalidate()有两个重载方法：可以给它传送一个矩形，指定(使用页面坐标)需要重新绘制哪个窗口区域，如果**不提供任何参数，它就把整个客户区域标记为无效**。 
+### （6）路径中反斜杠不要写2个，用@
+
+https://blog.csdn.net/u012719076/article/details/108235452
+
+路径中使用/ 和 \都可以，不过Windows下两种都可以，而unix中只能用/
+
+而且由于在ASCII中字符 \ 是转义字符，所以要表示 \ 则要多加一个，所以是 \; 而 / 则不需多添加。
+
+对于路径加@
+正斜杠/ 加@ 没有作用
+反斜杠\ 加@ 会使 一个\ 变成 两个\
+
+```C#
+string strPath = @"D:\\OSA\\BK\\20200825-095420-bk.csv";
+```
+
+
+
+### （7）/// \<summary> XML注释
+
+https://www.cnblogs.com/mq0036/p/3544264.html
+
+```xml
+ /// <summary>
+/// 增加方法
+/// </summary> 
+```
+
+ 是XML注释
+xml注释都在三个向前的斜线之后(///)，两条斜线表示是一个注释，编译器将忽略后面的内容，三条斜线告诉编译器，后面是XML注释，需要适当地处理。
+
 >>>>>>> ac62793 (2021/6/9,winform笔记增加了注意点)
 
 ## 1. 窗体属性
@@ -1056,13 +1094,13 @@ public partial class Form1 : Form
 
 * **SizeMode**——获取或设置图片控件中图片显示的大小和位置
 
-  如果值为 Normal，则图片显不在控件的左上角；
+  如果值为 Normal，则从图片的左上角显示在控件中；
 
   如果值为 Stretchimage，则图片在图片控件中被拉伸或收缩，适合控件的大小；
 
   如果值为AutoSize，自动调整控件大小适应图片；
 
-  如果值为 Centerimage，则控件>图片时图片居中显示，控件<图片时图片外围被裁剪；
+  如果值为 Centerimage，则控件>图片时图片居中显示，控件<图片时图片外围被裁剪显示图片中心；
 
   如果值为 Zoom，则图片会自动按原比例缩放至符合图片控件的大小
 

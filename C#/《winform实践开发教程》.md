@@ -1,3 +1,5 @@
+# 第一章
+
 1. P18将listbox的Items.Add放在Load事件中
 
 2. ShowDialog显示模态窗体，只有关闭窗体才执行后面代码
@@ -46,4 +48,238 @@ this.Close();
   childFormB.Show();
   ```
 
+* 防止点击某一个按钮重复打开多个同一窗口
+
+  ```c#
   
+  ```
+
+  
+
+5. 添加menu
+
+   选择menustrip控件添加，右键属性更改name和text。
+
+   右键选择`编辑项`（或在属性的Items调出窗口修改）添加子选项，并编辑二级选项的name、text、shortcutkey。
+
+   在二级选项上右键，选择`编辑DropDownItems`添加修改二级选项并修改name、text和shortcutkey。
+
+6. 使用第三方皮肤
+
+   https://www.cnblogs.com/shaozhuyong/articles/3125402.html
+
+   自带设计的窗体都是很普通的，不够美观。使用第三方皮肤DotNetSkin.dll和IrisSkin2.dll可以得到较为美观的皮肤。皮肤文件.skin和.ssk。
+
+## 7. 菜单栏、工具栏、状态栏、右键菜单
+
+https://www.cnblogs.com/yieryi/p/4602765.html
+
+菜单栏——menustrip
+
+工具栏——toolstrip，添加各种控件且可设置图片
+
+状态栏——statusstrip
+
+鼠标右键菜单——contextmenustrip，右键点击`编辑项`添加和编辑。**要在窗体的contextMenuStrip属性上选择该控件，右键菜单才有效**
+
+toolstripcontainer控件——使用不是很方便。 其实就是个工具栏容器，软件运行起来后，允许我们将工具栏拖放到我们需要的地方（四边的四个框框）。中间的框框用来放其他控件。删除用delete键。
+
+
+
+# 第二章
+
+## 1. radiobutton
+
+和CheckBox的区别是，一个分组内一次只能选择一个。
+
+分组才能实现不能同时选择，一般用panel或groupbox。
+
+panel——默认无边框，可设置AutoScroll有滑动条。设置BorderStyle，可有边框。
+
+groupbox——有一个小标题，默认有框框。
+
+## 2. tabControl——选项卡
+
+### （1）属性
+
+> MultiLine——选项卡是否多行
+>
+> Appearance——选项卡外观（Button外观）
+>
+> ShowToolTips——鼠标移动到选项卡时是否提示信息。若设置true，在选项卡的属性`ToolTipText`中修改提示信息内容
+>
+> **TabPages**——选项卡编辑器（可编辑选项卡每页。也可直接点击选项卡下的框框编辑每页）
+>
+> SelectedIndex——被选的选项卡的index，从0编号，默认为-1
+>
+> SelectedTab——当前选中的选项卡，未选中时为NULL。
+>
+> TabCount——选项卡总数
+
+```C#
+private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
+{
+	string msg = string.Empty;
+	msg = "当前页面为：" + this.tabControl1.SelectedTab.Text + "，是第" + 			                     this.tabControl1.SelectedIndex.ToString() + "页" + "，共" + this.tabControl1.TabCount + "页";
+	MessageBox.Show(msg);
+}
+```
+
+### （2）事件
+
+
+
+## 3. progressBar——进度条
+
+### （1）属性
+
+> Maximum——最大值
+>
+> Minimum——最小值
+>
+> Step——步长
+>
+> Value——当前值
+
+### 方法
+
+```C#
+void Increment(int val)	//按照设定的val作为步长增加一次
+```
+
+```C#
+void PerformStep()	//按照属性中的Step作为步长增加一次
+```
+
+```C#
+while (this.progressBar1.Value != this.progressBar1.Maximum)
+{
+	this.progressBar1.Value+=this.progressBar1.Step;
+}
+```
+
+## 4. ImageList——封装图片的组件
+
+不能单独显示图片，作为控件，搭配其他控件使用，如toolbar，属性ImageList选择已有ImageList。
+
+### （1）属性
+
+> Images——图片集合。点击，弹出`图片集合编辑器`添加图片
+>
+> ImageSize——图片显示尺寸
+
+
+
+## 5. ToolBar——工具栏（老版本控件了不建议用，用ToolStrip）
+
+### （1）属性
+
+> ImageList——选择
+>
+> Style：工具栏按钮的样式
+>
+> ShowToolTips——鼠标放在按钮上是否显示提示
+>
+> **Buttons**——打开`ToolBarButton集合编辑器`。添加按钮，编辑按钮属性
+
+ToolBarButton按钮属性：
+
+> ImageIndex——按钮选择的ImageList封装的图片的序号
+>
+> ToolTipsText——按钮提示内容
+
+### （2）demo
+
+```C#
+private void Form_Load(object sender, EventArgs e){
+    //new按钮
+    ToolBarButton bt1 = new ToolBarButton();
+    ToolBarButton bt2 = new ToolBarButton();
+    ToolBarButton bt3 = new ToolBarButton();
+    ToolBarButton bt4 = new ToolBarButton();
+    ToolBarButton bt5 = new ToolBarButton();
+    //按钮添加到ToolBar上
+    ToolBar1.Buttons.Add(bt1);
+    ToolBar1.Buttons.Add(bt2);
+    ToolBar1.Buttons.Add(bt3);
+    ToolBar1.Buttons.Add(bt4);
+    ToolBar1.Buttons.Add(bt5);
+    //ToolBar添加ImageList
+    ToolBar1.ImageList=imageList1;
+ 	ToolBar1.ShowToolTips=true;
+    //为按钮设置ImageList中图片
+    bt1.ImageIndex=0;
+    bt2.ImageIndex=1;
+    bt3.ImageIndex=2;
+    bt4.ImageIndex=3;
+    bt5.ImageIndex=4;
+    
+    //按钮属性设置
+    bt1.Text="button1";
+    bt1.ToolTipText="button1 提示信息";
+    bt2.Text="button1";
+    bt2.ToolTipText="button1 提示信息";
+    bt3.Text="button1";
+    bt3.ToolTipText="button1 提示信息";
+    bt4.Text="button1";
+    bt4.ToolTipText="button1 提示信息";
+    bt5.Text="button1";
+    bt5.ToolTipText="button1 提示信息";
+}
+```
+
+## 6. StatusStrip——状态栏
+
+StatusStrip可添加进度条
+
+```C#
+while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
+{
+	this.toolStripProgressBar1.Value += this.toolStripProgressBar1.Step;
+}
+```
+
+
+
+## 7. numericUpDown——微调框
+
+### （1）属性
+
+> Maximum——最大值
+>
+> Minimum——最小值
+>
+> Value——当前值
+>
+> TextAlign——数字在框中的位置
+>
+> UpDownAlign——微调按钮的位置
+>
+> Increment——增长的步长
+
+## 8. DataTimePicker——调整时间
+
+### （1）属性
+
+> showcheckbox——是否显示复选框
+>
+> checked——复选框是否选中
+>
+> showupdown——false显示下拉日历。true为时间可调
+>
+> value——当前时间
+
+
+
+## 第三章
+
+
+
+
+
+
+
+
+
+
+
