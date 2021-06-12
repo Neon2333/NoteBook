@@ -10,7 +10,9 @@
 
 https://bbs.csdn.net/topics/190043971
 
+```C#
  DateTime.Now.ToString()+DateTime.Now.Millisecond.ToString() 
+```
 
 ## 4. 给DATETIME变量插入记录
 
@@ -52,7 +54,7 @@ SQLite多用在嵌入式设备上，如Android、Unix、Linux、单片机。MySQ
 
 重点指出与MySQL不同之处
 
-## CMD指令
+## 1. CMD指令
 
 ```sqlite
 .quit
@@ -64,7 +66,7 @@ SQLite多用在嵌入式设备上，如Android、Unix、Linux、单片机。MySQ
 
 
 
-##  建库
+##  2. 建库
 
 cmd下不进入sqlite
 
@@ -74,7 +76,7 @@ sqlite3 path\\dbName.db3  --path是db文件的路径
 
 
 
-## 约束
+## 3. 约束
 
 * NOT  NULL
 
@@ -98,7 +100,7 @@ sqlite3 path\\dbName.db3  --path是db文件的路径
 
   
 
-## 索引
+## 4. 索引
 
 * 概念
 
@@ -170,7 +172,7 @@ https://www.cnblogs.com/elonlee/p/3508237.html
 
 
 
-## 事务
+## 5. 事务
 
 * 概念
 
@@ -193,17 +195,6 @@ https://www.cnblogs.com/elonlee/p/3508237.html
   --撤销还没有提交到数据库文件的操作
   ROLLBACK;
   ```
-
-  
-
-
-
-
-
-
-
-
-
 
 # 3. C#连接SQLite
 
