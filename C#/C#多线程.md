@@ -96,8 +96,7 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
     > Priority：获取或设置一个值，该值指示线程的调度优先级
     >
     > ManagedThreadId：获取当前托管线程的唯一标识符
-    >
-  
+    
   * 成员方法
   
     > **public void Abort()**：调用此方法的线程上引发 ThreadAbortException，以开始终止此线程的过程
@@ -223,7 +222,6 @@ this.Result = this.Parame * ra.Next(10, 100);
       }
   }
   ```
-  
 
 
 
@@ -317,7 +315,7 @@ https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/lock-
 
 ### 3. C#自身语法
 
-（1）lock
+#### （1）lock
 
 lock语句获取给定对象的互斥 lock，执行语句块，然后释放 lock。 持有 lock 时，持有 lock 的线程可以再次获取并释放 lock。 阻止任何其他线程获取 lock 并等待释放 lock。
 
@@ -439,7 +437,7 @@ class AccountTest
 
 
 
-（2）Monitor
+#### （2）Monitor
 
 Monitor功能比lock丰富。
 
@@ -644,6 +642,95 @@ Queue Value:4
 Queue Size:0
 */
 ```
+
+#### （3）demo
+
+```C#
+ private void button_insert_Click(object sender, EventArgs e)
+        {
+            //int ms = 0;//给tiny int赋值字符串？
+
+            int total = 1000000;  //记录总条数，至少是4
+            //string cmd1 = "CAMERA1 (BRAND,RESULT,RIQI) VALUES (@brand,@result,datetime('now','localtime'));";
+            //string cmd2 = "CAMERA2 (BRAND,RESULT,RIQI) VALUES (@brand,@result,datetime('now','localtime'));";
+            string cmd1 = "CAMERA1 (BRAND,RESULT,RIQI) VALUES (@brand,@result,STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'));";  //时间戳精确到ms
+            string cmd2 = "CAMERA2 (BRAND,RESULT,RIQI) VALUES (@brand,@result,STRFTIME('%Y-%m-%d %H:%M:%f', 'NOW'));";
+
+            SQLiteParameter[] param =
+            {
+                new SQLiteParameter("@brand",DbType.String),   //DbType？MSDN上写的是SqliteType，但是找不到这个Enum
+                new SQLiteParameter("@result", DbType.Int16),
+            };
+            param[0].Value = "brand";
+            param[1].Value = 1;
+
+            ThreadInsert.setTotal(total);   //调用静态函数给类变量赋值
+            ThreadInsert mt1 = new ThreadInsert(cmd1,param);
+            ThreadInsert mt2 = new ThreadInsert(cmd2, param);
+            Thread thread1 = new Thread(new ThreadStart(mt1.threadInsert));
+            thread1.Name = "thread1";
+            Thread thread2 = new Thread(new ThreadStart(mt2.threadInsert));
+            thread2.Name = "thread2";
+
+            //插入开始
+            st.Start(); //计时开始
+
+            param[0].Value = "brand";
+            param[1].Value = 1;
+            sqlite1.SQLite_insert(cmd1, param, "BEGIN TRANSACTION;\n", ""); //第一条插入和最后一条插入加上事务指令
+            sqlite1.SQLite_insert(cmd2, param, "", ""); //第一条插入和最后一条插入加上事务指令
+
+            thread1.Start();
+            thread2.Start();
+            thread1.Join();
+            thread2.Join();
+
+            sqlite1.SQLite_insert(cmd1, param, "", "");
+            sqlite1.SQLite_insert(cmd2, param, "", "\nEND TRANSACTION;");
+
+            st.Stop();  //计时结束
+            MessageBox.Show("插入耗时：" + st.ElapsedMilliseconds.ToString() + "ms");
+        }
+
+        //线程类，封装子线程函数
+        public class ThreadInsert
+        {
+            public static int total = 0;
+            //要传递给线程函数的参数
+            public string cmd { set; get; }
+            public SQLiteParameter[] param { set; get; }
+
+            public ThreadInsert(string param2, SQLiteParameter[] param3)
+            {
+                this.cmd = param2;
+                this.param = param3;
+            }
+
+            //给total赋值（静态函数给类静态变量赋值）
+            public static void setTotal(int t)
+            {
+                ThreadInsert.total = t;
+            }
+
+            //线程执行函数
+            public void threadInsert(){
+                while ((ThreadInsert.total - 4) > 0)
+                {
+                    this.param[0].Value = "brand";
+                    this.param[1].Value = ThreadInsert.total % 2;
+                    //Thread.Sleep(400);
+                    Monitor.Enter(Form1.lockObj); //加锁
+                    sqlite1.SQLite_insert(this.cmd, this.param, "", "");
+                    ThreadInsert.total--;
+                    Monitor.Exit(lockObj);  //释放锁
+
+                }
+            }
+
+        }
+```
+
+
 
 
 
