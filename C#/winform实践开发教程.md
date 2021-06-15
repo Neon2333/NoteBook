@@ -86,7 +86,7 @@ toolstripcontainer控件——使用不是很方便。 其实就是个工具栏�
 
 
 
-# 第二章
+# 第二章	控件
 
 ## 1. radiobutton
 
@@ -141,7 +141,7 @@ private void tabControl1_SelectedIndexChanged(object sender, EventArgs e)
 >
 > Value——当前值
 
-### 方法
+### （2）方法
 
 ```C#
 void Increment(int val)	//按照设定的val作为步长增加一次
@@ -271,7 +271,23 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 
 
 
-## 第三章
+## 第三章	文件读写
+
+## 1. System.IO命名空间常用的类
+
+
+
+
+
+## 2. File类
+
+
+
+
+
+## 3. FileInfo类
+
+
 
 
 
