@@ -500,7 +500,7 @@ StreamWriter sw = new StreamReader(openFileStream, Encoding.Default);
 sw.write(richTextBox.Text);
 ```
 
-## 6. 读写二进制文件
+## 6. 读写二进制文件——读写图片等文件
 
 
 
