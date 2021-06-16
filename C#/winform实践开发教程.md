@@ -54,7 +54,6 @@ this.Close();
   
   ```
 
-  
 
 5. 添加menu
 
@@ -83,8 +82,6 @@ https://www.cnblogs.com/yieryi/p/4602765.html
 鼠标右键菜单——contextmenustrip，右键点击`编辑项`添加和编辑。**要在窗体的contextMenuStrip属性上选择该控件，右键菜单才有效**
 
 toolstripcontainer控件——使用不是很方便。 其实就是个工具栏容器，软件运行起来后，允许我们将工具栏拖放到我们需要的地方（四边的四个框框）。中间的框框用来放其他控件。删除用delete键。
-
-
 
 # 第二章	控件
 
@@ -275,27 +272,239 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 
 ## 1. System.IO命名空间常用的类
 
+> File——提供**文件**的打开、创建、删除、复制、移动的**静态**方法
+>
+> FileInfo——同File，提供的是**实例**方法（需先创建对象再使用）
+>
+> Directory——提供**文件夹**的创建、移动的**静态**方法
+>
+> DirectoryInfo——提供**实例**方法
+>
+> StreamWriter——以指定编码向字节流中写入字符
+>
+> StreamReader——以指定编码从字节流中读出字符
+>
+> FileStream——文件流，操作文件
+>
+> BinaryWriter——用指定编码以二进制形式将基元数据写入流
+>
+> BinaryReader——将基元数据以二进制读出
 
+* File类的方法为静态方法，可直接使用。FileInfo需要创建实例关联文件，以实例调用方法。
 
-
+* File性能低，若要多次操作文件，使用FileInfo。
+* **FileStream和StreamWriter/StreamReader类使用完记得.Close()关闭流。**
 
 ## 2. File类
 
+> bool Exists(string path)——判断指定路径的文件是否存在
+>
+> **FileStream** Open(string path, FileMode mode, FileAccess access, Fileshare fileshare)——打开指定文件，返回的FileStream提供对打开文件的访问
+>
+> **FileStream** Create(string path)——在指定路径创建文件/覆盖已有文件。返回的FileStream提供访问
+>
+> void Delete(string path)——删除指定文件。文件不存在不报异常
+>
+> void Copy(string sourcePath, string targetPath)——将源路径的文件拷贝到目标路径
+>
+> void Move(string sourcePath, string targetPath)——将源路径文件移动到目标路径
+>
+> **StreamWriter** CreateText(string path)——创建一个通过UTF-8写入的文件。返回StreamWriter
+>
+> **StreamReader** OpenText(string path)——打开UTF-8编码文件进行读取。返回StreamReader
 
-
-
+```C#
+string file = @"C:\1.txt";
+bool flag = File.Exists(file);
+```
 
 ## 3. FileInfo类
 
+**一个实例关联一个文件**
+
+```C#
+string file = @"C:\1.txt";
+FileInfo fileinfo = new FileInfo(file);
+bool flag = fileinfo.Exists;
+```
+
+### （1）属性
+
+> Name——文件名string
+>
+> Exists——文件是否存在bool
+>
+> Directory——获取目录的实例DirectoryInfo
+>
+> DirectoryName——目录的完整路径的字符串string
+>
+> length——文件大小（字节为单位）long
+>
+> CreationTime——创建时间DateTime
+
+### （2）方法
+
+> **FileStream** Open(string path, FileMode mode, FileAccess access, Fileshare fileshare)
+>
+> **FileStream** Create()——创建文件
+>
+> void Delete()——删除文件
+>
+> **FileInfo** copyTo(string destFileName)——拷贝
+>
+> **FileInfo** MoveTo(string destFileName)——移动
+>
+> **StreamWriter** CreateText()——创建新文件，返回写入新文本文件的StreamWriter
+>
+> **StreamWriter** AppendText()——向当前实例关联的文件中创建一个追加文本的StreamWriter
+>
+> **StreamReader** OpenText()——创建从当前文件中以UTF-8读取字符的StreamReader
+
+## 4. Directory类
+
+### （1）属性
+
+> 
+
+### （2）方法
+
+> bool Exists(string path)——目录是否存在
+>
+> **DirectoryInfo** CreateDirectory(string path)——创建目录
+>
+> void Delete(string path)——删除指定目录
+>
+> void Move(string sourceDirName, string destDirName)——移动文件夹
+>
+> string GetCurrentDirectory()——获取当前目录
+>
+> string[] GetFiles(string path)——获取目录中所有文件名（包含路径）
+>
+> DateTime GetCreationTime(string path)——获取路径的创建时间
+>
+> DateTime GetLastAccessTime(string path)——获得上次访问指定文件/目录的时间
+>
+> DateTime GetLastWriteTime(string path)——获得上次写入指定文件/目录的时间
+
+```C#
+public void Main(){
+    try{
+        DateTime dt = Directory.GetCreateTionTime(Environment.CurrentDirectory);
+        if(DateTime.Now.Subtract(dt).TotalDays>365){
+            Console.WriteLine("this directory is over a year old..");
+        }
+    }
+    catch(Exception ex){
+        ex.toString();
+    }
+}
+/**
+*           DateTime endTime = new DateTime(2016,4,10);
+            var startTime=DateTime.Now;
+            startTime.Subtract(endTime);	//时间差
+*/
+```
+
+```C#
+//文件夹操作函数
+//out表示引用传值，同ref。https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/out-parameter-modifier
+public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMethod, out string[] filesName){
+    bool flag = false;
+    filesName=null;
+    if(Directory.Exists(dirPath)){
+        try{
+        		if(optionMethod==0){
+                    //创建文件夹
+                    Directory.Create(dirPath);
+                    flag = true;
+                }else if(optionMethod==1){
+                    //删除文件夹
+                    Directory.Delete(dirPath);
+                    flag = true;
+                }else if(optionMethod==2){
+                    //移动文件夹
+                    Directory.Move(dirPath,targetDirPath);
+                    flag = true;
+                }else if(optionMethod==3){
+                    //获取文件夹下所有文件的文件名
+                    filesName=Directory.GetFiles(dirPath);
+                }
+   		   }
+    	catch(Exception ex){
+        	ex.toString();
+    	 }
+    }else{
+        Directory.Create(dirPath);	//不存在则创建
+        flag = true;
+    }
+    return flag;
+}
+```
+
+## 5. FileStream类
+
+提供文件读写，必须要实例化对象后才可操作文件。
+
+### （1）打开或创建
+
+* 构造
+
+  ```C#
+  string path = "";
+  FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Write, FileShare fileshare);
+  ```
+
+  FileMode——打开文件的方式
+
+  > Append——在现有文件后添加，与FileAccess.Write一起使用
+  >
+  > Create——文件不存在则创建，若已存在则覆盖
+  >
+  > OpenOrCreate——若已存在则打开，若不存在则创建
+  >
+  > CreateNew——创建新文件
+
+  FileAccess——Read、Write、ReadWrite
+
+  FileShare——是否允许其他线程共享访问（具体看书）
+
+* File.Open方法
+
+  ```C#
+  string path = "";
+  FileStream fs;
+  fs = File.Open(path, FileMode.OpenorCreate, FileAccess.Write, FileShare fileshare);
+  ```
+
+* File.Create方法
+
+  ```C#
+  string path = "";
+  FileStream fs = File.Create(path);
+  ```
+
+### （2）读写文本文件
+
+```C#
+//打开现有文本文件
+string path = @".txt";
+FileStream openFileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
+StreamReader sr = new StreamReader(openFileStream, Encoding.Default);
+richTextBox.Text = sr.ReadToEnd();
+sr.Close();
+openFileStream.Close();
+//创建文本文件
+string path = @".txt";
+FileStream openFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
+StreamWriter sw = new StreamReader(openFileStream, Encoding.Default);
+sw.write(richTextBox.Text);
+```
+
+## 6. 读写二进制文件
 
 
 
-
-
-
-
-
-
+## 7. 读写内存流
 
 
 
