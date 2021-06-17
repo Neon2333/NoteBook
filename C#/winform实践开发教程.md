@@ -215,13 +215,13 @@ private void Form_Load(object sender, EventArgs e){
     bt1.Text="button1";
     bt1.ToolTipText="button1 提示信息";
     bt2.Text="button1";
-    bt2.ToolTipText="button1 提示信息";
+    bt2.ToolTipText="button2 提示信息";
     bt3.Text="button1";
-    bt3.ToolTipText="button1 提示信息";
+    bt3.ToolTipText="button3 提示信息";
     bt4.Text="button1";
-    bt4.ToolTipText="button1 提示信息";
+    bt4.ToolTipText="button4 提示信息";
     bt5.Text="button1";
-    bt5.ToolTipText="button1 提示信息";
+    bt5.ToolTipText="button5 提示信息";
 }
 ```
 
@@ -235,8 +235,6 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 	this.toolStripProgressBar1.Value += this.toolStripProgressBar1.Step;
 }
 ```
-
-
 
 ## 7. numericUpDown——微调框
 
@@ -270,6 +268,8 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 
 ## 第三章	文件读写
 
+计算机上的文件基本上分为2种，文本文件（ASCII文件）和二进制文件，图形和程序都属于二进制文件。
+
 ## 1. System.IO命名空间常用的类
 
 > File——提供**文件**的打开、创建、删除、复制、移动的**静态**方法
@@ -293,7 +293,7 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 * File类的方法为静态方法，可直接使用。FileInfo需要创建实例关联文件，以实例调用方法。
 
 * File性能低，若要多次操作文件，使用FileInfo。
-* **FileStream和StreamWriter/StreamReader类使用完记得.Close()关闭流。**
+* **FileStream、StreamWriter/StreamReader、BinaryWriter/BinaryReader使用完记得.Close()关闭流。**
 
 ## 2. File类
 
@@ -350,9 +350,9 @@ bool flag = fileinfo.Exists;
 >
 > void Delete()——删除文件
 >
-> **FileInfo** copyTo(string destFileName)——拷贝
+> **FileInfo** copyTo(string targetFileName)——拷贝
 >
-> **FileInfo** MoveTo(string destFileName)——移动
+> **FileInfo** MoveTo(string targetFileName)——移动
 >
 > **StreamWriter** CreateText()——创建新文件，返回写入新文本文件的StreamWriter
 >
@@ -445,6 +445,8 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
 
 提供文件读写，必须要实例化对象后才可操作文件。
 
+用FileStream关联文件，再看具体是文本文件还是二进制文件。选择用StreamWriter或StreamReader读写文本。或BinaryWriter或BinaryReader读写二进制文件。
+
 ### （1）打开或创建
 
 * 构造
@@ -452,6 +454,7 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
   ```C#
   string path = "";
   FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Write, FileShare fileshare);
+  StreamWriter sw = new StreamWriter(fs, Encoding.Default);
   ```
 
   FileMode——打开文件的方式
@@ -502,9 +505,42 @@ sw.write(richTextBox.Text);
 
 ## 6. 读写二进制文件——读写图片等文件
 
+BinaryWriter
+
+BinaryReader
+
+### （1）构造
+
+构造必须要对FileStream对象上进行封装。
+
+```C#
+FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.ReadWrite);
+BinaryWriter bw = new BinaryWriter(fs);
+//BianryWriter bw = new BinaryWriter(File.Open(path, FileMode.OpenorCreate, FileAccess.ReadWrite));
+bw.Write(autoSaveTime);
+bw.Close();
+fs.Close();
+```
+
+### （2）写二进制文件
 
 
-## 7. 读写内存流
+
+## 8. 小结
+
+```C#
+string path = @"";
+//用FileStream关联文件，再依文件类型使用相应流封装文件流进行读写
+
+//使用FileInfo，若是文本文件可直接使用CreateText或OpenText，返回StreamWriter或StreamReader进行读写
+
+//若是二进制文件就饶了一个远路，再返回FileStream，再用Binary流封装进行读写
+
+```
 
 
+
+
+
+## 9. 读写内存流
 
