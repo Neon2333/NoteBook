@@ -522,9 +522,48 @@ bw.Close();
 fs.Close();
 ```
 
-### （2）写二进制文件
+### （2）读二进制文件
 
+```C#
+//从当前流中读取指定的字节数以写入字节数组中，并将当前位置前移相应的字节数
+public virtual byte[] binaryReader.ReadBytes(int len);
+```
 
+```c#
+FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Read);
+BinaryReader binaryReader = new BinaryReader(fs);
+byte[] fileBytes = binaryReader.ReadBytes((int)fs.Length)
+```
+
+### （3）写二进制文件
+
+```C#
+public virtual void Write(char[] chars, int index, int count);
+public virtual void Write(string value);
+public virtual void Write(float value);
+public virtual void Write(ulong value);
+public virtual void Write(long value);
+public virtual void Write(uint value);
+public virtual void Write(int value);
+public virtual void Write(ushort value);
+public virtual void Write(short value);
+public virtual void Write(byte[] buffer, int index, int count);
+public virtual void Write(double value);
+public virtual void Write(char[] chars);
+public virtual void Write(char ch);
+public virtual void Write(byte[] buffer);
+public virtual void Write(sbyte value);
+public virtual void Write(byte value);
+public virtual void Write(bool value);
+public virtual void Write(decimal value);
+```
+
+```c#
+byte[] fileBytes;
+binaryReader.Write(fileBytes);	//将二进制流fileBytes写入文件
+binaryReader.flush();
+binaryReader.Close();
+```
 
 ## 8. 小结
 
@@ -537,10 +576,6 @@ string path = @"";
 //若是二进制文件就饶了一个远路，再返回FileStream，再用Binary流封装进行读写
 
 ```
-
-
-
-
 
 ## 9. 读写内存流
 
