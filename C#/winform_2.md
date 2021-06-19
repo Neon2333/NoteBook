@@ -1157,12 +1157,6 @@ public partial class Form1 : Form
 
 https://blog.csdn.net/TimeFault/article/details/50206145
 
-### 按钮白边
-
-
-
-
-
 ## 19. 创建用户控件
 
 * 控件项目路径不能有#等非Unicode字符，否则`用户控件测试容器`无法启动

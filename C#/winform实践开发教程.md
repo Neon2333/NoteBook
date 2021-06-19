@@ -1,4 +1,4 @@
-# 第一章
+# 第一章	窗体
 
 1. P18将listbox的Items.Add放在Load事件中
 
@@ -264,9 +264,7 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 >
 > value——当前时间
 
-
-
-## 第三章	文件读写
+# 第三章	文件读写
 
 计算机上的文件基本上分为2种，文本文件（ASCII文件）和二进制文件，图形和程序都属于二进制文件。
 
@@ -312,6 +310,8 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 > **StreamWriter** CreateText(string path)——创建一个通过UTF-8写入的文件。返回StreamWriter
 >
 > **StreamReader** OpenText(string path)——打开UTF-8编码文件进行读取。返回StreamReader
+>
+> **SreamWriter** AppendText(string path)——通过StreamWriter将UTF-8文本添加到文件
 
 ```C#
 string file = @"C:\1.txt";
@@ -354,11 +354,11 @@ bool flag = fileinfo.Exists;
 >
 > **FileInfo** MoveTo(string targetFileName)——移动
 >
-> **StreamWriter** CreateText()——创建新文件，返回写入新文本文件的StreamWriter
+> **StreamWriter** CreateText()——**创建**新文件，返回写入新文本文件的StreamWriter
 >
-> **StreamWriter** AppendText()——向当前实例关联的文件中创建一个追加文本的StreamWriter
+> **StreamWriter** AppendText()——向当前实例关联的文件中创建一个**追加**文本的StreamWriter
 >
-> **StreamReader** OpenText()——创建从当前文件中以UTF-8读取字符的StreamReader
+> **StreamReader** OpenText()——创建从当前文件中以UTF-8**读取**字符的StreamReader
 
 ## 4. Directory类
 
@@ -374,7 +374,7 @@ bool flag = fileinfo.Exists;
 >
 > void Delete(string path)——删除指定目录
 >
-> void Move(string sourceDirName, string destDirName)——移动文件夹
+> void Move(string sourceDirName, string targetDirName)——移动文件夹
 >
 > string GetCurrentDirectory()——获取当前目录
 >
@@ -399,9 +399,9 @@ public void Main(){
     }
 }
 /**
-*           DateTime endTime = new DateTime(2016,4,10);
-            var startTime=DateTime.Now;
-            startTime.Subtract(endTime);	//时间差
+*            DateTime endTime = new DateTime(2016,4,10);
+*            var startTime=DateTime.Now;
+*            startTime.Subtract(endTime);	//时间差
 */
 ```
 
@@ -441,7 +441,7 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
 }
 ```
 
-## 5. FileStream类
+## 5. FileStream——文件流
 
 提供文件读写，必须要实例化对象后才可操作文件。
 
@@ -454,10 +454,10 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
   ```C#
   string path = "";
   FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Write, FileShare fileshare);
-  StreamWriter sw = new StreamWriter(fs, Encoding.Default);
+  StreamWriter sw = new StreamWriter(fs, Encoding.Default);	//StreamWriter和StreamReader要指定编码
   ```
 
-  FileMode——打开文件的方式
+  ### FileMode——打开文件的方式
 
   > Append——在现有文件后添加，与FileAccess.Write一起使用
   >
@@ -501,13 +501,15 @@ string path = @".txt";
 FileStream openFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
 StreamWriter sw = new StreamReader(openFileStream, Encoding.Default);
 sw.write(richTextBox.Text);
+sr.Close();
+openFileStream.Close();
 ```
 
-## 6. 读写二进制文件——读写图片等文件
+## 6.编写器、读取器——BinaryWriter/BinaryReader/StreamWriter/StreamReader
 
-BinaryWriter
+BinaryWriter、BinaryReader读写二进制文件（图片等文件）
 
-BinaryReader
+StreamWriter、StreamReader读写文本文件
 
 ### （1）构造
 
@@ -532,7 +534,7 @@ public virtual byte[] binaryReader.ReadBytes(int len);
 ```c#
 FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Read);
 BinaryReader binaryReader = new BinaryReader(fs);
-byte[] fileBytes = binaryReader.ReadBytes((int)fs.Length)
+byte[] fileBytes = binaryReader.ReadBytes((int)fs.Length)	//FileStream.Length获得文件大小字节数
 ```
 
 ### （3）写二进制文件
@@ -560,22 +562,159 @@ public virtual void Write(decimal value);
 
 ```c#
 byte[] fileBytes;
-binaryReader.Write(fileBytes);	//将二进制流fileBytes写入文件
-binaryReader.flush();
-binaryReader.Close();
+binaryweader.Write(fileBytes);	//将二进制流fileBytes写入文件
+binaryweader.flush();	//清理“编写器”的缓冲区，将数据写入基础设备
+binaryweader.Close();
 ```
 
 ## 8. 小结
 
+文件不存在
+
+> FileMode.Create
+>
+> FileAccess.Write
+>
+> File.CreateText
+>
+> StreamWriter
+
+文件已存在——有两种情况：读取或者在现有文件上追加内容
+
+​	读取
+
+> FileMode.Open
+>
+> FileAccess.Read
+>
+> File.OpenText
+>
+> StreamReader
+
+​	追加
+
+> FileMode.Append
+>
+> FileAccess.Write
+>
+> File.AppendText
+>
+> StreamWriter
+
 ```C#
 string path = @"";
-//用FileStream关联文件，再依文件类型使用相应流封装文件流进行读写
 
-//使用FileInfo，若是文本文件可直接使用CreateText或OpenText，返回StreamWriter或StreamReader进行读写
+/*用FileStream关联文件，再依文件类型使用相应的文本流或二进制流封装文件流进行读写*/
+FileStream fs1 = new FileStream(filepathTarget, FileMode.OpenorCreate ,FileAccess.ReadWrite);
+BinaryWrite bw = new BinaryWrite(fs1);
+FileStream fs2 = File.Open(filepathSource, FileMode.OpenorCreate ,FileAccess.ReadWrite);
+BinaryReader br = new BinaryReader(fs2);
+byte[] fileBytes = br.ReadBytes((int)fs2.Length);	//从filepathSource中读取二进制数据
+bw.Write(fileBytes);	//将二进制数据写入filepathTarget
+
+//使用FileInfo/File，若是文本文件可直接使用CreateText或OpenText，返回StreamWriter或StreamReader进行读写
+string content="hello world!";
+FileInfo fi = new FileInfo(filepath, FileMode.Append ,FileAccess.ReadWrite);	//文件已存在
+//StreamRriter sw = fi.OpenText();	//OpenText只能读取
+StreamWriter sw = fi.AppendText();
+sw.Write(content);
 
 //若是二进制文件就饶了一个远路，再返回FileStream，再用Binary流封装进行读写
 
 ```
 
-## 9. 读写内存流
+## 9. MemoryStream——读写内存流
+
+MemoryStream为系统内存提供流式的读写操作。常作为其他流数据交换时的中间对象操作。
+
+* MemoryStream类封装一个字节数组，即内存中一块连续区域（缓冲区Buffer），每个数组元素存储一个字节的数据。
+
+  在构造实例时可以使用一个字节数组作为参数，但是数组的长度无法调整。使用默认无参数构造函数创建实例，可以使用Write方法写入，随着字节数据的写入，数组的大小自动调整
+
+```C#
+//构造函数
+MemoryStream();	//buffer初始容量为0，但是可动态增长
+MemoryStream(byte[]);	//使用指定字节数组初始化内存流，字节数组长度固定了无法调整
+MemoryStream(byte[], Boolean);	//同上，多一个可设置CanWrite属性
+```
+
+* 在对MemoryStream类中数据流进行读取时，可以使用seek方法定位读取器的当前的位置，可以通过指定长度的数组一次性读取指定长度的数据。ReadByte方法每次读取一个字节，并将字节返回一个整数值。
+
+  MemoryStream继承自Stream类。内存流的好处是指针可以晃来晃去，也就是支CanSeek，Position,Seek()。任意读其中一段。
+
+  SeekOrigin
+
+  > Begin	指定流的开头
+  >
+  > Current	指定流的当前位置
+  >
+  > End	指定流的结尾
+
+* MemoryStream中没有任何非托管资源，所以它的Dispose不调用也没关系。托管资源.Net会自动回收
+
+### （1）属性
+
+> CanWrite 　　　 已重写。获取一个值，该值指示当前流是否支持写入
+>
+> CanRead 　　　　已重写。获取一个值，该值指示当前流是否支持读取
+>
+> CanSeek 　　　　已重写。获取一个值，该值指示当前流是否支持查找
+>
+> Capacity 　　　　获取或设置分配给该流的字节数。 这个是分配的字节数
+>
+> Length 　　　　 已重写。获取用字节表示的流长度。这个是真正占用的字节数
+>
+> Position 　　　　 已重写。获取或设置流中的当前位置。
+
+### （2）方法
+
+> void Write(byte[] buffer, int offset, int count)	已重写。 使用从缓冲区读取的数据将字节块写入当前流。
+>
+> int ReadByte()	已重写。 从当前流中读取一个字节。
+>
+> long Seek(long offset, SeekOrigin loc) 	已重写。 将当前流中的位置设置为指定值。起点loc，偏移量offset
+
+# 第七章 网络编程
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
