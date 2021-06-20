@@ -378,7 +378,7 @@ bool flag = fileinfo.Exists;
 >
 > string GetCurrentDirectory()——获取当前目录
 >
-> string[] GetFiles(string path)——获取目录中所有文件名（包含路径）
+> **string[] GetFiles(string path)**——获取目录中所有文件名（包含路径）
 >
 > DateTime GetCreationTime(string path)——获取路径的创建时间
 >
@@ -389,10 +389,10 @@ bool flag = fileinfo.Exists;
 ```C#
 public void Main(){
     try{
-        DateTime dt = Directory.GetCreateTionTime(Environment.CurrentDirectory);
-        if(DateTime.Now.Subtract(dt).TotalDays>365){
-            Console.WriteLine("this directory is over a year old..");
-        }
+        	DateTime dt = Directory.GetCreateTionTime(Environment.CurrentDirectory);
+        	if(DateTime.Now.Subtract(dt).TotalDays>365){
+            	Console.WriteLine("this directory is over a year old..");
+        	}
     }
     catch(Exception ex){
         ex.toString();
@@ -476,14 +476,14 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
   ```C#
   string path = "";
   FileStream fs;
-  fs = File.Open(path, FileMode.OpenorCreate, FileAccess.Write, FileShare fileshare);
+  fs = File.Open(path, FileMode.OpenorCreate, FileAccess.Read, FileShare fileshare);
   ```
 
 * File.Create方法
 
   ```C#
   string path = "";
-  FileStream fs = File.Create(path);
+  FileStream fs = File.Create(path, FileMode.Create, FileAccess.Write, FileShare fileshare);
   ```
 
 ### （2）读写文本文件
@@ -500,7 +500,7 @@ openFileStream.Close();
 string path = @".txt";
 FileStream openFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
 StreamWriter sw = new StreamReader(openFileStream, Encoding.Default);
-sw.write(richTextBox.Text);
+sw.write(richTextBox.Text);	//将richTextBox中的文本写入文件
 sr.Close();
 openFileStream.Close();
 ```
@@ -615,7 +615,7 @@ bw.Write(fileBytes);	//将二进制数据写入filepathTarget
 //使用FileInfo/File，若是文本文件可直接使用CreateText或OpenText，返回StreamWriter或StreamReader进行读写
 string content="hello world!";
 FileInfo fi = new FileInfo(filepath, FileMode.Append ,FileAccess.ReadWrite);	//文件已存在
-//StreamRriter sw = fi.OpenText();	//OpenText只能读取
+//StreamReader sw = fi.OpenText();	//OpenText只能读取
 StreamWriter sw = fi.AppendText();
 sw.Write(content);
 
@@ -640,7 +640,7 @@ MemoryStream(byte[], Boolean);	//同上，多一个可设置CanWrite属性
 
 * 在对MemoryStream类中数据流进行读取时，可以使用seek方法定位读取器的当前的位置，可以通过指定长度的数组一次性读取指定长度的数据。ReadByte方法每次读取一个字节，并将字节返回一个整数值。
 
-  MemoryStream继承自Stream类。内存流的好处是指针可以晃来晃去，也就是支CanSeek，Position,Seek()。任意读其中一段。
+  MemoryStream继承自Stream类。内存流的好处是指针可以晃来晃去，也就是支持CanSeek，Position,Seek()。任意读其中一段。
 
   SeekOrigin
 
