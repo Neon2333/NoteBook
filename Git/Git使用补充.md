@@ -68,15 +68,17 @@ https://blog.csdn.net/cnds123321/article/details/110731428
 
 ## 4. 版本回滚
 
+**本地版本回滚的关键在于，本地仓库的内容是否发生了改变，是否生成了新的版本号。**
+
 https://blog.csdn.net/chenpuzhen/article/details/92006378
 
 > **Workspace  ----add---->  暂存区  ----commit---->  本地仓库 ----push----> 远程仓库**
 >
-> **已add未commit：git reset HEAD** 或**git reset --hard**
+> 本地仓库被更新了，生成了新的版本号，回滚本地仓库：**git reset HEAD^或git reset 版本号**
 >
-> **已commit：git reset HEAD^或git reset 版本号**
-
-
+> 本地仓库未更新，未生成新的版本号。用本地仓库回滚暂存区：**git reset HEAD** 
+>
+> 本地仓库未更新，未生成新的版本号。用本地仓库回滚暂存区和WorkSpace：**git reset --hard**
 
 ### （1）已add未commit
 
