@@ -341,6 +341,8 @@ bool flag = fileinfo.Exists;
 > length——文件大小（字节为单位）long
 >
 > CreationTime——创建时间DateTime
+>
+> public string Extension {get, }——获取文件后缀的字符串
 
 ### （2）方法
 
@@ -441,7 +443,31 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
 }
 ```
 
-## 5. FileStream——文件流
+## 5. DirectoryInfo类
+
+公开用于创建、移动和枚举目录和子目录的**实例方法**。
+
+### （1）属性
+
+> CreationTime——获取/设置当前文件夹的创建时间
+>
+> CreationTimeUtc——获取/设置文件夹创建时间，为世界时格式
+>
+> Exists——文件夹是否存在
+>
+> public DirectoryInfo Parent {get, }——获取当前目录的父目录
+>
+> Name——返回目录名
+>
+> FullName——返回目录名完整路径
+>
+> Root——返回根目录
+
+### （2）方法
+
+
+
+## 6. FileStream——文件流
 
 提供文件读写，必须要实例化对象后才可操作文件。
 
@@ -505,7 +531,7 @@ sr.Close();
 openFileStream.Close();
 ```
 
-## 6.编写器、读取器——BinaryWriter/BinaryReader/StreamWriter/StreamReader
+## 7.编写器、读取器——BinaryWriter/BinaryReader/StreamWriter/StreamReader
 
 BinaryWriter、BinaryReader读写二进制文件（图片等文件）
 
