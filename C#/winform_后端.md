@@ -264,6 +264,93 @@ while (this.toolStripProgressBar1.Value != this.toolStripProgressBar1.Maximum)
 >
 > value——当前时间
 
+## 9. openFileDialog和saveFileDialog——文件读写对话框
+
+### （1）属性
+
+> FileName——第一个对话框中显示的文件，或用户选择的最后一个文件
+>
+> Title——将显示在对话框标题栏中的字符串
+>
+> InitialDirectory——对话框的初始目录
+>
+> Filter——对话框中显示的文件筛选器，例如"C#文件|*.cs|所有文件|*.*"
+>
+> DefaultExt——默认的扩展名，当用户键入文件名时，如果未指定扩展名，将在文件名后添加此扩展名
+>
+> Multiselect——控制是否可以在该对话框中选择多个文件
+
+### （2）事件
+
+> FileOk——当用户对话框单击"打开"或"保存"按钮是发生
+
+```C#
+private void FileOpen_Click(object sender, EventArgs e)
+ 2         {
+ 3             OpenFileDialog openFile = new OpenFileDialog();//创建OpenFileDialog对象
+ 4 
+ 5             openFile.InitialDirectory = @"E:\";//打开初始目录
+ 6             openFile.Title = "选择打开文件";//窗体标题
+ 7             openFile.Filter = "txt files (*.txt)|*.txt|All files (*.*)|*.*";//过滤条件
+ 8             openFile.FilterIndex = 2;//获取第二个过滤条件开始的文件
+ 9             openFile.Multiselect = true;//是否多选
+10 
+11             if (openFile.ShowDialog() == DialogResult.OK)//页面弹出判断是否点击确定按钮
+12             {
+13                 //没勾选多选时
+14                 //string filename = openFile.FileName;
+15                 //string name=openFile.SafeFileName; 
+16 
+17                 //勾选多选时
+18                 for (int i = 0; i < openFile.SafeFileNames.Length; i++)//获取文件名，拓展名
+19                 {
+20                     rictbo.Text += openFile.SafeFileNames[i] + "\r\n";
+21                 }
+22                 for (int i = 0; i < openFile.FileNames.Length; i++)//获取文件全部路径
+23                 {
+24                     rictbo.Text += openFile.FileNames[i] + "\r\n";
+25                 }
+26             }
+27         }
+```
+
+```C#
+public partial class FileDialogForm : Form
+{
+    public FileDialogForm()
+    {
+        InitializeComponent();
+    }
+    //打开文件
+    private void button1_Click(object sender, EventArgs e)
+    {
+        DialogResult dr = openFileDialog1.ShowDialog();
+        //获取所打开文件的文件名
+        string filename = openFileDialog1.FileName;
+        if(dr==System.Windows.Forms.DialogResult.OK && !string.IsNullOrEmpty(filename))
+        {
+            StreamReader sr = new StreamReader(filename);
+            textBox1.Text = sr.ReadToEnd();
+            sr.Close();
+        }
+    }
+    //保存文件
+    private void button2_Click(object sender, EventArgs e)
+    {
+        DialogResult dr = saveFileDialog1.ShowDialog();
+        string filename = saveFileDialog1.FileName;
+        if(dr==System.Windows.Forms.DialogResult.OK && !string.IsNullOrEmpty(filename))
+        {
+            StreamWriter sw = new StreamWriter(filename, true, Encoding.UTF8);
+            sw.Write(textBox1.Text);
+            sw.Close();
+        }
+    }
+}
+```
+
+
+
 # 第三章	文件读写
 
 计算机上的文件基本上分为2种，文本文件（ASCII文件）和二进制文件，图形和程序都属于二进制文件。
@@ -699,6 +786,46 @@ MemoryStream(byte[], Boolean);	//同上，多一个可设置CanWrite属性
 > int ReadByte()	已重写。 从当前流中读取一个字节。
 >
 > long Seek(long offset, SeekOrigin loc) 	已重写。 将当前流中的位置设置为指定值。起点loc，偏移量offset
+
+# 第四章 常用数据结构
+
+## 1. Queue
+
+### （1）方法
+
+> Enqueue():在队列的末端添加元素
+>
+> Dequeue():在队列的头部读取和删除一个元素，注意，这里读取元素的同时也删除了这个元素。如果队列中不再有任何元素。就抛出异常
+>
+> Count：返回队列中的元素个数
+>
+> Contains():确定某个元素是否在队列中
+>
+> Peek():在队列的头读取一个元素，但是不删除它
+>
+> ToArray():返回一个包含元素的新数组
+>
+> CopyTo():把元素队列复制到一个已有的数组中
+
+## 2. Stack
+
+### （1）方法
+
+> | 1    | **public virtual void Clear();** 从 Stack 中移除所有的元素。 |
+> | ---- | ------------------------------------------------------------ |
+> | 2    | **public virtual bool Contains( object obj );** 判断某个元素是否在 Stack 中。 |
+> | 3    | **public virtual object Peek();** 返回在 Stack 的顶部的对象，但不移除它。 |
+> | 4    | **public virtual object Pop();** 移除并返回在 Stack 的顶部的对象。 |
+> | 5    | **public virtual void Push( object obj );** 向 Stack 的顶部添加一个对象。 |
+> | 6    | **public virtual object[] ToArray();** 复制 Stack 到一个新的数组中。 |
+
+```C#
+Stack st = new Stack();
+st.Push('A');
+st.Push('M');        
+```
+
+
 
 # 第七章 网络编程
 
