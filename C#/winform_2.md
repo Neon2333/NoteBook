@@ -240,6 +240,18 @@ xml注释都在三个向前的斜线之后(///)，两条斜线表示是一个注
 
 >>>>>>> ac62793 (2021/6/9,winform笔记增加了注意点)
 
+### （8）char转数字
+
+```C#
+int i = 9;
+//char c = (char)i;
+//Console.WriteLine(c);
+char c = (char)(i+'0');//9+48 => '0':48
+Console.WriteLine(c);
+```
+
+
+
 ## 1. 窗体属性
 
 > Name：窗体名
@@ -278,7 +290,7 @@ xml注释都在三个向前的斜线之后(///)，两条斜线表示是一个注
 >
 > Opacity：透明度
 >
-> **StartPosition**：窗口启动时的位置
+> **StartPosition**：窗口启动时的位置（this.StartPosition = FormStartPosition.Manual）
 >
 > **FormBorderStyle**：窗体的边框和标题栏的的外观
 >
@@ -365,14 +377,14 @@ Application.Run(new Form1());
 
 ## 3. 窗体方法
 
-> | void Show()               | 显示窗体                 |
-> | ------------------------- | ------------------------ |
-> | **void Hide()**           | 隐藏窗体                 |
-> | DialogResult ShowDialog() | 以对话框模式显示窗体     |
-> | void CenterToParent()     | 使窗体在父窗体边界内居中 |
-> | void CenterToScreen()     | 使窗体在当前屏幕上居中   |
-> | void Activate()           | 激活窗体并给予它焦点     |
-> | void Close()              | 关闭窗体                 |
+> | void Show()               | 显示窗体                       |
+> | ------------------------- | ------------------------------ |
+> | **void Hide()**           | 隐藏窗体                       |
+> | DialogResult ShowDialog() | 以对话框模式显示窗体，模态窗体 |
+> | void CenterToParent()     | 使窗体在父窗体边界内居中       |
+> | void CenterToScreen()     | 使窗体在当前屏幕上居中         |
+> | void Activate()           | 激活窗体并给予它焦点           |
+> | void Close()              | 关闭窗体                       |
 
 ### （1）ShowDialog()和Show()的区别？
 
@@ -383,6 +395,13 @@ ShowDialog()显示的窗口是模态窗口，不能切换到其他窗口，ShowD
 ### （2）怎样将Hide的窗体重新显示？
 
 https://www.cnblogs.com/hexiaobao/p/7692790.html
+
+**Hide和Visible=false的区别是什么？**
+
+> 1、hide和.visible=false同是隐藏，hide之后是show,窗体当即可见，而visible的窗体即使＝true了，可能还被什么窗体挡住。
+>
+> 2、从语言方面来说有区别，HIDE是方法，VISIBLE是属性。
+> 不过从达到效果来说没有什么区别，都一样~
 
 ```C#
 //主窗口:
@@ -439,7 +458,7 @@ https://blog.csdn.net/po_xiao_/article/details/49758823
 
   （1）在Form3的关闭事件里
 
-  ```
+  ```C#
    private void Form3_FormClosed(object sender, FormClosedEventArgs e)
           {
               this.Dispose();
@@ -448,7 +467,7 @@ https://blog.csdn.net/po_xiao_/article/details/49758823
 
   （2）在Form3的关闭事件中将DialogResult设置为OK,在调用者里面判断后释放
 
-  ```
+  ```C#
   //这是Form3的事件 
   private void Form3_FormClosed(object sender, FormClosedEventArgs e)
           {
@@ -456,7 +475,7 @@ https://blog.csdn.net/po_xiao_/article/details/49758823
           }
   ```
 
-  ```
+  ```C#
    //这是Form2中调用private void button2_Click(object sender, EventArgs e)
           {
               Form3 fr3 = new Form3();
