@@ -1,4 +1,4 @@
-# 安装
+# 一、安装
 
 ## 1. 汉化
 
@@ -13,15 +13,51 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 
 ```
 
-
-
-# 属性优先级问题
-
+# 二、属性优先级
 
 
 
+# 三、窗体
 
-# 常用控件
+## 1. XtraForm
+
+*  XtraForm.FormBorderEffect设置边框被选中时发光或是阴影。ActiveGlowColor设定选中时边框的发光颜色，InactiveGlowColor设定未选中时边框的发光颜色。
+
+* Opacity设定窗体透明度
+
+* 
+
+  
+
+## 2. Ribbon Form
+
+### 1. 问题
+
+* 修改标题的[RibbonControl.ApplicationCaption](https://docs.devexpress.com/WindowsForms/DevExpress.XtraBars.Ribbon.RibbonControl.ApplicationCaption)和[RibbonControl.ApplicationDocumentCaption 两个属性不存在
+
+
+
+### 2. 注意
+
+* 2个标题字体可以分别使用`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaption.ForeColor`和`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaptionForeColor2`来设置，前者在AppearanceRibbon.FormCaption中，一个在AppearanceRibbon中。
+* 增加边框宽度的`WindowsFormsSettings.FormThickBorder`的WindowsFormsSettings找不到是什么？
+* Quick Access Toolbar 找不到在哪
+* StatusBar找不到
+* ribbon display mode selector找不到
+
+## 3. Tabbed Form
+
+怎么添加？？
+
+## 4. Fluent Design Form
+
+### 1. 属性
+
+> enableAcrylicAccent——鼠标在左侧element移动时有光效
+>
+> 
+
+# 四、常用控件
 
 ## 1. XtraEditors.TextEdit——文本框（TextBox）
 
@@ -70,7 +106,6 @@ AllowFocus——允许被focus，即鼠标点击时可选中，出现虚线选�
 > > WordWrap——是否换行
 > >
 > > Trimming——
->
 
 **LookAndFeel——**
 
@@ -217,7 +252,30 @@ private void simpleButton1_Click(object sender, EventArgs e)
 
 
 
-## 7. 
+## 7. XtraMessageBox——消息框
+
+代替普通messageBox，可以使用DevExpress skins。
+
+* 显示
+
+  DialogResult r = XtraMessageBox.Show();	//r是一个DialogResult类型枚举
+
+* 计时自动关闭
+
+  ```C#
+  XtraMessageBoxArgs args = new XtraMessageBoxArgs();
+  args.AutoCloseOptions.Delay = 5000; //计时单位ms
+  args.Caption = "Auto-close message";
+  args.Text = "This message closes automatically after 5 seconds.";
+  args.Buttons = new DialogResult[] { DialogResult.OK, DialogResult.Cancel };
+  XtraMessageBox.Show(args).ToString();	//XtraMessageBox.Show(XtraMessageBoxArgs) 
+  ```
+
+* 显示"do not ask again"复选框
+
+```C#
+args.DoNotShowAgainCheckBoxVisible = true;  //显示do not ask again
+```
 
 
 
