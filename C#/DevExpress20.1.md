@@ -46,17 +46,18 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 
 * add page/add page group/add item
 
-* 页面组成
 
-  backstageViewControl——在RibbonForm右上角三角形处`add backstage view`
+### 3. 页面组成
 
-  backstageViewClientControl——backstageViewControl右侧的空白部分 
+backstageViewControl——在RibbonForm右上角三角形处`add backstage view`
 
-  ribbon——RibbonForm上方的菜单栏和图标快捷方式
+backstageViewClientControl——backstageViewControl右侧的空白部分 
 
-  
+ribbon——RibbonForm上方的菜单栏和图标快捷方式
 
-  
+
+
+
 
 ## 3. Tabbed Form
 
