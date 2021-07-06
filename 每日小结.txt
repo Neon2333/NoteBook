@@ -168,3 +168,7 @@ pm：请假
 2021/7/3
 继续学习DevExpress，发现文档应该和版本契合，是20.1版本，并且在网页文档点击链接可以弹出demo应用。
 后续打算按照该demo应用写。
+
+2021/7/6
+按照svgImageBox中所给的demo应用，以后将模仿该demo的外观写。仍以普通Form作为mainform通过TAB弹出控件，弹出RibbonForm和fluentdesignForm时
+可以将所有的控件按钮事件copy过来，用更好的界面展示。
