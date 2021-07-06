@@ -43,8 +43,20 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 ### 2. 注意
 
 * 2个标题字体可以分别使用`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaption.ForeColor`和`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaptionForeColor2`来设置，前者在AppearanceRibbon.FormCaption中，一个在AppearanceRibbon中。
+
 * add page/add page group/add item
-* 
+
+* 页面组成
+
+  backstageViewControl——在RibbonForm右上角三角形处`add backstage view`
+
+  backstageViewClientControl——backstageViewControl右侧的空白部分 
+
+  ribbon——RibbonForm上方的菜单栏和图标快捷方式
+
+  
+
+  
 
 ## 3. Tabbed Form
 
