@@ -35,15 +35,16 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 
 * 修改标题的[RibbonControl.ApplicationCaption](https://docs.devexpress.com/WindowsForms/DevExpress.XtraBars.Ribbon.RibbonControl.ApplicationCaption)和[RibbonControl.ApplicationDocumentCaption 两个属性不存在
 
-
-
-### 2. 注意
-
-* 2个标题字体可以分别使用`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaption.ForeColor`和`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaptionForeColor2`来设置，前者在AppearanceRibbon.FormCaption中，一个在AppearanceRibbon中。
 * 增加边框宽度的`WindowsFormsSettings.FormThickBorder`的WindowsFormsSettings找不到是什么？
 * Quick Access Toolbar 找不到在哪
 * StatusBar找不到
 * ribbon display mode selector找不到
+
+### 2. 注意
+
+* 2个标题字体可以分别使用`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaption.ForeColor`和`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaptionForeColor2`来设置，前者在AppearanceRibbon.FormCaption中，一个在AppearanceRibbon中。
+* add page/add page group/add item
+* 
 
 ## 3. Tabbed Form
 
@@ -277,9 +278,80 @@ private void simpleButton1_Click(object sender, EventArgs e)
 args.DoNotShowAgainCheckBoxVisible = true;  //显示do not ask again
 ```
 
+* 自定义按钮Icon
+
+  上面用code添加的按钮都无icon。这里使用SvgImageCollection来存储图片，该控件可选择自带矢量图或导入。
+
+  ```C#
+  args.Showing += argsShowing;
+  
+  private void argsShowing(object sender, XtraMessageShowingArgs e)
+          {
+              foreach (var control in e.Form.Controls)
+              {
+                  SimpleButton button = control as SimpleButton;
+                  if (button != null)
+                  {
+                      button.ImageOptions.SvgImageSize = new Size(16, 16);	//设定按钮中icon的尺寸
+                      //button.Height = 25;
+                      switch (button.DialogResult.ToString())
+                      {
+                          case ("OK"):
+                              button.ImageOptions.SvgImage = svgImageCollection1[0];  //按钮图片
+                              break;
+                          case ("Cancel"):
+                              button.ImageOptions.SvgImage = svgImageCollection1[1];
+                              break;
+                          case ("Retry"):
+                              button.ImageOptions.SvgImage = svgImageCollection1[2];
+                              break;
+                      }
+                  }
+              }
+          }
+  
+  ```
+
+  
+
+## 8. XtraCharts——图表
 
 
 
+## 9. navBarControl——侧面按钮面板
+
+* add group
+* add item
+* add separator
+* run designer
+
+## 
+
+
+
+# 五、CommonControls
+
+## 1. SvgImageBox
+
+### （1）属性
+
+> SvgImage——图片
+>
+> Size——尺寸
+>
+> SizeMode——图片显示模式
+>
+> Location——位置
+>
+> TabIndex——Tab键选择的顺序
+>
+> OptionsSelection.Selection——
+>
+> OptionsSelection.UseCtrlToMultiSelect——
+>
+> ItemAppearance.Selected.BorderColor = System.Drawing.Color.Red;——选中时图片的边框的颜色
+>
+> ItemAppearance.Selected.FillColor = System.Drawing.Color.Lime;——选中时图片填充的颜色
 
 
 

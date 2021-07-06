@@ -750,3 +750,5 @@ https://blog.csdn.net/weixin_44228698/article/details/108524804
 
 * 类Interlocked
 
+# 4. 这么多种创建线程的方法该选哪种？
+
