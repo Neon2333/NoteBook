@@ -71,7 +71,11 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 >
 > 
 
-# 四、常用控件
+# 4. 官方Demo
+
+[官方Demo](dxdemo://Win/XtraEditors/MainDemo/SvgImageBox)
+
+# 5. 常用控件
 
 ## 1. XtraEditors.TextEdit——文本框（TextBox）
 
@@ -268,7 +272,7 @@ private void simpleButton1_Click(object sender, EventArgs e)
 
 ## 7. XtraMessageBox——消息框
 
-代替普通messageBox，可以使用DevExpress skins。
+Messages,Notification,Dialogs——代替普通messageBox，可以使用DevExpress skins。
 
 * 显示
 
@@ -331,7 +335,7 @@ args.DoNotShowAgainCheckBoxVisible = true;  //显示do not ask again
 
 
 
-## 9. navBarControl——侧面按钮面板
+## 9. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
 
 * add group
 * add item
@@ -342,29 +346,255 @@ args.DoNotShowAgainCheckBoxVisible = true;  //显示do not ask again
 
 
 
-# 五、CommonControls
+# 6. Common Controls
 
-## 1. SvgImageBox
+## 1. DevExpress.XtraEditors.SvgImageBox
+
+https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox?v=20.1
 
 ### （1）属性
 
-> SvgImage——图片
+> BackColor——设置背景颜色，设置Transparent时背景其实黑色。直接放在form上时默认白色，放进容器时背景默认transparent。
+>
+> **BackgroundImage——为啥设置背景图不显示？？？**
+>
+> Dock——锚定位置	
+>
+> ForeColor——**文本**的字体颜色（**怎么添加文本？？？**）
+>
+> **ItemHitTestType——图标选中是需要精确选中，还是选中边框即可**
+>
+> > Precious
+> >
+> > BoundingBox
+>
+> SvgImage——图片	
 >
 > Size——尺寸
 >
 > SizeMode——图片显示模式
 >
+> > Squeeze
+> >
+> > Clip
+> >
+> > Zoom
+>
 > Location——位置
+>
+> LookAndFeel——设置皮肤。皮肤会和初始的外观叠加，**改变图标的原本颜色**。未研究这种叠加会造成的效果，最好不修改皮肤。
 >
 > TabIndex——Tab键选择的顺序
 >
-> OptionsSelection.Selection——
+> OptionSelection
 >
-> OptionsSelection.UseCtrlToMultiSelect——
+> > **OptionsSelection.SelectionMode**——单选或多选
+> >
+> > OptionsSelection.UseCtrlToMultiSelect——
 >
-> ItemAppearance.Selected.BorderColor = System.Drawing.Color.Red;——选中时图片的边框的颜色
+> **ItemAppearance——设置所有Image element的默认外观**
 >
-> ItemAppearance.Selected.FillColor = System.Drawing.Color.Lime;——选中时图片填充的颜色
+> > Normal.FillColor = System.Drawing.Color.Lime;——设置**默认的**填充颜色
+> >
+> > Hovered.BorderColor = System.Drawing.Color.Red;——设置所有Image element的**悬停时**边框的颜色，Hovered的设定是针对每一个element的
+> >
+> > Selected.FillColor = System.Drawing.Color.Lime;——设置所有Image element**被选中时**填充的颜色，若图片由多个元素组成，需要分别选中
+>
+> **小三角Customize——自定义Image element外观等属性**
+>
+> > Appearance——进入Customize后，设置具体的某个Image element的外观，覆盖ItemAppearance设置的默认外观
+> >
+> > ID——默认是""
+> >
+> > Tag——默认是null
+
+### （2）自定义SvgImage
+
+Image的每一个元素都是SvgImageItem类型，由Group element和regular element组成，其中后者组成前者。若element是Group element，则SvgImageItem.IsGroup=true；
+
+* **初始时属性**设置
+
+  小三角处点击Customize，可访问SvgImageBox设计器。
+
+  可更改Normal/Hovered/Selected时的item的**Appearance**。
+
+* 代码设置**运行时**设置
+
+  ```C#
+  //RootItems访问Image element的根节点，可以是Group或regular，都可访问到
+  SvgImageBox.RootItems[0].Visible = false;
+  //若RootItems访问到的element是Grope element时，通过RootItems.Items访问Group内部元素
+  SvgImageBox.RootItems[0].Items[1].Visible = false;
+  ```
+
+  ```C#
+  svgImageBox5.RootItems[0].Items[1].Visible = false;
+  svgImageBox5.RootItems[0].Items[0].Appearance.Normal.FillColor = Color.Aqua;
+  ```
+
+  <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707095238262.png" alt="image-20210707095238262" style="zoom:50%;" />
+
+### （3）指定Image element
+
+* 查找Image element常用函数
+
+  ```C#
+  //通过ID查找，未找到时返回null
+  public SvgImageItem FindItemById(string id)
+  //通过tag查找，未找到时返回null
+  public SvgImageItem FindItemById(string id)
+  //通过委托方式遍历所有image element，返回一个item
+  public SvgImageItem FindItem(Predicate<SvgImageItem> predicate);
+  //通过委托凡是遍历所有image element，返回一个item集合items
+  //通过ForEach再遍历items中的所有item
+  public SvgImageItem FindItems(Predicate<SvgImageItem> predicate);
+  ```
+
+* 通过ID属性
+
+  ID属性为String类型，在尖括号中显示，<11>
+
+  ```C#
+  //遍历image element，找出所有Id="13"的item组成的集合
+  var itemsId = svgImageBox5.FindItems(item => item.Id != null && item.Id.Equals("13"));	//若不设置Id，则默认为null
+  itemsId.ForEach(item => item.Visible = false);
+  //已知遍历的结果只有一个element时
+  var itemId = svgImageBox5.FindItem(item => item.Id!=null && item.Id.Equals("13"));	//返回一个元素
+  ```
+
+  <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707103209367.png" alt="image-20210707103209367" style="zoom:50%;" />
+
+  
+
+* 通过Tag属性
+
+  Tag是object类型，所以在设置时可选择类型再设value
+
+  ```C#
+  //遍历image element，找出Tag="shining"的将其Appearan.Normal.FillColor设为DarkRed
+  var itemsTag = svgImageBox5.FindItems(item => item.Id != null && item.Tag.Equals("shining"));	//若不设置Tag，则默认为null
+  itemsTag.ForEach(item => item.Appearance.Normal.FillColor=Color.DarkRed);
+  ```
+
+  <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707105506023.png" alt="image-20210707105506023" style="zoom:50%;" /> 	
+
+  
+
+### （4）事件
+
+> [SvgImageBox.QueryHoveredItem](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.QueryHoveredItem?v=20.1) - 当您将鼠标光标移动到项目上时，允许您将自定义项目指定为“悬停”，而不管它们的可见性。例如，当您将鼠标悬停在组的项目上时，您可以将组指定为“悬停”。
+>
+> [SvgImageBox.ItemEnter](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.ItemEnter?v=20.1)——鼠标光标进入图形路径或边界矩形时触发。
+>
+> [SvgImageBox.ItemLeave](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.ItemLeave?v=20.1)——鼠标光标离开图形路径或边界矩形时触发。
+>
+> [SvgImageBox.ItemClick](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.ItemClick?v=20.1)——单击项目时触发。
+
+### （5）设定悬停效果
+
+默认不会突出悬停Hovered效果
+
+* 初始时属性中设置
+
+  ```C#
+  svgImageBox6.ItemAppearance.Hovered.BorderColor = Color.Red;	//设置的是每个item被鼠标划过时的悬停效果
+  ```
+
+  
+
+<img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707112600824.png" alt="image-20210707112600824" style="zoom:50%;" />
+
+* 使用`SvgImageBox.ItemHitTestType`属性指定鼠标选中时的精度要求。
+* 使用`SvgImageBox.HoveredItem`属性访问当前悬停的项目
+* 要判断item是否悬停，使用bool变量`SvgImageItem.Hovered`。 
 
 
+
+### （6）选中效果
+
+* SvgImageBox.OptionsSelection.SelectionMode——默认多选、可选择单选
+
+* 单击item时会被选中，但是默认没有选中效果
+
+  SvgImageBox.ItemAppearance.Selected设定被选中的item的外观变化
+
+* **选中相关属性**
+
+  > [SvgImageItem.Selected](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageItem.Selected?v=20.1) - 获取或设置项目是否被选中
+  >
+  > ```C#
+  > public bool Selected { get; set; }
+  > ```
+  >
+  > ```C#
+  > //将Id为0的item设为选中
+  > var itemsTag = svgImageBox6.FindItems(item => item.Id != null && item.Id.Equals("0"));
+  > itemsTag.ForEach(item => item.Selected=true);
+  > ```
+  >
+  > 
+  >
+  > 注意和ItemAppearance中的Selected区别
+
+  > SvgImageBox.Selection——返回被选中item的集合
+  >
+  > ```C#
+  >  foreach(var item in svgImageBox.Selection) {
+  >         string itemDisplayName = string.Format("Seat number: {0}", ((string)item.Tag).ToUpper()); 
+  >         selectedItemsListBox.Items.Add(itemDisplayName);
+  >     }
+  > ```
+  >
+  > 
+
+  > [SvgImageBox.Select](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Select(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 选择指定的item
+  >
+  > ```C#
+  > public void Select(SvgImageItem item)
+  > ```
+  >
+  > ```C#
+  > //通过Select(item)设定被选择的item
+  > var itemId = svgImageBox6.FindItem(item => item.Id != null && item.Id.Equals("1"));
+  > svgImageBox6.Select(itemId);
+  > ```
+
+  
+
+  > [SvgImageBox.Unselect](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Unselect(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 取消选择指定的item
+  >
+  > ```C#
+  > public void Unselect(SvgImageItem item)
+  > ```
+
+  > [SvgImageBox.SelectionChanged](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanged?v=20.1) - 通知事件，被选中的item改变时触发
+  >
+  > ```C#
+  > void OnSvgImageBoxSelectionChanged(object sender, EventArgs e) {
+  >     selectedItemsListBox.Items.Clear();
+  >     foreach(var item in svgImageBox.Selection) {
+  >         string itemDisplayName = string.Format("Seat number: {0}", ((string)item.Tag).ToUpper()); 
+  >         selectedItemsListBox.Items.Add(itemDisplayName);
+  >     }
+  > }
+  > ```
+
+  > 
+  >
+  > - [SvgImageBox.SelectionChanging](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanging?v=20.1) - 当项目选择即将改变时触发。允许您取消当前操作..
+
+  <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707145548942.png" alt="image-20210707145548942" style="zoom:50%;" />
+
+### （7）demo
+
+* SVG图片是SVG是一种图像[文件格式](https://baike.baidu.com/item/文件格式/6156907)，它的[英文](https://baike.baidu.com/item/英文/3079091)全称为Scalable Vector Graphics，意思为可缩放的[矢量图形](https://baike.baidu.com/item/矢量图形/1450649)，基于XML描述的图片，用户可以直接用[代码](https://baike.baidu.com/item/代码/86048)来描绘图像，可以用任何文字处理工具打开SVG图像。用来描述二维矢量及矢量/栅格图形。SVG提供了3种类型的图形对象：矢量图形（vectorgraphicshape例如：由直线和曲线组成的路径）、图象(image)、文本(text)。
+
+* 添加Svg资源
+
+  ImagePicker中Import，添加到Resource文件夹中。
+
+* 注意区分：SvgImageBox.ItemAppearance和item.Appearance
+
+```C#
+```
 
