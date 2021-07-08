@@ -5,13 +5,15 @@
 * TextEdit的高级模式找不到`UseAdvancedMode`属性
 * LabelControl.UseMnemonic属性设置后，无法使用ALT+助记键选中相应label
 
-
+---
 
 # 博客汇总
 
 https://zhuanlan.zhihu.com/p/34037924
 
-# 一、安装
+---
+
+# 安装
 
 ## 1. 汉化
 
@@ -26,11 +28,15 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 
 ```
 
-# 二、属性优先级
+---
+
+# 属性优先级
 
 
 
-# 三、窗体
+---
+
+# 窗体
 
 ## 1. XtraForm
 
@@ -38,13 +44,12 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 
 * Opacity设定窗体透明度
 
-* 
-
   
+
 
 ## 2. Ribbon Form
 
-### 1. 问题
+### （1）问题
 
 * 修改标题的[RibbonControl.ApplicationCaption](https://docs.devexpress.com/WindowsForms/DevExpress.XtraBars.Ribbon.RibbonControl.ApplicationCaption)和[RibbonControl.ApplicationDocumentCaption 两个属性不存在
 
@@ -53,14 +58,13 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 * StatusBar找不到
 * ribbon display mode selector找不到
 
-### 2. 注意
+### （2）注意
 
 * 2个标题字体可以分别使用`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaption.ForeColor`和`defaultBarAndDockingController1.Controller.AppearancesRibbon.FormCaptionForeColor2`来设置，前者在AppearanceRibbon.FormCaption中，一个在AppearanceRibbon中。
 
 * add page/add page group/add item
 
-
-### 3. 页面组成
+### （3）页面组成
 
 backstageViewControl——在RibbonForm右上角三角形处`add backstage view`
 
@@ -78,81 +82,26 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 
 ## 4. Fluent Design Form
 
-### 1. 属性
+### （1）属性
 
 > enableAcrylicAccent——鼠标在左侧element移动时有光效
 >
-> 
 
-# 4. 官方Demo
+
+
+---
+
+# 官方Demo
 
 [官方Demo](dxdemo://Win/XtraEditors/MainDemo/SvgImageBox)
 
-# 5. 常用控件
 
-## 1. XtraEditors.TextEdit——文本框（TextBox）
 
-### （1）属性
+---
 
-* EditValue——编辑文本。可选类型。
+#  常用控件
 
-  Text只能输入文本
-
-* Properties.Options下（[DevExpress.XtraEditors.Repository](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository)文本编辑控件都有的属性）
-
-  * [RepositoryItemTextEdit.CharacterCasing](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.CharacterCasing)——EditValue的大小写
-
-  * [RepositoryItemTextEdit.MaxLength](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.MaxLength)——指定用户输入时可以输入的最多字符数
-
-  * [RepositoryItem.NullText](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItem.NullText)——设置editor为空时默认显示的文本
-
-  * [RepositoryItemTextEdit.NullValuePrompt](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.NullValuePrompt)——设置editor为空时默认显示的文本
-
-    NullText和NullValuePrompt两者区别：
-
-  * ShowNullValuePrompt——显示NullText的情形
-  * UseSystemPasswordChar——是否使用密码形式
-
-* 不在Options中，直接使用代码指定
-
-  * [TextEdit.SelectionStart](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TextEdit.SelectionStart)——设置或获取被选择的字符的信息
-
-    ```C#
-    public int SelectionStart { get; set; }
-    ```
-
-  * TextEdit.SelectionLength——设置或获取被选择字符的长度
-
-  * TextEdit.SelectedText——设置或获取被选择的文本
-
-    ```C#
-     private void textEdit1_MouseClick(object sender, MouseEventArgs e)
-            {
-                //string str = textEdit1.SelectedText;
-                //MessageBox.Show(str);
-                textEdit1.SelectionStart = 1;
-                textEdit1.SelectionLength = 3;
-            }
-    ```
-
-### （2）方法
-
-* TextEdit.Copy——将被选中的文本拷贝到剪切板
-
-  ```C# 
-  public void Copy();
-  ```
-
-* TextEdit.Cut——剪切
-* TextEdit.Paste——黏贴
-
-### （3）高级模式（从V20.2开始才有）
-
-[高级模式](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.UseAdvancedMode)
-
-从 TextEdit 类派生的所有编辑器（除了[TokenEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TokenEdit)、[RepositoryItemHypertextLabel](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemHypertextLabel)和[HyperLinkEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.HyperLinkEdit)）都可以在高级模式下运行。在这种模式下，编辑器使用自定义 DevExpress 文本框而不是标准的 Windows 窗体屏蔽框。此自定义文本框支持独特的功能，例如嵌入式编辑器标签和自定义插入符号动画。
-
-## 2. XtraEditors.SimpleButton——按钮
+##  XtraEditors.SimpleButton——按钮
 
 **不支持添加背景图片backgroundimage，会被压在skin或Appearance后面。若想实现图片按钮，使用pictureEdit**
 
@@ -323,99 +272,167 @@ private void simpleButton1_Click(object sender, EventArgs e)
 
 
 
-## 3. XtraEditors.ComboBoxEditor——下拉框
+## XtraEditors.TextEdit——文本框（TextBox）
 
+### （1）属性
 
+* EditValue——编辑文本。可选类型。
 
-## 4. XtraEditors.CheckEdit——复选框
+  Text只能输入文本
 
+* Properties.Options下（[DevExpress.XtraEditors.Repository](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository)文本编辑控件都有的属性）
 
+  * [RepositoryItemTextEdit.CharacterCasing](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.CharacterCasing)——EditValue的大小写
 
-## 5. XtraEditors.TimeEdit——日期（DataTimePicker）
+  * [RepositoryItemTextEdit.MaxLength](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.MaxLength)——指定用户输入时可以输入的最多字符数
 
+  * [RepositoryItem.NullText](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItem.NullText)——设置editor为空时默认显示的文本
 
+  * [RepositoryItemTextEdit.NullValuePrompt](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.NullValuePrompt)——设置editor为空时默认显示的文本
 
-## 6. XtraBars.Navigation.TileBarItem.TileBarItem——
+    NullText和NullValuePrompt两者区别：
 
+  * ShowNullValuePrompt——显示NullText的情形
+  * UseSystemPasswordChar——是否使用密码形式
 
+* 不在Options中，直接使用代码指定
 
-## 7. XtraMessageBox——消息框
+  * [TextEdit.SelectionStart](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TextEdit.SelectionStart)——设置或获取被选择的字符的信息
 
-Messages,Notification,Dialogs——代替普通messageBox，可以使用DevExpress skins。
+    ```C#
+    public int SelectionStart { get; set; }
+    ```
 
-* 显示
+  * TextEdit.SelectionLength——设置或获取被选择字符的长度
 
-  DialogResult r = XtraMessageBox.Show();	//r是一个DialogResult类型枚举
+  * TextEdit.SelectedText——设置或获取被选择的文本
 
-* 计时自动关闭
+    ```C#
+     private void textEdit1_MouseClick(object sender, MouseEventArgs e)
+            {
+                //string str = textEdit1.SelectedText;
+                //MessageBox.Show(str);
+                textEdit1.SelectionStart = 1;
+                textEdit1.SelectionLength = 3;
+            }
+    ```
 
-  ```C#
-  XtraMessageBoxArgs args = new XtraMessageBoxArgs();
-  args.AutoCloseOptions.Delay = 5000; //计时单位ms
-  args.Caption = "Auto-close message";
-  args.Text = "This message closes automatically after 5 seconds.";
-  args.Buttons = new DialogResult[] { DialogResult.OK, DialogResult.Cancel };
-  XtraMessageBox.Show(args).ToString();	//XtraMessageBox.Show(XtraMessageBoxArgs) 
+### （2）方法
+
+* TextEdit.Copy——将被选中的文本拷贝到剪切板
+
+  ```C# 
+  public void Copy();
   ```
 
-* 显示"do not ask again"复选框
+* TextEdit.Cut——剪切
+* TextEdit.Paste——黏贴
+
+### （3）高级模式（从V20.2开始才有）
+
+[高级模式](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.UseAdvancedMode)
+
+从 TextEdit 类派生的所有编辑器（除了[TokenEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TokenEdit)、[RepositoryItemHypertextLabel](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemHypertextLabel)和[HyperLinkEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.HyperLinkEdit)）都可以在高级模式下运行。在这种模式下，编辑器使用自定义 DevExpress 文本框而不是标准的 Windows 窗体屏蔽框。此自定义文本框支持独特的功能，例如嵌入式编辑器标签和自定义插入符号动画。
+
+## [ PictureEdit](#jump1)
+
+
+
+##  [LabelControl](#jump2)
+
+##  XtraEditors.ComboBoxEditor——下拉框
+
+
+
+##  XtraEditors.CheckEdit——复选框
+
+
+
+## XtraEditors.TimeEdit——日期（DataTimePicker）
+
+
+
+## XtraBars.Navigation.TileBarItem.TileBarItem——
+
+
+
+## XtraMessageBox——消息框
+
+Messages,Notification,Dialogs——代替普通messageBox，可以使用DevExpress skins
+
+DialogResult r = XtraMessageBox.Show();	//r是一个DialogResult类型枚举
+
+### （1）属性
+
+
+
+### （2）计时自动关闭
+
+```C#
+XtraMessageBoxArgs args = new XtraMessageBoxArgs();
+args.AutoCloseOptions.Delay = 5000; //计时单位ms
+args.Caption = "Auto-close message";
+args.Text = "This message closes automatically after 5 seconds.";
+args.Buttons = new DialogResult[] { DialogResult.OK, DialogResult.Cancel };
+XtraMessageBox.Show(args).ToString();	//XtraMessageBox.Show(XtraMessageBoxArgs) 
+```
+
+### （3）显示"do not ask again"复选框
 
 ```C#
 args.DoNotShowAgainCheckBoxVisible = true;  //显示do not ask again
 ```
 
-* 自定义按钮Icon
+### （4）自定义按钮Icon
 
-  上面用code添加的按钮都无icon。这里使用SvgImageCollection来存储图片，该控件可选择自带矢量图或导入。
+上面用code添加的按钮都无icon。这里使用SvgImageCollection来存储图片，该控件可选择自带矢量图或导入。
 
-  ```C#
-  args.Showing += argsShowing;
-  
-  private void argsShowing(object sender, XtraMessageShowingArgs e)
-          {
-              foreach (var control in e.Form.Controls)
-              {
-                  SimpleButton button = control as SimpleButton;
-                  if (button != null)
-                  {
-                      button.ImageOptions.SvgImageSize = new Size(16, 16);	//设定按钮中icon的尺寸
-                      //button.Height = 25;
-                      switch (button.DialogResult.ToString())
-                      {
-                          case ("OK"):
-                              button.ImageOptions.SvgImage = svgImageCollection1[0];  //按钮图片
-                              break;
-                          case ("Cancel"):
-                              button.ImageOptions.SvgImage = svgImageCollection1[1];
-                              break;
-                          case ("Retry"):
-                              button.ImageOptions.SvgImage = svgImageCollection1[2];
-                              break;
-                      }
-                  }
-              }
-          }
-  
-  ```
+```C#
+args.Showing += argsShowing;
 
-  
+private void argsShowing(object sender, XtraMessageShowingArgs e)
+        {
+            foreach (var control in e.Form.Controls)
+            {
+                SimpleButton button = control as SimpleButton;
+                if (button != null)
+                {
+                    button.ImageOptions.SvgImageSize = new Size(16, 16);	//设定按钮中icon的尺寸
+                    //button.Height = 25;
+                    switch (button.DialogResult.ToString())
+                    {
+                        case ("OK"):
+                            button.ImageOptions.SvgImage = svgImageCollection1[0];  //按钮图片
+                            break;
+                        case ("Cancel"):
+                            button.ImageOptions.SvgImage = svgImageCollection1[1];
+                            break;
+                        case ("Retry"):
+                            button.ImageOptions.SvgImage = svgImageCollection1[2];
+                            break;
+                    }
+                }
+            }
+        }
 
-## 8. XtraCharts——图表
+```
 
 
 
-## 9. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
+## XtraCharts——图表
+
+
+
+## DevExpress.XtraNavBar.navBarControl——侧面按钮面板
 
 * add group
 * add item
 * add separator
 * run designer
 
-## 
+---
 
-
-
-# 6. Common Controls
+# Common Controls
 
 ## 1. DevExpress.XtraEditors.SvgImageBox
 
@@ -672,7 +689,7 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708092849542.png" alt="image-20210708092849542" style="zoom: 80%;" />
 
-## 2.  DevExpress.XtraEditors.PictureEdit——
+## <span id="jump1">2. DevExpress.XtraEditors.PictureEdit——</span>
 
 ### （1）属性
 
@@ -692,7 +709,7 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
   代码中：打开图片编辑器，使用[PictureEdit.ShowImageEditorDialog](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PictureEdit.ShowImageEditorDialog)
 
-* Properties.ShowCameraMenuItem——右键菜单是否显示`take picutre from camera`，允许最终用户从网络摄像头拍摄照片
+* Properties.ShowCameraMenuItem——右键菜单是否显示`take picutre from camera`，允许最终用户从`网络摄像头`拍摄照片
 
   > Auto——插入网络摄像头时自动显示按钮
   >
@@ -724,7 +741,7 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
 Properties.Options.OptionsMask.MaskType
 
-## 3. DevExpress.XtraEditors.LabelControl——标签
+## <span id="jump2">3. DevExpress.XtraEditors.LabelControl——标签</span>
 
 ### （1）属性
 
@@ -772,9 +789,59 @@ Properties.Options.OptionsMask.MaskType
   >
   > **UseMnemonic**——设为true时，可在Text中以&标记助记键。 ALT + 助记键会将焦点设置到 [Label](https://docs.microsoft.com/zh-cn/dotnet/api/system.windows.forms.label?view=net-5.0) tab 键顺序中跟随的控件（不知道为啥，ATL加助记键无效）
 
-  ### （2）事件
+### （2）事件
 
-  * HyperlinkClick——用户单击包含在当前LabelControl 中的超链接时触发
+* HyperlinkClick——用户单击包含在当前LabelControl 中的超链接时触发
 
-    
+## 4. XtraEditors.ListBoxControl
+
+填充来自data source的数据。
+
+默认将item呈现为String
+
+每个item都可以显示多个图片或文本，并设置为不同的外观和排版。
+
+### （1）属性
+
+* Items——ListBoxItem的集合，未绑定数据源时，使用索引增加、删除、访问元素
+
+> * 使用Items可访问**ListBoxItemCollection**对象
+>
+>   ```C#
+>   ListBoxControl.Items.ListBoxItemCollection	//item的集合
+>   ```
+
+* [BaseListBoxControl.DataSource](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.BaseListBoxControl.DataSource?v=20.1)——绑定数据源。绑定数据源后，Items集合为空。使用**GetItem**访问元素，返回数据源中的单个记录
+
+  > ```C#
+  > public object GetItem(int index)	//index从0开始
+  > ```
+  >
+  > * DataSource属性改变时，会触发**DataSourceChanged事件**
+  >
+  > * 
+  >
+  >   
+
+* MultiColumn——设置是否可以**多列**显示。若false，则item多到行数无法显示时，会出现**滑动条**。若true，则可多列显示
+
+  ![image-20210708234507974](https://i.loli.net/2021/07/08/OFlJgzWie5HtjRv.png)
+
+* SelectionMode——设置可同时选择**单个/多个**item
+
+  ```C#
+  public SelectionMode SelectionMode { get; set; }	//类型是SelectionMode枚举
+  ```
+
+  ![image-20210708234549790](https://i.loli.net/2021/07/08/t4k2B3eWfAZJ8X9.png)
+
+* ContextButtons——
+
+### （2）事件
+
+* SelectedIndexChanged——选择的item改变时触发
+
+  
+
+### （3）DataSource连接MySQL
 
