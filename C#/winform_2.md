@@ -2,6 +2,8 @@
 
 http://c.biancheng.net/csharp/winform/
 
+微软的.NET开发框架图形用户界面的一部分，该组件通过将**现有的Windows API（Win32 API）封装**为托管代码提供了对Windows本地（native）组件的访问方式
+
 winform窗体应用程序是事件驱动的。鼠标或键盘发出事件，通过窗体和控件的属性和响应相关事件完成业务逻辑。
 
 <<<<<<< HEAD

@@ -1,3 +1,16 @@
+
+
+# 问题总结
+
+* TextEdit的高级模式找不到`UseAdvancedMode`属性
+* LabelControl.UseMnemonic属性设置后，无法使用ALT+助记键选中相应label
+
+
+
+# 博客汇总
+
+https://zhuanlan.zhihu.com/p/34037924
+
 # 一、安装
 
 ## 1. 汉化
@@ -81,7 +94,63 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 
 ### （1）属性
 
+* EditValue——编辑文本。可选类型。
 
+  Text只能输入文本
+
+* Properties.Options下（[DevExpress.XtraEditors.Repository](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository)文本编辑控件都有的属性）
+
+  * [RepositoryItemTextEdit.CharacterCasing](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.CharacterCasing)——EditValue的大小写
+
+  * [RepositoryItemTextEdit.MaxLength](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.MaxLength)——指定用户输入时可以输入的最多字符数
+
+  * [RepositoryItem.NullText](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItem.NullText)——设置editor为空时默认显示的文本
+
+  * [RepositoryItemTextEdit.NullValuePrompt](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.NullValuePrompt)——设置editor为空时默认显示的文本
+
+    NullText和NullValuePrompt两者区别：
+
+  * ShowNullValuePrompt——显示NullText的情形
+  * UseSystemPasswordChar——是否使用密码形式
+
+* 不在Options中，直接使用代码指定
+
+  * [TextEdit.SelectionStart](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TextEdit.SelectionStart)——设置或获取被选择的字符的信息
+
+    ```C#
+    public int SelectionStart { get; set; }
+    ```
+
+  * TextEdit.SelectionLength——设置或获取被选择字符的长度
+
+  * TextEdit.SelectedText——设置或获取被选择的文本
+
+    ```C#
+     private void textEdit1_MouseClick(object sender, MouseEventArgs e)
+            {
+                //string str = textEdit1.SelectedText;
+                //MessageBox.Show(str);
+                textEdit1.SelectionStart = 1;
+                textEdit1.SelectionLength = 3;
+            }
+    ```
+
+### （2）方法
+
+* TextEdit.Copy——将被选中的文本拷贝到剪切板
+
+  ```C# 
+  public void Copy();
+  ```
+
+* TextEdit.Cut——剪切
+* TextEdit.Paste——黏贴
+
+### （3）高级模式（从V20.2开始才有）
+
+[高级模式](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.UseAdvancedMode)
+
+从 TextEdit 类派生的所有编辑器（除了[TokenEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TokenEdit)、[RepositoryItemHypertextLabel](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemHypertextLabel)和[HyperLinkEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.HyperLinkEdit)）都可以在高级模式下运行。在这种模式下，编辑器使用自定义 DevExpress 文本框而不是标准的 Windows 窗体屏蔽框。此自定义文本框支持独特的功能，例如嵌入式编辑器标签和自定义插入符号动画。
 
 ## 2. XtraEditors.SimpleButton——按钮
 
@@ -91,7 +160,7 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 
 AllowFocus——允许被focus，即鼠标点击时可选中，出现虚线选中框
 
-**Appearance——**
+**Appearance**
 
 > BackColor——当BackColor2为Color.Empty时，指定背景色。当BackColor2指定颜色时，背景色为渐变色，指定渐变的起始色
 >
@@ -448,6 +517,8 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   //通过委托凡是遍历所有image element，返回一个item集合items
   //通过ForEach再遍历items中的所有item
   public SvgImageItem FindItems(Predicate<SvgImageItem> predicate);
+  //返回符合指定条件的item的
+  public List<SvgImageItem> SvgImageItem.FindAncestors(Predicate<SvgImageItem>)
   ```
 
 * 通过ID属性
@@ -482,7 +553,7 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
 ### （4）事件
 
-> [SvgImageBox.QueryHoveredItem](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.QueryHoveredItem?v=20.1) - 当您将鼠标光标移动到项目上时，允许您将自定义项目指定为“悬停”，而不管它们的可见性。例如，当您将鼠标悬停在组的项目上时，您可以将组指定为“悬停”。
+> [SvgImageBox.QueryHoveredItem](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.QueryHoveredItem?v=20.1)——当您将鼠标光标移动到项目上时，允许您将自定义项目指定为“悬停”，而不管它们的Visibility。例如，当您将鼠标悬停在组的项目上时，您可以将组指定为“悬停”。
 >
 > [SvgImageBox.ItemEnter](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.ItemEnter?v=20.1)——鼠标光标进入图形路径或边界矩形时触发。
 >
@@ -596,5 +667,114 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 * 注意区分：SvgImageBox.ItemAppearance和item.Appearance
 
 ```C#
+
 ```
+
+<img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708092849542.png" alt="image-20210708092849542" style="zoom: 80%;" />
+
+## 2.  DevExpress.XtraEditors.PictureEdit——
+
+### （1）属性
+
+* Image/SvgImage——选择图片
+
+* Properties.SizeMode——显示方式：Zoom、Stretch等
+
+* Properties.PictureAlignment——图片显示位置
+
+* Properties.ShowMenu——**右键**时是否显示**菜单**（copy、paste、delete、cut、open）
+
+* Properties.ShowZoomSubMenu——右键菜单是否显示**放缩**按钮
+
+* Properties.ZoomingOperationMode——鼠标**滚轮**控制放缩
+
+* Properties.ShowEditMenuItem——右键菜单显示**编辑**按钮。打开`图片编辑器`。
+
+  代码中：打开图片编辑器，使用[PictureEdit.ShowImageEditorDialog](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PictureEdit.ShowImageEditorDialog)
+
+* Properties.ShowCameraMenuItem——右键菜单是否显示`take picutre from camera`，允许最终用户从网络摄像头拍摄照片
+
+  > Auto——插入网络摄像头时自动显示按钮
+  >
+  > Never——默认。永远不显示按钮
+  >
+  > Always——始终显示
+
+  代码中：**ShowTakePictureDialog**
+
+* Properties.Options.OptionsMask——掩膜
+
+  > MaskLayoutMode——在图片上的布局位置
+  >
+  > MaskType——设置是否有Mask以及Mask的形状
+  >
+  > Offset——在图片上的偏移
+  >
+  > Size——掩膜的尺寸，容纳的图片的像素数
+
+### （2）事件
+
+* LoadCompleted
+* TakePictureDialogShowing——当TakePictureDialog显示之前触发
+* TakePictureDialogClosed——当TakePictureDialog关闭时触发
+* ImageEditorDialogClosed——
+* ImageEditorDialogShowing——
+
+### （3）图像Mask
+
+Properties.Options.OptionsMask.MaskType
+
+## 3. DevExpress.XtraEditors.LabelControl——标签
+
+### （1）属性
+
+* AllowHTMLString——是否在Text中允许HTML格式文本。
+
+  HTML文本以LabelControl.HyperlinkClick事件响应，并设置事件函数。
+
+* AllowHmltextInToolTip——是否允许在ToolTip中显示Html文本
+
+* Appearance——默认情况的外观
+
+  > TextOptions
+  >
+  > > HAlignment——Text的水平位置。默认是Near
+  > >
+  > > VAlignment——Text的垂直位置。默认是Center
+
+* ImageAlignToText——Icon显示在文本的位置
+
+* ImageOptions——图片相关设置
+
+  > Alignment——图片位置（和ImageAlignToText有啥区别？？）
+  >
+  > HoveredImage——悬停时显示的图片
+  >
+  > PressedImage——按下时显示的图片
+  >
+  > Image——ImageList。以ImageIndex选择图片
+  >
+  > LineVisible——当LabelControl尺寸大于文本时，会在文本旁显示`线`
+  >
+  > > LineLocation——线的位置：Top、Center、Bottom。默认Center
+  > >
+  > > LineOrientation——线的方向：Vertical、Horizontal。默认Horizontal。
+  > >
+  > > LineStyle——线型
+  > >
+  > > LineColor——线颜色
+  >
+  > ToolTip——提示内容
+  >
+  > ToolTipIconType——提示内容的Icon
+  >
+  > ToolTipTitle——提示内容的标题
+  >
+  > **UseMnemonic**——设为true时，可在Text中以&标记助记键。 ALT + 助记键会将焦点设置到 [Label](https://docs.microsoft.com/zh-cn/dotnet/api/system.windows.forms.label?view=net-5.0) tab 键顺序中跟随的控件（不知道为啥，ATL加助记键无效）
+
+  ### （2）事件
+
+  * HyperlinkClick——用户单击包含在当前LabelControl 中的超链接时触发
+
+    
 
