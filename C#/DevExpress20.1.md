@@ -2,8 +2,12 @@
 
 # 问题总结
 
-* TextEdit的高级模式找不到`UseAdvancedMode`属性
-* LabelControl.UseMnemonic属性设置后，无法使用ALT+助记键选中相应label
+* 注意看designer.cs中的内容，了解代码形式怎么编写
+
+* TextEdit的高级模式找不到`UseAdvancedMode`属性——版本问题
+* LabelControl.UseMnemonic属性设置后，无法使用ALT+助记键选中相应label——
+* [ListBoxControl的ContextButtons属性怎么添加RatingContextButton？？](#jump_ContextButtons)
+* [ListBoxControl的动态指定模板怎么用？？？](#jump_模板)
 
 ---
 
@@ -85,7 +89,6 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 ### （1）属性
 
 > enableAcrylicAccent——鼠标在左侧element移动时有光效
->
 
 
 
@@ -689,6 +692,12 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210708092849542.png" alt="image-20210708092849542" style="zoom: 80%;" />
 
+
+
+
+
+
+
 ## <span id="jump1">2. DevExpress.XtraEditors.PictureEdit——</span>
 
 ### （1）属性
@@ -740,6 +749,10 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 ### （3）图像Mask
 
 Properties.Options.OptionsMask.MaskType
+
+
+
+
 
 ## <span id="jump2">3. DevExpress.XtraEditors.LabelControl——标签</span>
 
@@ -793,11 +806,15 @@ Properties.Options.OptionsMask.MaskType
 
 * HyperlinkClick——用户单击包含在当前LabelControl 中的超链接时触发
 
+
+
+
+
 ## 4. XtraEditors.ListBoxControl
 
-填充来自data source的数据。
+可填充来自data source的数据。
 
-默认将item呈现为String
+默认将item呈现为string
 
 每个item都可以显示多个图片或文本，并设置为不同的外观和排版。
 
@@ -835,13 +852,114 @@ Properties.Options.OptionsMask.MaskType
 
   ![image-20210708234549790](https://i.loli.net/2021/07/08/t4k2B3eWfAZJ8X9.png)
 
-* ContextButtons——
+* <span id="jump_ContextButtons">[ContextButtons](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.BaseListBoxControl.ContextButtons?v=20.1)——调用ContextButton管理器</span>
+
+  BaseListBoxControl.ContextButtonClick——以集中方式处理context button的单击
+
+  > [**RatingContextButton**](https://docs.devexpress.com/WindowsForms/DevExpress.Utils.RatingContextButton._members?v=20.1)——五角星评级
+  >
+  > * RatingContextButton.ItemCount——设定星的个数。默认5个
+  > * RatingContextButton.Rating——获取当前选择的等级
+  > * RatingContextButton.FillPrecision——可设置使用半整数。默认是整数
+
+* ContextButtonsOptions——ContextButtons设置
+
+* DataSource——绑定数据源
+
+* HighlightentedItemStyle——高亮item的风格：宽或窄
+
+* SortOrder——item的升序/降序
+* Templates——模板编辑器
 
 ### （2）事件
 
 * SelectedIndexChanged——选择的item改变时触发
 
+* BaseListBoxControl.ContextButtonClick
+
   
 
-### （3）DataSource连接MySQL
+### （3）DataSource绑定数据源
+
+
+
+#### <1> Access
+
+* accdb文件
+
+  
+
+#### <2>MySQL
+
+
+
+
+
+
+
+### （4）搜索、过滤器
+
+使用[SearchControl](#jump_SearchControl)——将ListBoxControl与之关联
+
+```C#
+SearchControl.Client = listBoxControl1;
+```
+
+![image-20210709103029462](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210709103029462.png)
+
+### （5）<span id="jump_模板">模板</span>
+
+* 当Templates非空时使用模板，要不使用模板，需清空Templates
+
+* 默认时，Templates的第一个模板被用于当前ListBox的**所有item**
+
+  可创建多个模板，分别用于**不同的item**。或通过**BaseListBoxControl.CustomItemTemplate事件**让不同情况下使用不同的模板
+
+  ```C#
+  //不同item指定不同模板
+  
+  //CustomItem.Template事件指定不同模板
+  ```
+
+  
+
+* 模板可用于ListBoxControl、CheckedListBoxControl和ImageListBoxControl
+
+* 若ListBoxControl绑定了DataSource，则**Columns**会显示数据源中所有可访问的字段以待使用
+
+  ![image-20210709105307844](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210709105307844.png)
+
+* **Elements**——用来显示添加到模板中的元素
+
+  可用加号添加，也可以直接从Columns中拖到下方的模板编辑中。
+
+  最好用**拖曳**的方法直接从Columns将需要的拖进模板编辑中，因为加号添加的时候都重叠在一个地方然后还要拖曳。
+
+  ![image-20210709105540061](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210709105540061.png)
+
+* Merge——合并单元格，Umerge——取消合并，Hide Grid——隐藏/取消隐藏网格线
+
+  右键添加/删除单元格
+
+  网格尺寸可以拖动改变
+
+  拖动多个element到同一个单元格时，会重叠，需要设置AnchorAlignment
+
+  ![image-20210709111239042](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210709111239042.png)
+
+  AnchorElement——AnchorAlignment的基准Element
+
+  ![image-20210709111348188](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210709111348188.png)
+
+  
+
+* 保存模板——BaseListBoxControl.CustomItemTemplate事件，动态使用不同模板
+
+  ![image-20210709105928924](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210709105928924.png)
+
+  
+
+## <span id="jump_SearchControl">SearchControl——搜索栏</span>
+
+### （1）属性
 
