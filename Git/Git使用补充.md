@@ -1,6 +1,20 @@
-# Git使用补充
+# Git日常使用
 
-## 1. 使用已有的rsa私钥在另一台电脑上使用已有远程仓库
+## 1. HEAD是什么？Origin是什么？master是什么？Branch是什么？git push -u中的u是什么？
+
+https://www.zhihu.com/question/20019419
+
+Branch——分支
+
+Origin——`origin` 指代的是当前的git服务器地址
+
+master——`master` 是 `Git` 为我们自动创建的第一个分支，也叫主分支，其它分支开发完成后都要合并到 `master`
+
+[HEAD](https://www.zsythink.net/archives/3412/)——指向**当前分支**的**最新提交**
+
+git push -u中u——使用一次`git push -u origin master`后，告知Git记忆相关参数，下次只需要`git push`即可。（用-u（--up-stream）来建立本地分支与远程某个分支的关联，形成一个管道，之后 git push可以直接沿着管道 到达关联的分支 无需在加-u参数了）
+
+## 2. 使用已有的rsa私钥在另一台电脑上使用已有远程仓库
 
 设置用户名： git config --global user.name taotaoo 
 
@@ -14,13 +28,13 @@
 
 将远程仓库clone下来，就可以提交修改了（clone别人的代码修改后无法提交，需要别人同意）
 
-## 2. git commit 时没写 -m 进入vim 模式的处理
+## 3. git commit 时没写 -m 进入vim 模式的处理
 
 进入的是vim模式，按下i进入Insert模式，输入message，在上方以黄色字体显示。按下ESC退出Insert模式，
 
 :wq保存。
 
-## 3. 查看文件的修改情况
+## 4. 查看文件的修改情况
 
 https://blog.csdn.net/cnds123321/article/details/110731428
 
@@ -66,7 +80,7 @@ https://blog.csdn.net/cnds123321/article/details/110731428
 
   功能1：会出现一个编辑器，然后可以修改上一次的提交信息，按键盘上的Insert键进行插入，修改完成后按Esc键并输入:wq保存退出 
 
-## 4. 版本回滚
+## 5. 版本回滚
 
 **本地版本回滚的关键在于，本地仓库的内容是否发生了改变，是否生成了新的版本号。**
 
@@ -108,7 +122,7 @@ git reset HEAD就是回退到当前版本——用本地仓库还原暂存区
 
 但是我不建议大家使用这个，因为这个杀伤力有点强。万一手残删掉了一些自己不想删的就没有后悔药了。所以慎用。
 
-## 5. 当远程仓库的代码已经修改，试图将这种修改拉取到本地
+## 6. 当远程仓库的代码已经修改，试图将这种修改拉取到本地
 
 当前文件夹已有.git，也有代码，只是代码落后于远程仓库。
 
@@ -116,7 +130,7 @@ git pull
 
 然后可以对代码进行编辑。编辑结束后git add `flename`、git commit -m "message"、git push filename。
 
-## 6.日常操作流程总结
+## 7.日常操作流程总结
 
 ### （1）直接从别人的项目里拷贝到文件夹里
 
@@ -152,9 +166,11 @@ git pull origin master:brantest
 git pull origin master
 ```
 
-### （3）将远程仓库中对代码的修改拉取到本地文件夹（已是项目文件夹，有.git文件夹）
+### （3）将服务器上的最新代码拉取到本地文件夹（已是项目文件夹，有.git文件夹）
 
 > git pull origin master
+
+**若本地代码被修改，但是未push到远程服务器。且在另一个主机上修改了服务器上代码。那么pull时，服务器上的改动和本地改动就会产生冲突。一般，git会自动合并冲突。但若涉及到同一行代码的改动，就需要手动合并代码**
 
 ### （4）本地修改代码后的一系列操作
 
@@ -178,6 +194,74 @@ git pull origin master
 
 
 
-## 7. HEAD是什么？Origin是什么？master是什么？Branch是什么？git push -u中的u是什么？
 
-https://www.zhihu.com/question/20019419
+
+## 8. 分支操作
+
+https://www.cnblogs.com/andydao/p/6808431.html
+
+### （1）新建分支
+
+```
+git branch daily/0.0.0	//新建日常开发分支daily/0.0.0
+```
+
+### （2）重命名分支
+
+```
+git branch daily/0.0.0 daily/1.0.0	//重命名分支daily/0.0.0为daily/1.0.0
+```
+
+### （3）删除分支
+
+```
+git branch -d daily/1.0.0	//删除分支daily/1.0.0
+```
+
+### （4）查看分支列表
+
+```
+git branch	//当前项目分支列表
+```
+
+```
+git branch -a	//查看本地仓库和远程仓库上所有分支列表
+git branch -r	//查看远程仓库所有分支列表
+git branch -r -d origin/branch-name		//查看并删除远程仓库上分支branch-name
+git branch -D	//分支未提交到本地版本库前强制删除分支
+bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交id、提交原因
+```
+
+### （5）切换分支
+
+切换分支，HEAD会改变指向
+
+```
+git checkout daily/1.0.0
+```
+
+## 9. push时的忽略文件
+
+```
+touch .gitignore	//创建.gitignore文件，编辑该文件，每行代表push时忽略不上传的文件
+```
+
+```
+//.gitignore
+1.md	//忽略1.md文件
+build/	//忽略build目录下的所有文件
+```
+
+## 10. tag
+
+当完成某项需求时，需要将代码打上一个版本tag，并push到线上。
+
+标签是用于标记特定的点或提交的历史，通常会用来标记**发布版本的名称或版本号**（如：`publish/0.0.1`），虽然标签看起来有点像分支，但打上标签的提交是**固定**的，不能随意的改动。
+
+```
+git tag publish/0.0.1	//给当前代码打上标签publish/0.0.1，表示当前代码以publish/0.0.1发布
+git push origin public/0.0.1	//推送到服务器
+```
+
+# Git高级功能
+
