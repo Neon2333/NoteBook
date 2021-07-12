@@ -1033,6 +1033,14 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SearchControl.Qu
 * CheckState——指定复选框的状态：**Unchecked**、**Checked**或**Indeterminate**枚举值
 * Checked——get/set，Checked状态
 
+```C#
+this.checkEdit42.Location = new System.Drawing.Point(401, 234);
+this.checkEdit42.Name = "checkEdit42";
+this.checkEdit42.Properties.Caption = "hide button";
+this.checkEdit42.Size = new System.Drawing.Size(106, 19);
+this.checkEdit42.TabIndex = 1;
+```
+
 
 
 ### （2）样式
