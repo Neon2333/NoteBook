@@ -5,9 +5,16 @@
 * 注意看designer.cs中的内容，了解代码形式怎么编写
 
 * TextEdit的高级模式找不到`UseAdvancedMode`属性——版本问题
+
 * LabelControl.UseMnemonic属性设置后，无法使用ALT+助记键选中相应label——
+
 * [ListBoxControl的ContextButtons属性怎么添加RatingContextButton？？](#jump_ContextButtons)
+
 * [ListBoxControl的动态指定模板怎么用？？？](#jump_模板)
+
+* [SearchControl搜索设定在某一行上搜索时。绑定的表格是什么控件？？？](#jump_QSearchControl)
+
+  ![image-20210712094824583](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712094824583.png)
 
 ---
 
@@ -29,7 +36,6 @@ https://www.devexpresscn.com/post/1081.html
 //汉化代码
 System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalization.CultureInfo("zh-Hans");
 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("zh-Hans");
-
 ```
 
 ---
@@ -104,7 +110,50 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 
 #  常用控件
 
-##  XtraEditors.SimpleButton——按钮
+## [1. XtraEditors.SimpleButton——按钮](#jump_SimpleButton)
+
+## [2. XtraEditors.MessageBox](#jump_MessageBox)
+
+## [3. XtraEditors.TextEdit——文本框（TextBox）](#jump_TextEdit)
+
+## [ 4. PictureEdit](#jump1)
+
+##  [5. LabelControl](#jump2)
+
+##  XtraEditors.ComboBoxEditor——下拉框
+
+
+
+##  XtraEditors.CheckEdit——复选框
+
+
+
+## XtraEditors.TimeEdit——日期
+
+
+
+## XtraBars.Navigation.TileBarItem.TileBarItem
+
+
+
+
+
+## XtraCharts——图表
+
+
+
+## DevExpress.XtraNavBar.navBarControl——侧面按钮面板
+
+* add group
+* add item
+* add separator
+* run designer
+
+---
+
+# Common Controls——通用控件
+
+##  <span id="jump_SimpleButton">1. XtraEditors.SimpleButton——按钮<span id="jump_SimpleButton">
 
 **不支持添加背景图片backgroundimage，会被压在skin或Appearance后面。若想实现图片按钮，使用pictureEdit**
 
@@ -275,91 +324,7 @@ private void simpleButton1_Click(object sender, EventArgs e)
 
 
 
-## XtraEditors.TextEdit——文本框（TextBox）
-
-### （1）属性
-
-* EditValue——编辑文本。可选类型。
-
-  Text只能输入文本
-
-* Properties.Options下（[DevExpress.XtraEditors.Repository](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository)文本编辑控件都有的属性）
-
-  * [RepositoryItemTextEdit.CharacterCasing](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.CharacterCasing)——EditValue的大小写
-
-  * [RepositoryItemTextEdit.MaxLength](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.MaxLength)——指定用户输入时可以输入的最多字符数
-
-  * [RepositoryItem.NullText](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItem.NullText)——设置editor为空时默认显示的文本
-
-  * [RepositoryItemTextEdit.NullValuePrompt](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.NullValuePrompt)——设置editor为空时默认显示的文本
-
-    NullText和NullValuePrompt两者区别：
-
-  * ShowNullValuePrompt——显示NullText的情形
-  * UseSystemPasswordChar——是否使用密码形式
-
-* 不在Options中，直接使用代码指定
-
-  * [TextEdit.SelectionStart](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TextEdit.SelectionStart)——设置或获取被选择的字符的信息
-
-    ```C#
-    public int SelectionStart { get; set; }
-    ```
-
-  * TextEdit.SelectionLength——设置或获取被选择字符的长度
-
-  * TextEdit.SelectedText——设置或获取被选择的文本
-
-    ```C#
-     private void textEdit1_MouseClick(object sender, MouseEventArgs e)
-            {
-                //string str = textEdit1.SelectedText;
-                //MessageBox.Show(str);
-                textEdit1.SelectionStart = 1;
-                textEdit1.SelectionLength = 3;
-            }
-    ```
-
-### （2）方法
-
-* TextEdit.Copy——将被选中的文本拷贝到剪切板
-
-  ```C# 
-  public void Copy();
-  ```
-
-* TextEdit.Cut——剪切
-* TextEdit.Paste——黏贴
-
-### （3）高级模式（从V20.2开始才有）
-
-[高级模式](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.UseAdvancedMode)
-
-从 TextEdit 类派生的所有编辑器（除了[TokenEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TokenEdit)、[RepositoryItemHypertextLabel](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemHypertextLabel)和[HyperLinkEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.HyperLinkEdit)）都可以在高级模式下运行。在这种模式下，编辑器使用自定义 DevExpress 文本框而不是标准的 Windows 窗体屏蔽框。此自定义文本框支持独特的功能，例如嵌入式编辑器标签和自定义插入符号动画。
-
-## [ PictureEdit](#jump1)
-
-
-
-##  [LabelControl](#jump2)
-
-##  XtraEditors.ComboBoxEditor——下拉框
-
-
-
-##  XtraEditors.CheckEdit——复选框
-
-
-
-## XtraEditors.TimeEdit——日期（DataTimePicker）
-
-
-
-## XtraBars.Navigation.TileBarItem.TileBarItem——
-
-
-
-## XtraMessageBox——消息框
+## <span id="jump_MessageBox">2. XtraMessageBox——消息框<span id="jump_MessageBox">
 
 Messages,Notification,Dialogs——代替普通messageBox，可以使用DevExpress skins
 
@@ -420,24 +385,73 @@ private void argsShowing(object sender, XtraMessageShowingArgs e)
 
 ```
 
+## <span id="jump_TextBox">3. XtraEditors.TextEdit——文本框（TextBox）</span>
+
+### （1）属性
+
+* EditValue——编辑文本。可选类型。
+
+  Text只能输入文本
+
+* Properties.Options下（[DevExpress.XtraEditors.Repository](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository)文本编辑控件都有的属性）
+
+  * [RepositoryItemTextEdit.CharacterCasing](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.CharacterCasing)——EditValue的大小写
+
+  * [RepositoryItemTextEdit.MaxLength](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.MaxLength)——指定用户输入时可以输入的最多字符数
+
+  * [RepositoryItem.NullText](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItem.NullText)——设置editor为空时默认显示的文本
+
+  * [RepositoryItemTextEdit.NullValuePrompt](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.NullValuePrompt)——设置editor为空时默认显示的文本
+
+    NullText和NullValuePrompt两者区别：
+
+  * ShowNullValuePrompt——显示NullText的情形
+
+  * UseSystemPasswordChar——是否使用密码形式
+
+* 不在Options中，直接使用代码指定
+
+  * [TextEdit.SelectionStart](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TextEdit.SelectionStart)——设置或获取被选择的字符的信息
+
+    ```C#
+    public int SelectionStart { get; set; }
+    ```
+
+  * TextEdit.SelectionLength——设置或获取被选择字符的长度
+
+  * TextEdit.SelectedText——设置或获取被选择的文本
+
+    ```C#
+     private void textEdit1_MouseClick(object sender, MouseEventArgs e)
+            {
+                //string str = textEdit1.SelectedText;
+                //MessageBox.Show(str);
+                textEdit1.SelectionStart = 1;
+                textEdit1.SelectionLength = 3;
+            }
+    ```
+
+### （2）方法
+
+* TextEdit.Copy——将被选中的文本拷贝到剪切板
+
+  ```C# 
+  public void Copy();
+  ```
+
+* TextEdit.Cut——剪切
+
+* TextEdit.Paste——黏贴
+
+### （3）高级模式（从V20.2开始才有）
+
+[高级模式](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemTextEdit.UseAdvancedMode)
+
+从 TextEdit 类派生的所有编辑器（除了[TokenEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TokenEdit)、[RepositoryItemHypertextLabel](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.Repository.RepositoryItemHypertextLabel)和[HyperLinkEdit](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.HyperLinkEdit)）都可以在高级模式下运行。在这种模式下，编辑器使用自定义 DevExpress 文本框而不是标准的 Windows 窗体屏蔽框。此自定义文本框支持独特的功能，例如嵌入式编辑器标签和自定义插入符号动画。
 
 
-## XtraCharts——图表
 
-
-
-## DevExpress.XtraNavBar.navBarControl——侧面按钮面板
-
-* add group
-* add item
-* add separator
-* run designer
-
----
-
-# Common Controls
-
-## 1. DevExpress.XtraEditors.SvgImageBox
+## 4. DevExpress.XtraEditors.SvgImageBox——SVG图片框（ICON）
 
 https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox?v=20.1
 
@@ -674,7 +688,7 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   >
   > - [SvgImageBox.SelectionChanging](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanging?v=20.1) - 当项目选择即将改变时触发。允许您取消当前操作..
 
-  <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707145548942.png" alt="image-20210707145548942" style="zoom:50%;" />
+  <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707145548942.png" alt="image-20210707145548942" style="zoom:70%;" />
 
 ### （7）demo
 
@@ -694,11 +708,7 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
 
 
-
-
-
-
-## <span id="jump1">2. DevExpress.XtraEditors.PictureEdit——</span>
+## <span id="jump1">5. DevExpress.XtraEditors.PictureEdit——图片框</span>
 
 ### （1）属性
 
@@ -748,13 +758,13 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
 ### （3）图像Mask
 
-Properties.Options.OptionsMask.MaskType
+Properties.Options.OptionsMask.MaskType——Mask的形状
+
+![image-20210712101917104](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712101917104.png)
 
 
 
-
-
-## <span id="jump2">3. DevExpress.XtraEditors.LabelControl——标签</span>
+## <span id="jump2">6. DevExpress.XtraEditors.LabelControl——标签</span>
 
 ### （1）属性
 
@@ -810,7 +820,7 @@ Properties.Options.OptionsMask.MaskType
 
 
 
-## 4. XtraEditors.ListBoxControl
+## 7. XtraEditors.ListBoxControl——列表框
 
 可填充来自data source的数据。
 
@@ -881,13 +891,11 @@ Properties.Options.OptionsMask.MaskType
 
 ### （3）DataSource绑定数据源
 
-
-
 #### <1> Access
 
-* accdb文件
+![image-20210712084354760](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712084354760.png)
 
-  
+
 
 #### <2>MySQL
 
@@ -933,9 +941,15 @@ SearchControl.Client = listBoxControl1;
 
   可用加号添加，也可以直接从Columns中拖到下方的模板编辑中。
 
-  最好用**拖曳**的方法直接从Columns将需要的拖进模板编辑中，因为加号添加的时候都重叠在一个地方然后还要拖曳。
+  数据源中有的字段用**拖曳**的方法直接从Columns将需要的拖进模板编辑中，因为加号添加的时候都重叠在一个地方然后还要拖曳。
 
   ![image-20210709105540061](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210709105540061.png)
+
+  添加数据源中没有的字段，用添加的方法
+
+  ![image-20210712094554107](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712094554107.png)
+
+  ![image-20210712094930196](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712094930196.png)
 
 * Merge——合并单元格，Umerge——取消合并，Hide Grid——隐藏/取消隐藏网格线
 
@@ -959,7 +973,146 @@ SearchControl.Client = listBoxControl1;
 
   
 
-## <span id="jump_SearchControl">SearchControl——搜索栏</span>
+## <span id="jump_SearchControl">8. SearchControl——搜索栏</span>
+
+搜索框，过滤数据
 
 ### （1）属性
+
+* SearchControl.Client——绑定要过滤数据的控件
+
+* Properties.Options.AllowAutoApply——false为按下Enter后才触发搜索
+
+* Search.Properties.Options.FindDelay——在非自动搜索的情况下，设置延迟搜索
+
+* ShowDefaultButtonsMode——搜索按钮、清除按钮的显示模式
+
+  > AutoChangeSearchToClear/Default——搜索框无文本时显示搜索按钮，有文本时显示清除按钮
+  >
+  > AutoShowClear——搜索按钮一直显示。当搜索框有文本时显示清除按钮
+  >
+  > Always——两个按钮都一直显示
+
+* ShowMRUButton——搜索历史按钮
+* NullValuePrompt——搜索框中显示提示信息（按下Enter，当前文本添加进提示信息）
+
+### （2）<span id="jump_QSearchControl">事件</span>
+
+https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SearchControl.QueryIsSearchColumn
+
+* SearchControl.QueryIsSearchColumn——设定在某一行进行搜索
+
+  每列都会触发
+
+  读取Caption获得列标题，FieldName获取字段名，DataType获取数据类型
+
+  设置IsSearchColumn=false，设置某列不在搜索范围，从而设定在搜索范围内的列
+
+  ```C#
+  private void searchControl1_QueryIsSearchColumn(object sender, QueryIsSearchColumnEventArgs args) {
+      if (args.FieldName != "ShipCountry")
+          args.IsSearchColumn = false;    
+  }
+  ```
+
+  
+
+## 
+
+
+
+##  9. XtraEditors.ComboBoxEditor——下拉框
+
+
+
+##  10. XtraEditors.CheckEdit——复选框
+
+### （1）属性
+
+* Properties.Options.AllowGrayed——是否显示不确定框Indeterminate
+* CheckState——指定复选框的状态：**Unchecked**、**Checked**或**Indeterminate**枚举值
+* Checked——get/set，Checked状态
+
+
+
+### （2）样式
+
+* Properties.Options.CheckBoxOptions.Style——设置样式
+
+  ![image-20210712105117045](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712105117045.png)
+
+> Custom——自定义。通过ImageOptions设置Checked/Unchecked的**图片、图片大小**。
+
+
+
+* Style是Svg时
+
+  ![image-20210712112839952](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712112839952.png)
+
+  Properties.CheckBoxOptions——用于在相应状态中绘制矢量字形的颜色、尺寸（Style是Svg是前提）
+
+  > **SvgColorUnchecked**
+  >
+  > **SvgColorChecked**
+  >
+  > **SvgColorGrayed**
+  >
+  > **SvgImageSize——默认18*18**
+
+  ```C#
+  	private void checkEdit43_CheckStateChanged(object sender, EventArgs e)
+          {
+              if (this.checkEdit43.Checked == true)
+              {
+                  this.checkEdit43.Properties.CheckBoxOptions.SvgImageSize = new Size(50,50);
+              }
+              else
+              {
+                  this.checkEdit43.Properties.CheckBoxOptions.SvgImageSize = new Size(16, 16);    //svg默认大小16*16
+  
+              }
+          }
+  ```
+
+  ![image-20210712114245025](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712114245025.png)
+
+  ![image-20210712114305519](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712114305519.png)
+
+  
+
+* 复选框根据当前应用的皮肤和调色板呈现
+
+  ![image-20210712105157956](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712105157956.png)
+
+* GlyphAlignment——设定文字和框的相对位置
+
+![image-20210712111437657](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712111437657.png)
+
+## 11. CheckedListBoxControl——复选框列表
+
+
+
+## 12. XtraEditors.TimeEdit——日期（DataTimePicker）
+
+
+
+## 13. XtraBars.Navigation.TileBarItem.TileBarItem——
+
+
+
+## 14. XtraCharts——图表
+
+
+
+## 15. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
+
+
+
+
+
+---
+
+# Navigation & Layout——容器
+
+## 1. Panel
 
