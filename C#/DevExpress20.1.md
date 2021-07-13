@@ -16,6 +16,14 @@
 
   ![image-20210712094824583](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712094824583.png)
 
+* 怎么给template添加图片？？（CheckListBoxControl）
+
+  ![image-20210713095400589](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210713095400589.png)
+
+  ![image-20210713095443021](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210713095443021.png)
+
+* TimeEdit和TimeSpanEdit的DisplayFormat和Mask
+
 ---
 
 # 博客汇总
@@ -1017,15 +1025,7 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SearchControl.Qu
 
   
 
-## 
-
-
-
-##  9. XtraEditors.ComboBoxEditor——下拉框
-
-
-
-##  10. XtraEditors.CheckEdit——复选框
+##  9. XtraEditors.CheckEdit——复选框
 
 ### （1）属性
 
@@ -1096,23 +1096,190 @@ this.checkEdit42.TabIndex = 1;
 
 ![image-20210712111437657](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712111437657.png)
 
-## 11. CheckedListBoxControl——复选框列表
+## 10. CheckedListBoxControl——复选框列表
+
+### （1）属性
+
+> BaseCheckedListBoxControl.Items - 允许您在未绑定模式下使用项目填充控件。
+> BaseListBoxControl.DataSource - 使用此属性可使用数据源中的项目填充控件。
+> BaseListBoxControl.Templates - 此属性支持项模板功能。请参阅模板化列表框项目以了解更多信息。
+> BaseListBoxControl.CustomizeItem - 允许您动态自定义模板化项目。
+> BaseListBoxControl.CustomItemTemplate - 允许您为列表框项目提供自定义模板。
+> BaseListBoxControl.ValueMember - 获取或设置绑定数据源中的字段名称，其内容分配给项目值。
+> BaseListBoxControl.DisplayMember - 获取或设置为列表框项提供显示文本的数据源字段的名称。当列表框项基于项模板呈现时，不支持此属性
+> BaseListBoxControl.MultiColumn - 获取或设置列表框项是否可以跨多列排列。
+> BaseListBoxControl.SelectionMode - 获取或设置是可以选择单个还是多个项目。
+> BaseListBoxControl.ContextButtons - 提供对控件中显示的上下文按钮集合的访问。
+> BaseListBoxControl.SelectedIndexChanged - 允许您响应项目选择。
+> BaseListBoxControl.ItemHeight - 获取或设置项目的高度。
+> BaseCheckedListBoxControl.GetItemEnabled - 使您能够在绑定模式下禁用特定项目。
+
+### （2）事件
+
+* [BaseListBoxControl.SelectedIndexChanged](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.BaseListBoxControl.SelectedIndexChanged?v=20.1) - 允许您响应项目选择
+* [BaseCheckedListBoxControl.GetItemEnabled](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.BaseCheckedListBoxControl.GetItemEnabled?v=20.1) - 使您能够在绑定模式下禁用特定项目
+
+### （3）热跟踪
+
+* HotTrackItems——设置为true，有热跟踪效果
+
+* 无法在SelectedMode=multi时使用
+
+  ![image-20210713094138292](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210713094138292.png)
+
+* HotTrackSelectMode——
+
+  > SelectItemOnClick——虽然有热跟踪，但是高亮框需要Click才选中
+  >
+  > SelectItemOnHotTrack——热跟踪，高亮框跟着鼠标走
+  >
+  > SelectItemOnHotTrackEx
+
+### （4）API
 
 
 
-## 12. XtraEditors.TimeEdit——日期（DataTimePicker）
+##  11. XtraEditors.ComboBoxEditor——下拉框
+
+### （1）属性
+
+* TextEditStyle——是否可编辑文本
+
+* Properties.Items——集合可以是任何类型的。如果项目是**字符串**类型，则项目值和显示文本匹配。在其他情况下，项目的显示文本由项目的**ToString**方法确定
+
+* RepositoryItemComboBox.AutoComplete——true时可输入字符串前几个字符来自动补全字符串。默认为true
+
+* RepositoryItemComboBox.CycleOnDblClick——
+
+* ComboBoxEdit.SelectedIndex——获取/设置选择item的index
+
+  ```C#
+  public virtual int SelectedIndex { get; set; }
+  ```
+
+* ComboBoxEdit.SelectedItem——当选中某个项目时，将选中item分配给SelectedItem
+* 
+
+## 12. CheckedComboBoxEdit——
 
 
 
-## 13. XtraBars.Navigation.TileBarItem.TileBarItem——
+## 13. ImageComboBoxEdit——ComboxBoxEdit可以显示图标
+
+### （1）属性
+
+* Items——ImageComboBoxItem类型
+
+  > Description——文本
+  >
+  > ImageIndex——图片集合的序号
+
+* 图片集合支持
+
+> ImageCollection——支持图片透明度
+>
+> SharedImageCollection——支持图片透明度，可在多个form的控件之间共享图像
+>
+> SvgImageCollection——存储可在高分辨率设备上放缩的Svg图片
+>
+> ImageList﻿
+
+* LargeImages——下拉框显示的图片
+* SmallImages——编辑框中显示的图片
+
+## 14. XtraEditors.TimeEdit——日期（DataTimePicker）
+
+### （1）属性
+
+> Properties.SpinStyle——时间编辑按钮是横向还是竖向
+>
+> Properties.TimeEditStyle——选择触控UI模式
+>
+> ![image-20210713143731860](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210713143731860.png)
+>
+> Time——编辑时间
+>
+> ```C# 
+> public virtual DateTime Time { get; set; }
+> ```
+>
+> **DisplayFormat**——
+>
+> > FormatString——
+> >
+> > FormatType——
 
 
 
-## 14. XtraCharts——图表
+### （2）代码中设定时间
+
+* Time属性
+
+  ```C#
+   public Control_TimeEdit()
+          {
+              InitializeComponent();
+  
+              this.timeEdit4.Time = new DateTime(2021, 7, 13, 10, 30, 25, 670);
+          }
+  ```
+
+### （3）时间显示格式——修改Mask
+
+![image-20210713135016279](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210713135016279.png)
+
+![image-20210713140001508](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210713140001508.png)
+
+**若要在TextEdit中显示日期，也是使用Mask设置显示。**
+
+### （4）TimeSpanEdit——时间跨度编辑
+
+* ReadOnly——设置只读
+
+```C#
+DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
+        public Control_TimeEdit()
+        {
+            InitializeComponent();
+
+            this.timeEdit4.Time = new DateTime(2021, 7, 13, 10, 30, 25, 670);
+            this.timeEdit5.Time = new DateTime(2021, 7, 13, 10, 30, 25, 670);
+
+            timeSpanEdit2.Properties.DisplayFormat.FormatType = DevExpress.Utils.FormatType.Custom;
+            timeSpanEdit2.Properties.DisplayFormat.FormatString = "{0:dd} days, {0:hh} hours, {0:mm} minutes and {0:ss} seconds";
+            timeSpanEdit2.Properties.ReadOnly = false;
+            timeSpanEdit2.Properties.Mask.EditMask = "dd:HH:mm:ss";
+            RefreshTimer();
+        }
+
+        private void RefreshTimer()
+        {
+            DateTime currentDate = DateTime.Now;
+            TimeSpan timeToNY = currentDate - NYDate;
+            timeSpanEdit1.EditValue = timeToNY;
+        }
+
+        private void simpleButton1_Click(object sender, EventArgs e)
+        {
+            RefreshTimer();
+        }
+
+        private void simpleButton1_Click_1(object sender, EventArgs e)
+        {
+            labelControl1.Text = timeSpanEdit1.Properties.GetDisplayText(timeSpanEdit1.EditValue) + " left for the New Year!";
+
+        }
+```
+
+## 15. XtraCharts——图表
 
 
 
-## 15. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
+## 16. XtraBars.Navigation.TileBarItem.TileBarItem——
+
+
+
+## 17. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
 
 
 
