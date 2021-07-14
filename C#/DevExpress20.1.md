@@ -1,6 +1,6 @@
 
 
-# 问题总结
+# 疑问总结
 
 * 注意看designer.cs中的内容，了解代码形式怎么编写
 
@@ -23,6 +23,10 @@
   ![image-20210713095443021](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210713095443021.png)
 
 * TimeEdit和TimeSpanEdit的DisplayFormat和Mask
+
+*  ImageComboBoxEdit选择下拉框中项目无法改变？？？
+
+* 
 
 ---
 
@@ -772,7 +776,15 @@ Properties.Options.OptionsMask.MaskType——Mask的形状
 
 
 
-## <span id="jump2">6. DevExpress.XtraEditors.LabelControl——标签</span>
+## 6. DevExpress.XtraEditors.ImageSlider——图片滑动框
+
+### （1）属性
+
+* 
+
+
+
+## <span id="jump2">7. DevExpress.XtraEditors.LabelControl——标签</span>
 
 ### （1）属性
 
@@ -828,7 +840,7 @@ Properties.Options.OptionsMask.MaskType——Mask的形状
 
 
 
-## 7. XtraEditors.ListBoxControl——列表框
+## 8. XtraEditors.ListBoxControl——列表框
 
 可填充来自data source的数据。
 
@@ -981,7 +993,7 @@ SearchControl.Client = listBoxControl1;
 
   
 
-## <span id="jump_SearchControl">8. SearchControl——搜索栏</span>
+## <span id="jump_SearchControl">9. SearchControl——搜索栏</span>
 
 搜索框，过滤数据
 
@@ -1025,7 +1037,7 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SearchControl.Qu
 
   
 
-##  9. XtraEditors.CheckEdit——复选框
+##  10. XtraEditors.CheckEdit——复选框
 
 ### （1）属性
 
@@ -1096,7 +1108,7 @@ this.checkEdit42.TabIndex = 1;
 
 ![image-20210712111437657](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210712111437657.png)
 
-## 10. CheckedListBoxControl——复选框列表
+## 11. CheckedListBoxControl——复选框列表
 
 ### （1）属性
 
@@ -1139,7 +1151,7 @@ this.checkEdit42.TabIndex = 1;
 
 
 
-##  11. XtraEditors.ComboBoxEditor——下拉框
+##  12. XtraEditors.ComboBoxEditor——下拉框
 
 ### （1）属性
 
@@ -1158,13 +1170,14 @@ this.checkEdit42.TabIndex = 1;
   ```
 
 * ComboBoxEdit.SelectedItem——当选中某个项目时，将选中item分配给SelectedItem
-* 
 
-## 12. CheckedComboBoxEdit——
+  
+
+## 13. CheckedComboBoxEdit——
 
 
 
-## 13. ImageComboBoxEdit——ComboxBoxEdit可以显示图标
+## 14. ImageComboBoxEdit——ComboxBoxEdit可以显示图标
 
 ### （1）属性
 
@@ -1187,7 +1200,45 @@ this.checkEdit42.TabIndex = 1;
 * LargeImages——下拉框显示的图片
 * SmallImages——编辑框中显示的图片
 
-## 14. XtraEditors.TimeEdit——日期（DataTimePicker）
+
+
+## 15. RadioGroup——提供一组单选按钮
+
+### （1）属性
+
+* Items——添加RadioButton
+
+  > Description——设定按钮文本
+  >
+  > Value——设定按钮的值。选中相应按钮时，会将item.Value赋值给Editvalue。若不设置，则Value=null
+
+  ```C#
+  // Create five items.
+  object[] itemValues = new object[] {10, 11, 12, 13, 14};
+  string [] itemDescriptions = new string [] {"Circle", "Rectangle", "Ellipse", "Triangle", "Square"};
+  for(int i = 0; i < itemValues.Length; i++) {
+      radioGroup1.Properties.Items.Add(new RadioGroupItem(itemValues[i], itemDescriptions[i]));
+  //Select the Rectangle item.
+  radioGroup1.EditValue = 11;
+  ```
+
+* ItemsLayout——设置Item的布局：Column（默认）/Flow
+
+* SelectedIndex——选中的按钮的index
+
+  ```C#
+  public int SelectedIndex { get; set; }
+  ```
+
+### （2）事件
+
+* SelectedIndexChanged——选中的按钮发生改变时触发
+
+* EditValueChanged——RadioGroup的EditValue被赋予新值
+
+  （先触发EditValueChanged再触发SelectedIndexChanged）
+
+## 16. XtraEditors.TimeEdit——日期（DataTimePicker）
 
 ### （1）属性
 
@@ -1271,15 +1322,21 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
         }
 ```
 
-## 15. XtraCharts——图表
+## 17. XtraCharts——图表
 
 
 
-## 16. XtraBars.Navigation.TileBarItem.TileBarItem——
+## 18. XtraBars.Navigation.TileBarItem.TileBar——磁贴
+
+### （1）属性
 
 
 
-## 17. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
+
+
+
+
+## 19. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
 
 
 
@@ -1289,5 +1346,9 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 # Navigation & Layout——容器
 
-## 1. Panel
+## 1. 
+
+
+
+
 
