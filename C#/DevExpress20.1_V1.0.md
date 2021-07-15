@@ -778,9 +778,7 @@ Properties.Options.OptionsMask.MaskType——Mask的形状
 
 ## 6. DevExpress.XtraEditors.ImageSlider——图片滑动框
 
-### （1）属性
-
-* 
+### <img src="D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715162109333.png" alt="image-20210715162109333" style="zoom:50%;" />
 
 
 
@@ -1326,16 +1324,6 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 
 
-## 18. XtraBars.Navigation.TileBarItem.TileBar——磁贴
-
-### （1）属性
-
-
-
-
-
-
-
 ## 19. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
 
 
@@ -1346,9 +1334,135 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 # Navigation & Layout——容器
 
-## 1. 
+## 1.  XtraBars.Navigation.TileBarItem.TileBar——磁贴
+
+### （1）属性
+
+* tilebar内添加tileGroup，在tileGroup中添加tileBar
+
+* 在tileGroup的Text中设置标题
+
+![image-20210715083153298](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715083153298.png)
+
+* tileBar——ScrollMode，滑动模式
+
+  AllowSelectedItem——设为true，才允许磁贴被选中
+
+* tileBarItem——DropDownControl，设置磁贴下拉菜单。用`tileBarDropDownContainer`，再往里添加控件（还可以添加tileBar）
+
+  DropDownOptions——设置下拉菜单
+
+  > AutoHeight——是否自动设置高度
+  >
+  > BackColorMode——下拉菜单的背景色
+  >
+  > > UseTileBackColor——使用磁贴颜色作为下拉菜单颜色
+  > >
+  > > UseBeakColor——使用BeakColor
+  >
+  > ImageOptions
+  >
+  > > ImageAlignment——图片位置
+  >
+  > TextAlignment——文字位置
+
+* Hover、selected效果由`AppearanceItem`设置
+* 将tileBarDropDownContainer置于底层，tileBar置于顶层
+
+
+
+## 2. WindowsUIButtonPanel
+
+![image-20210715171703403](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715171703403.png)
+
+```c#
+using DevExpress.XtraBars.Docking2010;
+```
+
+### （1）属性
+
+* Orientation——设定按钮排列是水平/垂直
+
+* BackColor——面板的背景颜色
+
+* ForeColor——按钮和文本颜色
+
+* UseButtonBackgroundImages——去掉按钮圆圈
+
+  **Hover效果**手动设置——有圆圈时自带hover效果。去掉圆圈，若需Hover效果改变**图标和文本**颜色时，则需要手动设置`AppearanceButton.Hover.ForeColor`
+
+  **选中效果**手动设置——BackColor是图标色，ForeColor是文本色
+
+* Buttons
+
+  > Add WindowsUIButton——添加按钮
+  >
+  > Add WindowsUISeparator——添加分割线
+  >
+  > Style——设定是pushbutton/checkbutton
+  >
+  > Caption——文本
+  >
+  > UseCaption——使用文本
+  >
+  > GroupIndex——pushbutton时设定按钮的index。checkbutton设为同一值则所有checkbutton设为一组
+
+* ButtonInterval——按钮间距
+
+* Dock——锚定
+
+### （2）事件
+
+* ButtonCheckd——通过`((WindowsUIButton)e.Button`访问按下的按钮
+
+  ```C#
+  //checkButton
+  void windowsUIButtonPanel1_ButtonChecked(object sender, ButtonEventArgs e) {
+              string tag = ((WindowsUIButton)e.Button).Tag.ToString();	//checkButton时Caption被禁用了
+              switch(tag) {
+                  case "Ad1":
+                      /* Navigate to page A */
+                      break;
+                  case "Ad2":
+                      /* Navigate to page B */
+                      break;
+                  case "Ad3":
+                      /* Navigate to page C*/
+                      break;
+                  case"Ad4":
+                      /* Navigate to page D */
+                      break;
+                  case "Ad5":
+                      /* Navigate to page E */
+                      break;
+              }
+          }
+  
+  ```
+
+## 3. BehaviorManager
+
+* target为tileBar/imageSlider
+
+  通过`BehaviorManager`中的`Pager Navigation Behavior`将`pager`和`target`绑定，target可为`TileControl`、`TileBar`、`ImageSider`、`NavigationFrame`，pager可为`RadioGroup`和`WindowsUIButtonPanel`
+
+  ![image-20210715155745451](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715155745451.png)
+
+![image-20210715171806083](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715171806083.png)
+
+* target为 NavigationFrame
+
+  
+
+## 4. NavigationFrame——
 
 
 
 
+
+## 5. TabPane
+
+
+
+## 6. AccordionControl——
 
