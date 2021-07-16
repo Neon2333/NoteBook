@@ -26,7 +26,7 @@
 
 *  ImageComboBoxEdit选择下拉框中项目无法改变？？？
 
-* 
+* 使用BehaviorManager绑定WindowsUIButtonPanel和NavigationFrame时，不知道为什么WindowUIButtonPanel的Button无法显示？？？？
 
 ---
 
@@ -1371,13 +1371,27 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 
 
-## 2. WindowsUIButtonPanel
+## 2. tileNavPane——分层次磁贴（最多三层）
+
+### （1）概念
+
+* 按钮分类
+
+   TileNavCategory——顶层按钮
+
+   TileNavItem——二层按钮
+
+   TileNavSubItem——三层按钮
+
+* 默认三层，可设置显示两层，将`TileNavPane.DefaultCategory`设为`ShowDefaultCategoryItems`
+
+   
+
+## 3. WindowsUIButtonPanel
+
+**使用时，一定要注意Button是PushButton还是CheckButton。若是Checkbutton，则需要把GroupIndex设为同一正整数，通过每个button的Tag搭配ButtonChecked事件使用，可触发每个按钮被按下时的动作**
 
 ![image-20210715171703403](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715171703403.png)
-
-```c#
-using DevExpress.XtraBars.Docking2010;
-```
 
 ### （1）属性
 
@@ -1416,6 +1430,8 @@ using DevExpress.XtraBars.Docking2010;
 * ButtonCheckd——通过`((WindowsUIButton)e.Button`访问按下的按钮
 
   ```C#
+  using DevExpress.XtraBars.Docking2010;
+  
   //checkButton
   void windowsUIButtonPanel1_ButtonChecked(object sender, ButtonEventArgs e) {
               string tag = ((WindowsUIButton)e.Button).Tag.ToString();	//checkButton时Caption被禁用了
@@ -1440,29 +1456,80 @@ using DevExpress.XtraBars.Docking2010;
   
   ```
 
-## 3. BehaviorManager
+## 4. BehaviorManager——将换页按钮绑定到页面
 
-* target为tileBar/imageSlider
+### （1）target为tileBar/imageSlider
 
-  通过`BehaviorManager`中的`Pager Navigation Behavior`将`pager`和`target`绑定，target可为`TileControl`、`TileBar`、`ImageSider`、`NavigationFrame`，pager可为`RadioGroup`和`WindowsUIButtonPanel`
+通过`BehaviorManager`中的`Pager Navigation Behavior`将`pager`和`target`绑定，target可为`TileControl`、`TileBar`、`ImageSider`、`NavigationFrame`，pager可为`RadioGroup`和`WindowsUIButtonPanel`
 
-  ![image-20210715155745451](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715155745451.png)
+![image-20210715155745451](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715155745451.png)
+
+```C#
+//代码绑定target和pager
+BehaviorManager bm = new BehaviorManager(this.components);
+bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
+    behavior.Properties.Pager = windowsUIButtonPanel1;
+    behavior.CustomizePagerItem += Behavior_CustomizePagerItem;
+});
+
+```
 
 ![image-20210715171806083](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715171806083.png)
 
-* target为 NavigationFrame
+### （2）target为 NavigationFrame
+
+使用BehaviorManager绑定WindowsUIButtonPanel和NavigationFrame时，不知道为什么WindowUIButtonPanel的Button无法显示？？？？
+
+
+
+## 5. NavigationFrame——
+
+### （1）属性
+
+* Pages——保存着NavigationPage，NavigationPage可容纳其他各种控件
 
   
 
-## 4. NavigationFrame——
+  ![image-20210716102704733](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210716102704733.png)
 
 
 
+* SelectedPage——当前展示的NavigationPage
+
+  **通过WindowUIButtonPanel设定翻页**
+
+  ```C#
+  private void windowsUIButtonPanel2_ButtonChecked(object sender, DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
+          {
+              string tag = ((WindowsUIButton)e.Button).Tag.ToString();	//checkButton时Caption被禁用了
+              switch (tag)
+              {
+                  case "Contacts":
+                      navigationFrame1.SelectedPage = navigationPage1;
+                      break;
+                  case "Calendar":
+                      navigationFrame1.SelectedPage = navigationPage2;
+  
+                      break;
+                  case "Mail":
+                      navigationFrame1.SelectedPage = navigationPage3;
+  
+                      break;
+              }
+          }
+  ```
 
 
-## 5. TabPane
 
+* TransitionType——页面切换的不同效果
 
+  
+
+  
 
 ## 6. AccordionControl——
+
+
+
+## 7. TabPane
 
