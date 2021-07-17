@@ -34,7 +34,33 @@ git push -u中u——使用一次`git push -u origin master`后，告知Git记�
 
 :wq保存。
 
-## 4. 查看文件的修改情况
+## 4. 合并多次零碎的commit
+
+当我们开发一个功能，不是一时半会可以完成的时候，为了保护代码不丢失，通常会把这次的修改先 commit，等到这个功能完全做好，再 push。不过这样一来，就会有很多零碎的 commit 记录，这会使远程的提交历史显得杂乱。
+
+必要的时候，我们需要将这些相近的 commit 合并为一个 commit 再 push。当然了，如果你想合并远程的 commit 也是可以的，但请一定要提前跟团队里的其他人说一声，免得有人也在跟你做同样的事情，导致没必要的代码冲突（所以合并 commit 尽量在 push 前）。
+
+https://blog.csdn.net/yinchuan_111/article/details/106913632
+
+https://www.jianshu.com/p/571153f5daa1
+
+```
+git log --oneline	//可以更加简明的展示commit日志，且显示的commit-id是简化形式
+```
+
+```
+git rebase -i commit-id	//commit-id为要最终合并的commit-id的上一条commit。执行完后，会从下条commit开始显示
+```
+
+```
+修改除第一条commit-id（想要保留的commit）以外的下方若干commit，commit从上往下是逐渐接近最新提交的，最下方的是最新的commit
+将除第一条以外的pick改为squash/s，然后:wq保存退出
+成功的话，会出现编辑合并后commit的message。编辑新的message，然后:wq保存退出
+```
+
+
+
+## 5. 查看文件的修改情况
 
 https://blog.csdn.net/cnds123321/article/details/110731428
 
@@ -80,7 +106,7 @@ https://blog.csdn.net/cnds123321/article/details/110731428
 
   功能1：会出现一个编辑器，然后可以修改上一次的提交信息，按键盘上的Insert键进行插入，修改完成后按Esc键并输入:wq保存退出 
 
-## 5. 版本回滚
+## 6. 版本回滚
 
 **本地版本回滚的关键在于，本地仓库的内容是否发生了改变，是否生成了新的版本号。**
 
@@ -122,7 +148,7 @@ git reset HEAD就是回退到当前版本——用本地仓库还原暂存区
 
 但是我不建议大家使用这个，因为这个杀伤力有点强。万一手残删掉了一些自己不想删的就没有后悔药了。所以慎用。
 
-## 6. 当远程仓库的代码已经修改，试图将这种修改拉取到本地
+## 7. 当远程仓库的代码已经修改，试图将这种修改拉取到本地
 
 当前文件夹已有.git，也有代码，只是代码落后于远程仓库。
 
@@ -130,7 +156,7 @@ git pull
 
 然后可以对代码进行编辑。编辑结束后git add `flename`、git commit -m "message"、git push filename。
 
-## 7.日常操作流程总结
+## 8.日常操作流程总结
 
 ### （1）直接从别人的项目里拷贝到文件夹里
 
@@ -194,7 +220,7 @@ git pull origin master
 
 
 
-## 8. 分支操作
+## 9. 分支操作
 
 https://www.cnblogs.com/andydao/p/6808431.html
 
@@ -238,7 +264,7 @@ bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交
 git checkout daily/1.0.0
 ```
 
-## 9. push时的忽略文件
+## 10. push时的忽略文件
 
 ```
 touch .gitignore	//创建.gitignore文件，编辑该文件，每行代表push时忽略不上传的文件
@@ -250,7 +276,7 @@ touch .gitignore	//创建.gitignore文件，编辑该文件，每行代表push�
 build/	//忽略build目录下的所有文件
 ```
 
-## 10. tag
+## 11. tag
 
 当完成某项需求时，需要将代码打上一个版本tag，并push到线上。
 
