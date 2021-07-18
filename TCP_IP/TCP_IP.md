@@ -301,7 +301,9 @@ IP数据报以**比特流bit**形式在物理连接上传输
 
 ### （6）ICMP协议报文
 
-ICMP（Internet Control Message Protocol）因特网控制报文协议。它是IPv4协议族中的一个子协议，用于IP主机、路由器之间传递**控制消息**。控制消息是在网络通不通、主机是否可达、路由是否可用等网络本身的消息。这些控制消息虽然不传输用户数据，但是对于用户数据的传递起着重要的作用。
+https://blog.csdn.net/chen1415886044/article/details/110356022
+
+ICMP（Internet Control Message Protocol）因特网控制报文协议，ICMP报文封装在ip包里。它是一个对IP协议的补充协议。它是IPv4协议族中的一个子协议，用于IP主机、路由器之间传递**控制消息**。控制消息是在网络通不通、主机是否可达、路由是否可用等网络本身的消息。这些控制消息虽然不传输用户数据，但是对于用户数据的传递起着重要的作用。
 ICMP协议与ARP协议不同，**ICMP靠IP协议来完成任务，所以ICMP报文中要封装IP头部**。它与传输层协议（如TCP和UDP）的目的不同，一般不用来在端系统之间传送数据，不被用户网络程序直接使用，除了想Ping和Tracert这样的诊断程序。
 
 * ICMP报文格式
@@ -310,15 +312,59 @@ ICMP协议与ARP协议不同，**ICMP靠IP协议来完成任务，所以ICMP报�
 
 ![ICMP报文格式](https://i.loli.net/2021/07/11/i7WTR2chNFoznAH.png)
 
+> Type：占8位
+>
+> Code：占8位
+>
+> Checksum：占16位
+>
+> Identifier：设置为ping 进程的进程ID。
+>
+> Sequence Number ：每个发送出去的分组递增序列号。
+>
+> Type：8，Code：0：表示回显请求(ping请求)。
+>
+> Type：0，Code：0：表示回显应答(ping应答)
+>
+> 说明：**ICMP所有报文的前4个字节都是一样的**，但是剩下的其他字节则互不相同。
+
+```c
+struct icmp {
+        uint8_t icmp_type;
+        uint8_t icmp_code;
+        uint16_t icmp_cksum;
+        uint16_t icmp_id;
+        uint16_t icmp_seq;
+    };
+```
+
 * 两类：ICMP错误报告报文、ICMP查询报文
 
 * ICMP错误报告报文格式：从错误分片IP数据报取出报头，首位各加8字节作为数据区，再加上ICMP错误报告报头。
 
+  `treaceroute/treacert`
+
+  > 可获取从源主机到目的主机所**经过的路由器**。应用程序将ICMP包中的IP报头中的TLL依次设为1,2,3，……，每经过一跳路由器时TTL减一，当TTL=0时路由器给源主机返回一个**ICMP超时报文**（类型11），这样源主机就可知TTL依次为1,2,3，……时的路由器的IP，并列出来。
+  >
+  > ![image-20210718225359254](https://i.loli.net/2021/07/18/q6atOvAmzRF3Edr.png)
+  >
+  > 序号指TTL
+  >
+  > 三个时间——每经过一个路有会都会发三个ICMP请求，这三个时间就是**三个请求分别响应的时间**
+  >
+  > *和请求超时——1、路由跳跃点禁PING。2、路由跳跃点不对TTL超时做响应处理，直接丢弃，不返回ICMP Echo Reply
+
 * ICMP查询报文：
 
-  [PING命令](https://blog.csdn.net/chen1415886044/article/details/110356022)底层是ICMP，调用网络层命令，发送请求与回复报文
+  > [PING命令](https://blog.csdn.net/chen1415886044/article/details/110356022)底层是ICMP，**回送请求**（**Echo Request**，类型8）和**回送应答**消息（**Echo Reply**，类型0）。
+  >
+  > ![image-20210718231428359](https://i.loli.net/2021/07/18/uXJ5Aesch2Navzw.png)
+  >
+  > 三个时间是因为发送了很多ICMP Echo Request收到了很多ICMP Echo Reply，统计下来三个时间：【最短】【最长】【平均】
+  
+* ICMPv6
 
-  ARP地址解析时，从ARP缓存中没有查找到相应MAC时，在集线器上广播自身IP和MAC以及查找的IP时，对应IP回复时的报文
+  IPv4中ICMP只是一个辅助支持作用，没有ICMPv4的话仍然可以IP通信。但是IPv6中若没有ICMPv6的话，就无法正常通信。
 
 ### （7）路径MTU
 
