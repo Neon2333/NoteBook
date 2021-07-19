@@ -338,7 +338,7 @@ struct icmp {
     };
 ```
 
-* 两类：ICMP错误报告报文、ICMP查询报文
+* 两类：ICMP**错误报告**报文、ICMP**查询**报文
 
 * ICMP错误报告报文格式：从错误分片IP数据报取出报头，首位各加8字节作为数据区，再加上ICMP错误报告报头。
 
@@ -366,7 +366,56 @@ struct icmp {
 
   IPv4中ICMP只是一个辅助支持作用，没有ICMPv4的话仍然可以IP通信。但是IPv6中若没有ICMPv6的话，就无法正常通信。
 
-### （7）路径MTU
+### （7）DHCP——动态主机设置协议
+
+* 连入局域网的设备都需要设置IP、子网掩码、默认网关（默认路由）、DNS，DHCP协议给接入链路的主机自动分配这些参数。
+
+* 为了使设备即插即用，使用DHCP。在局域网内架设DHCP服务器，用来给新设备分配四个参数。新设备连入时可选择静态IP或DHCP。
+
+* 网段中主机数较多时，为了避免DHCP服务器故障，一般在局域网中会假设两台及以上的DHCP服务器。但这样也会导致几个服务器同时给主机分配参数造成冲突。（可解决）主机较少时，一般就设置一台DHCP服务器，一般是由**路由器担任DHCP服务器**的角色。
+
+* **为了检查分配的IP是否可用。DHCP服务器——分配IP前向分配的IP发送ICMP回送请求，确保没有ICMP回送应答。DHCP客户端——向分配的IP的主机发送ARP请求，确保没有ARP应答**
+
+* [过程](https://blog.csdn.net/qq_22763255/article/details/105526332)
+
+  DHCP 协议是基于**UDP**（这也就是说在snort检测过程中，只能看UDP的包）之上的应用，dhcp使用udp携带报文，udp封装在ip数据包中发送。
+
+* [DHCP报文](https://blog.csdn.net/one_in_one/article/details/51684551)
+
+  ![image-20210719172631804](https://i.loli.net/2021/07/19/jiEpG2bvdKWVLIU.png)
+
+  > * DHCP一共有8种报文，分别为DHCP Discover、DHCP Offer、DHCP Request、DHCP ACK、DHCP NAK、DHCP Release、DHCP Decline、DHCP Inform。
+  >
+  >   请求报文： DHCP Discover、DHCP Request、DHCP Release、DHCP Inform和DHCP Decline。
+  >   应答报文： DHCP Offer、DHCP ACK和DHCP NAK。
+  >
+  > * DHCP报文格式基于BOOTP的报文格式
+  >
+  > * OP：报文的操作类型。分为请求报文和响应报文。1：请求报文，2：应答报文。即client送给server的封包，设为1，反之为2。
+  >
+  >   Htype： DHCP客户端的MAC地址类型。 MAC地址类型其实是指明网络类型 ，Htype值为1时表示为最常见的以太网MAC地址类型。
+  >   Hlen： DHCP客户端的MAC地址 长度。以太网MAC地址长度为6个字节，即以太网时Hlen值为6。
+  >   Hops：DHCP报文经过的DHCP中继的数目，默认为0。DHCP请求报文每经过一个DHCP中继，该字段就会增加1。没有经过DHCP中继时值为0。( 若数据包需经过router传送，每站加1，若在同一网内，为0。 )
+  >   Xid：客户端通过DHCP Discover报文发起一次IP地址请求时选择的随机数，相当于请求标识。用来标识一次IP地址请求过程。在一次请求中所有报文的Xid都是一样的。
+  >   Secs：DHCP客户端从获取到IP地址或者续约过程开始到现在所消耗的时间，以秒为单位。在没有获得IP地址前该字段始终为0。( DHCP客户端开始DHCP请求后所经过的时间。目前尚未使用，固定为0。)
+  >   Flags：标志位，只使用第0比特位，是广播应答标识位，用来标识DHCP服务器应答报文是采用单播还是广播发送，0表示采用单播发送方式，1表示采用广播发送方式。其余位 尚未使用 。(即 从0-15bits，最左1bit为1时表示server将以广播方式传送封包给client。 )
+  >   【注意】在客户端正式分配了IP地址之前的第一次IP地址请求过程中，所有DHCP报文都是以广播方式发送的，包括客户端发送的DHCP Discover和DHCP Request报文，以及DHCP服务器发送的DHCP Offer、DHCP ACK和DHCP NAK报文。当然，如果是由DHCP中继器转的报文，则都是以单播方式发送的。另外，IP地址续约、IP地址释放的相关报文都是采用单播方式进行发送的。
+  >   Ciaddr：DHCP客户端的IP地址。仅在DHCP服务器发送的ACK报文中显示，在其他报文中均显示0，因为在得到DHCP服务器确认前，DHCP客户端是还没有分配到IP地址的。只有客户端是Bound、Renew、Rebinding状态，并且能响应ARP请求时，才能被填充。
+  >   Yiaddr：DHCP服务器分配给客户端的IP地址。仅在DHCP服务器发送的Offer和ACK报文中显示，其他报文中显示为0。
+  >   Siaddr：下一个为DHCP客户端分配IP地址等信息的DHCP服务器IP地址。仅在DHCP Offer、DHCP ACK报文中显示，其他报文中显示为0。( 用于bootstrap过程中的IP地址)
+  >   Giaddr：DHCP客户端发出请求报文后经过的第一个DHCP中继的IP地址。如果没有经过DHCP中继， 则显示为0。( 转发代理（网关）IP地址 )
+  >   Chaddr：DHCP客户端的MAC地址。在每个报文中都会显示对应DHCP客户端的MAC地址。
+  >   Sname：为DHCP客户端分配IP地址的DHCP服务器名称（DNS域名格式）。在Offer和ACK报文中显示发送报文的DHCP服务器名称，其他报文显示为0。
+  >   File：DHCP服务器为DHCP客户端指定的启动配置文件名称及路径信息。仅在DHCP Offer报文中显示，其他报文中显示为空。
+  >   Options： 可选项字段，长度可变，格式为"代码+长度+数据"。
+
+* DHCP中继代理——当一个局域网中的网段太多（比如学校、单位），给每个网段假设DHCP服务器将会是个繁重的任务。即使，路由器作为DHCP服务器，当网段过多时，对每个路由器维护可分配IP范围也是一件繁重的工作。因此，可只用一个DHCP服务器，给多个网段分配，实现多个网段的统一管理。
+
+  在每个网段中不设置DHCP服务器，只设置一个DHCP中继代理，在多个网段上设置一个DHCP服务器即可。
+
+  主机上的DHCP客户端通过广播发送DHCP请求包，被DHCP中继代理收到后，通过单播转发给DHCP服务器。DHCP服务器返回应答，通过单播发给DHCP中继代理，DHCP中继代理再通过单播发给主机。这样主机就知晓了DCHP服务器分配的IP。
+
+### （8）路径MTU
 
 * 路径MTU——路径MTU是指一条因特网传输路径中，从源地址到目的地址所经过的“路径”上的所有IP跳的最大传输单元的最小值（取最小值才能满足所有MTU）。或者从另外一个角度来看，就是无需进行分片处理就能穿过这条“路径”的MTU的最大值。
 
@@ -378,6 +427,17 @@ struct icmp {
   Traceroute提取发送 ICMP TTL到期消息设备的IP地址并作域名解析。每次 ，Traceroute都打印出一系列数据,包括所经过的路由设备的域名及 IP地址,三个包每次来回所花时间。
 
 
+
+### （9）NAT和NAPT——网络地址转换协议
+
+https://blog.csdn.net/q235990/article/details/88177202
+
+NAT:网络地址转换 。
+NAPT:网络地址端口转换。
+（通俗的讲）它们都是地址转换，NAPT与NAT的区别在于 NAT是NAT是一对一转换，NAPT是多对一转换。通俗来说NAT是一个内部地址转换成一个外部地址进行通信的，而NAPT是多个内部地址使用同一地址不同端口转换成外部地址进行通信的。
+简单来说：NAPT发送数据的时候会在源地址和目标地址上加上端口号（比如源地址：192.168.1.2:1010，目标地址：200.1.1.2:1020），回来的数据也是一样。
+
+![image-20210719230152328](https://i.loli.net/2021/07/19/VNSa1yLKv6fm8dz.png)
 
 ---
 
