@@ -1348,6 +1348,8 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
   AllowSelectedItem——设为true，才允许磁贴被选中
 
+* Orientation——磁贴排列的方向，水平/垂直
+
 * tileBarItem——DropDownControl，设置磁贴下拉菜单。用`tileBarDropDownContainer`，再往里添加控件（还可以添加tileBar）
 
   DropDownOptions——设置下拉菜单
@@ -1367,9 +1369,12 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
   > TextAlignment——文字位置
 
 * Hover、selected效果由`AppearanceItem`设置
+
 * 将tileBarDropDownContainer置于底层，tileBar置于顶层
 
+* WideTileWidth——磁贴宽度
 
+  ![image-20210720111852029](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210720111852029.png)
 
 ## 2. tileNavPane——分层次磁贴（最多三层）
 
@@ -1482,7 +1487,7 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
 
 
-## 5. NavigationFrame——
+## 5. NavigationFrame——可翻页页面
 
 ### （1）属性
 
