@@ -662,9 +662,8 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   >     }
   > ```
   >
-  > 
-
-  > [SvgImageBox.Select](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Select(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 选择指定的item
+  
+> [SvgImageBox.Select](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Select(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 选择指定的item
   >
   > ```C#
   > public void Select(SvgImageItem item)
@@ -675,16 +674,16 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   > var itemId = svgImageBox6.FindItem(item => item.Id != null && item.Id.Equals("1"));
   > svgImageBox6.Select(itemId);
   > ```
-
   
 
-  > [SvgImageBox.Unselect](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Unselect(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 取消选择指定的item
+  
+> [SvgImageBox.Unselect](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Unselect(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 取消选择指定的item
   >
   > ```C#
   > public void Unselect(SvgImageItem item)
   > ```
-
-  > [SvgImageBox.SelectionChanged](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanged?v=20.1) - 通知事件，被选中的item改变时触发
+  
+> [SvgImageBox.SelectionChanged](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanged?v=20.1) - 通知事件，被选中的item改变时触发
   >
   > ```C#
   > void OnSvgImageBoxSelectionChanged(object sender, EventArgs e) {
@@ -695,12 +694,12 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   >     }
   > }
   > ```
-
-  > 
+  
+> 
   >
   > - [SvgImageBox.SelectionChanging](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanging?v=20.1) - 当项目选择即将改变时触发。允许您取消当前操作..
-
-  <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707145548942.png" alt="image-20210707145548942" style="zoom:70%;" />
+  
+<img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707145548942.png" alt="image-20210707145548942" style="zoom:70%;" />
 
 ### （7）demo
 
@@ -1532,9 +1531,17 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
   
 
-## 6. AccordionControl——
+## 6. LayoutControl——
+
+### （1）属性
 
 
 
-## 7. TabPane
+
+
+## 7. AccordionControl——
+
+
+
+## 8. TabPane
 
