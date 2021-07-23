@@ -50,10 +50,6 @@ System.Threading.Thread.CurrentThread.CurrentUICulture = new System.Globalizatio
 System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.CultureInfo("zh-Hans");
 ```
 
----
-
-# 属性优先级
-
 
 
 ---
@@ -661,8 +657,6 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   >         selectedItemsListBox.Items.Add(itemDisplayName);
   >     }
   > ```
-  >
-  
 > [SvgImageBox.Select](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Select(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 选择指定的item
   >
   > ```C#
@@ -674,15 +668,15 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   > var itemId = svgImageBox6.FindItem(item => item.Id != null && item.Id.Equals("1"));
   > svgImageBox6.Select(itemId);
   > ```
-  
 
-  
+
+
 > [SvgImageBox.Unselect](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.Unselect(DevExpress.XtraEditors.SvgImageItem)?v=20.1) - 取消选择指定的item
   >
   > ```C#
   > public void Unselect(SvgImageItem item)
   > ```
-  
+
 > [SvgImageBox.SelectionChanged](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanged?v=20.1) - 通知事件，被选中的item改变时触发
   >
   > ```C#
@@ -694,11 +688,11 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
   >     }
   > }
   > ```
-  
+
 > 
   >
   > - [SvgImageBox.SelectionChanging](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox.SelectionChanging?v=20.1) - 当项目选择即将改变时触发。允许您取消当前操作..
-  
+
 <img src="C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20210707145548942.png" alt="image-20210707145548942" style="zoom:70%;" />
 
 ### （7）demo
@@ -1323,6 +1317,12 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 
 
+## 18. WebChartControl
+
+
+
+
+
 ## 19. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
 
 
@@ -1407,9 +1407,9 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 * UseButtonBackgroundImages——去掉按钮圆圈
 
-  **Hover效果**手动设置——有圆圈时自带hover效果。去掉圆圈，若需Hover效果改变**图标和文本**颜色时，则需要手动设置`AppearanceButton.Hover.ForeColor`
+  **Hover效果**手动设置——有圆圈时自带hover效果。去掉圆圈，设置`AppearanceButton.Hover.ForeColor`，可改变Hover效果的**图标和文本**颜色时，
 
-  **选中效果**手动设置——BackColor是图标色，ForeColor是文本色
+  **选中效果**手动设置——BackColor是图标色，ForeColor是文本色（Hover中ForeColor可同时设置文本和图标颜色）
 
 * Buttons
 
@@ -1502,6 +1502,8 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
   **通过WindowUIButtonPanel设定翻页**
 
+  设置在底层，翻页时WindowUIButtonPanel不消失。设置在上层时，翻页动画时消失，动画结束时重新出现。
+  
   ```C#
   private void windowsUIButtonPanel2_ButtonChecked(object sender, DevExpress.XtraBars.Docking2010.ButtonEventArgs e)
           {
@@ -1513,11 +1515,9 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
                       break;
                   case "Calendar":
                       navigationFrame1.SelectedPage = navigationPage2;
-  
                       break;
                   case "Mail":
                       navigationFrame1.SelectedPage = navigationPage3;
-  
                       break;
               }
           }

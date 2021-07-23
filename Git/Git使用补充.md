@@ -108,6 +108,10 @@ https://blog.csdn.net/cnds123321/article/details/110731428
 
 ## 6. 版本回滚
 
+![git三大区域命令总结图](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\20200312120348300.png)
+
+https://blog.csdn.net/weixin_44802825/article/details/104814984
+
 **本地版本回滚的关键在于，本地仓库的内容是否发生了改变，是否生成了新的版本号。**
 
 https://blog.csdn.net/chenpuzhen/article/details/92006378

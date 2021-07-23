@@ -96,7 +96,7 @@ conn.open();	//连接打开
 
 ### （2）创建命令对象/增删改
 
- 		CommandType是SqlCommand对象的一个属性，用于指定执行动作的形式，它告诉.net接下来执行的是一个文本(text)、存储过程(StoredProcedure)还是表名称(TableDirect)。而CommandType是一个枚举类型。有三个值：text、StoredProcedure、TableDirect用于表示SqlCommand对象CommandType的执行形式。 cmd.CommandType = CommandType.Text; 是告诉cmd执行的sql是你赋给CommandText的值里写出的sql语句，如果是存储过程的话，cmd.CommandType = CommandType.StoredProcedure;然后CommandText='存储过程的名字'，这就是告诉cmd执行的是存储过程，存储过程的名字就是CommandText的值。 
+> ​	CommandType是SqlCommand对象的一个属性，用于指定执行动作的形式，它告诉.net接下来执行的是一个文本(text)、存储过程(StoredProcedure)还是表名称(TableDirect)。而CommandType是一个枚举类型。有三个值：text、StoredProcedure、TableDirect用于表示SqlCommand对象CommandType的执行形式。 cmd.CommandType = CommandType.Text; 是告诉cmd执行的sql是你赋给CommandText的值里写出的sql语句，如果是存储过程的话，cmd.CommandType = CommandType.StoredProcedure;然后CommandText='存储过程的名字'，这就是告诉cmd执行的是存储过程，存储过程的名字就是CommandText的值。 
 
 **当指令不确定时用变量替代变换内容，再给变量赋值**
 
