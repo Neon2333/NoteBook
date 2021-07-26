@@ -1,24 +1,34 @@
 # Git日常使用
 
-## 1. HEAD是什么？Origin是什么？master是什么？Branch是什么？git push -u中的u是什么？
+## 1. HEAD是什么？HEAD^/HEAD~/HEAD~2/HEAD^2是什么？Origin是什么？master是什么？Branch是什么？git push -u中的u是什么？
 
 https://www.zhihu.com/question/20019419
 
-Branch——分支
+* Branch——分支
 
-Origin——`origin` 指代的是当前的git服务器地址
+* Origin——`origin` 指代的是当前的git服务器地址
 
-master——`master` 是 `Git` 为我们自动创建的第一个分支，也叫主分支，其它分支开发完成后都要合并到 `master`
+* master——`master` 是 `Git` 为我们自动创建的第一个分支，也叫主分支，其它分支开发完成后都要合并到 `master`
 
-[HEAD](https://www.zsythink.net/archives/3412/)——指向**当前分支**的**最新提交**
+* [HEAD](https://www.zsythink.net/archives/3412/)——指向**当前分支**的**最新的提交。作用很像是数据结构中指向二叉树根节点`root`的指针。有个 `root` 指针我们就可以对二叉树进行任意操作，它是二叉树的根基。**而 `git` 中的 `HEAD` 概念也类似一个指针，它指向是当前分支的“头”，通过这个头节点可以追寻到当前分支之前的所有提交记录。git 的提交记录之间的关系很像一棵树，或者说是一张图，通过当前的提交记录指向上一次提交记录串联起来，形成一个头结构，而在 git 中我们常常说的切换分支，只不过是 git 客户端帮你把要操作的那条路径的头节点，存储到了 HEAD 文件中。
 
-git push -u中u——使用一次`git push -u origin master`后，告知Git记忆相关参数，下次只需要`git push`即可。（用-u（--up-stream）来建立本地分支与远程某个分支的关联，形成一个管道，之后 git push可以直接沿着管道 到达关联的分支 无需在加-u参数了）
+  HEAD 在 git 版本控制中代表头节点，也就是分支的最后一次提交，同时也是一个文件，通常在版本库中 repository/.git/HEAD，其中保存的一般是 ref: refs/heads/master 这种分支的名字，而本质上就是指向一次提交的 hash 值，一般长成这个样子 ce11d9be5cc7007995b607fb12285a43cd03154b。
+
+* HEAD^2/HEAD~2
+
+  https://blog.csdn.net/albertsh/article/details/106448035
+
+  https://www.cnblogs.com/mengff/p/12809911.html
+
+  https://www.cnblogs.com/chjbbs/p/6418339.html
+
+* git push -u中u——使用一次`git push -u origin master`后，告知Git记忆相关参数，下次只需要`git push`即可。（用-u（--up-stream）来建立本地分支与远程某个分支的关联，形成一个管道，之后 git push可以直接沿着管道 到达关联的分支 无需在加-u参数了）
 
 ## 2. 使用已有的rsa私钥在另一台电脑上使用已有远程仓库
 
-设置用户名： git config --global user.name taotaoo 
+设置用户名： git config --global user.name wk
 
-设置密码： git config --global user.password taotaoo 
+设置密码： git config --global user.password p
 
 将私钥复制到~/.ssh文件夹下：C:\Users\Administrator\.ssh
 
@@ -34,7 +44,7 @@ git push -u中u——使用一次`git push -u origin master`后，告知Git记�
 
 :wq保存。
 
-## 4. 合并多次零碎的commit
+## 4. 合并多次零碎的commit——git rebase
 
 当我们开发一个功能，不是一时半会可以完成的时候，为了保护代码不丢失，通常会把这次的修改先 commit，等到这个功能完全做好，再 push。不过这样一来，就会有很多零碎的 commit 记录，这会使远程的提交历史显得杂乱。
 
@@ -106,61 +116,7 @@ https://blog.csdn.net/cnds123321/article/details/110731428
 
   功能1：会出现一个编辑器，然后可以修改上一次的提交信息，按键盘上的Insert键进行插入，修改完成后按Esc键并输入:wq保存退出 
 
-## 6. 版本回滚
-
-![git三大区域命令总结图](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\20200312120348300.png)
-
-https://blog.csdn.net/weixin_44802825/article/details/104814984
-
-**本地版本回滚的关键在于，本地仓库的内容是否发生了改变，是否生成了新的版本号。**
-
-https://blog.csdn.net/chenpuzhen/article/details/92006378
-
-> **Workspace  ----add---->  暂存区  ----commit---->  本地仓库 ----push----> 远程仓库**
->
-> 本地仓库被更新了，生成了新的版本号，回滚本地仓库：**git reset HEAD^或git reset 版本号**
->
-> 本地仓库未更新，未生成新的版本号。用本地仓库回滚暂存区：**git reset HEAD** 
->
-> 本地仓库未更新，未生成新的版本号。用本地仓库回滚暂存区和WorkSpace：**git reset --hard**
-
-### （1）已add未commit
-
-git reset HEAD就是回退到当前版本——用本地仓库还原暂存区
-
-。 add以后我们发现工作区中添加了错误的内容并且add了，此时我们只是做了add 操作，就是将修改了内容添加到了暂存区，**还没有执行commit，所以还没有生成版本号，当前的版本号对应的内容**，还是你add之前的内容，所以我们只需要将代码回退到当前版本就行。 
-
-其实到这里，暂存区的修改就撤销了。工作区中内容可用下面的方法撤销，但是没什么必要，直接修改就行了。除非，**你需要一步将Workspace中某些文件还原**。
-
-（执行**git reset HEAD**后，用git status查看，发现已经退到未add的状态（Workspace中有未track的文件）。这表明暂存区已经被还原到add之前的状态。但是Workspace中有未track的文件恰恰表明，Workspace中的错误文件还在。要想**回退Workspace中的文件的错误修改**的话：**it checkout --<file> to discard changes in working directory**这个意思就是下载某某文件，**丢弃掉该文件在工作区的改变内容** ，需要根据提示输入被修改的文件名。）
-
-这样，先撤销add到暂存区，再撤销对Workspace某个文件的修改，最后完全撤销对文件的错误修改。
-
-### （2）已commit
-
- 已经commit了，还没有push,push的内容我们先不管，push这个命令其实和提交没关系，他只是推送到远程了，如果push了，也就是我们**回退了之后，再重新push一下而已**，所以请不要纠结push这个操作。他和提交版本其实没有关系的。 
-
-已经commit了，说明已经生成了最新的版本号了，此时我们想回退，则肯定是回退到之前的一个版本，版本号用git log查看。 git为我们提供了一个更简单的回退上一个版本的方法 **git reset HEAD^**,此命令专门用于回退到上一个版本。若你的错误已经经过好几次commit，回退到上一个版本无法解决时，就查看版本号，用git reset 版本号回退。
-
-回退后，就进入了（1）中 的状态，再按照（1）中描述进行回退。
-
-### （3）关于git reset --hard——用本地仓库还原暂存区+工作区
-
-用来撤销已add未commit。
-
-该指令和git reset HEAD+ it checkout --<file> to discard changes in working directory两步相同，一步到位直接将暂存区和Workspace都回退到本地仓库中的当前版本。
-
-但是我不建议大家使用这个，因为这个杀伤力有点强。万一手残删掉了一些自己不想删的就没有后悔药了。所以慎用。
-
-## 7. 当远程仓库的代码已经修改，试图将这种修改拉取到本地
-
-当前文件夹已有.git，也有代码，只是代码落后于远程仓库。
-
-git pull
-
-然后可以对代码进行编辑。编辑结束后git add `flename`、git commit -m "message"、git push filename。
-
-## 8.日常操作流程总结
+## 6.日常操作流程
 
 ### （1）直接从别人的项目里拷贝到文件夹里
 
@@ -202,37 +158,115 @@ git pull origin master
 
 **若本地代码被修改，但是未push到远程服务器。且在另一个主机上修改了服务器上代码。那么pull时，服务器上的改动和本地改动就会产生冲突。一般，git会自动合并冲突。但若涉及到同一行代码的改动，就需要手动合并代码**
 
-### （4）本地修改代码后的一系列操作
-
-> git add `filename`	//track filename
->
-> git status	//查看文件track和commit的情况
->
-> [git reset HEAD]	//发现错误，撤销add，手动修改Workspace
->
-> [git reset --hard]	//撤销add，也将Workspace的修改撤销，用当前本地仓库的内容覆盖
->
-> git commit -m "commit message"	//提交本地仓库
->
-> [git reset HEAD^ + git reset HEAD]	//撤销commit，再撤销add。再回到第三步去撤销。
->
-> git log	//查看commit日志
->
-> git remote add origin `ssh`	//连接远程仓库
->
-> git push -u origin master	//将本地内容推送到远程仓库
 
 
 
-## 9. 分支操作
+
+## 7. *版本回滚——git reset*
+
+![git三大区域命令总结图](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\20200312120348300.png)
+
+https://blog.csdn.net/weixin_44802825/article/details/104814984
+
+### 原理
+
+**Workspace  ----add---->  暂存区  ----commit---->  本地仓库 ----push----> 远程仓库**
+
+[reset加不加hard的区别](https://blog.csdn.net/chenpuzhen/article/details/92006378)
+
+> reset --soft——仅仅将HEAD指向新版本号
+>
+> reset——将HEAD指向新版本号，且更改暂存区（reset --mixed是默认情况，--mixed可省略）
+>
+> reset --hard——将HEAD指向新版本号，且暂存区和工作区一起更改
+
+> https://blog.csdn.net/albertsh/article/details/106448035
+>
+> HEAD——指向当前分支的最新的commit
+>
+> HEAD^和HEAD~
+>
+> ![image-20210726150257425](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726150257425-1627282981520.png)
+>
+> ![image-20210726150413658](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726150413658-1627283055489.png)
+>
+> HEAD~默认是HEAD^
+
+### 日常使用情景
+
+> * 未commit，未生成新的版本号
+>
+>   用本地仓库**回滚暂存区**，将暂存区和HEAD保持一致
+>
+>   本地仓库的最新commit不变，因为HEAD的指向未变
+>
+>   ```
+>   git reset HEAD
+>   ```
+>
+> * 未commit，未生成新的版本号。用本地仓库回滚**暂存区和WorkSpace**，将工作区、暂存区和HEAD保持一致
+>
+>   ```
+>   git reset --hard HEAD
+>   ```
+>
+> * 已commit，生成了新的版本号，回滚本地仓库到上一版本号
+>
+>   HEAD指向上个commit
+>
+>   ```
+>   git reset HEAD^
+>   git reset 版本号
+>   ```
+>
+> * 已commit了，生成了新的版本号，回滚本地仓库到上一版本的同时，将工作区和暂存区也于新的HEAD保持一致
+>
+>   HEAD指向上个commit
+>
+>   ```
+>   git reset --hard HEAD^
+>   git reset --hard 版本号
+>   ```
+
+### 已add未commit
+
+git reset HEAD就是回退到当前版本——用本地仓库还原暂存区
+
+add以后我们发现工作区中添加了错误的内容并且add了，此时我们只是做了add 操作，就是将修改了内容添加到了暂存区，**还没有执行commit，所以还没有生成版本号，当前的版本号对应的内容**，还是你add之前的内容，所以我们只需要将代码回退到当前版本就行。 
+
+其实到这里，暂存区的修改就撤销了。工作区中内容可用下面的方法撤销，但是没什么必要，直接修改就行了。除非，**你需要一步将Workspace中某些文件还原**。
+
+（执行**git reset HEAD**后，***用git status查看，发现已经退到未add的状态（Workspace中有未track的文件）。***这表明暂存区已经被还原到add之前的状态。但是Workspace中有未track的文件恰恰表明，Workspace中的错误文件还在。要想**回退Workspace中的文件的错误修改**的话：**it checkout --<file> to discard changes in working directory**这个意思就是下载某某文件，**丢弃掉该文件在工作区的改变内容** ，需要根据提示输入被修改的文件名。）
+
+这样，先撤销add到暂存区，再撤销对Workspace某个文件的修改，最后完全撤销对文件的错误修改。
+
+### 已commit
+
+ 已经commit了，还没有push,push的内容我们先不管，push这个命令其实和提交没关系，他只是推送到远程了，如果push了，也就是我们**回退了之后，再重新push一下而已**，所以请不要纠结push这个操作。他和提交版本其实没有关系的。 
+
+已经commit了，说明已经生成了最新的版本号了，此时我们想回退，则肯定是回退到之前的一个版本，版本号用git log查看。 git为我们提供了一个更简单的回退上一个版本的方法 **git reset HEAD^**,此命令专门用于回退到上一个版本。若你的错误已经经过好几次commit，回退到上一个版本无法解决时，就查看版本号，用git reset 版本号回退。
+
+回退后，就进入了（1）中 的状态，再按照（1）中描述进行回退。
+
+### 关于git reset --hard——用本地仓库还原暂存区+工作区
+
+用来撤销已add未commit。
+
+该指令和git reset HEAD+ it checkout --<file> to discard changes in working directory两步相同，一步到位直接将暂存区和Workspace都回退到本地仓库中的当前版本。
+
+## 8. *分支操作*
 
 https://www.cnblogs.com/andydao/p/6808431.html
 
 ### （1）新建分支
 
+commit后才会新建分支master，这之后才可以新建其他分支
+
 ```
 git branch daily/0.0.0	//新建日常开发分支daily/0.0.0
 ```
+
+![image-20210726093541204](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726093541204-1627263344263.png)
 
 ### （2）重命名分支
 
@@ -242,11 +276,25 @@ git branch daily/0.0.0 daily/1.0.0	//重命名分支daily/0.0.0为daily/1.0.0
 
 ### （3）删除分支
 
-```
-git branch -d daily/1.0.0	//删除分支daily/1.0.0
-```
+* 删除本地分支daily/1.0.0
 
-### （4）查看分支列表
+  ```
+  git branch -d daily/1.0.0	
+  ```
+
+* 强制删除本地分支
+
+  ```
+  git branch -D daily/1.0.0	
+  ```
+
+* 删除远程分支**(慎用)**
+
+  ```
+  git push origin --delete daily/1.0.0
+  ```
+
+### （4）查看分支列表——git branch -a
 
 ```
 git branch	//当前项目分支列表
@@ -254,13 +302,14 @@ git branch	//当前项目分支列表
 
 ```
 git branch -a	//查看本地仓库和远程仓库上所有分支列表
+
 git branch -r	//查看远程仓库所有分支列表
 git branch -r -d origin/branch-name		//查看并删除远程仓库上分支branch-name
 git branch -D	//分支未提交到本地版本库前强制删除分支
 bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交id、提交原因
 ```
 
-### （5）切换分支
+### （5）切换分支——git checkout
 
 切换分支，HEAD会改变指向
 
@@ -268,7 +317,37 @@ bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交
 git checkout daily/1.0.0
 ```
 
-## 10. push时的忽略文件
+### （6）git fetch
+
+https://www.jianshu.com/p/d07f5a8f604d
+
+![image-20210726172448439](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726172448439-1627291490026.png)
+
+### （7）合并分支——git merge
+
+https://www.jianshu.com/p/58a166f24c81
+
+
+
+### （8）git pull=git fetch +git merge
+
+https://blog.csdn.net/weixin_41975655/article/details/82887273
+
+![image-20210726171937862](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726171937862-1627291178971.png)
+
+
+
+### （9）暂存——git stash
+
+
+
+### （10）分支的日常使用情景
+
+
+
+
+
+## 9. push时的忽略文件
 
 ```
 touch .gitignore	//创建.gitignore文件，编辑该文件，每行代表push时忽略不上传的文件
@@ -280,7 +359,7 @@ touch .gitignore	//创建.gitignore文件，编辑该文件，每行代表push�
 build/	//忽略build目录下的所有文件
 ```
 
-## 11. tag
+## 10. tag
 
 当完成某项需求时，需要将代码打上一个版本tag，并push到线上。
 
@@ -291,9 +370,7 @@ git tag publish/0.0.1	//给当前代码打上标签publish/0.0.1，表示当前�
 git push origin public/0.0.1	//推送到服务器
 ```
 
-
-
-## 12. git bash快捷键
+## 11. git bash快捷键
 
 * windows系统，在工作目录下，shift+F10，再按s，再按enter。
 
@@ -305,5 +382,40 @@ git push origin public/0.0.1	//推送到服务器
 
   ![image-20210718000339131](https://i.loli.net/2021/07/18/kVvGAqnbdtFgOiW.png)
 
+---
+
 # Git高级功能
 
+## 1. git add
+
+
+
+## 2. git commit
+
+### git commit多行提交原因
+
+但是这种方式只能写一行的注释，如果你想要对commit的内容进行详细的讲解，以便仔细检查提交的文件，那你可能需要写多行注释，这个命令就不适用了。
+
+```
+git  -m "commit title" -m "commit description"
+```
+
+![image-20210726104439361](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726104439361-1627267481057.png)
+
+![image-20210726104508385](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726104508385-1627267509742.png)
+
+### 修改最新一条提交记录的提交原因
+
+```
+git commit --amend -m "提交原因"
+```
+
+## 3. git status
+
+### 简短方式查看status
+
+```
+git status -s
+```
+
+![image-20210726105245260](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726105245260-1627267966494.png)
