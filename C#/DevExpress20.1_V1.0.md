@@ -1,5 +1,7 @@
 
 
+
+
 # 疑问总结
 
 * 注意看designer.cs中的内容，了解代码形式怎么编写
@@ -36,6 +38,14 @@ https://zhuanlan.zhihu.com/p/34037924
 
 ---
 
+# 零散知识点
+
+## 截图，用画图打开，可用吸管获取精确颜色
+
+`吸管`吸取，然后`编辑颜色`，可得蓝色为(137,240,92)
+
+![image-20210727171219400](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727171219400.png)
+
 # 安装
 
 ## 1. 汉化
@@ -58,11 +68,17 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 
 ## 1. XtraForm
 
-*  XtraForm.FormBorderEffect设置边框被选中时发光或是阴影。ActiveGlowColor设定选中时边框的发光颜色，InactiveGlowColor设定未选中时边框的发光颜色。
+*  XtraForm.FormBorderEffect——设置边框被选中时发光或是阴影。ActiveGlowColor设定选中时边框的发光颜色，InactiveGlowColor设定未选中时边框的发光颜色。
 
-* Opacity设定窗体透明度
+*  Opacity——设定窗体透明度
 
-  
+* FormBorderStyle——设置是否有标题栏
+
+  ![image-20210727111359355](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727111359355.png)
+
+* IconOptions.ShowIcon——是否显示标题栏图标
+
+  ![image-20210727111506947](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727111506947.png)
 
 
 ## 2. Ribbon Form
@@ -1333,7 +1349,15 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 # Navigation & Layout——容器
 
-## 1.  XtraBars.Navigation.TileBarItem.TileBar——磁贴
+## 1. PanelControl
+
+https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=netframework
+
+
+
+
+
+## 2.  XtraBars.Navigation.TileBarItem.TileBar——磁贴
 
 ### （1）属性
 
@@ -1345,9 +1369,18 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 * tileBar——ScrollMode，滑动模式
 
-  AllowSelectedItem——设为true，才允许磁贴被选中
+* AllowSelectedItem——设为true，才允许磁贴被选中
 
 * Orientation——磁贴排列的方向，水平/垂直
+
+* VerticalContentAlignment——tileItem的水平对齐方式
+
+  ![image-20210727142330007](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727142330007.png)
+
+  ![image-20210727142403870](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727142403870.png)
+
+* HorizontalContentAlignment——设置水平对齐方式
+* **IndentBetweenItems**——设置磁贴间距
 
 * tileBarItem——DropDownControl，设置磁贴下拉菜单。用`tileBarDropDownContainer`，再往里添加控件（还可以添加tileBar）
 
@@ -1375,7 +1408,25 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
   ![image-20210720111852029](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210720111852029.png)
 
-## 2. tileNavPane——分层次磁贴（最多三层）
+* ItemSize——磁贴高度
+
+  ![image-20210727101946708](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727101946708.png)
+
+* 在磁贴中放多个文本和图像
+
+  ![image-20210727141408458](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141408458.png)
+
+  ![image-20210727141449186](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141449186.png)
+
+* ItemSize——设置磁贴是正方形/长方形
+
+  ![image-20210727141756830](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141756830.png)
+
+
+
+
+
+## 3. tileNavPane——分层次磁贴（最多三层）
 
 ### （1）概念
 
@@ -1391,7 +1442,7 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
    
 
-## 3. WindowsUIButtonPanel
+## 4. WindowsUIButtonPanel
 
 **使用时，一定要注意Button是PushButton还是CheckButton。若是Checkbutton，则需要把GroupIndex设为同一正整数，通过每个button的Tag搭配ButtonChecked事件使用，可触发每个按钮被按下时的动作**
 
@@ -1460,7 +1511,7 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
   
   ```
 
-## 4. BehaviorManager——将换页按钮绑定到页面
+## 5. BehaviorManager——将换页按钮绑定到页面
 
 ### （1）target为tileBar/imageSlider
 
@@ -1486,7 +1537,7 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
 
 
-## 5. NavigationFrame——可翻页页面
+## 6. NavigationFrame——可翻页页面
 
 ### （1）属性
 
@@ -1529,9 +1580,11 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
   
 
-  
+* TransitionAnimationProperties——设置切换效果的切换速度
 
-## 6. LayoutControl——
+
+
+## 7. LayoutControl——
 
 ### （1）属性
 
@@ -1539,9 +1592,27 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
 
 
-## 7. AccordionControl——
+## 8. AccordionControl——
 
 
 
-## 8. TabPane
+## 9. TabPane
+
+
+
+## 10. SearchPanel
+
+
+
+## 11. SidePanel
+
+https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layout-managers/side-panel?f=panelControl
+
+
+
+# Scheduling
+
+## TimeZoneEdit——时区选择
+
+
 

@@ -345,6 +345,22 @@ https://www.jianshu.com/p/58a166f24c81
 
 https://zhuanlan.zhihu.com/p/269043827
 
+```
+git merge [待合并分支]	//将待合并分支合并到当前分支
+```
+
+#### <1> fast-forward模式
+
+
+
+#### <2> no-fast-forward模式
+
+```
+git merge --no-ff
+```
+
+
+
 
 
 ### （8）rebase
