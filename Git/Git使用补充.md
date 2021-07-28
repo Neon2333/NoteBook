@@ -58,35 +58,43 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 
 > * 未commit，未生成新的版本号
 >
->   用本地仓库**回滚暂存区**，将暂存区和HEAD保持一致
+>   用暂存区回滚working tree
 >
->   本地仓库的最新commit不变，因为HEAD的指向未变
+>   ```
+>   git checkout .
+>   ```
+>   
+> * 未commit
+>
+>   用本地仓库**回滚暂存区**，将暂存区和HEAD保持一致
 >
 >   ```
 >   git reset HEAD
 >   ```
+>   
+> * 未commit
 >
-> * 未commit，未生成新的版本号。用本地仓库回滚**暂存区和WorkSpace**，将工作区、暂存区和HEAD保持一致
+>   用本地仓库回滚**暂存区和WorkSpace**，将工作区、暂存区和HEAD保持一致
 >
 >   ```
 >   git reset --hard HEAD
 >   ```
 >
-> * 已commit，生成了新的版本号，回滚本地仓库到上一版本号
+> * 已commit，生成了新的版本号
 >
->   HEAD指向上个commit
+>   回滚本地仓库到上一版本号
 >
 >   ```
->   git reset HEAD^
+>   git reset HEAD~1		//HEAD指向上个commit，
 >   git reset 版本号
 >   ```
 >
-> * 已commit了，生成了新的版本号，回滚本地仓库到上一版本的同时，将工作区和暂存区也于新的HEAD保持一致
+> * 已commit
 >
->   HEAD指向上个commit
+>   回滚本地仓库到上一版本的同时，将工作区和暂存区也于新的HEAD保持一致
 >
 >   ```
->   git reset --hard HEAD^
+>   git reset --hard HEAD~1
 >   git reset --hard 版本号
 >   ```
 
@@ -169,10 +177,10 @@ git checkout daily/1.0.0
 git checkout -b daily/0.0.1
 ```
 
-创建dev分支的同时，关联远程分支origin/dev
+创建dev分支的同时，关联分支origin/dev
 
 ```
-git checkout -b dev origin/dev
+git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
 ```
 
 
@@ -251,13 +259,11 @@ https://www.jianshu.com/p/d07f5a8f604d
 
   此时，1. 可以在origin/master的基础上工作。2. 可以将origin/master合并到master分支
 
-  > 在origin/master基础上工作，而不是在master基础上工作的话。建立本地分支dev关联远程分支origin/master
+  > 在origin/master基础上工作，而不是在master基础上工作的话。建立本地分支test关联远程分支origin/master
   >
   > ```
-  > git checkout -b dev origin/master
+  > git checkout -b test origin/master
   > ```
-  >
-  > 
   >
   > ![img](https://i.loli.net/2021/07/27/fGwY4utAS1Vd98a.jpg)
 

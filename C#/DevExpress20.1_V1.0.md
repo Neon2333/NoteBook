@@ -1357,72 +1357,91 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 
 
-## 2.  XtraBars.Navigation.TileBarItem.TileBar——磁贴
+## 2.  TileBar——磁贴
 
 ### （1）属性
 
-* tilebar内添加tileGroup，在tileGroup中添加tileBar
+#### tilebar内添加tileGroup，在tileGroup中添加tileBar
 
-* 在tileGroup的Text中设置标题
+#### 在tileGroup的Text中设置标题
 
 ![image-20210715083153298](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715083153298.png)
 
-* tileBar——ScrollMode，滑动模式
+#### tileBar——ScrollMode，滑动模式
 
-* AllowSelectedItem——设为true，才允许磁贴被选中
+#### AllowSelectedItem——设为true，才允许磁贴被选中
 
-* Orientation——磁贴排列的方向，水平/垂直
+#### Orientation——磁贴排列的方向，水平/垂直
 
-* VerticalContentAlignment——tileItem的水平对齐方式
+#### VerticalContentAlignment——tileItem的水平对齐方式
 
-  ![image-20210727142330007](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727142330007.png)
+![image-20210727142330007](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727142330007.png)
 
-  ![image-20210727142403870](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727142403870.png)
+![image-20210727142403870](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727142403870.png)
 
-* HorizontalContentAlignment——设置水平对齐方式
-* **IndentBetweenItems**——设置磁贴间距
+#### HorizontalContentAlignment——设置水平对齐方式
 
-* tileBarItem——DropDownControl，设置磁贴下拉菜单。用`tileBarDropDownContainer`，再往里添加控件（还可以添加tileBar）
+#### IndentBetweenItems——设置磁贴间距
 
-  DropDownOptions——设置下拉菜单
+#### tileBarItem——DropDownControl，设置磁贴下拉菜单。用`tileBarDropDownContainer`，再往里添加控件（还可以添加tileBar）
 
-  > AutoHeight——是否自动设置高度
-  >
-  > BackColorMode——下拉菜单的背景色
-  >
-  > > UseTileBackColor——使用磁贴颜色作为下拉菜单颜色
-  > >
-  > > UseBeakColor——使用BeakColor
-  >
-  > ImageOptions
-  >
-  > > ImageAlignment——图片位置
-  >
-  > TextAlignment——文字位置
+#### DropDownOptions——设置下拉菜单
 
-* Hover、selected效果由`AppearanceItem`设置
+> AutoHeight——是否自动设置高度
+>
+> BackColorMode——下拉菜单的背景色
+>
+> > UseTileBackColor——使用磁贴颜色作为下拉菜单颜色
+> >
+> > UseBeakColor——使用BeakColor
+>
+> ImageOptions
+>
+> > ImageAlignment——图片位置
+>
+> TextAlignment——文字位置
 
-* 将tileBarDropDownContainer置于底层，tileBar置于顶层
+#### Hover、selected效果由`AppearanceItem`设置
 
-* WideTileWidth——磁贴宽度
+#### 将tileBarDropDownContainer置于底层，tileBar置于顶层
 
-  ![image-20210720111852029](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210720111852029.png)
+#### WideTileWidth——磁贴宽度
 
-* ItemSize——磁贴高度
+![image-20210720111852029](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210720111852029.png)
 
-  ![image-20210727101946708](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727101946708.png)
+#### ItemSize——磁贴高度
 
-* 在磁贴中放多个文本和图像
+![image-20210727101946708](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727101946708.png)
 
-  ![image-20210727141408458](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141408458.png)
+#### 在磁贴中放多个文本和图像
 
-  ![image-20210727141449186](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141449186.png)
+![image-20210727141408458](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141408458.png)
 
-* ItemSize——设置磁贴是正方形/长方形
+![image-20210727141449186](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141449186.png)
 
-  ![image-20210727141756830](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141756830.png)
+#### ItemSize——设置磁贴是正方形/长方形
 
+![image-20210727141756830](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141756830.png)
 
+### （2）tileBarItem
+
+#### imageToTextAlignment——图标在文字的位置
+
+#### imageToTextIndent——图标与文字的间距
+
+#### 控制DropDownWindow显示/隐藏
+
+![image-20210728172726861](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210728172726861.png)
+
+```C#
+this.tileBar_mainMenu.ShowDropDown(this.tileBarItem_statusMonitoring);	//显示tileBarItem_statusMonitoring对应的子页面
+```
+
+```c#
+this.tileBar_mainMenu.HideDropDownWindow(false);	//隐藏tileBar_mainMenu对应的子页面
+//false——使用动画效果
+//true——立即关闭，不使用动画效果
+```
 
 
 
