@@ -693,6 +693,7 @@ git  -m "commit title" -m "commit description"
 
 ```
 git commit --amend -m "提交原因"
+git commit --amend --no-edit
 ```
 
 ## 3. git status
