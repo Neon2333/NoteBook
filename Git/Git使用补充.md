@@ -295,6 +295,10 @@ git merge [待合并分支]	//将待合并分支合并到当前分支
 
 #### fast-forward模式
 
+```
+git merge --ff
+```
+
 
 
 #### no-fast-forward模式
