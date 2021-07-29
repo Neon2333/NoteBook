@@ -773,13 +773,11 @@ git commit --amend -m "提交原因"
 git commit --amend --no-edit
 ```
 
-#### git commit -a -m
+### git commit -a -m
 
 ```
 等价于git add + git commit -m
 ```
-
-
 
 ## 3. git status
 
