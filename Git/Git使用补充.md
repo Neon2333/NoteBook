@@ -2,6 +2,8 @@
 
 ## 1. *版本回滚——git reset*
 
+**reset和revert的区别：reset会删除某commit-id之后所有的commit**
+
 https://blog.csdn.net/weixin_44802825/article/details/104814984
 
 ### 原理
@@ -124,11 +126,12 @@ git branch daily/0.0.0	//新建日常开发分支daily/0.0.0
 
 ### （2）重命名分支
 
-```
-git branch daily/0.0.0 daily/1.0.0	//重命名分支daily/0.0.0为daily/1.0.0
-```
+      ```
+      git branch -m <oldbranch> <newbranch>	//重命名分支
+      git branch -M <oldbranch> <newbranch>	//强制重命名
+      ```
 
-### （3）删除分支
+### （3）git branch -d——删除分支
 
 * 删除本地分支daily/1.0.0
 
@@ -148,7 +151,7 @@ git branch daily/0.0.0 daily/1.0.0	//重命名分支daily/0.0.0为daily/1.0.0
   git push origin --delete daily/1.0.0
   ```
 
-### （4）查看分支列表——git branch -a
+### （4）git branch -a——查看分支列表
 
 ```
 git branch	//当前项目分支列表
@@ -160,10 +163,10 @@ git branch -a	//查看本地仓库和远程仓库上所有分支列表
 git branch -r	//查看远程仓库所有分支列表
 git branch -r -d origin/branch-name		//查看并删除远程仓库上分支branch-name
 git branch -D	//分支未提交到本地版本库前强制删除分支
-bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交id、提交原因
+bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交id、各本地分支与远程分支的关联情况。ahead标识本地仓库超前远程仓库几个commit
 ```
 
-### （5）切换分支——git checkout
+### （5）git checkout——切换分支
 
 切换分支，HEAD会改变指向
 
@@ -171,29 +174,97 @@ bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交
 git checkout daily/1.0.0
 ```
 
-创建 `daily/0.0.1` 分支，同时切换到这个新创建的分支
+创建 `daily/0.0.1` 分支，同时**切换**到这个新创建的分支
 
 ```
 git checkout -b daily/0.0.1
 ```
 
-创建dev分支的同时，关联分支origin/dev
+创建dev分支的同时，**关联分支**origin/dev
 
 ```
 git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
 ```
 
+### （6）git stash——暂存
 
+* 原理
 
+  stash就是一个栈，把add后再在working tree发生的修改进行暂存，把工作区恢复到修改之前的状态
 
+  ***只有未add的文件才能stash***
 
+  可以跨分支
 
+* 操作
 
-### （11）暂存——git stash
+  > * 暂存当前工作进度，将工作区和暂存区恢复到修改之前
+  >
+  >   ```
+  >   git stash save "message"
+  >   ```
+  >
+  > * 显示暂存列表，编号`stash@{num}`越小代表保存进度的时间越近（显示栈内）
+  >
+  >   ```
+  >   git stash list
+  >   ```
+  >
+  > * 恢复到工作区
+  >
+  >   ```
+  >   git stash pop stash@{num}	//暂存从栈中弹出。因此只能恢复工作区一次
+  >   git stash apply stash@{num}	//暂存不从栈中弹出，可多次恢复工作区
+  >   git stash pop //等价于git stash pop stash@{0}
+  >   ```
+  >
+  > * 删除栈中暂存、清空栈
+  >
+  >   ```
+  >   git stash drop stash@{num}	//删除stash@{num}
+  >   git stash clear	//清空栈
+  >   ```
+  >
+  >   
 
+* 应用场景
 
+  > * 忘记切换到自己的分支，在不该修改的分支上修改了工作区
+  >
+  >   ```
+  >   //暂存上次add后的修改
+  >   git stash save <message>
+  >   //切换到自己的分支
+  >   git checkout myBranch
+  >   //释放暂存
+  >   git stash pop
+  >   ```
+  >
+  > * 远程分支改动未pull就在本地修改，且发生了冲突，pull的话需要解决冲突
+  >
+  >   为了避免合并解决冲突的情况，在本地修改还未add时，可以先暂存本地修改，pull后，再把修改放出来到working tree
+  >
+  >   ```
+  >   //暂存未add修改
+  >   git stash save <message>
+  >   //pull
+  >   git fetch origin master
+  >   git merge origin/master
+  >   //释放暂存
+  >   git stash pop
+  >   ```
+  >
+  >   
 
-### （12）分支的日常使用情景
+### （7）default分支
+
+[修改default分支](https://blog.csdn.net/xuchaoxin1375/article/details/111414527?utm_term=github%E5%88%86%E6%94%AFdefault&utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~all~sobaiduweb~default-0-111414527&spm=3001.4430)
+
+![image-20210729100510261](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210729100510261-1627524312032.png)
+
+> Settings----->Branches------->右侧箭头
+
+### （8）分支的日常使用情景
 
 
 
@@ -294,6 +365,10 @@ git merge [待合并分支]	//将待合并分支合并到当前分支
 ```
 
 #### fast-forward模式
+
+```
+git merge --ff
+```
 
 
 
@@ -652,7 +727,7 @@ build/	//忽略build目录下的所有文件
 
 ```
 git tag publish/0.0.1	//给当前代码打上标签publish/0.0.1，表示当前代码以publish/0.0.1发布
-git push origin public/0.0.1	//推送到服务器
+git push origin publish/0.0.1	//推送到服务器
 ```
 
 ## 12. git bash快捷键
@@ -669,7 +744,7 @@ git push origin public/0.0.1	//推送到服务器
 
 ---
 
-# Git高级功能
+# Git高级
 
 ## 1. git add
 
@@ -682,26 +757,76 @@ git push origin public/0.0.1	//推送到服务器
 但是这种方式只能写一行的注释，如果你想要对commit的内容进行详细的讲解，以便仔细检查提交的文件，那你可能需要写多行注释，这个命令就不适用了。
 
 ```
-git  -m "commit title" -m "commit description"
+git commit -m "commit title" -m "commit description"
 ```
 
 ![image-20210726104439361](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726104439361-1627267481057.png)
 
 ![image-20210726104508385](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726104508385-1627267509742.png)
 
-### git commit --amend——修改最新一条提交记录的提交原因
+### git commit --amend——修改最新一条提交记录的message
+
+若暂存区发生了改变，会将暂存区的改变提交
 
 ```
 git commit --amend -m "提交原因"
 git commit --amend --no-edit
 ```
 
+#### git commit -a -m
+
+```
+等价于git add + git commit -m
+```
+
+
+
 ## 3. git status
 
-### 简短方式查看status
+* 简短方式查看status
 
 ```
 git status -s
 ```
 
 ![image-20210726105245260](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726105245260-1627267966494.png)
+
+## 4. git blame \<filename>
+
+查看文件的修改者和修改内容
+
+## 5. git whatchanged --since='2 weeks ago'  
+
+查看当前分支在某个时间节点前的commit log
+
+## 6. 文件标识
+
+> A: 增加的文件.
+>
+> C: 文件的一个新拷贝.
+>
+> D: 删除的一个文件.
+>
+> M: 文件的内容或者mode被修改了.
+>
+> R: 文件名被修改了。
+>
+> T: 文件的类型被修改了。
+>
+> U: 文件没有被合并(你需要完成合并才能进行提交)
+>
+> X: 未知状态。(很可能是遇到git的bug了，你可以向git提交bug report)
+
+![image-20210729102540996](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210729102540996-1627525543734.png)
+
+## 7. git log --pretty=oneline --graph --decorate --all
+
+```
+--pretty=oneline	//一行显示完整commit-id
+--oneline	//一行显示缩略commit-id
+--graph	//图形化显示
+--decorate	//显示tag
+```
+
+![image-20210729103904316](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210729103904316-1627526345534.png)
+
