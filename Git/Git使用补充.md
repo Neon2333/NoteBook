@@ -12,11 +12,13 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 
 [reset加不加hard的区别](https://blog.csdn.net/chenpuzhen/article/details/92006378)
 
-> reset --soft——仅仅将HEAD指向新版本号
->
-> reset——将HEAD指向新版本号，且更改暂存区（reset --mixed是默认情况，--mixed可省略）
->
-> reset --hard——将HEAD指向新版本号，且暂存区和工作区一起更改
+```
+reset --soft	//仅仅将HEAD指向新版本号
+
+reset	//将HEAD指向新版本号，且更改暂存区（reset --mixed是默认情况，--mixed可省略）
+
+reset --hard	//将HEAD指向新版本号，且暂存区和工作区一起更改
+```
 
 > https://blog.csdn.net/albertsh/article/details/106448035
 >
@@ -38,7 +40,7 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 >
 > 其实到这里，暂存区的修改就撤销了。工作区中内容可用下面的方法撤销，但是没什么必要，直接修改就行了。除非，**你需要一步将Workspace中某些文件还原**。
 >
-> （执行**git reset HEAD**后，***用git status查看，发现已经退到未add的状态（Workspace中有未track的文件）。***这表明暂存区已经被还原到add之前的状态。但是Workspace中有未track的文件恰恰表明，Workspace中的错误文件还在。要想**回退Workspace中的文件的错误修改**的话：**it checkout --<file> to discard changes in working directory**这个意思就是下载某某文件，**丢弃掉该文件在工作区的改变内容** ，需要根据提示输入被修改的文件名。）
+> （执行**git reset HEAD**后，***用git status查看，发现已经退到未add的状态（Workspace中有未track的文件）。***这表明暂存区已经被还原到add之前的状态。但是Workspace中有未track的文件恰恰表明，Workspace中的错误文件还在。要想**回退Workspace中的文件的错误修改**的话：`git checkout \<filename>`）
 >
 > 这样，先撤销add到暂存区，再撤销对Workspace某个文件的修改，最后完全撤销对文件的错误修改。
 >
@@ -46,7 +48,7 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 >
 > 已经commit了，还没有push,push的内容我们先不管，push这个命令其实和提交没关系，他只是推送到远程了，如果push了，也就是我们**回退了之后，再重新push一下而已**，所以请不要纠结push这个操作。他和提交版本其实没有关系的。 
 >
-> 已经commit了，说明已经生成了最新的版本号了，此时我们想回退，则肯定是回退到之前的一个版本，版本号用git log查看。 git为我们提供了一个更简单的回退上一个版本的方法 **git reset HEAD^**,此命令专门用于回退到上一个版本。若你的错误已经经过好几次commit，回退到上一个版本无法解决时，就查看版本号，用git reset 版本号回退。
+> 已经commit了，说明已经生成了最新的版本号了，此时我们想回退，则肯定是回退到之前的一个版本，版本号用git log查看。 git为我们提供了一个更简单的回退上一个版本的方法 **git reset HEAD~**,此命令专门用于回退到上一个版本。若你的错误已经经过好几次commit，回退到上一个版本无法解决时，就查看版本号，用git reset 版本号回退。
 >
 > 回退后，就进入了（1）中 的状态，再按照（1）中描述进行回退。
 >
@@ -100,15 +102,19 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 >   git reset --hard 版本号
 >   ```
 
+---
+
 ## 2 远程仓库回滚
 
 当代码已经Push到远程仓库后，发现push的代码有问题，怎么回滚到之前的版本呢？
 
 
 
+---
+
 ## 3. *分支操作*
 
-**分支操作的各种情形下的处理方法，最好的办法是明确提交路径（commit快照）**
+**分支操作的各种情形下的处理方法，最好的办法是明确提交分支的提交路径（commit快照），脑子里要有几条平行的分支的提交记录。**
 
 **本地电脑上不但有本地的分支HEAD，也会记录远程仓库的指针origin/master和origin/dev，push时和远程仓库同步**
 
@@ -126,10 +132,8 @@ git branch daily/0.0.0	//新建日常开发分支daily/0.0.0
 
 ### （2）重命名分支
 
-      ```
       git branch -m <oldbranch> <newbranch>	//重命名分支
       git branch -M <oldbranch> <newbranch>	//强制重命名
-      ```
 
 ### （3）git branch -d——删除分支
 
@@ -174,7 +178,7 @@ bit branch -vv	//查看本地仓库分支列表，带有各分支的最后提交
 git checkout daily/1.0.0
 ```
 
-创建 `daily/0.0.1` 分支，同时**切换**到这个新创建的分支
+创建的同时**切换**`daily/0.0.1`分支
 
 ```
 git checkout -b daily/0.0.1
@@ -190,11 +194,11 @@ git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
 
 * 原理
 
-  stash就是一个栈，把add后再在working tree发生的修改进行暂存，把工作区恢复到修改之前的状态
+  stash就是一个栈，把add后再在working tree发生的修改进行暂存，并把工作区恢复到修改之前的状态
 
   ***只有未add的文件才能stash***
 
-  可以跨分支
+  可以跨分支恢复
 
 * 操作
 
@@ -214,18 +218,17 @@ git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
   >
   >   ```
   >   git stash pop stash@{num}	//暂存从栈中弹出。因此只能恢复工作区一次
-  >   git stash apply stash@{num}	//暂存不从栈中弹出，可多次恢复工作区
   >   git stash pop //等价于git stash pop stash@{0}
+  >   git stash apply stash@{num}	//暂存不从栈中弹出，可多次恢复工作区
   >   ```
   >
-  > * 删除栈中暂存、清空栈
+  > * 删除栈中某一暂存、清空栈
   >
   >   ```
   >   git stash drop stash@{num}	//删除stash@{num}
   >   git stash clear	//清空栈
   >   ```
   >
-  >   
 
 * 应用场景
 
@@ -233,7 +236,7 @@ git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
   >
   >   ```
   >   //暂存上次add后的修改
-  >   git stash save <message>
+  >   git stash save "message"
   >   //切换到自己的分支
   >   git checkout myBranch
   >   //释放暂存
@@ -246,15 +249,26 @@ git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
   >
   >   ```
   >   //暂存未add修改
-  >   git stash save <message>
+  >   git stash save "message"
   >   //pull
   >   git fetch origin master
   >   git merge origin/master
   >   //释放暂存
   >   git stash pop
   >   ```
-  >
   >   
+  > * git merge时有未commit的文件，先stash，再merge，否则一旦merge出问题，用merge --abort无法恢复到merge之前的状态
+  >
+  >   ```
+  >   //工作区有未commit或未add的文件
+  >   git stash save "temp for merge"
+  >   //merge
+  >   git merge 
+  >   //fix confliction
+  >   //stash pop
+  >   stash pop
+  >   ```
+  >
 
 ### （7）default分支
 
@@ -267,6 +281,8 @@ git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
 ### （8）分支的日常使用情景
 
 
+
+---
 
 ## 4. 冲突操作
 
@@ -288,20 +304,18 @@ https://www.jianshu.com/p/d07f5a8f604d
 
 ![img](https://i.loli.net/2021/07/27/kNTbjcUVmPa2JK5.jpg)
 
-
-
-#### git fetch [远程主机名] [分支名]
+#### git fetch [remote-name] [branch-name]
 
 * 指定远程仓库，默认是master分支
 
   ```
-  git fetch [远程主机名]
+  git fetch [remote-name]
   ```
 
 * 取回特定分支
 
   ```
-  git fetch [远程主机名] [分支名]
+  git fetch [remote-name] [branch-name]
   ```
 
   比如，取回origin仓库的master分支
@@ -310,13 +324,11 @@ https://www.jianshu.com/p/d07f5a8f604d
   git fetch origin master
   ```
 
-* 取回的代码在本地主机上会建立指针`远程主机名/分支名`指向拉取的分支的最新commit
+* 取回的代码在本地主机上会建立指针`远程主机名/分支名`指向拉取的分支的最新commit。如：fetch master分之后更新：origin/master
 
-* git fetch命令通常用来查看其他人的进程，因为它**取回的代码对你本地的开发代码没有影响**
+* git fetch命令通常用来查看其他人的分支的开发进程，因为它**取回的代码对你本地的开发代码没有影响**
 
   对于拉取的代码分支，查看后，若不需要，可用`git branch -d`删除
-
-
 
 #### git fetch origin
 
@@ -326,11 +338,11 @@ https://www.jianshu.com/p/d07f5a8f604d
 
 
 
-* 拉取了origin/master后，此时由于C0和D0，origin/master和master产生了分支。
+* 拉取了origin/master后，此时由于C0和D0，origin/master和master从B2开始产生了冲突。
 
   此时，1. 可以在origin/master的基础上工作。2. 可以将origin/master合并到master分支
 
-  > 在origin/master基础上工作，而不是在master基础上工作的话。建立本地分支test关联远程分支origin/master
+  > 1. 在origin/master基础上工作，而不是在master基础上工作的话。建立本地分支test关联远程分支origin/master
   >
   > ```
   > git checkout -b test origin/master
@@ -338,21 +350,19 @@ https://www.jianshu.com/p/d07f5a8f604d
   >
   > ![img](https://i.loli.net/2021/07/27/fGwY4utAS1Vd98a.jpg)
 
-> 将origin/master分支的内容和master分支合并
+> 2. 将origin/master分支的内容和master分支合并
 >
 > ```
 > //直接将origin/master合并到master分支
 > git checkout master
-> git merge origin/master
+> git merge origin/master --no-ff
 > ```
 >
 > ![img](https://i.loli.net/2021/07/27/oXAmFwKq7pNinSg.jpg)
 
-
-
-
-
 ### （3）git merge
+
+***merge开始时最好不要有未commit的文件，否则merge --abort时可能会发生无法回到merge之前的状态。若有，用stash暂存，待merge结束确认无问题后再stash pop***
 
 #### [图解说明，豁然开朗](https://zhuanlan.zhihu.com/p/132573100)
 
@@ -364,31 +374,45 @@ https://zhuanlan.zhihu.com/p/269043827
 git merge [待合并分支]	//将待合并分支合并到当前分支
 ```
 
+#### merge撤销
+
+```
+git merge --abort
+```
+
+```
+git reset --hard HEAD~
+```
+
 #### fast-forward模式
+
+在当前分支相比于我们要合并的分支没有额外的提交（commit）时，可以执行 fast-forward 合并。Git 很懒，首先会尝试执行最简单的选项：fast-forward！这类合并不会创建新的提交，而是会将我们正在合并的分支上的提交直接合并到当前分支。
 
 ```
 git merge --ff
 ```
 
-
+![merge--ff](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\merge--ff-1627609842321.gif)
 
 #### no-fast-forward模式
+
+如果我们在当前分支上提交我们想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。
+
+使用 no-fast-forward 合并时，Git 会在当前活动分支上创建新的 merging commit。这个提交的父提交（parent commit）即指向这个活动分支（HEAD^1），也指向我们想要合并的分支（HEAD^2）。
 
 ```
 git merge --no-ff
 ```
 
-
-
-
+![merge--no-ff](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\merge--no-ff-1627611067936.gif)
 
 ### （4）rebase
 
-https://zhuanlan.zhihu.com/p/145037478
-
-https://www.jianshu.com/p/4a8f4af4e803
-
-https://blog.csdn.net/nrsc272420199/article/details/85555911
+> https://zhuanlan.zhihu.com/p/145037478
+>
+> https://www.jianshu.com/p/4a8f4af4e803
+>
+> https://blog.csdn.net/nrsc272420199/article/details/85555911
 
 **不要通过rebase对任何已经提交到公共仓库中的commit进行修改，只针对自己的开发分支进行。**
 
@@ -396,11 +420,11 @@ rebase主要有两个用法：
 
 #### 合并多个commit为一个完整commit
 
-***这种用法有一个重要问题：rebase后可以push吗？？***
-
+> ***这种用法有一个重要问题：rebase后可以push吗？？***
+>
 > 
 
-> 当我们在本地仓库中提交了多次，在我们把本地提交push到公共仓库中之前，为了让提交记录更简洁明了，我们希望把如下分支B、C、D三个提交记录合并为一个完整的提交，然后再push到公共仓库。
+> 当我们在本地仓库中提交了多次，在我们把本地提交push到公共仓库中之前，为了让提交记录更简洁明了，我们希望把如下分支B、C、D三个提交记录合并为一个完整的提交B'，然后再push到公共仓库。
 >
 > ![image-20210727005742741](https://i.loli.net/2021/07/27/p2Z9LfvRxYdCT6U.png)
 >
@@ -410,63 +434,66 @@ rebase主要有两个用法：
 >
 > 这里我们使用命令:
 >
-> 
->
 > ```css
-> git rebase -i  [startpoint]  [endpoint]
+>git rebase -i  [startpoint]  [endpoint]
 > ```
->
-> 其中`-i`的意思是`--interactive`，即弹出交互式的界面让用户编辑完成合并操作，`[startpoint]`  `[endpoint]`则指定了一个编辑区间，如果不指定`[endpoint]`，则该区间的终点默认是当前分支`HEAD`所指向的`commit`(注：该区间指定的是一个前开后闭的区间)。
-> 在查看到了log日志后，我们运行以下命令：
->
 > 
+> 其中`-i`的意思是`--interactive`，即弹出交互式的界面让用户编辑完成合并操作，`[startpoint]`  `[endpoint]`则指定了一个编辑区间，如果不指定`[endpoint]`，则该区间的终点默认是当前分支`HEAD`所指向的`commit`(注：该区间指定的是一个前开后闭的区间)。
 >
-> ```undefined
+> [startpoint]指定为所有要合并的commit-id的前一个commit-id
+> 
+>在查看到了log日志后，我们运行以下命令：
+> 
+>```undefined
 > git rebase -i 36224db
 > ```
->
-> 或:
->
 > 
->
-> ```undefined
+>或:
+> 
+>```undefined
 > git rebase -i HEAD~3 //将包含HEAD在内的n个commit合并的话，就是HEAD~n
-> ```
->
+>```
+> 
 > 然后我们会看到如下界面:
->
-> ![image-20210727005822758](https://i.loli.net/2021/07/27/cI5fMYpBDqr26W4.png)
->
+> 
+>![image-20210727005822758](https://i.loli.net/2021/07/27/cI5fMYpBDqr26W4.png)
+> 
 >
 > 上面未被注释的部分列出的是我们本次rebase操作包含的所有提交，下面注释部分是git为我们提供的命令说明。每一个commit id 前面的`pick`表示指令类型，git 为我们提供了以下几个命令:
 >
-> > - pick：保留该commit（缩写:p）
+>> - pick：保留该commit（缩写:p）
 > > - reword：保留该commit，但我需要修改该commit的注释（缩写:r）
-> > - edit：保留该commit, 但我要停下来修改该提交(不仅仅修改注释)（缩写:e）
+>> - edit：保留该commit, 但我要停下来修改该提交(不仅仅修改注释)（缩写:e）
 > > - squash：将该commit和前一个commit合并（缩写:s）
 > > - fixup：将该commit和前一个commit合并，但我不要保留该提交的注释信息（缩写:f）
 > > - exec：执行shell命令（缩写:x）
 > > - drop：我要丢弃该commit（缩写:d）
->
+> 
 > 根据我们的需求，我们将commit内容编辑如下:
->
-> ![img](https:////upload-images.jianshu.io/upload_images/2147642-a651234e62ed20a5.png?imageMogr2/auto-orient/strip|imageView2/2/w/536/format/webp)
->
-> 然后是注释修改界面:
->
-> **最终保留的是哪个commit，就修改哪个commit的message**
->
-> ![image-20210727005838589](https://i.loli.net/2021/07/27/PCRjnJEeOoy98cr.png)
->
-> 编辑完保存即可完成commit的合并了：
->
-> ![image-20210727005904255](https://i.loli.net/2021/07/27/RmnLdGhNcgQHTPJ.png)
+> 
+>![img](https:////upload-images.jianshu.io/upload_images/2147642-a651234e62ed20a5.png?imageMogr2/auto-orient/strip|imageView2/2/w/536/format/webp)
+> 
+>然后是注释修改界面:
+> 
+>**最终保留的是哪个commit，就修改哪个commit的message**
+> 
+>![image-20210727005838589](https://i.loli.net/2021/07/27/PCRjnJEeOoy98cr.png)
+> 
+>编辑完保存即可完成commit的合并了：
+> 
+>![image-20210727005904255](https://i.loli.net/2021/07/27/RmnLdGhNcgQHTPJ.png)
 
 #### 将某一段commit粘贴到另一个分支上
 
 > 当我们项目中存在多个分支，有时候我们需要将某一个分支中的一段提交同时应用到其他分支中，就像下图：
 >
 > ![image-20210727012338240](https://i.loli.net/2021/07/27/MNLszwOUFVteBro.png)
+
+#### rebase撤销
+
+
+
+
 
 ### （5）merge和rebase用哪个？
 
@@ -480,7 +507,9 @@ rebase主要有两个用法：
 
   merge和rebase都要用，rebase会隐藏分支的提交历史，最终呈现的结果只有master上的若干分支合并历史，而分支上的commit历史则会消失。
 
+* 两者区别
 
+  merge会保留待合并分支的提交记录。rebase最终只保留一条分支记录。
 
 
 ### （6）git pull=git fetch +git merge
@@ -517,7 +546,7 @@ https://blog.csdn.net/weixin_41975655/article/details/82887273
 git commit --amend
 ```
 
-合并暂存区的修改和HEAD的commit，然后生成新的commit（**commit ID变化了**），用新的commit替代原来的commit。若暂存区没有修改，就相当于替换commit ID和重写message。
+合并暂存区的修改和HEAD的commit，然后生成新的commit（**commit ID变化了**），用新的commit替代原来的commit。若暂存区没有修改，就相当于替换commit ID和重写message。（连带当前的暂存区内容提交，生成新的commit-id，替换HEAD）
 
 #### 功能1——修改message
 
@@ -543,7 +572,7 @@ git commit --amend
 
 ## 3. git push时会更新本地的origin/分支的指向
 
-## 3. HEAD是什么？HEAD^/HEAD~/HEAD~2/HEAD^2是什么？Origin是什么？master是什么？Branch是什么？git push -u中的u是什么？
+## 4. HEAD是什么？HEAD^/HEAD~/HEAD~2/HEAD^2是什么？Origin是什么？master是什么？Branch是什么？git push -u中的u是什么？
 
 https://www.zhihu.com/question/20019419
 
@@ -567,9 +596,7 @@ https://www.zhihu.com/question/20019419
 
 * git push -u中u——使用一次`git push -u origin master`后，告知Git记忆相关参数，下次只需要`git push`即可。（用-u（--up-stream）来建立本地分支与远程某个分支的关联，形成一个管道，之后 git push可以直接沿着管道 到达关联的分支 无需在加-u参数了）
 
-
-
-## 4. 多次commit，想把这若干commit合并为一个——git rebase
+## 5. 多次commit，想把这若干commit合并为一个——git rebase
 
 当我们开发一个功能，不是一时半会可以完成的时候，为了保护代码不丢失，通常会把这次的修改先 commit，等到这个功能完全做好，再 push。不过这样一来，就会有很多零碎的 commit 记录，这会使远程的提交历史显得杂乱。
 
@@ -607,7 +634,7 @@ git rebase -i commit-id	//commit-id为要最终合并的commit-id的上一条com
 
 
 
-## 5. 查看文件的修改情况
+## 6. 查看文件的修改情况
 
 https://blog.csdn.net/cnds123321/article/details/110731428
 
@@ -653,7 +680,7 @@ https://blog.csdn.net/cnds123321/article/details/110731428
 
   功能1：会出现一个编辑器，然后可以修改上一次的提交信息，按键盘上的Insert键进行插入，修改完成后按Esc键并输入:wq保存退出 
 
-## 6.日常操作流程
+## 7.日常操作流程
 
 ### （1）直接从别人的项目里拷贝到文件夹里
 
@@ -695,19 +722,7 @@ git pull origin master
 
 **若本地代码被修改，但是未push到远程服务器。且在另一个主机上修改了服务器上代码。那么pull时，服务器上的改动和本地改动就会产生冲突。一般，git会自动合并冲突。但若涉及到同一行代码的改动，就需要手动合并代码**
 
-
-
-
-
-### 
-
-
-
-
-
-
-
-## 10. push时的忽略文件
+## 8. push时的忽略文件
 
 ```
 touch .gitignore	//创建.gitignore文件，编辑该文件，每行代表push时忽略不上传的文件
@@ -719,7 +734,7 @@ touch .gitignore	//创建.gitignore文件，编辑该文件，每行代表push�
 build/	//忽略build目录下的所有文件
 ```
 
-## 11. tag
+## 9. ***tag***
 
 当完成某项需求时，需要将代码打上一个版本tag，并push到线上。
 
@@ -730,7 +745,7 @@ git tag publish/0.0.1	//给当前代码打上标签publish/0.0.1，表示当前�
 git push origin publish/0.0.1	//推送到服务器
 ```
 
-## 12. git bash快捷键
+## 10. git bash快捷键
 
 * windows系统，在工作目录下，shift+F10，再按s，再按enter。
 
@@ -747,8 +762,6 @@ git push origin publish/0.0.1	//推送到服务器
 # Git高级
 
 ## 1. git add
-
-
 
 ## 2. git commit
 
@@ -826,5 +839,15 @@ git status -s
 --decorate	//显示tag
 ```
 
-![image-20210729103904316](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210729103904316-1627526345534.png)
+## 8. git reflog和git log
+
+git log可以显示所有提交过的版本信息，不包括已经被删除的 commit 记录和 reset 的操作
+
+git reflog是显示所有的操作记录，包括提交，回退的操作。一般用来找出操作记录中的版本号，进行回退
+
+git reflog常用于恢复本地的错误操作
+
+## 9. git push -f \<remote-name>  \<branch-name>
+
+强制推送到远端仓库
 
