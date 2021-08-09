@@ -370,7 +370,7 @@ struct icmp {
 
 * ICMP错误报告报文格式：从错误分片IP数据报取出报头，首位各加8字节作为数据区，再加上ICMP错误报告报头。
 
-  `treaceroute/treacert`
+  `traceroute/tracert`
 
   > 可获取从源主机到目的主机所**经过的路由器**。应用程序将ICMP包中的IP报头中的TLL依次设为1,2,3，……，每经过一跳路由器时TTL减一，当TTL=0时路由器给源主机返回一个**ICMP超时报文**（类型11），这样源主机就可知TTL依次为1,2,3，……时的路由器的IP，并列出来。
   >
@@ -781,6 +781,8 @@ https://blog.csdn.net/q235990/article/details/88177202
   https://zhuanlan.zhihu.com/p/78244069
 
   ![cfbe0172cf7f5078b3a4234dbf7047cb.gif](https://img-blog.csdnimg.cn/img_convert/cfbe0172cf7f5078b3a4234dbf7047cb.gif)
+
+  ![image-20210809100944031](D:\WorkSpace\工作笔记\TCP_IP\TCP_IP.assets\image-20210809100944031-1628474986285.png)
 
   > #### **为什么需要三次握手？**
   >

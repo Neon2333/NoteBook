@@ -1423,7 +1423,13 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 ![image-20210727141756830](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141756830.png)
 
+#### ItemPadding——设置所有磁贴中文字和图片的位置
+
+
+
 ### （2）tileBarItem
+
+#### Padding——设置单个tileBarItem中文字和图片的位置
 
 #### imageToTextAlignment——图标在文字的位置
 
