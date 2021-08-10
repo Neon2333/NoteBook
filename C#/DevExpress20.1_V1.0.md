@@ -1635,6 +1635,10 @@ https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layo
 
 
 
+## 12. splitContainerControl——侧边栏收起
+
+
+
 # Scheduling
 
 ## TimeZoneEdit——时区选择
