@@ -1373,6 +1373,12 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 #### Orientation——磁贴排列的方向，水平/垂直
 
+![image-20210811153241290](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811153241290.png)
+
+![image-20210811153312035](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811153312035.png)
+
+
+
 #### VerticalContentAlignment——tileItem的水平对齐方式
 
 ![image-20210727142330007](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727142330007.png)
@@ -1419,11 +1425,27 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 ![image-20210727141449186](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141449186.png)
 
+* **文字位置**
+
+  ![image-20210811152040016](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811152040016.png)
+
+* **图片位置**
+
+  ![image-20210811152134290](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811152134290.png)
+
+  **通过坐标设置图片位置：**
+
+  ![image-20210811152207925](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811152207925.png)
+
 #### ItemSize——设置磁贴是正方形/长方形
 
 ![image-20210727141756830](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210727141756830.png)
 
-#### ItemPadding——设置所有磁贴中文字和图片的位置
+#### ItemPadding——所有磁贴，文字和图片相对于磁贴的左右上下的距离
+
+![image-20210811152629177](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811152629177.png)
+
+![image-20210811152655351](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811152655351.png)
 
 
 
@@ -1431,9 +1453,21 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 #### Padding——设置单个tileBarItem中文字和图片的位置
 
-#### imageToTextAlignment——图标在文字的位置
 
-#### imageToTextIndent——图标与文字的间距
+
+#### imageToTextIndent——图标不动，文字距图标的距离
+
+![image-20210811152847607](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811152847607.png)
+
+![image-20210811152913375](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811152913375.png)
+
+#### imageToTextAlignment——图标相对于文本的位置
+
+![image-20210811153056987](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811153056987.png)
+
+![image-20210811153120508](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811153120508.png)
+
+
 
 #### 控制DropDownWindow显示/隐藏
 
