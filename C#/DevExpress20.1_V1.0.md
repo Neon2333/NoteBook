@@ -1363,13 +1363,31 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 #### tilebar内添加tileGroup，在tileGroup中添加tileBar
 
-#### 在tileGroup的Text中设置标题
+#### 在tileBarGroup的Text中设置标题
 
-![image-20210715083153298](D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715083153298.png)
+**Visible设置文字是否显示——Visible会影响最上面Item的Top间距（由tileBar.Padding设置，注意和tileBarItem.Padding的区别）**
 
-#### tileBar——ScrollMode，滑动模式
+**一般而言，Visible不要设为false。在Visible=true的基础上，将Text设为空，然后设置Padding调整tileBarGroup的间距**
+
+![image-20210812160025613](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812160025613.png)
+
+![image-20210812160055507](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812160055507.png)
+
+#### AppearanceGroupText——tileBarGroup上文字的颜色格式
+
+![image-20210812095240415](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812095240415.png)
+
+#### Padding——设置TileBarGroup的间距
+
+![image-20210812160600747](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812160600747.png)
+
+![image-20210812160714926](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812160714926.png)
+
+#### ScrollMode——滑动模式
 
 #### AllowSelectedItem——设为true，才允许磁贴被选中
+
+#### AllowItemHover——设为true时，磁贴有Hover效果。false时没有
 
 #### Orientation——磁贴排列的方向，水平/垂直
 
@@ -1377,7 +1395,17 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 ![image-20210811153312035](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210811153312035.png)
 
+#### SelectionColorMode——TileBarItem被选中时外框的颜色
 
+![image-20210812092921609](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812092921609.png)
+
+#### SelectionColor——被选中TileBarItem的外框颜色
+
+![image-20210812093018199](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812093018199.png)
+
+#### SelectionBorderWidth——TileBarItem被选中时外框宽度
+
+![image-20210812093157470](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812093157470.png)
 
 #### VerticalContentAlignment——tileItem的水平对齐方式
 
@@ -1451,9 +1479,13 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 ### （2）tileBarItem
 
+#### AppearanceItem.Selected.BorderColor——选中后外框内按钮外一圈细细的边框颜色（图中红色部分）
+
+![image-20210812094026951](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812094026951.png)
+
+![image-20210812094100413](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812094100413.png)
+
 #### Padding——设置单个tileBarItem中文字和图片的位置
-
-
 
 #### imageToTextIndent——图标不动，文字距图标的距离
 
