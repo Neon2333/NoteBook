@@ -1713,6 +1713,87 @@ https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layo
 
 ## 1. GridControl
 
+### （1）类型
+
+![image-20210816083610630](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816083610630.png)
+
+* tileView——磁贴类型
+
+* GridView——表格类型
+
+
+
+### （2）tileView
+
+#### 概念
+
+* GridControl——控件
+
+```C#
+//gridControl1
+private GridControl gridControl1.Cursor = System.Windows.Forms.Cursors.Default;
+this.gridControl1.MainView = this.tileView1;
+//form
+this.Controls.Add(gridControl1);
+```
+
+* TileView——页面
+
+```C#
+private TileView tileview1 = new DevExpress.XtraGrid.Views.Tile.TileView();
+this.tileView1.GridControl = this.gridControl1;
+```
+
+* tile template——每个tile的模板
+
+  
+
+* TileElement——每个tile中显示的部分
+
+gridControl由tileView组成，tileView中设定tile模板
+
+#### Views——页面
+
+![image-20210816084046378](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816084046378.png)
+
+#### Columns
+
+![image-20210816093720077](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816093720077.png)
+
+* 字段
+
+  显示**已关联的**DataSource中的字段
+
+  ![image-20210816093747384](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816093747384.png)
+
+* 表格的列
+
+  将字段添加到列中
+
+  可重复、可自定义顺序、可只添加某几个字段
+
+  ![image-20210816094047226](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816094047226.png)
+
+  #### Layout
+
+  ![image-20210816094253186](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816094253186.png)
+
+  
+
+  #### TileTemplate——磁贴布局模板
+
+  磁贴形式，需要将表格中的列在磁贴上进行布局
+
+  用Columns生成TileElement，拖拽Columns中列放到磁贴上作为Element
+
+  ![image-20210816095914950](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816095914950.png)
+
+  
+
+  
+
+
+
 
 
 ---
