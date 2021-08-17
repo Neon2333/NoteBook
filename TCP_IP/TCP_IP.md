@@ -434,6 +434,8 @@ struct icmp {
 
   DHCP 协议是基于**UDP**（这也就是说在snort检测过程中，只能看UDP的包）之上的应用，dhcp使用udp携带报文，udp封装在ip数据包中发送。
 
+  DHCP客户端对响应速度有较高要求，使用UDP，内部有保证可靠通信的机制。
+
 * [DHCP报文](https://blog.csdn.net/one_in_one/article/details/51684551)
 
   ![image-20210719172631804](https://i.loli.net/2021/07/19/jiEpG2bvdKWVLIU.png)
