@@ -1760,6 +1760,21 @@ gridControl由tileView组成，tileView中设定tile模板
 
 ![image-20210816093720077](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816093720077.png)
 
+![image-20210818114857647](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210818114857647.png)
+
+#### 注意——动态绑定数据源时，dt中添加的表的字段名要在Columns.FieldName中选择
+
+```C#
+dtCigarettePackaging.Columns.Add("nameCigarette", typeof(String));  //这里设定的表的字段，要和设计器的Column的fieldName保持一致
+dtCigarettePackaging.Columns.Add("detection", typeof(String));
+dtCigarettePackaging.Columns.Add("missingBranch", typeof(String));
+dtCigarettePackaging.Columns.Add("CPUtemperature", typeof(Double));
+dtCigarettePackaging.Columns.Add("CPUusage", typeof(Double));
+dtCigarettePackaging.Columns.Add("memoryUsage", typeof(Double));
+dtCigarettePackaging.Columns.Add("state", typeof(String));
+dtCigarettePackaging.Columns.Add("img", typeof(Image));
+```
+
 * 字段
 
   显示**已关联的**DataSource中的字段
