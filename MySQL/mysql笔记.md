@@ -8,6 +8,22 @@ https://blog.csdn.net/u012326462/article/details/82081756
 
 ## 2. INSERT INTO指令中赋值字符串用单引号
 
+## 3. Windows安装
+
+> * https://www.runoob.com/mysql/mysql-install.html
+>
+>   #### MySQL版本为8+不需要配置my.ini中的datadir
+>
+> * root密码为空时，设置root密码
+>
+>   https://blog.csdn.net/fengzhantian/article/details/90213785
+>
+> * 配置环境变量
+>
+>   https://blog.csdn.net/wd2011063437/article/details/78793917
+>
+> * 修改root密码
+
 ## 1.基本概念
 
 * MySQL是一个C/S型DBMS，user通过客户端访问服务器mysqld.exe，服务器软件副本可在本机也可在服务器上。
