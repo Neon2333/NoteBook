@@ -1383,6 +1383,14 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 ![image-20210812160714926](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210812160714926.png)
 
+#### *设置按钮在菜单中居中位置，Size是菜单尺寸，WideTileWidth为按钮尺寸，Size-WideTileWidth/2分到Padding上作为边距*
+
+![image-20210928171927381](https://i.loli.net/2021/09/28/l9Do26W3MwaJKjP.png)
+
+![image-20210928171944431](https://i.loli.net/2021/09/28/YVBmZUwyzS54kb7.png)
+
+![image-20210928171958375](https://i.loli.net/2021/09/28/IR9yojNeSF6dYub.png)
+
 #### ScrollMode——滑动模式
 
 #### AllowSelectedItem——设为true，才允许磁贴被选中
@@ -1417,11 +1425,27 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 #### IndentBetweenItems——设置磁贴间距
 
-#### tileBarItem——DropDownControl，设置磁贴下拉菜单。用`tileBarDropDownContainer`，再往里添加控件（还可以添加tileBar）
+#### 每个tileBarItem——DropDownControl，设置该tileBarItem磁贴的下拉菜单。用`tileBarDropDownContainer`，再往里添加控件（还可以添加tileBar）
 
-#### DropDownOptions——设置下拉菜单
+#### 每个TileBarItem的DropDownOptions——设置下拉菜单
 
-> AutoHeight——是否自动设置高度
+> AutoHeight——是否自动设置高度/宽度（Orientation为Vertical时为宽度，为Horizontal时为高度）
+>
+> > True——运行效果，子菜单高度/宽度和拖曳的tileBarItem_sub宽度/高度相同（不取决于tileBarDropDownContainer的宽度）
+> >
+> > False——运行效果，宽度/高度取决于Height设定值
+>
+> ![image-20210928170612209](D:/WorkSpace/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/C%23/DevExpress20.1_V1.0.assets/bq5a6Wg3dsXVUky.png)
+>
+> ![image-20210928170527370](D:/WorkSpace/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/C%23/DevExpress20.1_V1.0.assets/Bs1mKPtjV5AfhE8.png)
+>
+> ![image-20210928170713136](https://i.loli.net/2021/09/28/aOCDrqV4cUfEdiZ.png)
+>
+> ![image-20210928170801165](https://i.loli.net/2021/09/28/Bg6nxtMeERWyTcs.png)
+>
+> ![image-20210928170919593](https://i.loli.net/2021/09/28/hCopPfgkzbIuxaO.png)
+>
+> ![image-20210928170855764](https://i.loli.net/2021/09/28/lCtmYf5EgT9RQWe.png)
 >
 > BackColorMode——下拉菜单的背景色
 >
