@@ -1385,6 +1385,8 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=n
 
 #### *设置按钮在菜单中居中位置，Size是菜单尺寸，WideTileWidth为按钮尺寸，Size-WideTileWidth/2分到Padding上作为边距*
 
+***子菜单的有颜色的菜单的尺寸实际由DropDownContainer决定，而不是tileBar_sub***
+
 ![image-20210928171927381](https://i.loli.net/2021/09/28/l9Do26W3MwaJKjP.png)
 
 ![image-20210928171944431](https://i.loli.net/2021/09/28/YVBmZUwyzS54kb7.png)
