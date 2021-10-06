@@ -94,3 +94,38 @@
 
 ### num+ce——删除包括光标在内的num个word，同时进入Insert模式进行编辑
 
+
+
+# 4. 多窗口
+
+## 多文件
+
+### :qa——关闭所有窗口
+
+### 关闭当前窗口——:q
+
+### 切换窗口——Ctrl-ww（Ctrl-w+jk/hl）
+
+### vim -o file1 file2——上下分屏
+
+### :sp file2
+
+![image-20211006213317177](https://i.loli.net/2021/10/06/iOhPln2648SqvkF.png)
+
+
+
+### vim -O file1 file2——左右分屏
+
+### :vsp file2
+
+![image-20211006213518751](https://i.loli.net/2021/10/06/RNl6gB4CyYV7uHp.png)
+
+
+
+## 多窗口一个文件
+
+### 多窗口打开的是同一文件，在任一窗口所做修改都会同步，主要用于查看/修改某文件的不同位置
+
+### 上下分屏——:sp
+
+### 左右分屏——:vsp
