@@ -1329,6 +1329,183 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
         }
 ```
 
+### （5）Text Edit Style——时间栏：Standard单击时输入、HideTextEditor不显示时间只显示下拉按钮、DisableTextEditor不可输入单击直接显示下拉菜单
+
+![](https://i.loli.net/2021/10/11/luJfR7SdxV8CLOa.png)
+
+![](https://i.loli.net/2021/10/11/yDOHJ18R3zKNfAQ.png)
+
+
+
+![](https://i.loli.net/2021/10/11/iBHIlqSPLutCUhj.png)
+
+![](https://i.loli.net/2021/10/11/cPsrL1jMAoQzbiq.png)
+
+
+
+![](https://i.loli.net/2021/10/11/P4jSEQiKI5lzkeW.png)
+
+![](https://i.loli.net/2021/10/11/SMHIdnLhuUa5vw6.png)
+
+
+
+### （6）代码中设置——属性、方法
+
+#### 属性
+
+```C#
+ //
+        // 摘要:
+        //     Gets or sets the currently edited time value.
+        //
+        // 值:
+        //     A System.DateTime object representing the edited time value.
+        [Description("Gets or sets the currently edited time value.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+        [DXCategory("Appearance")]
+        public virtual DateTime Time { get; set; }
+```
+
+```C#
+ //
+        // 摘要:
+        //     Gets the text string representing the edited time value.
+        //
+        // 值:
+        //     A string value representing the editor's value.
+        [Bindable(false)]
+        [Browsable(false)]
+        public override string Text { get; set; }
+```
+
+```C#
+//返回是否可以显示下拉滑动菜单
+protected override bool CanShowPopup { get; }
+```
+
+#### 方法
+
+下拉滑动菜单——BaseSpinEdit类型
+
+```C#
+        //
+        // 摘要:
+        //     Displays the DevExpress.XtraEditors.TimeEdit's pop-up window.
+		//显示下拉滑动菜单
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override void ShowPopup();
+```
+
+```C#
+        //
+        // 摘要:
+        //     Closes the popup window accepting the changes made.
+		// 下拉滑动菜单中的《确认》按钮
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override void ClosePopup();
+
+```
+
+```C#
+        //
+        // 摘要:
+        //     Closes the editor's popup window discarding the changes made.
+		// 下拉滑动菜单中的《取消》按钮
+        [Browsable(true)]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override void CancelPopup();
+```
+
+```C#
+//
+        // 摘要:
+        //     Returns the control's popup window.
+        //
+        // 返回结果:
+        //     A DevExpress.XtraEditors.Popup.TouchPopupTimeEditForm object that represents
+        //     the control's popup window. null (Nothing in VB) if the popup window has not
+        //     been opened yet.
+        public TouchPopupTimeEditForm GetPopupEditForm();
+```
+
+
+
+#### 事件
+
+```C#
+ //
+        // 摘要:
+        //     Occurs when the DevExpress.XtraEditors.TimeEdit control attempts to open its
+        //     pop-up window.
+        [Browsable(true)]
+        [Description("Occurs when the TimeEdit control attempts to open its pop-up window.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DXCategory("Events")]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override event CancelEventHandler QueryPopUp;
+```
+
+```C#
+ //
+        // 摘要:
+        //     Occurs after the DevExpress.XtraEditors.TimeEdit control's pop-up window is completely
+        //     displayed.
+        [Browsable(true)]
+        [Description("Occurs after the TimeEdit control's pop-up window is completely displayed.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DXCategory("Events")]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override event EventHandler Popup;
+```
+
+```C#
+  //
+        // 摘要:
+        //     Occurs when the current DevExpress.XtraEditors.TimeEdit attempts to close its
+        //     pop-up window.
+        [Browsable(true)]
+        [Description("Occurs when the current TimeEdit attempts to close its pop-up window.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DXCategory("Events")]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override event CancelEventHandler QueryCloseUp;
+```
+
+```C#
+//
+        // 摘要:
+        //     Allows you to accept or discard the modified DevExpress.XtraEditors.TimeEdit
+        //     control's value after the pop-up window is closed.
+        [Browsable(true)]
+        [Description("Allows you to accept or discard the modified TimeEdit control's value after the pop-up window is closed.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DXCategory("Events")]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override event CloseUpEventHandler CloseUp;
+```
+
+```C#
+  //
+        // 摘要:
+        //     Occurs when the DevExpress.XtraEditors.TimeEdit control's pop-up window is completely
+        //     closed and allows you to specify exactly how it was closed.
+        [Browsable(true)]
+        [Description("Occurs when the TimeEdit control's pop-up window is completely closed and allows you to specify exactly how it was closed.")]
+        [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
+        [DXCategory("Events")]
+        [EditorBrowsable(EditorBrowsableState.Always)]
+        public override event ClosedEventHandler Closed;
+```
+
+
+
+
+
 ## 17. XtraCharts——图表
 
 
@@ -1349,13 +1526,29 @@ DateTime NYDate = new DateTime(2021, 3, 8, 0, 0, 0, 0);
 
 # Navigation & Layout——容器
 
-## 1. PanelControl
+## 1. PanelControl——容器，提供边框
 
 https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.PanelControl?p=netframework
 
+### （1）与TileBar一起用时，边缘不能和TileBar的边缘重合，否则边框无法显示
 
+**在设置时，一般将panelControl的边缘设置比内部多1像素**
 
+* TileBar：239
 
+  PanelControl：240
+
+  窗口Control：240
+
+  ![image-20211011145225696](https://i.loli.net/2021/10/11/OuL7lWebqwgCrMR.png)
+
+* TileBar：240
+
+  PanelControl：240
+
+  窗口Control：250
+
+  ![image-20211011145323195](https://i.loli.net/2021/10/11/R2InaNmEHyfspTJ.png)
 
 ## 2.  TileBar——磁贴
 
