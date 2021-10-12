@@ -87,7 +87,7 @@
 
 ​													目标主机y.abc.com的IP												
 
-​	localhost：m.xyz.com	 <------------------------------------本地域名服务器dns.xyz.com	
+​	localhost：m.xyz.com	 <-------------------------------------本地域名服务器dns.xyz.com	
 
 
 
