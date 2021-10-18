@@ -432,25 +432,37 @@ listView同listBox，添加项为listView.Items.Add()，不同的是前者可以
 
 ## GDI绘图
 
-* Graphics对象，GDI绘图表面
+https://blog.csdn.net/harvic880925/article/details/9071795
 
-  Graphics g = this.CreateGraphics();
+### Graphics对象，GDI绘图表面
 
-  修改已存在图像：Bitmap mbit = new Bitmap(@"path.bmp");
+```C#
+Graphics g = this.CreateGraphics();
+```
 
-  Graphics g = Graphics.FromImage(mbit);
+修改已存在图像：Bitmap mbit = new Bitmap(@"path.bmp");
 
-* 线条Pen
+```C#
+Graphics g = Graphics.FromImage(mbit);
+```
 
+* ### 线条Pen
+
+  ```C#
   Pen pen = new Pen(Color.Blue, 2);	//设置颜色和线条宽度
+  ```
 
-* 填充SolidBrush
+  填充SolidBrush——**用于填充。画刷与画笔不同，画刷只是用来填充区域，所以，画刷无宽度、长度可言**
 
+  ```C#
   Brush b = new SolidBrush(Color.Red);
+  ```
 
-* 直线DrawLine
+* ### 直线DrawLine
 
+  ```c#
   public void DrawLine(Pen p,int x1,int y1,int x2,int y2);
+  ```
 
   ```c#
   Graphics g = this.CreateGraphics();
@@ -467,11 +479,11 @@ listView同listBox，添加项为listView.Items.Add()，不同的是前者可以
   gp.DrawLine(new Pen(Color.LightSkyBlue, 2), new Point(0, 2), new Point(500, 2));
   ```
 
-  
+* ### 矩形DrawRectangle
 
-* 矩形DrawRectangle
-
+  ```C#
   public void DrawRectangle(Pen p,int x,int y, int width, int height);
+  ```
 
   (x,y)为矩形左上角点的坐标。
 
@@ -485,29 +497,45 @@ listView同listBox，添加项为listView.Items.Add()，不同的是前者可以
   Rectangle myRectangle = new Rectangle(70,20,100,60);	//创建矩形对象
   ```
 
-* 椭圆
+* ### 椭圆
 
+  ```C#
   public void DrawEllipse(Pen p,int x, int y, int width, int height);
+  ```
 
   椭圆由矩形边框决定，(x,y)是边框左上角点，width和height分别是边框宽度。
 
-* 圆弧
+* ### 圆弧
 
+  ```C#
   public void DrawArc(Pen pen,Rectangle rect, float startAngle, float sweepAngle);
+  ```
 
   rect矩形定义圆弧的边界。
 
+  ```C#
   startAngle和sweepAngle：
+  ```
 
-* 扇形
+* ### 扇形
 
+  ```C#
   public void DrawPie(Pen p, float x, float y, float width, float height,float startAngle , float sweepAngle);
+  ```
 
-* 多边形
+* ### 多边形
 
+  ```C#
   public void DrawPloygon(Pen p, Point[] points);
-
+  ```
+  
   Point[]数组确定多边形的顶点。
+  
+* ### 添加文字
+
+  https://www.cnblogs.com/08shiyan/archive/2011/03/22/1991426.html
+
+  
 
 ## 例题
 
