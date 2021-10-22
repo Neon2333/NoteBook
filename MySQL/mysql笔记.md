@@ -24,6 +24,10 @@ https://blog.csdn.net/u012326462/article/details/82081756
 >
 > * 修改root密码
 
+---
+
+
+
 ## 1.基本概念
 
 * MySQL是一个C/S型DBMS，user通过客户端访问服务器mysqld.exe，服务器软件副本可在本机也可在服务器上。
@@ -290,13 +294,15 @@ CREATE DATABASE db_name；	//增
 DROP DATABASE db_name;		//删
 ALTER DATABASE db_name;		//改
 SHOW DATABASES;			    //查
+USE db_name;	//使用库
+SELECT DATABASE();	//当前使用的库
 ```
 
 * 表操作
 
 ```mysql
 //增
-CREATE TABLE IF NOT EXISTS `runoob_tbl`(
+CREATE TABLE IF NOT EXISTS runoob_tbl(
    `runoob_id` INT UNSIGNED AUTO_INCREMENT,
    `runoob_title` VARCHAR(100) NOT NULL,
    `runoob_author` VARCHAR(40) NOT NULL,
@@ -321,14 +327,14 @@ ALTER TABLE tb_name CHANGE COLUMN field_old field_new typename(n) NOT NULL DEFAU
 
 ```mysql
 //查
-SHOW TABLES;
+SHOW TABLES;	//显示当前库中所有的表
 ```
 
 * 字段操作
 
 ```mysql
 //插入记录
-INSERT INTO tb_name (field1,field2) VALUES (val1,val2);
+INSERT INTO tb_name (field1,field2) VALUES (val1,val2);		//若每个字段都按顺序赋值则可省略字段名，若有字段被省略，则需要将赋值的字段写出来
 //删除记录
 DELETE FROM tb_name [WHERE clause];
 //修改某条记录的某个字段的值
