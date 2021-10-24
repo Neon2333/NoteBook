@@ -187,12 +187,17 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
 
   LIKE谓词：在子句中使用LIKE表明子句中使用的搜索模式，是通配符匹配而不是相等匹配。
 
+  ```mysql
+  SELECT field_name1,field_name2,field_name3 FROM table_name 
+  WHERE field_name1 LIKE 'jet%';
+  ```
+  
   %可在搜索模式中任意位置，区分大小写，可有多个。可匹配0/1/多个字符。
-
+  
   注意：待匹配字符串末尾有空格，需要用函数去掉首尾空格。
-
+  
   _只能匹配一个字符
-
+  
   通配符速度慢，不要滥用，尽量不把通配符放在字符串开头。
 
 ## 5.正则表达式
