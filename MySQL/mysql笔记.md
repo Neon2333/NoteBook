@@ -171,7 +171,7 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
 
   ```mysql
   SELECT field_name1,field_name2,field_name3 FROM table_name 
-  WHERE field_name1=val1,field_name2<=val2;
+  WHERE field_name1=val1 AND field_name2<=val2;
   ```
 
 * IN(val1,val2,val3,...)指定WHERE语句中字段的所需取值列表。需要取表中某些指定的字段的行。
@@ -180,7 +180,12 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
 
 * NOT
 
-  NOT IN，NOT BETWEEN，可以容易的过滤出不符合给定条件的行。
+  可以容易的过滤出不符合给定条件的行。
+  
+  ```mysql
+  NOT IN
+  NOT BETWEEN
+  ```
 
 
 * LIKE模式，使用通配符进行过滤
@@ -199,6 +204,11 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
   _只能匹配一个字符
   
   通配符速度慢，不要滥用，尽量不把通配符放在字符串开头。
+  
+  ```mysql
+  -- 24、查询id、货品名称、分类编号，零售价大于等于80并且货品名称匹配'%罗技M1_ _'：
+  SELECT id,productName,dir_id,salePrice FROM product WHERE salePrice>=80 AND productName LIKE '%罗技M1__'
+  ```
 
 ## 5.正则表达式
 
@@ -290,6 +300,18 @@ http://c.biancheng.net/view/2448.html
   CHANGE COLUMN <字段名> <字段名> <数据类型> NULL;
   ```
 
+* NULL相等不用=，用IS
+
+  ```MYSQL
+  SELECT id,productName,dir_id FROM product WHERE dir_id IS NULL
+  ```
+
+  ```mysql
+  SELECT id,productName,dir_id FROM product WHERE dir_id IS NOT NULL
+  ```
+
+  
+
 ## 8.常用指令
 
 * 库操作
@@ -308,12 +330,12 @@ SELECT DATABASE();	//当前使用的库
 ```mysql
 //增
 CREATE TABLE IF NOT EXISTS runoob_tbl(
-   `runoob_id` INT UNSIGNED AUTO_INCREMENT,
-   `runoob_title` VARCHAR(100) NOT NULL,
-   `runoob_author` VARCHAR(40) NOT NULL,
-   `submission_date` DATE,
+   `runoob_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,	--默认非NULL，自增
+   `runoob_title` VARCHAR(100) NOT NULL,				--默认非NULL
+   `runoob_author` VARCHAR(40) DEFAULT NULL,			--默认值NULL
+   `submission_date` DATE	DEFAULT NULL,
    PRIMARY KEY ( `runoob_id` )
-)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 ```
 
 ```mysql
@@ -339,7 +361,7 @@ SHOW TABLES;	//显示当前库中所有的表
 
 ```mysql
 //插入记录
-INSERT INTO tb_name (field1,field2) VALUES (val1,val2);		//若每个字段都按顺序赋值则可省略字段名，若有字段被省略，则需要将赋值的字段写出来
+INSERT INTO tb_name (field1,field2) VALUES (val11,val12),(val21,val22),(val31,val32);		//若每个字段都按顺序赋值则可省略字段名，若有字段被省略，则需要将赋值的字段写出来
 //删除记录
 DELETE FROM tb_name [WHERE clause];
 //修改某条记录的某个字段的值
@@ -651,7 +673,7 @@ CREATE TABLE emp(
 	job		VARCHAR(50),
 	mgr		INT,
 	hiredate	DATE,
-	sal		DECIMAL(7,2),
+	sal		DECIMAL(7,2),		-- 2表示小数的位数为2,7表示整数位数+小数位数不能超过7
 	comm		DECIMAL(7,2),
 	deptno		INT
 ) ;
@@ -690,14 +712,14 @@ select * from emp;
 SELECT * FROM
 emp
 WHERE `sal`>
-(SELECT AVG(sal) FROM emp WHERE `deptno`=10);
+(SELECT AVG(`sal`) FROM emp WHERE `deptno`=10);
 ```
 
 ```mysql
 -- 2.查询出比10号部门任何员工薪资高的员工信息
 SELECT * FROM 
 emp
-WHERE sal>(SELECT MAX(sal) FROM emp WHERE `deptno`=10);
+WHERE `sal`>(SELECT MAX(`sal`) FROM emp WHERE `deptno`=10);
 ```
 
 ```mysql
@@ -717,20 +739,19 @@ WHERE `deptno`=
 
 ```mysql
 -- 5.查询工作和工资与MARTIN完全相同的员工信息
-SELECT * FROM 
-emp
-WHERE `job`=(SELECT `job` FROM emp WHERE `ename`='MARTIN') AND 
-`sal`=(SELECT `sal` FROM emp WHERE `ename`='MARTIN');
-```
-
-```MYSQL
--- 6.查询员工编号为7788的员工名称,员工工资,部门名称,部门地址
-
+SELECT * 
+FROM emp
+WHERE job=(SELECT job FROM emp WHERE ename='MARTIN')
+AND 
+sal=(SELECT sal FROM emp WHERE ename='MARTIN')
+AND ename!='MARTIN';
 ```
 
 #### T2
 
 https://zhuanlan.zhihu.com/p/345457364
+
+https://zhuanlan.zhihu.com/p/345459843
 
 多表，记得把各个表的字段列出，标明表之间相同的字段。
 
@@ -880,6 +901,11 @@ HAVING COUNT(*)>1;
 SELECT (SELECT `Cname` FROM course WHERE course.Cid=sc.Cid) AS '课程名称',COUNT(`Sid`)
 FROM sc
 GROUP BY `Cid`;
+-- 解法2：
+SELECT course.Cname,COUNT(*) 
+FROM course INNER JOIN sc ON sc.Cid=course.Cid
+GROUP BY course.Cname
+ORDER BY course.Cname;
 ```
 
 ```mysql
@@ -887,6 +913,12 @@ GROUP BY `Cid`;
 SELECT AVG(score),(SELECT `Cname` FROM course WHERE course.`Cid`=sc.`Cid`)
 FROM sc
 GROUP BY `Cid`;
+
+-- 解法2：
+SELECT course.Cname,AVG(sc.score)
+FROM course INNER JOIN sc ON course.Cid=sc.Cid
+GROUP BY course.Cname
+ORDER BY course.Cid;
 ```
 
 ```mysql
@@ -952,6 +984,12 @@ WHERE `Sid`IN
 FROM sc
 GROUP BY `Sid`
 HAVING COUNT(`Cid`)=2);
+
+-- 解法2：
+SELECT tmp.Sid AS `学生学号`,student.Sname AS `学生姓名`,course.Cname AS `课程名称`
+FROM student INNER JOIN 
+(SELECT sc.Sid,sc.Cid,COUNT(sc.Cid) FROM sc GROUP BY sc.Sid HAVING COUNT(sc.Cid)=2)AS tmp 
+ON student.Sid=tmp.Sid INNER JOIN course ON course.Cid= tmp.Cid;
 ```
 
 ```mysql
@@ -1006,6 +1044,18 @@ https://zhuanlan.zhihu.com/p/58108883
 
 https://blog.csdn.net/wheredata/article/details/87191983
 
+
+
+* 叉联结+WHERE过滤
+
+  叉联结形成笛卡尔积，有很多无意义行，通过WHERE过滤出指定条件的行
+
+  是全相乘效率低，全相乘会在内存中生成一个非常大的数据(临时表)，因为有很多不必要的数据。
+  
+  全相乘不能好好的利用索引，因为全相乘生成一张临时表，临时表里是没有索引的，大大降低了查询效率。
+  
+  
+  
 * 内联结
 
   **两表**的等值联结。若需联结多个表需多个INNER JOIN。
@@ -1019,7 +1069,14 @@ https://blog.csdn.net/wheredata/article/details/87191983
               WHERE where_conditions;
   ```
 
-  
+  #### 多表内联结
+
+**mysql 在运行是关联指定的每个表以处理联结，这种处理是非常消耗资源的，所以不要联结过多的表，表越多性能下降越厉害**
+
+```mysql
+```
+
+
 
 * 自联结
 
@@ -1028,6 +1085,10 @@ https://blog.csdn.net/wheredata/article/details/87191983
   
 
 * 左联结/右联结
+
+  左连接查询达到了同样的效果，但是不会有其它冗余数据，查询速度快，消耗内存小，而且使用了索引。左连接查询效率相比于全相乘的查询效率快了10+倍以上。
+
+  右连接查询跟左连接查询类似，只是**右连接是以右表为主表**，会将右表所有数据查询出来，而左表则根据条件去匹配，如果左表没有满足条件的行，则左边默认显示NULL。左右连接是可以互换的。
 
   
 
@@ -1042,6 +1103,62 @@ https://blog.csdn.net/wheredata/article/details/87191983
 
 
 ## 14.索引
+
+### （1）普通索引
+
+#### 表已建立后创建索引
+
+```mysql
+CREATE INDEX indexName ON table_name (column_name);
+```
+
+#### 修改表结构——添加索引
+
+```mysql
+ALTER TABLE t_name ADD INDEX indexName(`fieldName`);
+```
+
+#### 建表的时候创建索引
+
+```mysql
+CREATE TABLE t_name(  
+`ID` INT NOT NULL,   
+`username` VARCHAR(16) NOT NULL,  
+INDEX [indexName] (username(length))  
+);  
+```
+
+#### 删除索引
+
+```mysql
+DROP INDEX [indexName] ON t_name; 
+```
+
+#### 显示已建立的索引
+
+```mysql
+SHOW INDEX FROM table_name\G
+```
+
+
+
+### （2）唯一索引
+
+**与前面的普通索引类似，不同的就是：索引列的值必须唯一，但允许有空值**
+
+```mysql
+CREATE UNIQUE INDEX indexName ON mytable(username(length)) 
+
+ALTER table mytable ADD UNIQUE [indexName] (username(length))
+
+CREATE TABLE mytable(   
+ID INT NOT NULL,    
+username VARCHAR(16) NOT NULL,   
+UNIQUE [indexName] (username(length))   
+);  
+```
+
+
 
 
 
