@@ -997,6 +997,11 @@ ON student.Sid=tmp.Sid INNER JOIN course ON course.Cid= tmp.Cid;
 SELECT * 
 FROM student 
 WHERE `Sid` IN (SELECT `Sid` FROM sc GROUP BY `Sid` HAVING COUNT(`Cid`)=(SELECT COUNT(`Cid`) FROM course));
+
+-- 解法2：
+SELECT * FROM student INNER JOIN 
+(SELECT sc.Sid FROM sc GROUP BY sc.Sid HAVING COUNT(sc.Cid)=(SELECT COUNT(course.Cid) FROM course)) AS tmp
+ON student.Sid=tmp.Sid
 ```
 
 ```mysql
