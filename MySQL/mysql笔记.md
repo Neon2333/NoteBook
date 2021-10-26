@@ -582,6 +582,8 @@ ORDER BY `prod_num`;                    //按照prod_num排序
 
 SELECT->FROM->WHERE->GROUP BY->HAVING->ORDER BY->LIMIT
 
+![image-20211026085535132](https://i.loli.net/2021/10/26/Cwy6hxOYGn3IiZN.png)
+
 ## 11.子查询（嵌套查询）
 
 https://www.cnblogs.com/xiaoxi/p/6734025.html
@@ -1049,15 +1051,20 @@ https://zhuanlan.zhihu.com/p/58108883
 
 https://blog.csdn.net/wheredata/article/details/87191983
 
+> 1. 先确定数据要用到哪些表。
+> 2. 将多个表先通过笛卡尔积变成一个表。
+> 3. 然后去除不符合逻辑的数据（根据两个表的关系去掉）。
+> 4. 最后当做是一个虚拟表一样来加上条件即可。
 
-
-* 叉联结+WHERE过滤
+* 叉联结+WHERE过滤——笛卡尔积
 
   叉联结形成笛卡尔积，有很多无意义行，通过WHERE过滤出指定条件的行
 
   是全相乘效率低，全相乘会在内存中生成一个非常大的数据(临时表)，因为有很多不必要的数据。
   
   全相乘不能好好的利用索引，因为全相乘生成一张临时表，临时表里是没有索引的，大大降低了查询效率。
+  
+  联结要指定条件，否则会返回笛卡尔积，新表列数=表1列数*表2列数。
   
   
   
@@ -1099,11 +1106,6 @@ https://blog.csdn.net/wheredata/article/details/87191983
 
 * 在联结中使用聚集函数
 
-  
-
-* 笛卡尔积
-
-  联结要指定条件，否则会返回笛卡尔积，新表列数=表1列数*表2列数。
 
 
 
@@ -1114,7 +1116,7 @@ https://blog.csdn.net/wheredata/article/details/87191983
 #### 表已建立后创建索引
 
 ```mysql
-CREATE INDEX indexName ON table_name (column_name);
+CREATE INDEX indexName ON t_name (column_name);
 ```
 
 #### 修改表结构——添加索引
@@ -1142,7 +1144,7 @@ DROP INDEX [indexName] ON t_name;
 #### 显示已建立的索引
 
 ```mysql
-SHOW INDEX FROM table_name\G
+SHOW INDEX FROM t_name\G
 ```
 
 
