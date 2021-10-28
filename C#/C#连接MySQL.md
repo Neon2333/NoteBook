@@ -84,14 +84,35 @@ static void Main(string[] args)
 
 ### （1）创建连接对象
 
+> * 使用【using】来调用mysql连接，这样使用完后可以自动关闭连接
+> * 连接数据库：
+>   【data source】=服务器IP地址;
+>   【database】=数据库名称;
+>   【user id】=数据库用户名;
+>   【password】=数据库密码;
+>   【pooling】=是否放入连接池;
+>   【charset】=编码方式;
+>   ————————————————
+>   版权声明：本文为CSDN博主「(≯^ω^≮)喵毛」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+>   原文链接：https://blog.csdn.net/shenqiankk/article/details/99704319
+
 ```mysql
 //命名空间 System.Data.MySqlClient.MySqlConnection
 using MySql.Data;
 using MySql.Data.MySqlClient;
 
-string connStr="dataBase=,server=,userId=,password=";	//存储指定连接时的数据库、服务器、用户名等
+string constring = "data source=localhost;database=test1;user id=root;password=1234;pooling=true;charset=utf8;";	//存储指定连接时的数据库、服务器、用户名等
+
 MySqlConnection conn = new MySqlConnection(connStr);	//创建连接对象
 conn.open();	//连接打开
+
+ string constring = "data source=localhost;database=test1;user id=root;password=1234;pooling=true;charset=utf8;";
+ 
+ //使用【using】来调用mysql连接，这样使用完后可以自动关闭连接
+ using(MySqlConnection msc = new MySqlConnection(constring))
+{
+	conn.open();	//连接打开
+}
 ```
 
 ### （2）创建命令对象/增删改
@@ -192,6 +213,44 @@ while(reader.Read()){
   conn.Close();
   ```
 
+* **MySqlDataAdapter+MySqlCommandBuilder**
+
+  ```C#
+   //----------------------------------------------------------------------
+          // 功能说明：数据库表查询函数。显示表中所有字段，返回DataTable。sqlSearch存过滤条件。
+          // 输入参数：无
+          // 输出参数：无
+          // 返回值：无
+          //----------------------------------------------------------------------
+          public DataTable _SearchTable(String sqlSearch)
+          {
+              DataTable myDataTable = new DataTable();//创建存放数据表。DataTable是MySQL中本地的表，DataSet本地的库，其中有若干DataTable组成
+  
+              try
+              {
+                  sqlSearch = "select * from " + sqlSearch;//查询指令内容
+                  MySqlCommand myCommand = new MySqlCommand(sqlSearch, mySqlConnect);//创建MySqlCommand对象
+                  myCommand.CommandTimeout = 12000;//超时
+                  if (mySqlConnect.State == ConnectionState.Closed)
+                  {
+                      mySqlConnect.Open();//开启连接
+                  }
+  
+                  MySqlDataAdapter adapter = new MySqlDataAdapter(sqlSearch, mySqlConnect);//创建MySqlDataAdapter对象
+                  MySqlCommandBuilder builder = new MySqlCommandBuilder(adapter);//此处必须有，否则无法更新
+                  adapter.Fill(myDataTable);//将查询的内容填充到数据表中
+              }
+              catch (SystemException ex)
+              {
+                  ex.ToString();
+              }
+  
+              return myDataTable;
+          }
+  ```
+  
+  
+  
 * **用DataSet/DataTable读取数据（常用）**
 
   DataSet与DataReader以“流”随时和服务器保持联系不同，类似于一个本地的小数据库，速度略慢但可忽略不计，连接池负担小。
