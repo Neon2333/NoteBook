@@ -105,6 +105,10 @@ https://www.jb51.net/article/163001.htm
 
 
 
+## 6. 关于反引号
+
+![image-20211029161625330]()
+
 ---
 
 
@@ -395,7 +399,7 @@ http://c.biancheng.net/view/2448.html
 
 ## 8.常用指令
 
-* 库操作
+#### 库操作
 
 ```mysql
 CREATE DATABASE db_name；	//增
@@ -406,7 +410,7 @@ USE db_name;	//使用库
 SELECT DATABASE();	//当前使用的库
 ```
 
-* 表操作
+#### 表操作
 
 ```mysql
 //增
@@ -419,11 +423,15 @@ CREATE TABLE IF NOT EXISTS runoob_tbl(
 )ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
 ```
 
+
+
 ```mysql
 //删
 DROP TABLE runoob_tbl;	//表被删除
 TRUNCATE TABLE runoob_tb1;	//表还在，但是表中记录都被清空
 ```
+
+
 
 ```mysql
 //改
@@ -433,12 +441,20 @@ ALTER TABLE tb_name MODIFY COLUMN field_ typename(n) NOT NULL DEFAULT '' COMMENT
 ALTER TABLE tb_name CHANGE COLUMN field_old field_new typename(n) NOT NULL DEFAULT '' COMMENT '' AFTER field_;
 ```
 
+用Navicat修改表结构：
+
+![image-20211029151207636](https://i.loli.net/2021/10/29/2RNHGFxpJOsoS7l.png)
+
+![image-20211029151249940](https://i.loli.net/2021/10/29/m8u1ctxGMQgAf2I.png)
+
+#### 主键字段的值不能重复
+
 ```mysql
 //查
 SHOW TABLES;	//显示当前库中所有的表
 ```
 
-* 字段操作
+#### 字段操作
 
 ```mysql
 //插入记录
@@ -470,6 +486,14 @@ SELECT `field_name1` FROM tb_name;
   库/表：CREATE/DROP/ALTER/SHOW，且后要加上DATABASE/TABLE表明是库还是表
 
   字段：INSERT INTO/DELETE FROM/UPDATE SET/SELECT FROM，且不要加上TABLE关键字。
+
+#### 获取表的所有字段
+
+```mysql
+select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_table_name' and table_schema = 'your_db_name';  
+```
+
+
 
 ## 9.函数
 
@@ -597,6 +621,13 @@ WHERE `prod_id` IN(1001,1002,1003);
 * SUM()
 
   求某列记录之和，忽略NULL
+
+  #### 对一行多列求和
+
+  ```mysql
+  ```
+
+  #### 统计一行中
 
 * 搭配DISTINCT使用，忽略列中的重复记录
 
@@ -1132,6 +1163,10 @@ https://zhuanlan.zhihu.com/p/58108883
 
 https://blog.csdn.net/wheredata/article/details/87191983
 
+https://www.cnblogs.com/guokaifeng/p/11192266.html
+
+https://blog.csdn.net/qq_36078992/article/details/106005655
+
 > 1. 先确定数据要用到哪些表。
 > 2. 将多个表先通过笛卡尔积变成一个表。
 > 3. 然后去除不符合逻辑的数据（根据两个表的关系去掉）。
@@ -1162,6 +1197,8 @@ https://blog.csdn.net/wheredata/article/details/87191983
               WHERE where_conditions;
   ```
 
+  ![image-20211029140928846](https://i.loli.net/2021/10/29/Dq8fvNFYmaT2WKS.png)
+  
   #### 多表内联结
 
 **mysql 在运行是关联指定的每个表以处理联结，这种处理是非常消耗资源的，所以不要联结过多的表，表越多性能下降越厉害**
@@ -1445,7 +1482,7 @@ SET GLOBAL AUTOCOMMIT=1;	-- 开启自动提交
   SET PASSWORD FOR user_name = PASSWORD('password');
   ```
 
-## 21. 备份
+## 21. 导出导入
 
 https://www.cnblogs.com/chenbin93/p/14697451.html
 
@@ -1465,6 +1502,12 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
   -- 导出所有库
   mysqldump  -u user_name -p pwd  --all-databases > Backup.sql;
   ```
+
+  Navicat——https://jingyan.baidu.com/article/ca00d56cba9926a99eebcfd6.html
+
+* 导入数据库
+
+  https://jingyan.baidu.com/article/cb5d61053ebdd4415d2fe020.html
 
 * 导出表
 
