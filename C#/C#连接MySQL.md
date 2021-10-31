@@ -275,6 +275,33 @@ while(reader.Read()){
   string name = dt.Rows[0][1].ToString();
   ```
 
+### （4）读取数据后的类型转换
+
+[(string)、toString()、Convert.toString()的区别](https://www.cnblogs.com/kissdodog/p/3565988.html)
+
+![image-20211031133859987](https://i.loli.net/2021/10/31/83DdpiSRM9Get7P.png)
+
+```C#
+//其中，DT.Rows[i][colNum]是object(double)类型
+num = this.DT.Rows[i][colNum].ToString();
+//num = Convert.ToString(this.DT.Rows[i][colNum]);  //可以
+//num = (string)this.DT.Rows[i][colNum];    //无法将double转成string
+```
+
+### （5）DataTable相关
+
+#### 对DataTable某列求和
+
+https://blog.csdn.net/weixin_40508362/article/details/106668117
+
+https://blog.csdn.net/missysm586/article/details/6644319?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.no_search_link&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.no_search_link
+
+
+
+
+
+
+
 ## 3. dataGridView控件
 
 https://www.cnblogs.com/monkeyZhong/p/4530795.html

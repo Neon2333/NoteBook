@@ -730,21 +730,21 @@ https://www.cnblogs.com/zhuiluoyu/p/5822481.html
 
 ### （1）子查询作为过滤条件
 
-* 子查询的结果是一个值
+#### 子查询的结果是一个值
 
-   SELECT 查询字段 FROM 表 **WHERE 字段=（**子查询**）;** 
+​	SELECT 查询字段 FROM 表 **WHERE 字段=（**子查询**）;** 
 
-* 子查询结果是多行单列的时候
+#### 子查询结果是多行单列的时候
 
-   SELECT 查询字段 FROM 表 **WHERE 字段 IN （子查询）** 
+​	SELECT 查询字段 FROM 表 **WHERE 字段 IN （子查询）** 
 
-* 子查询的结果是多行多列
+#### 子查询的结果是多行多列
 
-​       子查询结果是多行多列的临时表，肯定接在FROM后
+​	**子查询结果是多行多列的临时表**，肯定接在FROM后
 
-​       SELECT 查询字段 FROM （子查询） **表别名 WHERE 条件**
+​    SELECT 查询字段 FROM （子查询） **表别名 WHERE 条件**
 
-​      **子查询作为表必须取别名，否则这张表没有名称则无法访问表中的字段** 。注意：用临时表的别名引用字段时，反引号括住字段名，临时表名不要括住。
+​    **子查询作为表必须取别名，否则这张表没有名称则无法访问表中的字段** 。注意：用临时表的别名引用字段时，反引号括住字段名，临时表名不要括住。
 
 ```mysql
  SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,tmp.`total` FROM
@@ -759,6 +759,60 @@ GROUP BY `cat_id`;
 * Q：主查询中未使用聚合函数，却使用GROUP BY。按照cat_id分组，查询goods_id,goods_name,cat_id,shop_price等字段，为什么每个cat_id只显示一条记录（cat_id分组下的第一条记录）？
 
   不规范的用法？？？
+
+#### with as将临时表作为变量再操作
+
+**MySQL8.0以上版本的特性，版本低于8.0使用该语法将会显示错误**
+
+```mysql
+SELECT a.name FROM 
+(
+SELECT name, gender FROM employee
+)AS t1
+WHERE t1.gender='man';
+
+-- 使用with as可写成：
+WITH t1 AS(
+SELECT name,gender FROM emplyee
+)
+SELECT t1.gender='man';
+```
+
+```mysql
+WITH t1 AS
+(
+SELECT 
+LineNO,
+DeviceStatus_001 + 
+DeviceStatus_002 +
+DeviceStatus_003 +
+DeviceStatus_004 +
+DeviceStatus_005 +
+DeviceStatus_006 +
+DeviceStatus_007 +
+DeviceStatus_008 +
+DeviceStatus_009 +
+DeviceStatus_010 +
+DeviceStatus_011 +
+DeviceStatus_012 +
+DeviceStatus_013 +
+DeviceStatus_101 +
+DeviceStatus_102 +
+DeviceStatus_103 +
+DeviceStatus_104 +
+DeviceStatus_105 AS `DeviceTotalNum`
+FROM device_config
+)
+SELECT t1.LineNO,t2.LineName,t1.DeviceTotalNum
+FROM t1 INNER JOIN device AS t2
+ON t1.LineNO=t2.LineNO;
+```
+
+
+
+
+
+
 
 ### （2）子查询作为计算字段
 
@@ -1507,7 +1561,7 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
 * 导入数据库
 
-  https://jingyan.baidu.com/article/cb5d61053ebdd4415d2fe020.html
+  https://jingyan.baidu.com/article/a24b33cd2de7e219ff002b6b.html
 
 * 导出表
 
@@ -1545,6 +1599,5 @@ https://blog.csdn.net/defonds/article/details/46858949
 ## 23.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
-
 
 
