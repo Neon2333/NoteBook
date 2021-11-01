@@ -1,5 +1,3 @@
-# mysql笔记
-
 # 问题总结
 
 ## 1. 获取系统时间
@@ -107,11 +105,11 @@ https://www.jb51.net/article/163001.htm
 
 ## 6. 关于反引号
 
-![image-20211029161625330]()
+反引号一般用于把字段名、表名括起来，但一般来说字段名、表名若不会与关键字混淆，就不需要加。
 
 ---
 
-
+# MySQL基本知识
 
 ## 1.基本概念
 
@@ -120,7 +118,7 @@ https://www.jb51.net/article/163001.htm
   常用客户端有GUI的也有CLI的，如cmd中的mysql、Navicat等。在cmd中输入mysql调用CLI形式的Client软件，直接输入mysql可能报错，因为该CLI客户端软件没有用户名和密码来连接服务器。
 
   ```mysql
-  mysql -uroot -p 	//输入用户名和密码，调用CLI，连接服务器
+  mysql -hlocalhost -p3036 -uroot -p 	//输入用户名和密码，调用CLI，连接服务器
   ```
 
 * 注释
@@ -134,14 +132,9 @@ https://www.jb51.net/article/163001.htm
 ```mysql
 show databases;	//显示所有数据库
 show tables;	//显示所有表
-show columns from t_name;	//显示表t_name中所有字段的预设信息
-desc t_name;	//上条语句可由该语句替换
+desc t_name;	//显示表结构
 show create database db_name;	//显示数据库db_name创建时的信息
 show create table t_name;	//显示表t_name创建时的信息
-```
-
-```mysql
-use db_name;	//show databases后用use选择使用某一个具体的数据库
 ```
 
 ## 3.检索数据
@@ -168,7 +161,7 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
   SELECT * FROM t_name;
   ```
 
-* 非主键的字段显示存在重复
+* 非主键的字段显示存在值重复的情况
 
   字段若不是主键，则表有多少行就会显示多少行，存在重复问题。
 
@@ -201,19 +194,19 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
   按多个字段排序，当第一个字段相同时，才会在第一个字段相同的行内部按照第二个字段进行排序。若所有行第一个字段都相同，不会按照第二个字段排序。
 
   ```mysql
-  SELECT field_name1,field_name2,field_name3 FROM table_name ORDER BY field_name1,field_name2;
+  SELECT field_name1,field_name2,field_name3 FROM t_name ORDER BY field_name1,field_name2;
   ```
 
   (2) 默认升序，DESC设置降序
 
   ```mysql
-  SELECT field_name1,field_name2,field_name3 FROM table_name ORDER BY field_name1 DESC;
+  SELECT field_name1,field_name2,field_name3 FROM t_name ORDER BY field_name1 DESC;
   ```
 
   (3) DESC只针对关键字前紧邻的字段有效。其他未用DESC修饰的字段仍然以升序排序。
 
   ```mysql
-  SELECT field_name1,field_name2,field_name3 FROM table_name ORDER BY field_name1 DESC,field_name2;
+  SELECT field_name1,field_name2,field_name3 FROM t_name ORDER BY field_name1 DESC,field_name2;
   //field_name1按照降序排序，field_name1相同的按照field_name2升序排序
   ```
 
@@ -255,7 +248,7 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
 *  用AND/OR连接多条WHERE语句。用()明确分组过滤条件，避免歧义。
 
   ```mysql
-  SELECT field_name1,field_name2,field_name3 FROM table_name 
+  SELECT field_name1,field_name2,field_name3 FROM t_name 
   WHERE field_name1=val1 AND field_name2<=val2;
   ```
 
@@ -278,7 +271,7 @@ use db_name;	//show databases后用use选择使用某一个具体的数据库
   LIKE谓词：在子句中使用LIKE表明子句中使用的搜索模式，是通配符匹配而不是相等匹配。
 
   ```mysql
-  SELECT field_name1,field_name2,field_name3 FROM table_name 
+  SELECT field_name1,field_name2,field_name3 FROM t_name 
   WHERE field_name1 LIKE 'jet%';
   ```
   
@@ -391,10 +384,12 @@ http://c.biancheng.net/view/2448.html
   SELECT id,productName,dir_id FROM product WHERE dir_id IS NULL
   ```
 
+  
+  
   ```mysql
   SELECT id,productName,dir_id FROM product WHERE dir_id IS NOT NULL
   ```
-
+  
   
 
 ## 8.常用指令
@@ -487,7 +482,7 @@ SELECT `field_name1` FROM tb_name;
 
   字段：INSERT INTO/DELETE FROM/UPDATE SET/SELECT FROM，且不要加上TABLE关键字。
 
-#### 获取表的所有字段
+#### 获取表的所有字段名
 
 ```mysql
 select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_table_name' and table_schema = 'your_db_name';  
@@ -502,6 +497,20 @@ select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_tabl
 concat(field1, '(', field2 ,')')
 
 ' '中的字符将直接拼接在字段上
+
+```MYSQL
+SELECT t1.DeviceNO,t2.DeviceName,
+(CASE WHEN t1.DeviceStatus=1 THEN '正常'
+WHEN t1.DeviceStatus=0 THEN '异常'
+WHEN t1.DeviceStatus=-1 THEN '无效'
+END) AS DeviceStatus,
+t1.TestingNum,t1.DefectNum,
+CONCAT(t1.CPUTemperature,'℃') AS CPUTemperature,CONCAT(t1.CPUUsage,'%') AS CPUUsage,CONCAT(t1.MemoryUsage,'%') AS MemoryUsage
+FROM device_info AS t1 INNER JOIN device AS t2
+ON t1.DeviceNO=t2.DeviceNO
+WHERE t1.LineNO='001'
+ORDER BY t1.`NO`;
+```
 
 ### （2）去掉空格
 
@@ -532,6 +541,33 @@ prod_quantity*prod_price AS 'total price'
 FROM orderitems 
 WHERE order_num=20005;
 ```
+
+```mysql
+SELECT LineNO,
+(
+DeviceStatus_001 +
+DeviceStatus_002 +
+DeviceStatus_003 +
+DeviceStatus_004 +
+DeviceStatus_005 +
+DeviceStatus_006 +
+DeviceStatus_007 +
+DeviceStatus_008 +
+DeviceStatus_009 +
+DeviceStatus_010 +
+DeviceStatus_011 +
+DeviceStatus_012 +
+DeviceStatus_013 +
+DeviceStatus_101 +
+DeviceStatus_102 +
+DeviceStatus_103 +
+DeviceStatus_104 +
+DeviceStatus_105
+)AS DeviceTotalNum
+FROM device_config;
+```
+
+
 
 ### （5）日期时间
 
@@ -616,7 +652,7 @@ WHERE `prod_id` IN(1001,1002,1003);
 
   COUNT(*) 求整张表的列数，不忽略NULL
 
-  COUNT() 对某一列计数时，忽略NULL的记录。
+  COUNT() 对某一列计数时，**忽略NULL的记录**。
 
 * SUM()
 
@@ -625,6 +661,28 @@ WHERE `prod_id` IN(1001,1002,1003);
   #### 对一行多列求和
 
   ```mysql
+  SELECT LineNO,
+  (
+  DeviceStatus_001 +
+  DeviceStatus_002 +
+  DeviceStatus_003 +
+  DeviceStatus_004 +
+  DeviceStatus_005 +
+  DeviceStatus_006 +
+  DeviceStatus_007 +
+  DeviceStatus_008 +
+  DeviceStatus_009 +
+  DeviceStatus_010 +
+  DeviceStatus_011 +
+  DeviceStatus_012 +
+  DeviceStatus_013 +
+  DeviceStatus_101 +
+  DeviceStatus_102 +
+  DeviceStatus_103 +
+  DeviceStatus_104 +
+  DeviceStatus_105
+  )AS DeviceTotalNum
+  FROM device_config;
   ```
 
   #### 统计一行中
@@ -661,7 +719,7 @@ FROM products						  //数据源
 GROUP BY `prod_id`;					   //从products中按照prod_id分组	
 ```
 
-（特别的，若计算字段不是聚合函数，而是普通字段，则显示一组中的符合过滤条件的第一条记录）
+（特别的，若计算字段不是聚合函数，而是非GROUP BY后字段的普通字段，则**显示一组中的符合过滤条件的第一条记录**）
 
 ### （2）HAVING
 
@@ -1226,34 +1284,51 @@ https://blog.csdn.net/qq_36078992/article/details/106005655
 > 3. 然后去除不符合逻辑的数据（根据两个表的关系去掉）。
 > 4. 最后当做是一个虚拟表一样来加上条件即可。
 
-* 叉联结+WHERE过滤——笛卡尔积
+#### 叉联结+WHERE过滤——笛卡尔积
 
-  叉联结形成笛卡尔积，有很多无意义行，通过WHERE过滤出指定条件的行
+叉联结形成笛卡尔积，有很多无意义行，通过WHERE过滤出指定条件的行
 
-  是全相乘效率低，全相乘会在内存中生成一个非常大的数据(临时表)，因为有很多不必要的数据。
-  
-  全相乘不能好好的利用索引，因为全相乘生成一张临时表，临时表里是没有索引的，大大降低了查询效率。
-  
-  联结要指定条件，否则会返回笛卡尔积，新表列数=表1列数*表2列数。
-  
-  
-  
-* 内联结
+是全相乘效率低，全相乘会在内存中生成一个非常大的数据(临时表)，因为有很多不必要的数据。
 
-  **两表**的等值联结。若需联结多个表需多个INNER JOIN。
+全相乘不能好好的利用索引，因为全相乘生成一张临时表，临时表里是没有索引的，大大降低了查询效率。
 
-  ```mysql
-  select [column_list]
-              FROM 
-              t1 INNER JOIN t2 ON [连接条件1]
-              INNER JOIN t3 ON [连接条件2]
-              ...
-              WHERE where_conditions;
-  ```
+联结要指定条件，否则会返回笛卡尔积，新表列数=表1列数*表2列数。
 
-  ![image-20211029140928846](https://i.loli.net/2021/10/29/Dq8fvNFYmaT2WKS.png)
-  
-  #### 多表内联结
+#### 外联结——OUTER JOIN
+
+查询出左表和右表所有数据，但是去除两表的重复数据
+
+#### 内联结
+
+**两表**的等值联结。若需联结多个表需多个INNER JOIN。
+
+```mysql
+select [column_list]
+            FROM 
+            t1 INNER JOIN t2 ON [连接条件1]
+            INNER JOIN t3 ON [连接条件2]
+            ...
+            WHERE where_conditions;
+```
+
+![image-20211029140928846](https://i.loli.net/2021/10/29/Dq8fvNFYmaT2WKS.png)
+
+![image-20211101095439013](https://i.loli.net/2021/11/01/vKc7PAxEmQDn2qU.png)
+
+```mysql
+SELECT t1.DeviceNO,t2.DeviceName,
+(CASE WHEN t1.DeviceStatus=1 THEN '正常'
+WHEN t1.DeviceStatus=0 THEN '异常'
+WHEN t1.DeviceStatus=-1 THEN '无效'
+END) AS DeviceStatus,
+t1.TestingNum,t1.DefectNum,t1.CPUTemperature,t1.CPUUsage,t1.MemoryUsage
+FROM device_info AS t1 INNER JOIN device AS t2
+ON t1.DeviceNO=t2.DeviceNO
+WHERE t1.LineNO='001'
+ORDER BY t1.`NO`;
+```
+
+#### 多表内联结
 
 **mysql 在运行是关联指定的每个表以处理联结，这种处理是非常消耗资源的，所以不要联结过多的表，表越多性能下降越厉害**
 
@@ -1262,21 +1337,60 @@ https://blog.csdn.net/qq_36078992/article/details/106005655
 
 
 
-* 自联结
+#### 自联结
 
-  一张表看成两张表，要取2个别名。否则字段指定存在歧义。
+一张表看成两张表，要取2个别名。否则字段指定存在歧义。
 
-  
+#### 左联结/右联结
 
-* 左联结/右联结
+左连接查询达到了同样的效果，但是不会有其它冗余数据，查询速度快，消耗内存小，而且使用了索引。左连接查询效率相比于全相乘的查询效率快了10+倍以上。
 
-  左连接查询达到了同样的效果，但是不会有其它冗余数据，查询速度快，消耗内存小，而且使用了索引。左连接查询效率相比于全相乘的查询效率快了10+倍以上。
+![image-20211101095359954](https://i.loli.net/2021/11/01/T6poxlzaesh9k15.png)
 
-  右连接查询跟左连接查询类似，只是**右连接是以右表为主表**，会将右表所有数据查询出来，而左表则根据条件去匹配，如果左表没有满足条件的行，则左边默认显示NULL。左右连接是可以互换的。
+右连接查询跟左连接查询类似，只是**右连接是以右表为主表**，会将右表所有数据查询出来，而左表则根据条件去匹配，如果左表没有满足条件的行，则左边默认显示NULL。左右连接是可以互换的。
 
-  
+![image-20211101095416260](https://i.loli.net/2021/11/01/9GDWcbePTiuaHYo.png)
 
-* 在联结中使用聚集函数
+```mysql
+SELECT LineName, 
+(CASE WHEN COUNT(FaultTime)>0 THEN 1 
+WHEN COUNT(FaultTime)=0 THEN 0
+END) AS LineStatus
+FROM productionline AS t1 LEFT JOIN faults_time AS t2
+ON t1.LineNO=t2.LineNO
+GROUP BY LineName
+ORDER BY t1.`NO`;
+```
+
+#### 在联结中使用聚集函数
+
+
+
+#### CASE、WHEN、THEN
+
+> 数据SQL CASE 表达式是一种通用的条件表达式，类似于其它语言中的 if/else 语句。 
+>
+> ```mysql
+> CASE WHEN condition THEN result 
+> 
+> 　　　WHEN condition THEN result 
+> 
+> 　　　.............
+> 　　　[WHEN ...] 
+> 　　　[ELSE result] 
+> END 
+> ```
+>
+> CASE 子句可以用于任何表达式可以有效存在的地方。 ***condition 是一个返回boolean 的表达式***。 如果结果为真，那么 CASE 表达式的结果就是符合条件的 result。 如果结果为假，那么以相同方式搜寻任何随后的 WHEN 子句。 如果没有 WHEN condition 为真，那么 case 表达式的结果就是在 ELSE 子句里的值。 如果省略了 ELSE 子句而且没有匹配的条件， 结果为 NULL。
+>
+> ```mysql
+> CASE sex 
+>          WHEN '1' THEN '男' 
+>          WHEN '2' THEN '女' 
+> ELSE '其他' END 
+> ```
+>
+> 
 
 
 
@@ -1599,5 +1713,4 @@ https://blog.csdn.net/defonds/article/details/46858949
 ## 23.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
-
 
