@@ -28,8 +28,6 @@ https://www.cnblogs.com/mm20/p/8060425.html
 
 PRIMARY KEY (主键的列不能为空值)
 
-
-
 ## 5.批量插入大量数据
 
 #### 通过INSERT INTO插入
@@ -1392,23 +1390,73 @@ ORDER BY t1.`NO`;
 >
 > 
 
+## 14. 条件、循环语句
+
+### （1）条件语句
+
+#### IF
+
+```mysql
+IF(expr1,expr2,expr3)	-- 如果第一个条件为True,则返回第二个参数，否则返回第三个
+```
+
+```mysql
+select if(author='Felix', 'yes', 'no') as Author from books;
+```
+
+#### CASE、WHEN、THEN
+
+数据SQL CASE 表达式是一种通用的条件表达式，类似于其它语言中的 if/else 语句。
+
+可以表达多种条件。
+
+```mysql
+CASE WHEN condition THEN result 
+
+　　　WHEN condition THEN result 
+
+　　　.............
+　　　[WHEN ...] 
+　　　[ELSE result] 
+END 
+```
+
+CASE 子句可以用于任何表达式可以有效存在的地方。 ***condition 是一个返回boolean 的表达式***。 如果结果为真，那么 CASE 表达式的结果就是符合条件的 result。 如果结果为假，那么以相同方式搜寻任何随后的 WHEN 子句。 如果没有 WHEN condition 为真，那么 case 表达式的结果就是在 ELSE 子句里的值。 如果省略了 ELSE 子句而且没有匹配的条件， 结果为 NULL。
+
+```mysql
+select 
+case author 
+when 'Felix' then 'yes' 
+else 'no' 
+end as AU from felix_test;
+```
+
+### （2）循环语句
+
+https://www.cnblogs.com/chenliyang/p/6553068.html
+
+
 
 
 
 ## 14.索引
+
+[...]中表示可选内容
 
 ### （1）普通索引
 
 #### 表已建立后创建索引
 
 ```mysql
-CREATE INDEX indexName ON t_name (column_name);
+CREATE INDEX indexName ON t_name (`fieldName`);
 ```
 
 #### 修改表结构——添加索引
 
 ```mysql
 ALTER TABLE t_name ADD INDEX indexName(`fieldName`);
+
+ALTER TABLE dept ADD INDEX index1(`deptno`);
 ```
 
 #### 建表的时候创建索引
@@ -1433,8 +1481,6 @@ DROP INDEX [indexName] ON t_name;
 SHOW INDEX FROM t_name\G
 ```
 
-
-
 ### （2）唯一索引
 
 **与前面的普通索引类似，不同的就是：索引列的值必须唯一，但允许有空值**
@@ -1451,13 +1497,7 @@ UNIQUE [indexName] (username(length))
 );  
 ```
 
-
-
-
-
 ## 15.约束
-
-
 
 ## 16.视图
 
@@ -1524,8 +1564,6 @@ https://blog.csdn.net/weixin_39641173/article/details/113945257?utm_medium=distr
 
   savepoint的良好使用的场景之一是“嵌套事务”，你可能希望程序执行一个小的事务，但是不希望回滚外面更大的事务
 
-  
-
 * 保留点ROLLBACK或者COMMIT后就自动释放。也可用RELEASE P1手动释放。
 
 ```mysql
@@ -1568,17 +1606,152 @@ SET GLOBAL AUTOCOMMIT=1;	-- 开启自动提交
 
 ## 18. 存储过程
 
-调用。变量用@表示。
+存储过程类似脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
+
+### （1）概念
+
+MySQL 5.0 版本开始支持存储过程。
+
+存储过程（Stored Procedure）是一种在数据库中存储复杂程序，以便外部程序调用的一种数据库对象。类似于函数。
+
+存储过程是为了完成特定功能的SQL语句集，经编译创建并保存在数据库中，用户可通过指定存储过程的名字并给定参数(需要时)来调用执行。
+
+存储过程思想上很简单，就是数据库 SQL 语言层面的代码封装与重用。
+
+- 存储过程就是具有名字的一段代码，用来完成一个特定的功能。
+- 创建的存储过程保存在数据库的数据字典中。
+
+使用存储过程比多条语句效率更高。且存储过程将语句封装，便于调用的人使用时保持代码的一致性。
+
+### （2）修改结束符
+
+![image-20211102095514968](https://i.loli.net/2021/11/02/3q1MhQeaXOUrYsc.png)
+
+### （3）创建存储过程
+
+存储过程一旦创建就被保存在服务器上供调用，直至删除。
+
+```mysql
+DELIMITER //
+CREATE PROCEDURE func()
+BEGIN
+	SELECT * FROM t_name;
+END//
+
+DELIMITER ;
+```
+
+```mysql
+DELIMITER //
+CREATE PROCEDURE func(
+	OUT para1 VARCHAR(255),
+	OUT para2 INT(10)
+)
+BEGIN
+	SELECT name FROM t1_name para1;
+	SELECT age FROM t2_name para2;
+END//
+
+DELIMITER ;
+```
+
+> * **OUT声明参数是传出存储过程的**
+> * **IN声明参数是传入存储过程的**
+> * **INTO语句表示将语句结果保存到变量para中**
+
+```mysql
+-- 显示创建该存储过程的语句
+SHOW CREATE PROCEDURE func;
+```
+
+### （4）调用存储过程
+
+```mysql
+CALL func();
+```
+
+```mysql
+CALL func(@paraName, @paraAge);	//传递两个变量给存储过程
+```
+
+> * **MySQL中变量都必须以@开始**
+>
+> * **显示变量**
+>
+>   ```mysql
+>   SELECT @paraName, @paraAge;
+>   ```
+
+```mysql
+-- 例子
+DELIMITER //
+CREATE PROCEDURE totalStudentEAchClass(IN classNO VARCHAR(255), OUT totalStudent INT(10))
+BEGIN
+	SELECT COUNT(studentID) FROM student WHERE classID=classNO INTO totalStudent; 
+END//
+DELIMITER ;
+
+CALL totalStudentEAchClass("A班", @totalS);
+SELECT @totalS;
+```
+
+### （5）删除存储过程
+
+```mysql
+DROP PROCEDURE IF EXISTS func;	//注意只写存储过程名，不加括号
+```
+
+### （6）显示所有存储过程
+
+```mysql
+SHOW PROCEDURE STATUS;
+```
+
+### （7）智能存储——脚本
+
+　**迄今为止使用的所有存储过程基本上都是封装MySQL简单的 SELECT语句**。虽然它们全都是有效的存储过程例子,但它们所能完成的工作你直接用这些被封装的语句就能完成(如果说它们还能带来更多的东西,那就是使事情更复杂)。**只有在存储过程内包含业务规则和智能处理时,它们的威力才真正显现出来，来使我们的语句执行更加可靠和智能，比如我们可以声明局部变量、添加内部注释、使用循环或判断语句等等**。
+
+```mysql
+DELIMITER //
+CREATE PROCEDURE ordertotal(
+	IN onumber INT,
+    IN taxable BOOLEAN,
+    OUT ototal DECIMAL(8,2)
+) COMMENT 'Obatin order total,optionally adding tax'
+BEGIN
+
+	-- Declare variable for total
+    DECLARE total DECIMAL(8,2);
+    -- Declare tax percentage
+    DECLARE taxrate INT DEFAULT 6;
+    
+    -- Get the order total
+    SELECT Sum(item_price*quantity)
+    FROM orderitems
+    WHERE order_num = onumber
+    INTO total;
+    
+    -- Is this taxable?
+    IF taxable THEN
+		-- Yes,so add taxrate to the total
+        SELECT total+(total/100*taxrate) INTO total;
+	END IF;
+    
+    -- And finally,save to out variable
+    SELECT total INTO ototal;
+    
+END//
+
+DELIMITER ;
+```
+
+
 
 
 
 
 
 ## 19.  游标
-
-
-
-
 
 ## 20. 账号管理
 
