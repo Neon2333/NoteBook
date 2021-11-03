@@ -719,6 +719,8 @@ GROUP BY `prod_id`;					   //从products中按照prod_id分组
 
 （特别的，若计算字段不是聚合函数，而是非GROUP BY后字段的普通字段，则**显示一组中的符合过滤条件的第一条记录**）
 
+**GROUP BY后跟ORDER BY，排序的字段若不是分组依据的字段，则都只显示改组的第一条记录的该字段值，因此若要按照该字段排序，要注意排序是按照组中该字段的第一个值排序的。**
+
 ### （2）HAVING
 
 **必须搭配GROUP BY和聚合函数使用**，以组为单位进行过滤。（WHERE过滤行）
@@ -864,17 +866,11 @@ FROM t1 INNER JOIN device AS t2
 ON t1.LineNO=t2.LineNO;
 ```
 
-
-
-
-
-
-
 ### （2）子查询作为计算字段
 
+子查询得到的结果还可以作为SELECT显示的字段。
+
 T1-3
-
-
 
 ### （3）操作符
 
@@ -1279,7 +1275,7 @@ https://blog.csdn.net/qq_36078992/article/details/106005655
 
 > 1. 先确定数据要用到哪些表。
 > 2. 将多个表先通过笛卡尔积变成一个表。
-> 3. 然后去除不符合逻辑的数据（根据两个表的关系去掉）。
+> 3. 然后去除不符合逻辑的数据（根据两个表的关系去掉），内联/左联/自联。
 > 4. 最后当做是一个虚拟表一样来加上条件即可。
 
 #### 叉联结+WHERE过滤——笛卡尔积
@@ -1388,7 +1384,20 @@ ORDER BY t1.`NO`;
 > ELSE '其他' END 
 > ```
 >
-> 
+
+```mysql
+SELECT t1.DeviceNO,t2.DeviceName,
+(CASE WHEN t1.DeviceStatus=1 THEN '正常'
+WHEN t1.DeviceStatus=0 THEN '异常'
+WHEN t1.DeviceStatus=-1 THEN '无效'
+END) AS DeviceStatus,
+t1.TestingNum,t1.DefectNum,
+CONCAT(t1.CPUTemperature,'℃') AS CPUTemperature,CONCAT(t1.CPUUsage,'%') AS CPUUsage,CONCAT(t1.MemoryUsage,'%') AS MemoryUsage
+FROM device_info AS t1 INNER JOIN device AS t2
+ON t1.DeviceNO=t2.DeviceNO
+WHERE t1.LineNO='001'
+ORDER BY t1.`NO`;
+```
 
 ## 14. 条件、循环语句
 
@@ -1648,8 +1657,8 @@ CREATE PROCEDURE func(
 	OUT para2 INT(10)
 )
 BEGIN
-	SELECT name FROM t1_name para1;
-	SELECT age FROM t2_name para2;
+	SELECT name FROM t1_name INTO para1;
+	SELECT age FROM t2_name INTO para2;
 END//
 
 DELIMITER ;
