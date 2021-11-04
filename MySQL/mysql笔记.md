@@ -486,6 +486,22 @@ SELECT `field_name1` FROM tb_name;
 select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_table_name' and table_schema = 'your_db_name';  
 ```
 
+## 9.主键
+
+### （1）概念
+
+
+
+
+
+### （2）Navicat中给表添加主键
+
+默认自增1
+
+![image-20211104140610120](https://i.loli.net/2021/11/04/Y2TAn1choVsOlIm.png)
+
+
+
 
 
 ## 9.函数
@@ -1247,7 +1263,15 @@ FROM student;
 
 ```
 
-## 12.组合查询
+## 12.并集
+
+https://blog.csdn.net/mine_song/article/details/70184072
+
+https://www.jb51.net/article/65696.htm
+
+MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但是对于交集Intersect、差集Except，就没有实现了。
+
+一般的解决方案用in和not in来解决，小量数据还可以，但数据量大了效率就很低了
 
 * UNION
 
