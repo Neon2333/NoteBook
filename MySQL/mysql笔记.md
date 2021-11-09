@@ -1711,20 +1711,26 @@ select t1.emp_name,t2.team_name from t_employee t1 inner join t_team t2
 on t1.team_id = t2.id and t2.team_name = '架构组';
 ```
 
+
+
 ```mysql
 select t1.emp_name,t2.team_name from t_employee t1 inner join t_team t2
 on t1.team_id = t2.id where t2.team_name = '架构组';
 ```
+
+
 
 ```mysql
 select t1.emp_name,t2.team_name from t_employee t1, t_team t2 where
 t1.team_id = t2.id and t2.team_name = '架构组';
 ```
 
-内连接建议使用第3种语法，简洁：
+#### 内连接：INNER JOIN和先笛卡尔积再WHERE两种写法。
+
+建议使用笛卡尔积+WHERE语法，简洁：
 
 ```mysql
-select 字段 from 表1, 表2 [where 关联条件];  
+select 字段 from 表1, 表2, 表3 [where 关联条件];  
 ```
 
 #### 若需联结多个表需多个INNER JOIN
