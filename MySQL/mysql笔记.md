@@ -1219,11 +1219,155 @@ ON t1.LineNO=t2.LineNO;
 
 T1-3
 
-### （3）操作符
+### （3）多行操作符
 
  ANY（SOME）, ALL, IN, EXISTS 
 
-### (4)练习
+> 子查询放在小括号内。
+>
+> 标量子查询，一般搭配着单行单列操作符使用 >、<、>=、<=、=、<>、!=
+>
+> 列子查询，一般搭配着多行操作符使用
+
+> **in(not in)**——列表中的“任意一个”
+> **any或者some**——和子查询返回的“某一个值”比较，比如**a>some(10,20,30)**，a大于子查询中
+> 任意一个即可，a大于子查询中最小值即可，等同于a>min(10,20,30)。
+> **all**——和子查询返回的“所有值”比较，比如**a>all(10,20,30)**，a大于子查询中所有值，换句话
+> 说，a大于子查询中最大值即可满足查询条件，等同于a>max(10,20,30);
+
+```mysql
+/*返回location_id是1400或1700的部门中的所有员工姓名*/
+/*方式1*/
+/*①查询location_id是1400或1700的部门编号*/
+SELECT DISTINCT department_id
+FROM departments
+WHERE location_id IN (1400, 1700);
+/*②查询员工姓名，要求部门是①列表中的某一个*/
+SELECT a.last_name
+FROM employees a
+WHERE a.department_id IN (SELECT DISTINCT department_id
+FROM departments
+WHERE location_id IN (1400, 1700));
+/*方式2：使用any实现*/
+SELECT a.last_name
+FROM employees a
+WHERE a.department_id = ANY (SELECT DISTINCT department_id
+FROM departments
+WHERE location_id IN (1400, 1700));
+/*拓展，下面与not in等价*/
+SELECT a.last_name
+FROM employees a
+WHERE a.department_id <> ALL (SELECT DISTINCT department_id
+FROM departments
+WHERE location_id IN (1400, 1700));
+```
+
+### （4）NULL的坑
+
+**=、<>、<、>、>=、<=、IN、NOT IN过滤NULL时无法查询出值为NULL的记录！**
+
+**判断NULL只能用IS NULL、IS NOT NULL **
+
+```mysql
+mysql> select 1>=NULL;
++---------+
+| 1>=NULL |
++---------+
+| NULL |
++---------+
+1 row in set (0.00 sec)
+-- ///////////////////////////////////////////////////////////
+mysql> select 1 in (null),1 not in (null),null in (null),null not in (null);
++-------------+-----------------+----------------+--------------------+
+| 1 in (null) | 1 not in (null) | null in (null) | null not in (null) |
++-------------+-----------------+----------------+--------------------+
+| NULL | NULL | NULL | NULL |
++-------------+-----------------+----------------+--------------------+
+1 row in set (0.00 sec)
+-- /////////////////////////////////////////////////////////////
+mysql> select 1=any(select null),null=any(select null);
++--------------------+-----------------------+
+| 1=any(select null) | null=any(select null) |
++--------------------+-----------------------+
+| NULL | NULL |
++--------------------+-----------------------+
+```
+
+#### IN后跟着NULL
+
+```mysql
+mysql> select * from test1;
++------+------+
+| a | b |
++------+------+
+| 1 | 1 |
+| 1 | NULL |
+| NULL | NULL |
++------+------+
+3 rows in set (0.00 sec)
+-- IN后跟着NULL，查出的都是空集
+mysql> select * from test1 where a in (null);
+Empty set (0.00 sec)
+-- IN后除了跟着NULL还有别的值，NULL查不出，其他的值可以查询出来
+mysql> select * from test1 where a in (null,1);
++------+------+
+| a | b |
++------+------+
+| 1 | 1 |
+| 1 | NULL |
++------+------+
+2 rows in set (0.00 sec)
+```
+
+#### NOT IN后跟着NULL
+
+```mysql
+mysql> select * from test1 where a not in (null);
+Empty set (0.00 sec)
+-- //////////////////////////////////////////////////////
+mysql> select * from test1 where a not in (2);
++------+------+
+| a | b |
++------+------+
+| 1 | 1 |
+| 1 | NULL |
++------+------+
+2 rows in set (0.00 sec)
+-- NOT IN后跟着的除了NULL还有别的值，则都查不出来
+mysql> select * from test1 where a not in (null,2);
+Empty set (0.00 sec)
+```
+
+#### COUNT后跟着NULL
+
+COUNT(col)——统计不包含字段col中值为NULL的行
+
+COUNT(*)——统计包含字段col中值为NULL的行
+
+#### 主键的字段会自动设为NOT NULL，故添加记录时主键的值不能是NULL
+
+```mysql
+CREATE TABLE `test3` (
+`a` int(11) NOT NULL,
+`b` int(11) DEFAULT NULL,
+PRIMARY KEY (`a`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8
+-- 插入数据时主键不能是NULL
+mysql> insert into test3 values (null,1);
+ERROR 1048 (23000): Column 'a' cannot be null
+```
+
+#### 因为NULL的情况确实比较难以处理，容易出错，最有效的方法就是避免使用NULL。所以，强烈建议创建字段的时候字段不允许为NULL，设置一个默认值。  
+> 任何值和NULL使用运算符（>、<、>=、<=、!=、<>）或者（in、not in、any/some、all），
+> 返回值都为NULL
+> 当IN和NULL比较时，无法查询出为NULL的记录
+> 当NOT IN 后面有NULL值时，不论什么情况下，整个sql的查询结果都为空
+> 判断是否为空只能用IS NULL、IS NOT NULL
+> count(字段)无法统计字段为NULL的值，count(*)可以统计值为null的行
+> 当字段为主键的时候，字段会自动设置为not null
+> NULL导致的坑让人防不胜防，强烈建议创建字段的时候字段不允许为NULL，给个默认值  
+
+### (5)练习
 
 https://blog.csdn.net/weixin_45664854/article/details/105498760
 
@@ -1644,12 +1788,69 @@ https://blog.csdn.net/qq_36078992/article/details/106005655
 联结要指定条件，否则会返回笛卡尔积，新表列数=表1列数*表2列数。
 
 ```mysql
-mysql> select * from t_team,t_employee;
+drop table if exists test1;
+create table test1(
+a int
+);
+drop table if exists test2;
+create table test2(
+b int
+);
+insert into test1 values (1),(2),(3);
+insert into test2 values (3),(4),(5)
 ```
+
+```mysql
+mysql> select * from test1;
++------+
+| a |
++------+
+| 1 |
+| 2 |
+| 3 |
++------+
+3 rows in set (0.00 sec)
+mysql> select * from test2;
++------+
+| b |
++------+
+| 3 |
+| 4 |
+| 5 |
++------+
+3 rows in set (0.00 sec)
+```
+
+```mysql
+mysql> select * from test1 t1,test2 t2;
++------+------+
+| a | b |
++------+------+
+| 1 | 3 |
+| 2 | 3 |
+| 3 | 3 |
+| 1 | 4 |
+| 2 | 4 |
+| 3 | 4 |
+| 1 | 5 |
+| 2 | 5 |
+| 3 | 5 |
++------+------+
+9 rows in set (0.00 sec)
+mysql> select * from test1 t1,test2 t2 where t1.a = t2.b;
++------+------+
+| a | b |
++------+------+
+| 3 | 3 |
++------+------+
+1 row in set (0.00 sec
+```
+
+
 
 ### （2）内联结
 
-#### 内连接相当于在笛卡尔积的基础上加上了连接的条件。
+**内连接相当于在笛卡尔积的基础上加上了连接的条件进行过滤**
 
 ```mysql
 for(Object eleA : A){
@@ -1673,7 +1874,7 @@ on t1.team_id = t2.id;
 +---------------+-----------+
 ```
 
-#### 当没有连接条件ON的时候，内连接上升为笛卡尔积，结果和笛卡尔积相同。  
+**当没有连接条件ON的时候，内连接上升为笛卡尔积，结果和笛卡尔积相同。  **
 
 ```mysql
 mysql> select t1.emp_name,t2.team_name from t_employee t1 inner join t_team t2;
@@ -1703,7 +1904,7 @@ mysql> select t1.emp_name,t2.team_name from t_employee t1 inner join t_team t2;
 +---------------+-----------+
 ```
 
-#### 组合查询条件
+#### 内连接——INNER JOIN和先笛卡尔积再WHERE两种写法
 
 ```mysql
 -- 查询架构组的员工
@@ -1711,21 +1912,15 @@ select t1.emp_name,t2.team_name from t_employee t1 inner join t_team t2
 on t1.team_id = t2.id and t2.team_name = '架构组';
 ```
 
-
-
 ```mysql
 select t1.emp_name,t2.team_name from t_employee t1 inner join t_team t2
 on t1.team_id = t2.id where t2.team_name = '架构组';
 ```
 
-
-
 ```mysql
 select t1.emp_name,t2.team_name from t_employee t1, t_team t2 where
 t1.team_id = t2.id and t2.team_name = '架构组';
 ```
-
-#### 内连接：INNER JOIN和先笛卡尔积再WHERE两种写法。
 
 建议使用笛卡尔积+WHERE语法，简洁：
 
@@ -1733,16 +1928,7 @@ t1.team_id = t2.id and t2.team_name = '架构组';
 select 字段 from 表1, 表2, 表3 [where 关联条件];  
 ```
 
-#### 若需联结多个表需多个INNER JOIN
-
-```mysql
-select [column_list]
-            FROM 
-            t1 INNER JOIN t2 ON [连接条件1]
-            INNER JOIN t3 ON [连接条件2]
-            ...
-            WHERE where_conditions;
-```
+#### 
 
 ![image-20211029140928846](https://i.loli.net/2021/10/29/Dq8fvNFYmaT2WKS.png)
 
@@ -1759,20 +1945,31 @@ WHERE t1.LineNO='001'
 ORDER BY t1.`NO`;
 ```
 
-#### 多表内联结
+#### 多表内联结——需多个INNER JOIN
 
 **mysql 在运行是关联指定的每个表以处理联结，这种处理是非常消耗资源的，所以不要联结过多的表，表越多性能下降越厉害**
 
 ```mysql
+select [column_list]
+            FROM 
+            t1 INNER JOIN t2 ON [连接条件1]
+            INNER JOIN t3 ON [连接条件2]
+            ...
+            WHERE where_conditions;
 ```
 
+```mysql
+SELECT t1.`NO`, t2.LineName, t3.DeviceName, t4.FaultName,(CASE WHEN FaultEnable=1 THEN '使能' WHEN FaultEnable=0 THEN '禁止' END) AS FaultEnable
+FROM faults_config AS t1
+INNER JOIN productionline AS t2	ON t1.LineNO=t2.LineNO 
+INNER JOIN device AS t3	ON t1.DeviceNO=t3.DeviceNO 
+INNER JOIN faults AS t4	ON t1.FaultNO=t4.FaultNO AND t1.DeviceNO=t4.DeviceNO
+ORDER BY t1.`NO`;
+```
 
+### （3）左联结/右联结
 
-#### 自联结
-
-一张表看成两张表，要取2个别名。否则字段指定存在歧义。
-
-#### 左联结/右联结
+https://blog.csdn.net/weixin_39608063/article/details/113187275
 
 左连接查询达到了同样的效果，但是不会有其它冗余数据，查询速度快，消耗内存小，而且使用了索引。左连接查询效率相比于全相乘的查询效率快了10+倍以上。
 
@@ -1793,50 +1990,36 @@ GROUP BY LineName
 ORDER BY t1.`NO`;
 ```
 
-#### 在联结中使用聚集函数
+### （4）在联结中使用聚集函数
 
 
 
-#### CASE、WHEN、THEN
 
-> 数据SQL CASE 表达式是一种通用的条件表达式，类似于其它语言中的 if/else 语句。 
->
-> ```mysql
-> CASE WHEN condition THEN result 
-> 
-> 　　　WHEN condition THEN result 
-> 
-> 　　　.............
-> 　　　[WHEN ...] 
-> 　　　[ELSE result] 
-> END 
-> ```
->
-> CASE 子句可以用于任何表达式可以有效存在的地方。 ***condition 是一个返回boolean 的表达式***。 如果结果为真，那么 CASE 表达式的结果就是符合条件的 result。 如果结果为假，那么以相同方式搜寻任何随后的 WHEN 子句。 如果没有 WHEN condition 为真，那么 case 表达式的结果就是在 ELSE 子句里的值。 如果省略了 ELSE 子句而且没有匹配的条件， 结果为 NULL。
->
-> ```mysql
-> CASE sex 
->          WHEN '1' THEN '男' 
->          WHEN '2' THEN '女' 
-> ELSE '其他' END 
-> ```
->
 
-```mysql
-SELECT t1.DeviceNO,t2.DeviceName,
-(CASE WHEN t1.DeviceStatus=1 THEN '正常'
-WHEN t1.DeviceStatus=0 THEN '异常'
-WHEN t1.DeviceStatus=-1 THEN '无效'
-END) AS DeviceStatus,
-t1.TestingNum,t1.DefectNum,
-CONCAT(t1.CPUTemperature,'℃') AS CPUTemperature,CONCAT(t1.CPUUsage,'%') AS CPUUsage,CONCAT(t1.MemoryUsage,'%') AS MemoryUsage
-FROM device_info AS t1 INNER JOIN device AS t2
-ON t1.DeviceNO=t2.DeviceNO
-WHERE t1.LineNO='001'
-ORDER BY t1.`NO`;
-```
+### （5）自联结
 
-## 16. 条件、循环语句
+一张表看成两张表，要取2个别名。否则字段指定存在歧义。
+
+
+
+### （6）INNER JOIN和LEFT JOIN的代码模拟
+
+> 上面java代码中两个表的连接查询使用了嵌套循环，外循环每执行一次，内循环的表都会全部遍
+> 历一次，如果放到mysql中，就相当于内表（被驱动表）全部扫描了一次（一次全表io读取操
+> 作），主表（外循环）如果有n条数据，那么从表就需要全表扫描n次，表的数据是存储在磁盘
+> 中，每次全表扫描都需要做io操作，**io操作是最耗时间的**，如果mysql按照上面的java方式实现，
+> 那效率肯定很低。
+> 那mysql是如何优化的呢？
+> msql内部使用了一个**内存缓存空间**，就叫他 join_buffer 吧，先把外循环的数据放到
+> join_buffer 中，然后对从表进行遍历，从表中取一条数据和 join_buffer 的数据进行比较，
+> 然后从表中再取第2条和 join_buffer 数据进行比较，直到从表遍历完成，使用这方方式来减少
+> 从表的io扫描次数，当 join_buffer 足够大的时候，大到可以存放主表所有数据，那么从表只需
+> 要全表扫描一次（即只需要一次全表io读取操作）。
+> mysql中这种方式叫做 **Block Nested Loop**   
+
+
+
+## 16. 流程控制语句
 
 ### （1）条件语句
 
@@ -1858,12 +2041,12 @@ select if(author='Felix', 'yes', 'no') as Author from books;
 
 ```mysql
 -- 方式1：
-CASE <表达式>
-WHEN <值1> THEN <操作>
-WHEN <值2> THEN <操作>
+case 表达式
+when 值1 then 结果1或者语句1（如果是语句需要加分号）
+when 值2 then 结果2或者语句2
 ...
-ELSE <操作>
-END;
+else 结果n或者语句n
+end [case] （如果是放在begin end之间需要加case，如果在select后则不需要）
 
 -- 方式2：
 CASE
@@ -1898,9 +2081,19 @@ ELSE '未知' END) 性别
 FROM t_stu t;
 ```
 
-
-
-
+```mysql
+SELECT t1.DeviceNO,t2.DeviceName,
+(CASE WHEN t1.DeviceStatus=1 THEN '正常'
+WHEN t1.DeviceStatus=0 THEN '异常'
+WHEN t1.DeviceStatus=-1 THEN '无效'
+END) AS DeviceStatus,
+t1.TestingNum,t1.DefectNum,
+CONCAT(t1.CPUTemperature,'℃') AS CPUTemperature,CONCAT(t1.CPUUsage,'%') AS CPUUsage,CONCAT(t1.MemoryUsage,'%') AS MemoryUsage
+FROM device_info AS t1 INNER JOIN device AS t2
+ON t1.DeviceNO=t2.DeviceNO
+WHERE t1.LineNO='001'
+ORDER BY t1.`NO`;
+```
 
 ### （2）循环语句
 
