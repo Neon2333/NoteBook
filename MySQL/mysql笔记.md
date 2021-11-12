@@ -1738,7 +1738,7 @@ FROM student;
 
 ```
 
-## 14.并集
+## 14.并集——UNION
 
 https://blog.csdn.net/mine_song/article/details/70184072
 
@@ -2023,14 +2023,119 @@ ORDER BY t1.`NO`;
 
 ### （1）条件语句
 
-#### IF
+#### IF函数
 
 ```mysql
-IF(expr1,expr2,expr3)	-- 如果第一个条件为True,则返回第二个参数，否则返回第三个
+IF(expr1, val1, val2)	-- 如果第一个条件为True,则返回第二个参数，否则返回第三个
 ```
 
 ```mysql
 select if(author='Felix', 'yes', 'no') as Author from books;
+```
+
+#### IF结构
+
+```mysql
+if 条件语句1 then 语句1;
+elseif 条件语句2 then 语句2;
+...
+else 语句n;
+end if;
+```
+
+```mysql
+/*删除id=7的记录*/
+DELETE FROM t_user WHERE id=7;
+/*删除存储过程*/
+DROP PROCEDURE IF EXISTS proc2;
+/*声明结束符为$*/
+DELIMITER $
+/*创建存储过程*/
+CREATE PROCEDURE proc2(v_id int,v_sex varchar(8),v_name varchar(16),OUT result
+TINYINT)
+BEGIN
+	DECLARE v_count TINYINT DEFAULT 0;/*用来保存user记录的数量*/
+	/*根据v_id查询数据放入v_count中*/
+	select count(id) into v_count from t_user where id = v_id;
+	/*v_count>0表示数据存在，则修改，否则新增*/
+	if v_count>0 THEN
+		BEGIN
+			DECLARE lsex TINYINT;
+			select if(v_sex='男',1,2) into lsex;
+			update t_user set sex = lsex,name = v_name where id = v_id;
+			/*获取update影响行数*/
+			select ROW_COUNT() INTO result;
+		END;
+	else
+		BEGIN
+			DECLARE lsex TINYINT;
+			select if(lsex='男',1,2) into lsex;
+			insert into t_user VALUES (v_id,lsex,v_name);
+			select 0 into result;
+		END;
+	END IF;
+END $
+/*结束符置为;*/
+DELIMITER ;
+```
+
+```mysql
+mysql> SELECT * FROM t_user;
++----+-----+---------------+
+| id | sex | name |
++----+-----+---------------+
+| 1 | 1 | 路人甲Java |
+| 2 | 1 | 张学友 |
+| 3 | 2 | 王祖贤 |
+| 4 | 1 | 郭富城 |
+| 5 | 2 | 李嘉欣 |
+| 6 | 1 | 郭富城 |
++----+-----+---------------+
+6 rows in set (0.00 sec)
+mysql> CALL proc2(7,'男','黎明',@result);
+Query OK, 1 row affected (0.00 sec)
+mysql> SELECT @result;
++---------+
+| @result |
++---------+
+| 0 |
++---------+
+1 row in set (0.00 sec)
+mysql> SELECT * FROM t_user;
++----+-----+---------------+
+| id | sex | name |
++----+-----+---------------+
+| 1 | 1 | 路人甲Java |
+| 2 | 1 | 张学友 |
+| 3 | 2 | 王祖贤 |
+| 4 | 1 | 郭富城 |
+| 5 | 2 | 李嘉欣 |
+| 6 | 1 | 郭富城 |
+| 7 | 2 | 黎明 |
++----+-----+---------------+
+7 rows in set (0.00 sec)
+mysql> CALL proc2(7,'男','梁朝伟',@result);
+Query OK, 1 row affected (0.00 sec)
+mysql> SELECT @result;
++---------+
+| @result |
++---------+
+| 1 |
++---------+
+1 row in set (0.00 sec)
+mysql> SELECT * FROM t_user;
++----+-----+---------------+
+| id | sex | name |
++----+-----+---------------+
+| 1 | 1 | 路人甲Java |
+| 2 | 1 | 张学友 |
+| 3 | 2 | 王祖贤 |
+| 4 | 1 | 郭富城 |
+| 5 | 2 | 李嘉欣 |
+| 6 | 1 | 郭富城 |
+| 7 | 2 | 梁朝伟 |
++----+-----+---------------+
+7 rows in set (0.00 sec)
 ```
 
 #### CASE、WHEN、THEN
@@ -2046,7 +2151,7 @@ when 值1 then 结果1或者语句1（如果是语句需要加分号）
 when 值2 then 结果2或者语句2
 ...
 else 结果n或者语句n
-end [case] （如果是放在begin end之间需要加case，如果在select后则不需要）
+END CASE; （如果是放在begin end之间需要加case，如果在select后则不需要）
 
 -- 方式2：
 CASE
@@ -2054,7 +2159,7 @@ WHEN <条件1> THEN <命令>
 WHEN <条件2> THEN <命令>
 ...
 ELSE commands
-END;
+END CASE;
 ```
 
 ```mysql
@@ -2099,9 +2204,108 @@ ORDER BY t1.`NO`;
 
 https://www.cnblogs.com/chenliyang/p/6553068.html
 
+#### WHILE循环
 
+```mysql
+[标签:]while 循环条件 do
+循环体
+end while [标签];
+```
 
+> * 标签——是给while取个名字
+> * iterate ——结束本次循环
+> * leave ——跳出循环
 
+```mysql
+/*删除test1表记录*/
+DELETE FROM test1;
+/*删除存储过程*/
+DROP PROCEDURE IF EXISTS proc5;
+/*声明结束符为$*/
+DELIMITER $
+/*创建存储过程*/
+CREATE PROCEDURE proc5(v_count int)
+BEGIN
+	DECLARE i int DEFAULT 0;
+	a:WHILE i<=v_count DO
+		SET i=i+1;
+		/*如果i不为偶数，跳过本次循环*/
+		IF i%2!=0 THEN
+			ITERATE a;
+		END IF;
+		/*插入数据*/
+		INSERT into test1 values (i);
+	END WHILE;
+END $
+/*结束符置为;*/
+DELIMITER ;
+```
+
+```mysql
+mysql> DELETE FROM test1;
+Query OK, 5 rows affected (0.00 sec)
+mysql> CALL proc5(10);
+Query OK, 1 row affected (0.01 sec)
+mysql> SELECT * from test1;
++----+
+| a |
++----+
+| 2 |
+| 4 |
+| 6 |
+| 8 |
+| 10 |
++----+
+5 rows in set (0.00 sec)
+```
+
+```mysql
+-- test2表有2个字段（a,b），写一个存储过程（2个参数：v_a_count，v_b_count)，使用双重循环插入数据，数据条件：a的范围[1,v_a_count]、b的范围[1,v_b_count]所有偶数的组合。
+
+/*删除存储过程*/
+DROP PROCEDURE IF EXISTS proc8;
+/*声明结束符为$*/
+DELIMITER $
+/*创建存储过程*/
+CREATE PROCEDURE proc8(v_a_count int,v_b_count int)
+BEGIN
+	DECLARE v_a int DEFAULT 0;
+	DECLARE v_b int DEFAULT 0;
+	a:WHILE v_a<=v_a_count DO
+		SET v_a=v_a+1;
+		SET v_b=0;
+		b:WHILE v_b<=v_b_count DO
+			SET v_b=v_b+1;
+			IF v_a%2!=0 THEN
+				ITERATE a;
+			END IF;
+			IF v_b%2!=0 THEN
+				ITERATE b;
+			END IF;
+			INSERT INTO test2 VALUES (v_a,v_b);
+		END WHILE b;
+	END WHILE a;
+END $
+/*结束符置为;*/
+DELIMITER ;
+```
+
+```mysql
+mysql> CALL proc8(4,6);
+Query OK, 1 row affected (0.01 sec)
+mysql> SELECT * from test2;
++---+---+
+| a | b |
++---+---+
+| 2 | 2 |
+| 2 | 4 |
+| 2 | 6 |
+| 4 | 2 |
+| 4 | 4 |
+| 4 | 6 |
++---+---+
+6 rows in set (0.00 sec)
+```
 
 ## 14.索引
 
@@ -2270,7 +2474,7 @@ SET GLOBAL AUTOCOMMIT=1;	-- 开启自动提交
 
 ## 20. 存储过程
 
-存储过程类似脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
+存储过程类似批处理脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
 
 ### （1）概念
 
@@ -2291,13 +2495,32 @@ MySQL 5.0 版本开始支持存储过程。
 
 ![image-20211102095514968](https://i.loli.net/2021/11/02/3q1MhQeaXOUrYsc.png)
 
-### （3）创建存储过程
+### （3）参数列表
+
+* in：该参数可以作为输入，也就是该参数需要调用方传入值。
+
+* out：该参数可以作为输出，也就是说该参数可以作为返回值。
+
+  ```mysql
+  SELECT COUNT(*),max(id) into user_count,max_id from t_user;
+  ```
+
+* inout：该参数既可以作为输入也可以作为输出，也就是说该参数需要在调用的时候传入值，又可
+  以作为返回值。
+
+* 参数模式默认为IN。
+
+* 一个存储过程可以有多个输入、多个输出、多个输入输出参数  
+
+
+
+### （4）创建存储过程
 
 存储过程一旦创建就被保存在服务器上供调用，直至删除。
 
 ```mysql
-DELIMITER //
-CREATE PROCEDURE func()
+DELIMITER $
+CREATE PROCEDURE proc()
 BEGIN
 	SELECT * FROM t_name;
 END//
@@ -2306,7 +2529,7 @@ DELIMITER ;
 ```
 
 ```mysql
-DELIMITER //
+DELIMITER $
 CREATE PROCEDURE func(
 	OUT para1 VARCHAR(255),
 	OUT para2 INT(10)
@@ -2328,7 +2551,32 @@ DELIMITER ;
 SHOW CREATE PROCEDURE func;
 ```
 
-### （4）调用存储过程
+```mysql
+delete a from t_user a where a.id = 4;
+/*如果存储过程存在则删除*/
+DROP PROCEDURE IF EXISTS proc3;
+/*设置结束符为$*/
+DELIMITER $
+/*创建存储过程proc3*/
+CREATE PROCEDURE proc3(id int,age int,in name varchar(16),out user_count int,out
+max_id INT)
+BEGIN
+INSERT INTO t_user VALUES (id,age,name);
+/*查询出t_user表的记录，放入user_count中,max_id用来存储t_user中最小的id*/
+SELECT COUNT(*),max(id) into user_count,max_id from t_user;
+END $
+/*将结束符置为;*/
+DELIMITER ;
+
+/*创建了3个自定义变量*/
+SELECT @id:=4,@age:=55,@name:='郭富城';
+/*调用存储过程*/
+CALL proc3(@id,@age,@name,@user_count,@max_id);
+```
+
+
+
+### （5）调用存储过程
 
 ```mysql
 CALL func();
@@ -2359,19 +2607,19 @@ CALL totalStudentEAchClass("A班", @totalS);
 SELECT @totalS;
 ```
 
-### （5）删除存储过程
+### （6）删除存储过程
 
 ```mysql
-DROP PROCEDURE IF EXISTS func;	//注意只写存储过程名，不加括号
+DROP PROCEDURE IF EXISTS proc;	//注意只写存储过程名，不加括号
 ```
 
-### （6）显示所有存储过程
+### （7）显示所有存储过程
 
 ```mysql
 SHOW PROCEDURE STATUS;
 ```
 
-### （7）智能存储——脚本
+### （8）智能存储——脚本
 
 　**迄今为止使用的所有存储过程基本上都是封装MySQL简单的 SELECT语句**。虽然它们全都是有效的存储过程例子,但它们所能完成的工作你直接用这些被封装的语句就能完成(如果说它们还能带来更多的东西,那就是使事情更复杂)。**只有在存储过程内包含业务规则和智能处理时,它们的威力才真正显现出来，来使我们的语句执行更加可靠和智能，比如我们可以声明局部变量、添加内部注释、使用循环或判断语句等等**。
 
