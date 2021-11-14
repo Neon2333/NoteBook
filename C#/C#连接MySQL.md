@@ -213,7 +213,7 @@ while(reader.Read()){
   conn.Close();
   ```
 
-* **MySqlDataAdapter+MySqlCommandBuilder**
+* **MySqlDataAdapter+MySqlCommandBuilder**——读取一个datatable
 
   ```C#
    //----------------------------------------------------------------------

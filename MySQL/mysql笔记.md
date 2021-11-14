@@ -1058,7 +1058,7 @@ mysql> select now(),dayname(now());
 +---------------------+----------------+
 ```
 
-### （6）time_to_sec:将时间转换为秒值  
+### （6）time_to_sec——将时间转换为秒值  
 
 TIME_TO_SEC(time) 函数返回将参数 time 转换为秒数的时间值，转换公式为**“小时 ×3600+ 分钟
 ×60+ 秒”**。  
@@ -1072,7 +1072,7 @@ select time_to_sec('15:15:15'),now(),time_to_sec(now());
 +-------------------------+---------------------+--------------------+
 ```
 
-### （7）sec_to_time:将秒值转换为时间格式  
+### （7）sec_to_time——将秒值转换为时间格式  
 
 ```mysql
 mysql> select sec_to_time(100),sec_to_time(10000);
@@ -1083,7 +1083,7 @@ mysql> select sec_to_time(100),sec_to_time(10000);
 +------------------+--------------------+
 ```
 
-### （8）date_format:格式化指定的日期  
+### （8）date_format——格式化指定的日期  
 
 DATE_FORMAT(date，format) 函数是根据 format 指定的格式显示 date 值。
 DATE_FORMAT() 函数接受两个参数：
@@ -2537,7 +2537,7 @@ CREATE PROCEDURE func(
 BEGIN
 	SELECT name FROM t1_name INTO para1;
 	SELECT age FROM t2_name INTO para2;
-END//
+END $
 
 DELIMITER ;
 ```
@@ -2548,7 +2548,7 @@ DELIMITER ;
 
 ```mysql
 -- 显示创建该存储过程的语句
-SHOW CREATE PROCEDURE func;
+SHOW CREATE PROCEDURE proc;
 ```
 
 ```mysql
@@ -2596,11 +2596,11 @@ CALL func(@paraName, @paraAge);	//传递两个变量给存储过程
 
 ```mysql
 -- 例子
-DELIMITER //
+DELIMITER $
 CREATE PROCEDURE totalStudentEAchClass(IN classNO VARCHAR(255), OUT totalStudent INT(10))
 BEGIN
 	SELECT COUNT(studentID) FROM student WHERE classID=classNO INTO totalStudent; 
-END//
+END $
 DELIMITER ;
 
 CALL totalStudentEAchClass("A班", @totalS);
@@ -2624,7 +2624,7 @@ SHOW PROCEDURE STATUS;
 　**迄今为止使用的所有存储过程基本上都是封装MySQL简单的 SELECT语句**。虽然它们全都是有效的存储过程例子,但它们所能完成的工作你直接用这些被封装的语句就能完成(如果说它们还能带来更多的东西,那就是使事情更复杂)。**只有在存储过程内包含业务规则和智能处理时,它们的威力才真正显现出来，来使我们的语句执行更加可靠和智能，比如我们可以声明局部变量、添加内部注释、使用循环或判断语句等等**。
 
 ```mysql
-DELIMITER //
+DELIMITER $
 CREATE PROCEDURE ordertotal(
 	IN onumber INT,
     IN taxable BOOLEAN,
@@ -2652,7 +2652,7 @@ BEGIN
     -- And finally,save to out variable
     SELECT total INTO ototal;
     
-END//
+END $
 
 DELIMITER ;
 ```
