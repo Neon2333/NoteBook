@@ -288,7 +288,7 @@ num = this.DT.Rows[i][colNum].ToString();
 //num = (string)this.DT.Rows[i][colNum];    //无法将double转成string
 ```
 
-### （5）DataTable相关
+### （5）DataTable操作
 
 #### 对DataTable某列求和
 
@@ -296,7 +296,9 @@ https://blog.csdn.net/weixin_40508362/article/details/106668117
 
 https://blog.csdn.net/missysm586/article/details/6644319?spm=1001.2101.3001.6650.1&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.no_search_link&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7Edefault-1.no_search_link
 
+#### 对DataTable查询
 
+https://www.cnblogs.com/programsky/p/4290024.html
 
 
 

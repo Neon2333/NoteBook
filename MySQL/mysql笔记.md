@@ -496,6 +496,12 @@ select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_tabl
 
 ### （1）概念
 
+#### 主键
+
+
+
+#### 唯一主键
+
 
 
 
@@ -504,13 +510,9 @@ select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_tabl
 
 默认自增1
 
-![image-20211104140610120](https://i.loli.net/2021/11/04/Y2TAn1choVsOlIm.png)
+![image-20211104140610120.png](https://i.loli.net/2021/11/15/HvSIN8jdcMVFZ3J.png)
 
-
-
-
-
-## 9.函数
+## 10.自带函数
 
 ### （1）拼接计算字段
 
@@ -755,7 +757,7 @@ mysql> SELECT md5('123456');
 
 
 
-## 10. ORDER BY
+## 11. ORDER BY
 
 用GROUP BY/HAVING过滤后，显示，注意用ORDER BY排序。
 
@@ -767,7 +769,7 @@ HAVING COUNT(*)>=2;
 ORDER BY `prod_num`;                    //按照prod_num排序
 ```
 
-## 11. LIMIT
+## 12. LIMIT
 
 * LIMIT后跟的：不能是负数、只能是明确的数字不能是表达式
 * **跳过M条数据**，显示N条数据
@@ -800,7 +802,7 @@ SELECT * FROM t_name ORDER BY `age` desc LIMIT 2,2;		-- 第二页
 SELECT * FROM t_name ORDER BY `age` desc LIMIT 4,2;		-- 第三页
 ```
 
-## 12.分组——GROUP BY（重点）
+## 13.分组——GROUP BY（重点）
 
 ### （1）注意事项
 
@@ -948,7 +950,7 @@ limit [offset,] count;
 
 ![image-20211026085535132](https://i.loli.net/2021/10/26/Cwy6hxOYGn3IiZN.png)
 
-## 13. 日期和时间
+## 14. 日期和时间
 
 | 函数名称                | 作 用                                                        |
 | ----------------------- | ------------------------------------------------------------ |
@@ -1101,7 +1103,31 @@ date_format(now(),'%Y%m%d%H%i%s') as col2;
 +----------+---------------------+----------------+
 ```
 
-## 14.子查询（重点）
+## 15.并集——UNION
+
+https://blog.csdn.net/mine_song/article/details/70184072
+
+https://www.jb51.net/article/65696.htm
+
+MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但是对于交集Intersect、差集Except，就没有实现了。
+
+一般的解决方案用in和not in来解决，小量数据还可以，但数据量大了效率就很低了
+
+* UNION
+
+  连接多条SELECT语句，将查询出来的多条结果放在一张表上
+
+  若有重复的记录，则去重
+
+* UNION ALL
+
+  不去重
+
+* 连接的语句最好用括号括起来，括号内部的ORDER BY / LIMIT作用于括号内的SELECT语句。否则ORDER BY/LIMIT语句放在最后一条SELECT后，作用的是整个表，而不是最后一条SELECT查询到的表。见T2-8。
+
+## 16.约束
+
+## 17.子查询（重点）
 
 https://www.cnblogs.com/xiaoxi/p/6734025.html
 
@@ -1157,9 +1183,9 @@ https://www.cnblogs.com/zhuiluoyu/p/5822481.html
 GROUP BY `cat_id`;
 ```
 
-[![g3FkUH.png](https://z3.ax1x.com/2021/05/07/g3FkUH.png)](https://imgtu.com/i/g3FkUH)
+![微信截图 20210507142031](https://i.loli.net/2021/11/15/7V48GbWyas6CMqp.png)
 
-[![g3Fe2t.png](https://z3.ax1x.com/2021/05/07/g3Fe2t.png)](https://imgtu.com/i/g3Fe2t)
+![微信截图 20210507142108](https://i.loli.net/2021/11/15/6O9IUJzF2c3jMu7.png)
 
 * Q：主查询中未使用聚合函数，却使用GROUP BY。按照cat_id分组，查询goods_id,goods_name,cat_id,shop_price等字段，为什么每个cat_id只显示一条记录（cat_id分组下的第一条记录）？
 
@@ -1738,29 +1764,9 @@ FROM student;
 
 ```
 
-## 14.并集——UNION
+## 
 
-https://blog.csdn.net/mine_song/article/details/70184072
-
-https://www.jb51.net/article/65696.htm
-
-MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但是对于交集Intersect、差集Except，就没有实现了。
-
-一般的解决方案用in和not in来解决，小量数据还可以，但数据量大了效率就很低了
-
-* UNION
-
-  连接多条SELECT语句，将查询出来的多条结果放在一张表上
-
-  若有重复的记录，则去重
-
-* UNION ALL
-
-  不去重
-
-* 连接的语句最好用括号括起来，括号内部的ORDER BY / LIMIT作用于括号内的SELECT语句。否则ORDER BY/LIMIT语句放在最后一条SELECT后，作用的是整个表，而不是最后一条SELECT查询到的表。见T2-8。
-
-## 15.联结查询（重点）
+## 18.联结查询（重点）
 
 https://zhuanlan.zhihu.com/p/145679471
 
@@ -1928,9 +1934,9 @@ t1.team_id = t2.id and t2.team_name = '架构组';
 select 字段 from 表1, 表2, 表3 [where 关联条件];  
 ```
 
-#### 
 
-![image-20211029140928846](https://i.loli.net/2021/10/29/Dq8fvNFYmaT2WKS.png)
+
+![img](https://i.loli.net/2021/11/15/DEICQmyYqB8gfjX.png)
 
 ```mysql
 SELECT t1.DeviceNO,t2.DeviceName,
@@ -1973,11 +1979,11 @@ https://blog.csdn.net/weixin_39608063/article/details/113187275
 
 左连接查询达到了同样的效果，但是不会有其它冗余数据，查询速度快，消耗内存小，而且使用了索引。左连接查询效率相比于全相乘的查询效率快了10+倍以上。
 
-![image-20211101095359954](https://i.loli.net/2021/11/01/T6poxlzaesh9k15.png)
+![image-20211101095359954.png](https://i.loli.net/2021/11/15/sS7zfTxFNyM1cgq.png)
 
 右连接查询跟左连接查询类似，只是**右连接是以右表为主表**，会将右表所有数据查询出来，而左表则根据条件去匹配，如果左表没有满足条件的行，则左边默认显示NULL。左右连接是可以互换的。
 
-![image-20211101095416260](https://i.loli.net/2021/11/01/9GDWcbePTiuaHYo.png)
+![img](https://i.loli.net/2021/11/15/eaoqvu4b2Xp9t73.png)
 
 ```mysql
 SELECT LineName, 
@@ -2019,7 +2025,7 @@ ORDER BY t1.`NO`;
 
 
 
-## 16. 流程控制语句
+## 19. 流程控制语句
 
 ### （1）条件语句
 
@@ -2307,7 +2313,7 @@ mysql> SELECT * from test2;
 6 rows in set (0.00 sec)
 ```
 
-## 14.索引
+## 20.索引
 
 [...]中表示可选内容
 
@@ -2365,35 +2371,9 @@ UNIQUE [indexName] (username(length))
 );  
 ```
 
-## 17.约束
+## 
 
-## 18.视图
-
-将查询语句查询出来的表作为一个**虚拟表**进行封装。
-
-实现SQL语句的重用，简化复杂SQL语句（联结查询）的使用，给与用户一部分表（经过查询得出的表是原表的一部分）
-
-```mysql
--- 创建
-CREATE VIEW view_name
--- 删除
-DROP VIEW view_name
--- 显示创建
-SHOW CREATE VIEW view_name
-
--- 例子
-CREATE VIEW productscustomers AS 
-SELECT cust_name,cust_contact,prod_id
-FROM customers INNER JOIN orders ON customers.cust_id=orders.cust_id
-INNER JOIN orderitems ON orders.order_num=orderitems.order_num;
--- 上面语句查询列出订购任意产品的客户
--- 现在想查询订购了产品'TN2'的客户
-SELECT cust_name 
-FROM productscustomers 
-WHERE prod_id='TN2';
-```
-
-## 19. 事务
+## 21. 事务
 
 ### （1）使用条件
 
@@ -2408,11 +2388,41 @@ WHERE prod_id='TN2';
 * 提交——COMMIT，将未保存的动作写入数据库表
 * 保留点——SAVAPOINT，一系列语句中的**占位符**，当回退时，可以标记退回到什么位置。每个保留点都取**唯一的名字**。
 
-### （3）事务控制语句
+### （3）隐式事务——更改MySQL的自动提交行为
+
+MySQL默认情况下，只要表发生更改，就会立即提交。
+
+```mysql
+SET GLOBAL AUTOCOMMIT=0;	-- 关闭自动提交，直到AUTOCOMMIT置1时才提交
+SET GLOBAL AUTOCOMMIT=1;	-- 开启自动提交
+```
+
+```mysql
+mysql> show variables like 'autocommit';
++---------------+-------+
+| Variable_name | Value |
++---------------+-------+
+| autocommit | ON |
++---------------+-------+
+1 row in set, 1 warning (0.00 sec)
+-- autocommit 为ON表示开启了自动提交
+```
+
+### （4）显式事务——手动提交、回滚
 
 https://blog.csdn.net/weixin_39641173/article/details/113945257?utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-1.nonecase&depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-baidujs-1.nonecase
 
-* START TRANSACTION或BEGIN——开启事务
+* 开启事务
+
+  ```mysql
+  START TRANSACTION  -- 设置是否开启自动提交事务
+  ```
+
+  ```mysql
+  set autocommit=0;
+  ...
+  set autocommit=1;
+  ```
 
 * COMMIT
 
@@ -2455,24 +2465,281 @@ COMMIT;//或ROLLBACK;
 END;
 ```
 
-
-
-### （4）更改MySQL的自动提交行为
-
-MySQL默认情况下，只要表发生更改，就会立即提交。
+### （5）只读事务
 
 ```mysql
-SET GLOBAL AUTOCOMMIT=0;	-- 关闭自动提交，直到AUTOCOMMIT置1时才提交
-SET GLOBAL AUTOCOMMIT=1;	-- 开启自动提交
+START TRANSACTION READ ONLY;
 ```
 
-### （5）隔离级别与脏读
+表示在事务中执行的是一些只读操作，如查询，但是不会做insert、update、delete操作，数据库内部对只读事务可能会有一些性能上的优化  
 
-* 脏读——一个事务读到另一个事务还没有提交的数据（没有提交的数据一旦回滚到原数据，那读到的数据就是脏数据）
+若在事务中使用插入、删除等，会导致事务报错。
+
+### （6）并行事务——隔离级别与脏读
+
+#### 并行事务存在的问题
+
+> **脏读——**一个事务读到另一个事务还没有提交的数据（没有提交的数据一旦回滚到原数据，那读到的数据就是脏数据）
+>
+> **不可重复读——**一个事务操作中对于一个读取操作不管多少次，读取到的结果都是一样的。  
+>
+> **幻读——**幻读在可重复读的模式下才会出现，其他隔离级别中不会出现  
+>
+> > 事务A操作如下：  1、打开事务 2、查询号码为X的记录，不存在 3、插入号码为X的数据，插入报错（为
+> > 什么会报错，先向下看） 4、查询号码为X的记录，发现还是不存在（由于是可重复读，所以读取记录X
+> > 还是不存在的）  
+> >
+> > 事物B操作：在事务A第2步操作时插入了一条X的记录，所以会导致A中第3步插入报错（违反了唯一约
+> > 束）  
+
+#### 隔离级别
+
+事务隔离级别主要是解决了多个事务之间数据可见性及数据正确性的问题。
+隔离级别分为4种：
+
+> **读未提交——**READ-UNCOMMITTED 
+>
+> **读已提交——**READ-COMMITTED
+>
+> **可重复读——**REPEATABLE-READ
+>
+> **串行——**SERIALIZABLE
+
+***上面4种隔离级别越来越强，会导致数据库的并发性也越来越低。  比如最高级别 SERIALIZABLE 会让事物串行执行，并发操作变成串行
+了，会导致系统性能直接降低***
+
+***读已提交（READ-COMMITTED）通常用的比较多***
+
+| 隔离级别         | 脏读 | 不可重复读 | 幻读 |
+| ---------------- | ---- | ---------- | ---- |
+| READ-UNCOMMITTED | 有   | 有         | 无   |
+| READ-COMMITTED   | 无   | 有         | 无   |
+| REPEATABLE-READ  | 无   | 无         | 有   |
+| SERIALIZABLE     | 无   | 无         | 无   |
+
+#### 隔离级别修改
+
+```mysql
+transaction-isolation=READ-UNCOMMITTED
+
+-- 以管理员身份打开cmd窗口，重启mysql
+C:\Windows\system32>net stop mysql
+mysql 服务正在停止..
+mysql 服务已成功停止。
+C:\Windows\system32>net start mysql
+mysql 服务正在启动 .
+mysql 服务已经启动成功。
+
+-- 查看隔离级别
+mysql> show variables like 'transaction_isolation';
++-----------------------+----------------+
+| Variable_name | Value |
++-----------------------+----------------+
+| transaction_isolation | READ-COMMITTED |
++-----------------------+----------------+
+1 row in set, 1 warning (0.00 sec)
+```
+
+#### READ-UNCOMMITTED——读未提交  
+
+```mysql
+transaction-isolation=READ-UNCOMMITTED
+
+net stop mysql
+
+net start mysql
+
+show variables like 'transaction_isolation';
+
+delete from test1;
+select * from test1;
+```
+
+![image-20211115104003399](https://i.loli.net/2021/11/15/xSaIoZNCRpD3AH5.png)
+
+```mysql
+-- A窗口如下：
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+mysql> select * from test1;
+Empty set (0.00 sec)
+mysql> select * from test1;
+Empty set (0.00 sec)
+mysql> select * from test1;
++------+
+| a |
++------+
+| 1 |
++------+
+1 row in set (0.00 sec)
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+
+-- B窗口如下：
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+mysql> insert into test1 values (1);
+Query OK, 1 row affected (0.00 sec)
+mysql> select * from test1;
++------+
+| a |
++------+
+| 1 |
++------+
+1 row in set (0.00 sec)
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+```
+
+> T5-B：有数据，T6-A窗口：无数据，A看不到B的数据，说明没有脏读。
+> T6-A窗口：无数据，T8-A：看到了B插入的数据，此时B已经提交了，A看到了B已提交的数据，说明可
+> 以读取到已提交的数据。
+> T2-A、T6-A：无数据，T8-A：有数据，多次读取结果不一样，说明不可重复读。
+> 结论：读已提交情况下，无法读取到其他事务还未提交的数据，可以读取到其他事务已经提交的数据，
+> 多次读取结果不一样，未出现脏读，出现了读已提交、不可重复读。  
+
+#### REPEATABLE-READ——可重复读  
+
+![image-20211115104337685](https://i.loli.net/2021/11/15/SrRNg4YomhsMb38.png)
+
+```mysql
+-- A窗口如下：
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+mysql> select * from test1;
+Empty set (0.00 sec)
+mysql> select * from test1;
+Empty set (0.00 sec)
+mysql> select * from test1;
+Empty set (0.00 sec)
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+mysql> select * from test1;
++------+
+| a |
++------+
+| 1 |
+| 1 |
++------+
+2 rows in set (0.00 sec)
+-- B窗口如下:
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+mysql> insert into test1 values (1);
+Query OK, 1 row affected (0.00 sec)
+mysql> select * from test1;
++------+
+| a |
++------+
+| 1 |
+| 1 |
++------+
+2 rows in set (0.00 sec)
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+```
+
+> T2-A、T6-A窗口：无数据，T5-B：有数据，A看不到B的数据，说明没有脏读。
+> T8-A：无数据，此时B已经提交了，A看不到B已提交的数据，A中3次读的结果一样都是没有数据的，说
+> 明可重复读。
+> 结论：可重复读情况下，未出现脏读，未读取到其他事务已提交的数据，多次读取结果一致，即可重复
+> 读。  
+
+#### 幻读  
+
+幻读只会在 REPEATABLE-READ （可重复读）级别下出现，需要先把隔离级别改为可重复读。  
+
+```mysql
+transaction-isolation=REPEATABLE-READ
+
+net stop mysql
+
+net start mysql
+
+mysql> show variables like 'transaction_isolation';
++-----------------------+----------------+
+| Variable_name | Value |
++-----------------------+----------------+
+| transaction_isolation | REPEATABLE-READ |
++-----------------------+----------------+
+1 row in set, 1 warning (0.00 sec)
+```
+
+```mysql
+-- 上面我们创建t_user表，name添加了唯一约束，表示name不能重复，否则报错。
+mysql> create table t_user(id int primary key,name varchar(16) unique key);
+Query OK, 0 rows affected (0.01 sec)
+mysql> insert into t_user values (1,'路人甲Java'),(2,'路人甲Java');
+ERROR 1062 (23000): Duplicate entry '路人甲Java' for key 'name'
+mysql> select * from t_user;
+Empty set (0.00 sec)
+```
+
+![image-20211115105109190](https://i.loli.net/2021/11/15/wCUqbmTMlpDVvRn.png)
+
+```mysql
+-- A窗口如下：
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+mysql> select * from t_user where name='路人甲Java';
+Empty set (0.00 sec)
+mysql> insert into t_user values (2,'路人甲Java');
+ERROR 1062 (23000): Duplicate entry '路人甲Java' for key 'name'
+mysql> select * from t_user where name='路人甲Java';
+Empty set (0.00 sec)
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+-- B窗口如下：
+mysql> start transaction;
+Query OK, 0 rows affected (0.00 sec)
+mysql> insert into t_user values (1,'路人甲Java');
+Query OK, 1 row affected (0.00 sec)
+mysql> select * from t_user;
++----+---------------+
+| id | name |
++----+---------------+
+| 1 | 路人甲Java |
++----+---------------+
+1 row in set (0.00 sec)
+mysql> commit;
+Query OK, 0 rows affected (0.00 sec)
+```
+
+> A想插入数据 路人甲Java ，插入之前先查询了一下（T5时刻）该用户是否存在，发现不存在，然后在T7
+> 时刻执行插入，报错了，报数据已经存在了，因为T6时刻 B 已经插入了 路人甲Java 。
+> 然后A有点郁闷，刚才查的时候不存在的，然后A不相信自己的眼睛，又去查一次（T8时刻），发现 路
+> 人甲Java 还是不存在的。
+> 此时A心里想：数据明明不存在啊，为什么无法插入呢？这不是懵逼了么，A觉得如同发生了幻觉一样。  
+
+#### SERIALIZABLE——串行  
+
+SERIALIZABLE会**让并发的事务串行执行**（多个事务之间读写、写读、写写会产生互斥，效果就是串行执行，多个事务之间的**读读不会产生互斥**）。
+
+> 读写互斥：事务A中先读取操作，事务B发起写入操作，事务A中的读取会导致事务B中的写入处于
+> 等待状态，直到A事务完成为止。
+> 表示我开启一个事务，为了保证事务中不会出现上面说的问题（脏读、不可重复读、读已提交、
+> 幻读），那么我读取的时候，其他事务有修改数据的操作需要排队等待，等待我读取完成之后，
+> 他们才可以继续。
+> 写读、写写也是互斥的，读写互斥类似。  
+
+```mysql
+mysql> show variables like 'transaction_isolation';
++-----------------------+--------------+
+| Variable_name | Value |
++-----------------------+--------------+
+| transaction_isolation | SERIALIZABLE |
++-----------------------+--------------+
+1 row in set, 1 warning (0.00 sec)
+```
+
+![image-20211115105646742](https://i.loli.net/2021/11/15/F3EL4lXymVf15Qi.png)
+
+> 按时间顺序运行上面的命令，会发现T4-B这样会被阻塞，直到T5-A执行完毕。
+> 可以看出来，事务只能串行执行了。串行情况下不存在脏读、不可重复读、幻读的问题了。  
 
 
 
-## 20. 存储过程
+## 22. 存储过程
 
 存储过程类似批处理脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
 
@@ -2657,7 +2924,33 @@ END//
 DELIMITER ;
 ```
 
-## 21. 导出导入
+## 23.视图
+
+将查询语句查询出来的表作为一个**虚拟表**进行封装。
+
+实现SQL语句的重用，简化复杂SQL语句（联结查询）的使用，给与用户一部分表（经过查询得出的表是原表的一部分）
+
+```mysql
+-- 创建
+CREATE VIEW view_name
+-- 删除
+DROP VIEW view_name
+-- 显示创建
+SHOW CREATE VIEW view_name
+
+-- 例子
+CREATE VIEW productscustomers AS 
+SELECT cust_name,cust_contact,prod_id
+FROM customers INNER JOIN orders ON customers.cust_id=orders.cust_id
+INNER JOIN orderitems ON orders.order_num=orderitems.order_num;
+-- 上面语句查询列出订购任意产品的客户
+-- 现在想查询订购了产品'TN2'的客户
+SELECT cust_name 
+FROM productscustomers 
+WHERE prod_id='TN2';
+```
+
+## 24. 导出导入
 
 https://www.cnblogs.com/chenbin93/p/14697451.html
 
@@ -2711,7 +3004,7 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
   
 
-## 22. MySQL中间件
+## 25. MySQL中间件
 
 https://www.cnblogs.com/armyfai/p/13595055.html
 
@@ -2719,9 +3012,9 @@ https://blog.csdn.net/hanguofei/article/details/103465363
 
 https://www.cnblogs.com/zhou2019/p/10918131.html
 
-## 23.  游标
+## 26.  游标
 
-## 24. 账号管理
+## 27. 账号管理
 
 * 严肃对待root账号的使用，仅在绝对需要的时候才使用。
 
@@ -2791,13 +3084,13 @@ https://www.cnblogs.com/zhou2019/p/10918131.html
   SET PASSWORD FOR user_name = PASSWORD('password');
   ```
 
-## 25. 日志
+## 28. 日志
 
 https://blog.csdn.net/defonds/article/details/46858949
 
 需要配置启用日志。
 
-## 26.存储图片
+## 29.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
 
