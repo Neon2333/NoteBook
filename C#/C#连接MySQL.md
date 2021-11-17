@@ -288,7 +288,7 @@ num = this.DT.Rows[i][colNum].ToString();
 //num = (string)this.DT.Rows[i][colNum];    //无法将double转成string
 ```
 
-### （5）DataTable操作
+### （5）读到DataTable后操作
 
 #### 对DataTable某列求和
 
@@ -302,9 +302,19 @@ https://www.cnblogs.com/programsky/p/4290024.html
 
 
 
+## 插入
+
+### 不使用事务
+
+https://www.cnblogs.com/rainbow70626/p/14157637.html
+
+### 使用事务
+
+https://www.cnblogs.com/wwg1990/p/10362667.html
 
 
-## 3. dataGridView控件
+
+## dataGridView控件
 
 https://www.cnblogs.com/monkeyZhong/p/4530795.html
 
