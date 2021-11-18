@@ -26,7 +26,7 @@ https://blog.csdn.net/u012326462/article/details/82081756
 
 https://www.cnblogs.com/mm20/p/8060425.html
 
-PRIMARY KEY (主键的列不能为空值)
+PRIMARY KEY (主键的列不能为NULL)
 
 ## 5.批量插入大量数据
 
@@ -2315,9 +2315,17 @@ mysql> SELECT * from test2;
 
 ## 20.索引
 
-[...]中表示可选内容
+https://blog.csdn.net/qq_41174684/article/details/91350623
 
-### （1）普通索引
+### （1）什么情况应不建索引或少建索引
+
+**表记录太少**
+
+如果一个表只有5条记录，采用索引去访问记录的话，那首先需访问索引表，再通过索引表访问数据表，一般索引表与数据表不在同一个数据块，这种情况下ORACLE至少要往返读取数据块两次。而不用索引的情况下ORACLE会将所有的数据一次读出，处理速度显然会比用索引快。
+
+**经常插入、删除、修改的表**
+
+### （2）普通索引——单列索引
 
 #### 表已建立后创建索引
 
@@ -2336,6 +2344,7 @@ ALTER TABLE dept ADD INDEX index1(`deptno`);
 #### 建表的时候创建索引
 
 ```mysql
+-- [...]中表示可选内容
 CREATE TABLE t_name(  
 `ID` INT NOT NULL,   
 `username` VARCHAR(16) NOT NULL,  
@@ -2355,7 +2364,55 @@ DROP INDEX [indexName] ON t_name;
 SHOW INDEX FROM t_name\G
 ```
 
-### （2）唯一索引
+### （3）复合索引
+
+```mysql
+CREATE INDEX indexName ON t_name (colName1(len1), colName2(len2));
+```
+
+#### 建立复合索引时的注意事项：
+
+> 对一张表来说,如果有一个复合索引 on  (col1,col2),就没有必要同时建立一个单索引 on col1；  
+>
+> 如果查询条件需要,可以在已有单索引 on col1的情况下,添加复合索引on (col1,col2),对于效率有一定的提高；   
+>
+> 同时建立多字段(包含5、6个字段)的复合索引没有特别多的好处,相对而言,建立多个窄字段(仅包含一个,或顶多2个字段)的索引可以达到更好的效率和灵活性。
+
+#### 使用复合索引的注意事项：
+
+> * 对于复合索引,在查询使用时,最好将**条件顺序按找索引的顺序**,这样效率最高;  
+>
+>   ```sql
+>    select * from table1 where col1=A AND col2=B AND col3=D 
+>   ```
+>
+>   如果使用
+>
+>   ```sql
+>    where col2=B AND col1=A 
+>   ```
+>
+>   或者 
+>
+>   ```sql
+>   where col2=B 
+>   ```
+>
+>   将不会使用索引。
+>
+> ![img](https://i.loli.net/2021/11/18/pe15fINcCQwlAzq.png)
+>
+> * 如果where条件中是**OR关系，必须所有的or条件都必须是独立索引**，否则加索引不起作用。见：[mysql关于or的索引问题](https://www.cnblogs.com/yuerdongni/p/4255395.html)
+
+### （4）唯一索引
+
+创建唯一索引必须要指定关键字unique，唯一索引和单列索引类似，主要的区别是：唯一索引限制列的值必须唯一，但是允许出现空值。对于多个字段，对于多个字段而言，列值的组合必须是唯一的,创建唯一索引也有3种方式：
+
+类似创建单列索引，只是在INDEX前加个UNIQUE。
+
+```mysql
+create unique index index_name on tbl_name(index_col_name1,index_col_name2,index_col_name3);
+```
 
 **与前面的普通索引类似，不同的就是：索引列的值必须唯一，但允许有空值**
 
@@ -2371,7 +2428,19 @@ UNIQUE [indexName] (username(length))
 );  
 ```
 
-## 
+### （5）主键索引
+
+主键索引也就是丛生索引，是一种特殊的唯一索引，不允许有空值。创建主键索引的语法是：
+
+### （6）索引的使用
+
+
+
+### （7）索引的原理
+
+**详细内容、B+树原理见《Mysql笔记.PDF》**
+
+
 
 ## 21. 事务
 
@@ -2458,7 +2527,7 @@ https://blog.csdn.net/weixin_39641173/article/details/113945257?utm_medium=distr
 */
 
 SET AUTOCOMMIT=0
-BEGIN;
+START TRANSACTION;
 UPDATE table1 SET field1='aaa' WHERE type=1;
 UPDATE table2 SET field2='bbb' WHERE type=1;
 COMMIT;//或ROLLBACK;
@@ -2481,7 +2550,7 @@ START TRANSACTION READ ONLY;
 
 > **脏读——**一个事务读到另一个事务还没有提交的数据（没有提交的数据一旦回滚到原数据，那读到的数据就是脏数据）
 >
-> **不可重复读——**一个事务操作中对于一个读取操作不管多少次，读取到的结果都是一样的。  
+> **可重复读——**一个事务操作中对于一个读取操作不管多少次，读取到的结果都是一样的。  
 >
 > **幻读——**幻读在可重复读的模式下才会出现，其他隔离级别中不会出现  
 >
@@ -2542,6 +2611,8 @@ mysql> show variables like 'transaction_isolation';
 
 #### READ-UNCOMMITTED——读未提交  
 
+当前事务进行中时，存在脏读，可以读到未commit的其他事务操作的数据。
+
 ```mysql
 transaction-isolation=READ-UNCOMMITTED
 
@@ -2561,8 +2632,6 @@ select * from test1;
 -- A窗口如下：
 mysql> start transaction;
 Query OK, 0 rows affected (0.00 sec)
-mysql> select * from test1;
-Empty set (0.00 sec)
 mysql> select * from test1;
 Empty set (0.00 sec)
 mysql> select * from test1;
@@ -2599,6 +2668,8 @@ Query OK, 0 rows affected (0.00 sec)
 > 多次读取结果不一样，未出现脏读，出现了读已提交、不可重复读。  
 
 #### REPEATABLE-READ——可重复读  
+
+当前事务未commit前，无论其他事务对某些数据的操作怎样，读取这些数据的结果不变，即可重复读。
 
 ![image-20211115104337685](https://i.loli.net/2021/11/15/SrRNg4YomhsMb38.png)
 
@@ -2737,7 +2808,33 @@ mysql> show variables like 'transaction_isolation';
 > 按时间顺序运行上面的命令，会发现T4-B这样会被阻塞，直到T5-A执行完毕。
 > 可以看出来，事务只能串行执行了。串行情况下不存在脏读、不可重复读、幻读的问题了。  
 
+### （7）事务对于Insert数据速度的影响
 
+* InnoDB引擎，事务中insert的数据未commit之前，在内存的buffer_pool中
+
+  https://blog.csdn.net/weixin_36230541/article/details/113188052
+
+  MySQL不管事务有没有提交，DML语言所操作的数据就是innodb_buffer_pool缓存中的数据。只有check point检查到需要将脏页刷新到硬盘时，才会将数据写入磁盘
+
+* 对于Insert性能影响
+
+  https://blog.csdn.net/zdw19861127/article/details/78597523
+
+  > 对于一些数据量较大的系统，数据库面临的问题除了查询效率低下，还有就是数据入库时间长。总会有一些手段可以提高insert效率：
+  >
+  > **1. 多条Insert语句合并成一条语句，VALUES后跟多条数据，以逗号隔开**
+  >
+  > > https://www.zhihu.com/question/274242137/answer/1621320644
+  > >
+  > > 这里第二种SQL执行效率高的主要原因是合并后日志量(MySQL的binlog和innodb的事务让日志)减少了，降低日志刷盘的数据量和频率，从而提高效率。通过合并SQL语句，同时也能减少SQL语句解析的次数，减少网络传输的IO。
+  > >
+  > > 数据库的一个插入动作，包含了连接，传输，执行，提交/回滚 等等的动作，在 执行的时候可能还会遇到锁表，等待等等，所以，批量插比逐个插效率高，是大部分情况，而不是绝对情况
+  > >
+  > > 大部分情况下，批量插和逐个插，在执行层面，耗时接近；而不用多次连接数据库，在数据传输层面，也是一次性传输效率高（网络传输和这个模型类似，也有很多前置后置过程），而提交，也是只发起了一次，因而显得效率高
+  >
+  > **2. 使用事务**
+  >
+  > > 多条Insert语句放在事务中，以commit执行
 
 ## 22. 存储过程
 
@@ -2958,6 +3055,10 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
 **navicat右键，转储、运行SQL文件，导出导入.sql文件。导出/导入向导选择文件格式.csv。**
 
+![image-20211118134115940](C:/Users/eivision/AppData/Roaming/Typora/typora-user-images/image-20211118134115940.png)
+
+![image-20211118134207028](C:/Users/eivision/AppData/Roaming/Typora/typora-user-images/image-20211118134207028.png)
+
 ### （1）.sql
 
 * 导出数据库
@@ -3093,4 +3194,70 @@ https://blog.csdn.net/defonds/article/details/46858949
 ## 29.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
+
+## 30.MySQL与NoSQL
+
+http://www.cppblog.com/sunicdavy/archive/2015/07/20/210992.html
+
+用了NoSQL系列的数据库, 才意识到: 游戏服务器的数据存储和游戏服务器的存盘两个概念差异其实蛮大的.
+
+MySQL中, 背包其实跟角色完全没有关系, 只是通过1个角色id映射过去, 人为的割裂了数据的关联性. 还硬生生的整出个概念叫结构化查询让你学
+
+NoSQL中, 只是把数据库当成是存储点, 每个角色的数据是完整的一块. 里面怎么存随你便. 每个角色通过id来查询, 其他都没有了
+
+于是乎, 游戏开发变得异常简单. MySQL角色进门查询4~5次才能搞定要的数据.而NoSQL一口气全查出来, 存盘也无需增量, 直接存盘就可以了
+
+所以现在觉得, NoSQL的思路对于游戏服务器存储来说简直是完美的!
+
+NoSQL下实现方案很多, 游戏常用的就这么3家: mongo, redis, memcached
+
+下面说下优缺点
+
+## mongo
+
+磁盘映射内存数据库
+
+value为document类型, 基于BSON的value序列化
+
+应用场景:
+
+适合多写少读, 例如日志和备份
+
+转载请注明: 战魂小筑http://www.cppblog.com/sunicdavy
+
+ 
+
+## redis
+
+内存数据库
+
+单核
+
+value限制512M
+
+多种value类型, 游戏用途使用私有的序列化协议(例如protobuf)
+
+支持落地(bgsave)
+
+用户: 新浪, 淘宝, Flickr, Github
+
+应用场景: 适合读写都很高, 数据处理复杂等
+
+转载请注明: 战魂小筑http://www.cppblog.com/sunicdavy
+
+ 
+
+## memcached
+
+内存数据库
+
+多核
+
+value限制1M
+
+不支持落地(持久化)
+
+用户: LiveJournal、hatena、Facebook、Vox
+
+应用场景: 动态系统中的缓冲, 适合多读少写
 
