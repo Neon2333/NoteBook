@@ -183,7 +183,13 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 
 ### （1）属性
 
-AllowFocus——允许被focus，即鼠标点击时可选中，出现虚线选中框
+AllowFocus——True时鼠标点击时可选中，出现虚线选中框；false时没有虚线框。
+
+![image-20211122164518960](https://i.loli.net/2021/11/22/hOXa6EiNYn9Tl4f.png)
+
+
+
+![image-20211122164546739](https://i.loli.net/2021/11/22/LtHNWxTokBcsZgy.png)
 
 **Appearance**
 

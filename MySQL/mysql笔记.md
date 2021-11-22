@@ -2039,14 +2039,14 @@ IF(expr1, val1, val2)	-- 如果第一个条件为True,则返回第二个参数�
 select if(author='Felix', 'yes', 'no') as Author from books;
 ```
 
-#### IF结构
+#### IF-ELSE结构
 
 ```mysql
-if 条件语句1 then 语句1;
-elseif 条件语句2 then 语句2;
+IF 条件语句1 THEN 语句1;
+ELSEIF 条件语句2 THEN 语句2;
 ...
-else 语句n;
-end if;
+ELSE 语句n;
+END IF;
 ```
 
 ```mysql
@@ -2144,7 +2144,7 @@ mysql> SELECT * FROM t_user;
 7 rows in set (0.00 sec)
 ```
 
-#### CASE、WHEN、THEN
+#### CASE-WHEN-THEN
 
 数据SQL CASE 表达式是一种通用的条件表达式，类似于其它语言中的 if/else 语句。
 
@@ -2436,7 +2436,7 @@ UNIQUE [indexName] (username(length))
 
 ### （5）主键索引
 
-主键索引也就是丛生索引，是一种特殊的唯一索引，不允许有空值。创建主键索引的语法是：
+主键索引也就是丛生索引，**是一种特殊的唯一索引，不允许有空值**。创建主键索引的语法是：
 
 ### （6）索引的使用
 
@@ -2850,7 +2850,27 @@ mysql> show variables like 'transaction_isolation';
   >
   > > 多条Insert语句放在事务中，以commit执行
 
-## 22. 存储过程
+## 22. 变量
+
+### （1）局部变量
+
+declare用于定义局部变量变量，**在存储过程和函数中通过declare定义变量在begin...end中，且在语句之前。**并且可以通过重复定义多个变量。declare变量的作用范围同编程里面类似，在这里一般是在对应的begin和end之间。在end之后这个变量就没有作用了，不能使用了。这个同编程一样。  
+
+
+
+
+
+### （2）用户变量
+
+用户变量可以在任何地方使用也就是**既可以在begin end里面使用，也可以在他外面使用。**  
+
+
+
+
+
+---
+
+## 23. 存储过程
 
 存储过程类似批处理脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
 
@@ -3035,11 +3055,255 @@ END $
 DELIMITER ;
 ```
 
-## 23.视图
+### （9）字段名、表名作为变量传入存储过程进行查询，必须用动态SQL
 
-将查询语句查询出来的表作为一个**虚拟表**进行封装。
+https://www.cnblogs.com/fenxiangheiye/archive/2013/02/18/Mysql.html
 
-实现SQL语句的重用，简化复杂SQL语句（联结查询）的使用，给与用户一部分表（经过查询得出的表是原表的一部分）
+```mysql
+-- 
+CREATE PROCEDURE `proc1`(IN colname varchar(20))
+BEGIN 
+DECLARE SQL_FOR_SELECT varchar(255);
+SET SQL_FOR_SELECT=CONCAT('SELECT `',colname,'` FROM device');
+SET @sql=SQL_FOR_SELECT;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+END
+```
+
+```mysql
+CALL proc1('DeviceNO');
+```
+
+
+
+
+
+### （10）存储过程使用临时表
+
+
+
+
+
+
+
+---
+
+## 24. 触发器
+
+https://www.cnblogs.com/geaozhang/p/6819648.html
+
+https://www.cnblogs.com/phpper/p/7587031.html
+
+### （1）概念
+
+**触发器是与表有关的数据库对象**，在满足定义条件时触发，并执行触发器中定义的语句集合。触发器的这种特性可以协助应用在数据库端确保数据的完整性。
+
+举个例子，比如你现在有两个表【用户表】和【日志表】，当一个用户被创建的时候，就需要在日志表中插入创建的log日志，如果在不使用触发器的情况下，你需要编写程序语言逻辑才能实现，但是如果你定义了一个触发器，触发器的作用就是当你在用户表中插入一条数据的之后帮你在日志表中插入一条日志信息。当然触发器并不是只能进行插入操作，还能执行修改，删除。
+
+### （2）使用
+
+**！！尽量少使用触发器，不建议使用。**
+
+　　**假设触发器触发每次执行1s，insert table 500条数据，那么就需要触发500次触发器，光是触发器执行的时间就花费了500s，而insert 500条数据一共是1s，那么这个insert的效率就非常低了。因此我们特别需要注意的一点是触发器的begin end;之间的语句的执行效率一定要高，资源消耗要小。**
+
+　　**触发器尽量少的使用，因为不管如何，它还是很消耗资源，如果使用的话要谨慎的使用，确定它是非常高效的：触发器是针对每一行的；对增删改非常频繁的表上切记不要使用触发器，因为它会非常消耗资源。** 
+
+**如果不需要某个触发器时一定要将这个触发器删除，以免造成意外操作，这很关键。**
+
+### （3）语句
+
+#### 创建
+
+```mysql
+CREATE TRIGGER trigger_name trigger_time trigger_event ON tb_name FOR EACH ROW trigger_stmt
+```
+
+> trigger_name：触发器的名称
+> **tirgger_time：**触发时机，为BEFORE或者AFTER
+>
+> > after是先完成数据的增删改，再触发，触发器中的语句晚于监视的增删改，无法影响前面的增删该动作。就类似于先吃饭，再付钱。  before是先完成触发，再增删改，触发的语句先于监视的增删改发生，我们有机会判断修改即将发生的操作。就类似于先付钱，再吃饭
+>
+> **trigger_event：**触发事件，为INSERT、DELETE或者UPDATE
+> tb_name：表示建立触发器的表明，就是在哪张表上建立触发器
+> trigger_stmt：触发器的程序体，可以是一条SQL语句或者是用BEGIN和END包含的多条语句
+> 所以可以说MySQL创建以下六种触发器：
+> BEFORE INSERT,BEFORE DELETE,BEFORE UPDATE
+> AFTER INSERT,AFTER DELETE,AFTER UPDATE
+
+```mysql
+mysql> CREATE TRIGGER trig1 AFTER INSERT
+    -> ON work FOR EACH ROW
+    -> INSERT INTO time VALUES(NOW());
+```
+
+```mysql
+DELIMITER $
+CREATE TRIGGER 触发器名 BEFORE|AFTER 触发事件
+ON 表名 FOR EACH ROW
+BEGIN
+    执行语句列表
+END$
+DELIMITER ;
+```
+
+> BEGIN与END之间的执行语句列表参数表示需要执行的多个语句，不同语句用分号隔开
+>
+> 
+
+```mysql
+mysql> DELIMITER $
+mysql> CREATE TRIGGER trig2 BEFORE DELETE
+    -> ON work FOR EACH ROW
+    -> BEGIN
+    -> 　　INSERT INTO time VALUES(NOW());
+    -> 　　INSERT INTO time VALUES(NOW());
+    -> END$
+mysql> DELIMITER ;
+```
+
+#### 触发器类型
+
+![img](https://i.loli.net/2021/11/22/IUJyu2a6pnR8cDj.png)
+
+#### NEW和OLD
+
+MySQL 中定义了 NEW 和 OLD，用来表示触发器的所在表中，触发了触发器的那一行数据，来引用触发器中发生变化的记录内容，具体地：
+
+　　①在INSERT型触发器中，NEW用来表示将要（BEFORE）或已经（AFTER）插入的新数据；
+
+　　②在UPDATE型触发器中，OLD用来表示将要或已经被修改的原数据，NEW用来表示将要或已经修改为的新数据；
+
+　　③在DELETE型触发器中，OLD用来表示将要或已经被删除的原数据；
+
+使用方法：
+
+　　NEW.columnName （columnName为相应数据表某一列名）
+
+另外，OLD是只读的，而NEW则可以在触发器中使用 SET 赋值，这样不会再次触发触发器，造成循环调用（如每插入一个学生前，都在其学号前加“2013”）。
+
+如：
+
+```mysql
+mysql> CREATE TABLE account (acct_num INT, amount DECIMAL(10,2));
+mysql> INSERT INTO account VALUES(137,14.98),(141,1937.50),(97,-100.00);
+
+mysql> delimiter $$
+mysql> CREATE TRIGGER upd_check BEFORE UPDATE ON account
+    -> FOR EACH ROW
+    -> BEGIN
+    -> 　　IF NEW.amount < 0 THEN
+    -> 　　　　SET NEW.amount = 0;
+    -> 　　ELSEIF NEW.amount > 100 THEN
+    -> 　　　　SET NEW.amount = 100;
+    -> 　　END IF;
+    -> END$$
+mysql> delimiter ;
+
+mysql> update account set amount=-10 where acct_num=137;
+
+mysql> select * from account;
++----------+---------+
+| acct_num | amount  |
++----------+---------+
+|      137 |    0.00 |
+|      141 | 1937.50 |
+|       97 | -100.00 |
++----------+---------+
+
+mysql> update account set amount=200 where acct_num=137;
+
+mysql> select * from account;
++----------+---------+
+| acct_num | amount  |
++----------+---------+
+|      137 |  100.00 |
+|      141 | 1937.50 |
+|       97 | -100.00 |
++----------+---------+
+```
+
+#### 查看触发器
+
+```mysql
+SHOW TRIGGERS\G;
+```
+
+所有触发器信息都存储在information_schema数据库下的triggers表中，可以使用SELECT语句查询，如果触发器信息过多，最好通过TRIGGER_NAME字段指定查询
+
+```MYSQL
+SELECT * FROM information_schema.triggers\G
+```
+
+该方法可以根据触发器名查询制定触发器的详细信息：
+
+```
+mysql> select * from information_schema.triggers 
+    -> where trigger_name='upd_check'\G;
+```
+
+#### 删除触发器
+
+```mysql
+drop trigger if exists trigger_name
+```
+
+
+
+---
+
+## 24.视图
+
+https://www.jianshu.com/p/814d8aee700a
+
+### 概念
+
+从数据库系统内部来看，视图是由一张或多张表中的数据组成的
+
+从数据库系统外部来看，视图就如同一张表一样，对表能够进行的一般操作都可以应用于视图，例如查询，插入，修改，删除操作等
+
+视图不存储数据。
+
+通俗理解就是将一张表中经常要查询的列和记录创建成一张虚拟的表 , 其实viewer视图中存放的是select语句 . 视图中看到的数据会随着原始表格的更新而动态更新 
+
+视图是由从数据库的基本表中选出来的数据组成的逻辑窗口，它与基本表不同的是，视图是一个虚表。数据库中只存放视图的定义，而不存放视图包含的数据，这些数据仍存放在原来的基表中。所以基表中的数据如果发生改变，从视图中查询出的数据也随之改变。
+
+视图可以是建立在一个或多个表上，也可以建立在视图上，但是不管怎么样对视图数据的操作最终都会转换为对基本表的操作，因为视图是一个虚表，数据实际上保存在基本表中
+
+### 用途
+
+https://www.zhihu.com/question/21675233?from=profile_question_card
+
+重用SQL语句；简化复杂的SQL操作；使用表的组成部分；保护数据；更改数据格式和表示。实现SQL语句的重用，简化复杂SQL语句（联结查询）的使用，给与用户一部分表（经过查询得出的表是原表的一部分）。
+
+* 简化查询
+
+  比如说要查询公司里面每个部门的员工数，并且按照人数由多到少进行排序，如果写SQL语句的话每次都要这么写：
+
+  ```mysql
+  select `dept_emp`.`dept_no` AS `dept_no`,count(1) AS `emp_sum` from `dept_emp` group by `dept_emp`.`dept_no` order by `emp_sum` desc;
+  ```
+
+  如果创建成视图的话，每次只要查询视图就行了
+
+  ```mysql
+  create VIEW `v_test` AS select `dept_emp`.`dept_no` AS `dept_no`,count(1) AS `emp_sum` from `dept_emp` group by `dept_emp`.`dept_no` order by `emp_sum` desc
+  ```
+
+  **充当临时表**
+
+  有一个查询语句非常复杂，大概有100行这么多，有时还想把这个巨大无比的select语句和其他表关联起来得到结果，写太多很麻烦，可以用一个视图来代替这100行的select语句，充当一个变量角色
+
+* 权限控制
+
+  比如说公司A有一张用户表，公司B现在需要公司A用户表的用户信息，但是公司A不想让公司B获取用户的一些敏感信息（比如说家庭住址之类的），这时就可以公司A创建一个不含用户敏感信息的视图，然后再把这个视图的查询权限赋予公司B就可以了。
+
+### 语句
+
+***建议在视图名前加上v_区分视图和表***
+
+`AS`表明用SELECT出来的表填充视图`productscustomers`
 
 ```mysql
 -- 创建
@@ -3061,7 +3325,21 @@ FROM productscustomers
 WHERE prod_id='TN2';
 ```
 
-## 24. 导出导入
+### 和临时表的区别
+
+
+
+---
+
+## 25. 临时表
+
+
+
+
+
+---
+
+## 26.  导出导入
 
 https://www.cnblogs.com/chenbin93/p/14697451.html
 
