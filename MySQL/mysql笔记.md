@@ -105,6 +105,14 @@ https://www.jb51.net/article/163001.htm
 
 反引号一般用于把字段名、表名括起来，但一般来说字段名、表名若不会与关键字混淆，就不需要加。
 
+
+
+## 7. MySQL默认不区分大小写
+
+MySQL默认是不区分大小写的，但是在很多情况下需要大小敏感
+
+修改MySql Server安装目录下的 my.ini 文件，在mysqld节下加入下面一行 set-variable=lower_case_table_names=0 （0：大小写敏感；1：大小写不敏感）最后重启一下MySql服务即可。
+
 ---
 
 # MySQL基本知识
@@ -2039,7 +2047,7 @@ IF(expr1, val1, val2)	-- 如果第一个条件为True,则返回第二个参数�
 select if(author='Felix', 'yes', 'no') as Author from books;
 ```
 
-#### IF-ELSE结构
+#### IF-ELSE结构——只能使用在begin end之间  
 
 ```mysql
 IF 条件语句1 THEN 语句1;
@@ -2856,6 +2864,10 @@ mysql> show variables like 'transaction_isolation';
 
 declare用于定义局部变量变量，**在存储过程和函数中通过declare定义变量在begin...end中，且在语句之前。**并且可以通过重复定义多个变量。declare变量的作用范围同编程里面类似，在这里一般是在对应的begin和end之间。在end之后这个变量就没有作用了，不能使用了。这个同编程一样。  
 
+**局部变量的定义DECLARE只能写在开头？否则报错？**
+
+![image-20211123144256331](https://i.loli.net/2021/11/23/pGtHYeRCJZf6Mou.png)
+
 
 
 
@@ -2972,7 +2984,22 @@ SELECT @id:=4,@age:=55,@name:='郭富城';
 CALL proc3(@id,@age,@name,@user_count,@max_id);
 ```
 
-
+```mysql
+/*删除函数*/
+DROP FUNCTION IF EXISTS get_user_id;
+/*设置结束符为$*/
+DELIMITER $
+/*创建函数*/
+CREATE FUNCTION get_user_id(v_name VARCHAR(16))
+returns INT
+BEGIN
+DECLARE r_id int;
+SELECT id INTO r_id FROM t_user WHERE name = v_name;
+return r_id;
+END $
+/*设置结束符为;*/
+DELIMITER ;
+```
 
 ### （5）调用存储过程
 
@@ -3060,7 +3087,8 @@ DELIMITER ;
 https://www.cnblogs.com/fenxiangheiye/archive/2013/02/18/Mysql.html
 
 ```mysql
--- 
+-- 动态SQL
+-- SQL_FOR_SELECT局部变量，保存最终执行的SQL语句
 CREATE PROCEDURE `proc1`(IN colname varchar(20))
 BEGIN 
 DECLARE SQL_FOR_SELECT varchar(255);
@@ -3076,13 +3104,114 @@ END
 CALL proc1('DeviceNO');
 ```
 
+示例：
+
+```mysql
+            
+```
+
+```mysql
+
+```
+
+
+
+### （10） 在存储过程中使用UNION
+
+https://segmentfault.com/q/1010000019889121
 
 
 
 
-### （10）存储过程使用临时表
+
+### （11）存储过程中使用临时表
+
+存储过程中使用临时表，简化过程
 
 
+
+### （12）用存储过程封装SQL语句
+
+```mysql
+-- 通过输入确定查询条件
+DROP PROCEDURE IF EXISTS judgeIfExistInFaultHistory;
+DELIMITER $
+CREATE PROCEDURE judgeIfExistInFaultHistory(valLineNO VARCHAR(20), valDeviceNO VARCHAR(20), valFaultNO VARCHAR(20), valFaultTime VARCHAR(20))
+BEGIN
+
+SELECT COUNT(t1.`NO`) 
+FROM faults_history AS t1 
+WHERE t1.LineNO=valLineNO AND t1.DeviceNO=valDeviceNO AND t1.FaultNO=valFaultNO AND t1.FaultTime=valFaultTime;
+
+END$
+DELIMITER ;
+```
+
+```mysql
+string cmdGetDeviceNO = "SELECT `DeviceNO` FROM device;";
+            DataTable dtDeviceNOTemp = new DataTable();
+            _initDtMySQL(ref dtDeviceNOTemp, cmdGetDeviceNO);
+            string strT1 = "SELECT LineNo, DeviceStatus_" + dtDeviceNOTemp.Rows[0]["DeviceNO"].ToString();
+            int rowNumDtdeviceNOTemp = dtDeviceNOTemp.Rows.Count;
+            for (int i = 1; i < rowNumDtdeviceNOTemp; i++)
+            {
+                strT1 += "+DeviceStatus_" + dtDeviceNOTemp.Rows[i]["DeviceNO"].ToString();
+            }
+            strT1 += " AS DeviceTotalNum FROM device_config";
+            string cmdInitDtSideTileBar = "SELECT t1.LineNO,t2.LineName,t1.DeviceTotalNum " +
+                                           "FROM (" + strT1 + ")AS t1 " +
+                                           "INNER JOIN productionline AS t2 " +
+                                           "ON t1.LineNO=t2.LineNO;";      //19ms
+                                           
+-- 封装存储过程
+DELIMITER $
+CREATE PROCEDURE initDtSideTileBar()
+BEGIN
+
+DECLARE different_device_num INT DEFAULT 0;
+DECLARE colname VARCHAR(20);
+DECLARE SQL_FOR_SELECT varchar(1000);
+DECLARE ii INT(10) DEFAULT 2;
+
+SELECT COUNT(*) INTO different_device_num FROM device;
+
+-- SELECT 打印变量调试
+-- SELECT different_device_num;
+
+SET SQL_FOR_SELECT='SELECT device_config.LineNO ,DeviceStatus_001';
+
+a:WHILE ii<=different_device_num DO
+	SELECT deviceNO INTO colname FROM device WHERE NO=ii;
+	SET SQL_FOR_SELECT=CONCAT(SQL_FOR_SELECT, '+DeviceStatus_', colname);
+	SET ii=ii+1;
+END WHILE;
+
+SET SQL_FOR_SELECT=CONCAT(SQL_FOR_SELECT, ' AS DeviceTotalNum FROM device_config');
+
+SET SQL_FOR_SELECT=CONCAT('SELECT t1.LineNO,t2.LineName,t1.DeviceTotalNum FROM (', SQL_FOR_SELECT, ') AS t1 INNER JOIN productionline AS t2 ON t1.LineNO=t2.LineNO;');
+
+-- SELECT SQL_FOR_SELECT;
+
+SET @sql=SQL_FOR_SELECT;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+END$
+DELIMITER ;
+```
+
+
+
+### （13）存储过程的导出导入
+
+https://jingyan.baidu.com/article/b7001fe1b162d80e7282ddcc.html
+
+![image-20211123101611546](https://i.loli.net/2021/11/23/r2iIKCJXsjDYtxV.png)
+
+![image-20211123101710673](https://i.loli.net/2021/11/23/CNTHqZFelxtrEhw.png)
+
+![image-20211123101805218](https://i.loli.net/2021/11/23/RXJyztoaiWhLjBv.png)
 
 
 
