@@ -133,7 +133,11 @@ MySQL默认是不区分大小写的，但是在很多情况下需要大小敏感
 
   多行/**/
 
-## 2.SHOW命令
+## 2. 数据结构
+
+
+
+## 3.SHOW命令
 
 ```mysql
 show databases;	//显示所有数据库
@@ -143,7 +147,7 @@ show create database db_name;	//显示数据库db_name创建时的信息
 show create table t_name;	//显示表t_name创建时的信息
 ```
 
-## 3.检索数据
+## 4.检索数据
 
 * 检索出来的原始数据需要应用程序规定显示的格式
 
@@ -223,7 +227,7 @@ show create table t_name;	//显示表t_name创建时的信息
   SELECT => FROM => ORDER BY => LIMIT
 
 
-## 4. 过滤数据
+## 5. 过滤数据
 
 * 通过WHERE子句指定过滤条件
 
@@ -300,7 +304,7 @@ show create table t_name;	//显示表t_name创建时的信息
   SELECT id,productName,dir_id,salePrice FROM product WHERE salePrice>=80 AND productName LIKE '%罗技M1__'
   ```
 
-## 5.正则表达式
+## 6.正则表达式
 
 * REGEXP模式表示后面跟着的是正则表达式
 
@@ -346,7 +350,7 @@ show create table t_name;	//显示表t_name创建时的信息
 
   https://blog.csdn.net/qq_28633249/article/details/77686976
 
-## 6.默认值约束
+## 7.默认值约束
 
 * DEFAULT用于约束字段，当字段未输入值时，自动添加一个预设的值。
 
@@ -377,7 +381,7 @@ show create table t_name;	//显示表t_name创建时的信息
 
   
 
-## 7.非空约束
+## 8.非空约束
 
 http://c.biancheng.net/view/2448.html
 
@@ -404,7 +408,7 @@ http://c.biancheng.net/view/2448.html
   
   
 
-## 8.常用指令
+## 9.常用指令
 
 #### 库操作
 
@@ -500,7 +504,7 @@ SELECT `field_name1` FROM tb_name;
 select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_table_name' and table_schema = 'your_db_name';  
 ```
 
-## 9.主键
+## 10.主键
 
 ### （1）概念
 
@@ -520,7 +524,7 @@ select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_tabl
 
 ![image-20211104140610120.png](https://i.loli.net/2021/11/15/HvSIN8jdcMVFZ3J.png)
 
-## 10.自带函数
+## 11.自带函数
 
 ### （1）拼接计算字段
 
@@ -765,7 +769,7 @@ mysql> SELECT md5('123456');
 
 
 
-## 11. ORDER BY
+## 12. ORDER BY
 
 用GROUP BY/HAVING过滤后，显示，注意用ORDER BY排序。
 
@@ -777,7 +781,7 @@ HAVING COUNT(*)>=2;
 ORDER BY `prod_num`;                    //按照prod_num排序
 ```
 
-## 12. LIMIT
+## 13. LIMIT
 
 * LIMIT后跟的：不能是负数、只能是明确的数字不能是表达式
 * **跳过M条数据**，显示N条数据
@@ -810,7 +814,7 @@ SELECT * FROM t_name ORDER BY `age` desc LIMIT 2,2;		-- 第二页
 SELECT * FROM t_name ORDER BY `age` desc LIMIT 4,2;		-- 第三页
 ```
 
-## 13.分组——GROUP BY（重点）
+## 14.分组——GROUP BY（重点）
 
 ### （1）注意事项
 
@@ -958,7 +962,7 @@ limit [offset,] count;
 
 ![image-20211026085535132](https://i.loli.net/2021/10/26/Cwy6hxOYGn3IiZN.png)
 
-## 14. 日期和时间
+## 15. 日期和时间
 
 | 函数名称                | 作 用                                                        |
 | ----------------------- | ------------------------------------------------------------ |
@@ -1111,7 +1115,7 @@ date_format(now(),'%Y%m%d%H%i%s') as col2;
 +----------+---------------------+----------------+
 ```
 
-## 15.并集——UNION
+## 16.并集——UNION
 
 https://blog.csdn.net/mine_song/article/details/70184072
 
@@ -1133,9 +1137,9 @@ MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但�
 
 * 连接的语句最好用括号括起来，括号内部的ORDER BY / LIMIT作用于括号内的SELECT语句。否则ORDER BY/LIMIT语句放在最后一条SELECT后，作用的是整个表，而不是最后一条SELECT查询到的表。见T2-8。
 
-## 16.约束
+## 17.约束
 
-## 17.子查询（重点）
+## 18.子查询（重点）
 
 https://www.cnblogs.com/xiaoxi/p/6734025.html
 
@@ -1772,9 +1776,9 @@ FROM student;
 
 ```
 
-## 
 
-## 18.联结查询（重点）
+
+## 19.联结查询（重点）
 
 https://zhuanlan.zhihu.com/p/145679471
 
@@ -2033,7 +2037,7 @@ ORDER BY t1.`NO`;
 
 
 
-## 19. 流程控制语句
+## 20. 流程控制语句
 
 ### （1）条件语句
 
@@ -2321,7 +2325,7 @@ mysql> SELECT * from test2;
 6 rows in set (0.00 sec)
 ```
 
-## 20.索引
+## 21.索引
 
 https://blog.csdn.net/qq_41174684/article/details/91350623
 
@@ -2464,7 +2468,7 @@ UNIQUE [indexName] (username(length))
 
 
 
-## 21. 事务
+## 22. 事务
 
 ### （1）使用条件
 
@@ -2858,7 +2862,7 @@ mysql> show variables like 'transaction_isolation';
   >
   > > 多条Insert语句放在事务中，以commit执行
 
-## 22. 变量
+## 23. 变量
 
 ### （1）局部变量
 
@@ -2882,7 +2886,7 @@ declare用于定义局部变量变量，**在存储过程和函数中通过decla
 
 ---
 
-## 23. 存储过程
+## 24. 存储过程
 
 存储过程类似批处理脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
 
@@ -3219,7 +3223,7 @@ https://jingyan.baidu.com/article/b7001fe1b162d80e7282ddcc.html
 
 ---
 
-## 24. 触发器
+## 25. 触发器
 
 https://www.cnblogs.com/geaozhang/p/6819648.html
 
@@ -3382,7 +3386,7 @@ drop trigger if exists trigger_name
 
 ---
 
-## 24.视图
+## 26.视图
 
 https://www.jianshu.com/p/814d8aee700a
 
@@ -3460,7 +3464,7 @@ WHERE prod_id='TN2';
 
 ---
 
-## 25. 临时表
+## 27. 临时表
 
 
 
@@ -3468,7 +3472,7 @@ WHERE prod_id='TN2';
 
 ---
 
-## 26.  导出导入
+## 28.  导出导入
 
 https://www.cnblogs.com/chenbin93/p/14697451.html
 
@@ -3526,7 +3530,7 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
   
 
-## 25. MySQL中间件
+## 29. MySQL中间件
 
 https://www.cnblogs.com/armyfai/p/13595055.html
 
@@ -3534,9 +3538,9 @@ https://blog.csdn.net/hanguofei/article/details/103465363
 
 https://www.cnblogs.com/zhou2019/p/10918131.html
 
-## 26.  游标
+## 30.  游标
 
-## 27. 账号管理
+## 31. 账号管理
 
 * 严肃对待root账号的使用，仅在绝对需要的时候才使用。
 
@@ -3606,17 +3610,17 @@ https://www.cnblogs.com/zhou2019/p/10918131.html
   SET PASSWORD FOR user_name = PASSWORD('password');
   ```
 
-## 28. 日志
+## 32. 日志
 
 https://blog.csdn.net/defonds/article/details/46858949
 
 需要配置启用日志。
 
-## 29.存储图片
+## 33.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
 
-## 30.MySQL与NoSQL
+## 34.MySQL与NoSQL
 
 http://www.cppblog.com/sunicdavy/archive/2015/07/20/210992.html
 
