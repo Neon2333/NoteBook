@@ -551,7 +551,7 @@ git commit --amend
 #### 功能1——修改message
 
 ```
-git commit --amend
+git commit --amend -m "提交原因"
 ```
 
 #### 功能2——修改上次commit

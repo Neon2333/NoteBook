@@ -353,6 +353,8 @@ public partial class FileDialogForm : Form
 
 # 第三章	文件读写
 
+https://blog.csdn.net/deni2000/article/details/102023993
+
 计算机上的文件基本上分为2种，文本文件（ASCII文件）和二进制文件，图形和程序都属于二进制文件。
 
 ## 1. System.IO命名空间常用的类
