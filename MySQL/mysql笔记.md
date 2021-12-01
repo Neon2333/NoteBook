@@ -748,7 +748,44 @@ isnull函数，判断参数是否为空，若为空返回1，否则返回0
 ifnull函数，2个参数，判断第一个参数是否为空，如果为空返回第2个参数的值，否则返回第1个参数的
 值  
 
-### （8）其他函数
+### （8）ROW_COUNT()——返回被操作影响的行数
+
+**mysql中的ROW_COUNT()可以返回前一个SQL进行UPDATE，DELETE，INSERT操作所影响的行数**
+
+```mysql
+create table t(  
+id int,  
+name varchar(50),  
+address varchar(100),  
+primary key(id,name)  
+)engine =InnoDB; 
+```
+
+```mysql
+insert into t  
+(id,name,address)   
+values  
+(1,'yubowei','weifang'),  
+(2,'sam','qingdao'); 
+```
+
+```mysql
+update t set address = 'weifang'  
+where id = 1 and name = 'yubowei'; 
+-- 此时查看影响的行数：
+select row_count(); -- 执行结果为0；
+```
+
+```mysql
+update t set address = 'beijing'  
+where id = 1 and name = 'yubowei'; 
+-- 此时查看影响的行数：
+select row_count(); -- 执行结果为1；
+```
+
+从上面的测试可以得出在MySQL中只有***真正对记录进行修改了的情况下，row_count才会去记录影响的行数***，否则如果记录存在但是没有实际修改则不会将该次更新记录到row_count中。
+
+### （9）其他函数
 
 | 函数名称 | 作用                |
 | -------- | ------------------- |
@@ -2070,7 +2107,7 @@ IF(expr1, val1, val2)	-- 如果第一个条件为True,则返回第二个参数�
 select if(author='Felix', 'yes', 'no') as Author from books;
 ```
 
-#### IF-ELSE结构——只能使用在begin end之间  
+#### IF-ELSE结构——只能使用在BEGIN END之间  
 
 ```mysql
 IF 条件语句1 THEN 语句1;
@@ -2181,14 +2218,16 @@ mysql> SELECT * FROM t_user;
 
 可以表达多种条件。
 
+***如果是语句需要加分号***
+
 ```mysql
 -- 方式1：
-case 表达式
-when 值1 then 结果1或者语句1（如果是语句需要加分号）
-when 值2 then 结果2或者语句2
+CASE 表达式
+WHEN 值1 THEN 结果1或者语句1
+WHEN 值2 THEN 结果2或者语句2
 ...
-else 结果n或者语句n
-END CASE; （如果是放在begin end之间需要加case，如果在select后则不需要）
+ELSE 结果n或者语句n
+END CASE; （如果是放在BEGIN END之间需要加CASE，如果在SELECT后则不需要）
 
 -- 方式2：
 CASE
@@ -2881,7 +2920,73 @@ mysql> show variables like 'transaction_isolation';
   >
   > > 多条Insert语句放在事务中，以commit执行
 
+### （8）事务处理处理多次UPDATE、DELETE、INSERT
+
+用事务将多次UPDATE、DELETE、INSERT操作原子化，要么一次执行成功，要么回滚。
+
+有多个操作时，UPDATE、DELETE、INSERT等操作会返回影响的行数，通过ROW_COUNT()获取。将其记录在变量count中，通过判断count数值，决定是提交或回滚。
+
+> **使用PREPARE，获取ROW_COUNT必须要在DEALLOCATE释放sql语句s之前**
+
+```mysql
+CREATE DEFINER=`root`@`localhost` PROCEDURE `deleteDevice`(IN ln VARCHAR(20), IN dn VARCHAR(20))
+BEGIN
+DECLARE ifAffectedRow TINYINT(1) DEFAULT 1;		-- TINYINT括号内加数字，表示位数，如INT(4):0001
+DECLARE SQL_FOR_UPDATE_device_config VARCHAR(100);	-- 保存最后执行的动态SQL语句
+START TRANSACTION;
+
+-- 查询字段是动态，所以用动态SQL
+SET SQL_FOR_UPDATE_device_config=CONCAT('UPDATE device_config SET DeviceStatus_', dn, '=0 WHERE LineNO=', ln, ';');
+SET @sql=SQL_FOR_SELECT;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+-- 使用PREPARE，获取ROW_COUNT必须要在DEALLOCATE释放sql语句s之前
+CASE ROW_COUNT()	-- 判断语句执行影响表device_config的行数
+WHEN 0 THEN SET ifAffectedRow=0;
+END CASE;	
+DEALLOCATE PREPARE stmt;
+
+
+DELETE FROM device_info WHERE LineNO=ln AND DeviceNO=dn;
+CASE 
+WHEN ROW_COUNT()=0 THEN SET ifAffectedRow=0; 	-- THEN中若是语句需要加分号
+ELSE ALTER TABLE device_info AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM device_info_threshold WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN SET ifAffectedRow=0;
+ELSE ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM device_info_paranameandsuffix WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN SET ifAffectedRow=0;
+ELSE ALTER TABLE device_info_paranameandsuffix AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM faults_config WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN SET ifAffectedRow=0;
+ELSE ALTER TABLE faults_config AUTO_INCREMENT=1;
+END CASE;
+
+IF(ifAffectedRow=1) THEN COMMIT;	-- 若5次操作同时成功则commit，否则rollback
+ELSE ROLLBACK;
+END IF;
+
+END
+```
+
+
+
+
+
 ## 23. 变量
+
+变量分为系统变量、自定义变量
+
+自定义变量分为：局部变量、用户变量
 
 ### （1）局部变量
 
@@ -2891,6 +2996,17 @@ declare用于定义局部变量变量，**在存储过程和函数中通过decla
 
 ![image-20211123144256331](https://i.loli.net/2021/11/23/pGtHYeRCJZf6Mou.png)
 
+#### 赋值
+
+```mysql
+/*方式1*/
+set 局部变量名=值;
+set 局部变量名:=值;
+select 局部变量名:=值;
+/*方式2*/
+select 字段 into 局部变量名 from 表;
+```
+
 
 
 
@@ -2899,7 +3015,33 @@ declare用于定义局部变量变量，**在存储过程和函数中通过decla
 
 用户变量可以在任何地方使用也就是**既可以在begin end里面使用，也可以在他外面使用。**  
 
+#### 定义
 
+```mysql
+/*方式1*/
+set @变量名=值;
+/*方式2*/
+set @变量名:=值;
+/*方式3*/
+select @变量名:=值;
+```
+
+#### 赋值
+
+```mysql
+/*方式1：这块和变量的声明一样*/
+set @变量名=值;
+set @变量名:=值;
+select @变量名:=值;
+/*方式2*/
+select 字段 into @变量名 from 表;
+```
+
+#### 使用
+
+```mysql
+insert into employees (first_name,email) values (@first_name,@email);
+```
 
 
 
@@ -3130,7 +3272,39 @@ CALL proc1('DeviceNO');
 示例：
 
 ```mysql
-            
+CREATE DEFINER=`root`@`localhost` PROCEDURE `initDtSideTileBar`()
+BEGIN
+
+DECLARE different_device_num INT DEFAULT 0;
+DECLARE colname VARCHAR(20);
+DECLARE SQL_FOR_SELECT varchar(1000);
+DECLARE ii INT(10) DEFAULT 2;
+
+SELECT COUNT(*) INTO different_device_num FROM device;
+
+-- SELECT 打印变量调试
+-- SELECT different_device_num;
+
+SET SQL_FOR_SELECT='SELECT device_config.LineNO ,DeviceStatus_001';
+
+a:WHILE ii<=different_device_num DO
+	SELECT deviceNO INTO colname FROM device WHERE NO=ii;
+	SET SQL_FOR_SELECT=CONCAT(SQL_FOR_SELECT, '+DeviceStatus_', colname);
+	SET ii=ii+1;
+END WHILE;
+
+SET SQL_FOR_SELECT=CONCAT(SQL_FOR_SELECT, ' AS DeviceTotalNum FROM device_config');
+
+SET SQL_FOR_SELECT=CONCAT('SELECT t1.LineNO,t2.LineName,t1.DeviceTotalNum FROM (', SQL_FOR_SELECT, ') AS t1 INNER JOIN productionline AS t2 ON t1.LineNO=t2.LineNO;');
+
+-- SELECT SQL_FOR_SELECT;
+
+SET @sql=SQL_FOR_SELECT;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+END
 ```
 
 ```mysql
@@ -3153,7 +3327,12 @@ https://segmentfault.com/q/1010000019889121
 
 
 
-### （12）用存储过程封装SQL语句
+### （12）用存储过程封装动态SQL语句
+
+https://blog.csdn.net/qq_38216661/article/details/98871552
+
+> * **可以在存储过程中动态的拼接表名，字段名，来达到动态查询的效果**
+> * sql语句中还可以用?来代表参数，这样可以有效的防止sql注入
 
 ```mysql
 -- 通过输入确定查询条件
@@ -3215,12 +3394,46 @@ SET SQL_FOR_SELECT=CONCAT('SELECT t1.LineNO,t2.LineName,t1.DeviceTotalNum FROM (
 
 -- SELECT SQL_FOR_SELECT;
 
-SET @sql=SQL_FOR_SELECT;
-PREPARE stmt FROM @sql;
-EXECUTE stmt;
-DEALLOCATE PREPARE stmt;
+SET @sql=SQL_FOR_SELECT;	-- 将指令字符串SQL_FOR_SELECT作为sql语句
+PREPARE stmt FROM @sql;		
+EXECUTE stmt;			   -- 通过EXECUTE执行sql语句
+DEALLOCATE PREPARE stmt;    -- 通过DEALLOCATE PREPARE释放sql语句
 
 END$
+DELIMITER ;
+```
+
+```mysql
+/*建库javacode2018*/
+DROP DATABASE IF EXISTS javacode2018;
+CREATE DATABASE javacode2018;
+USE javacode2018;
+/*建表test1*/
+DROP TABLE IF EXISTS test1;
+CREATE TABLE test1 (
+id INT NOT NULL COMMENT '编号',
+name VARCHAR(20) NOT NULL COMMENT '姓名',
+sex TINYINT NOT NULL COMMENT '性别,1：男，2：女',
+email VARCHAR(50)
+);
+/*准备数据*/
+DROP PROCEDURE IF EXISTS proc1;
+DELIMITER $
+CREATE PROCEDURE proc1()
+BEGIN
+DECLARE i INT DEFAULT 1;
+START TRANSACTION;
+WHILE i <= 2000000 DO
+INSERT INTO test1 (id, name, sex, email) VALUES
+(i,concat('javacode',i),if(mod(i,2),1,2),concat('javacode',i,'@163.com'));
+SET i = i + 1;
+if i%10000=0 THEN
+COMMIT;
+START TRANSACTION;
+END IF;
+END WHILE;
+COMMIT;
+END $
 DELIMITER ;
 ```
 
@@ -3242,7 +3455,21 @@ https://jingyan.baidu.com/article/b7001fe1b162d80e7282ddcc.html
 
 ---
 
-## 25. 触发器
+## 25. 函数
+
+
+
+
+
+---
+
+## 26.异常
+
+
+
+---
+
+## 27. 触发器
 
 https://www.cnblogs.com/geaozhang/p/6819648.html
 
@@ -3256,7 +3483,11 @@ https://www.cnblogs.com/phpper/p/7587031.html
 
 ### （2）使用
 
-**！！尽量少使用触发器，不建议使用。**
+* **存储过程中不能创建触发器**
+
+* **只有表支持触发器，视图和临时时表不支持**
+
+* **！！尽量少使用触发器，不建议使用。**
 
 　　**假设触发器触发每次执行1s，insert table 500条数据，那么就需要触发500次触发器，光是触发器执行的时间就花费了500s，而insert 500条数据一共是1s，那么这个insert的效率就非常低了。因此我们特别需要注意的一点是触发器的begin end;之间的语句的执行效率一定要高，资源消耗要小。**
 
@@ -3279,7 +3510,7 @@ CREATE TRIGGER trigger_name trigger_time trigger_event ON tb_name FOR EACH ROW t
 >
 > **trigger_event：**触发事件，为INSERT、DELETE或者UPDATE
 > tb_name：表示建立触发器的表明，就是在哪张表上建立触发器
-> trigger_stmt：触发器的程序体，可以是一条SQL语句或者是用BEGIN和END包含的多条语句
+> **trigger_stmt：**触发器的程序体，可以是一条SQL语句或者是用BEGIN和END包含的多条语句
 > 所以可以说MySQL创建以下六种触发器：
 > BEFORE INSERT,BEFORE DELETE,BEFORE UPDATE
 > AFTER INSERT,AFTER DELETE,AFTER UPDATE
@@ -3405,7 +3636,7 @@ drop trigger if exists trigger_name
 
 ---
 
-## 26.视图
+## 28.视图
 
 https://www.jianshu.com/p/814d8aee700a
 
@@ -3483,7 +3714,7 @@ WHERE prod_id='TN2';
 
 ---
 
-## 27. 临时表
+## 29. 临时表
 
 
 
@@ -3491,7 +3722,7 @@ WHERE prod_id='TN2';
 
 ---
 
-## 28.  导出导入
+## 30.  导出导入
 
 https://www.cnblogs.com/chenbin93/p/14697451.html
 
@@ -3547,9 +3778,12 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
 * 导入
 
-  
 
-## 29. 并发控制——分布式锁
+
+
+---
+
+## 31. 并发控制——分布式锁
 
 https://blog.csdn.net/sunwenhao_2017/article/details/81565783
 
@@ -3605,7 +3839,11 @@ https://blog.csdn.net/u013474436/article/details/104924782/
 2. 乐观锁定的第二种实现方式和第一种差不多，同样是在需要乐观锁控制的table中增加一个字段，名称无所谓，字段类型使用时间戳（timestamp）, 和上面的version类似，也是在更新提交的时候检查当前数据库中数据的时间戳和自己更新前取到的时间戳进行对比，如果一致则OK，否则就是版本冲突。
    
 
-## 30. MySQL中间件
+
+
+---
+
+## 32. MySQL中间件
 
 https://www.cnblogs.com/armyfai/p/13595055.html
 
@@ -3613,9 +3851,17 @@ https://blog.csdn.net/hanguofei/article/details/103465363
 
 https://www.cnblogs.com/zhou2019/p/10918131.html
 
-## 31.  游标
 
-## 32. 账号管理
+
+---
+
+## 33.  游标
+
+
+
+---
+
+## 34. 账号管理
 
 * 严肃对待root账号的使用，仅在绝对需要的时候才使用。
 
@@ -3685,17 +3931,29 @@ https://www.cnblogs.com/zhou2019/p/10918131.html
   SET PASSWORD FOR user_name = PASSWORD('password');
   ```
 
-## 33. 日志
+
+
+---
+
+## 35. 日志
 
 https://blog.csdn.net/defonds/article/details/46858949
 
 需要配置启用日志。
 
-## 34.存储图片
+
+
+---
+
+## 36.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
 
-## 35.MySQL与NoSQL
+
+
+---
+
+## 37.MySQL与NoSQL
 
 http://www.cppblog.com/sunicdavy/archive/2015/07/20/210992.html
 
@@ -3761,7 +4019,11 @@ value限制1M
 
 应用场景: 动态系统中的缓冲, 适合多读少写
 
-## 36. MySQL规范及性能优化
+
+
+---
+
+## 38. MySQL规范及性能优化
 
 ### （1）MySQL三表禁止join
 
