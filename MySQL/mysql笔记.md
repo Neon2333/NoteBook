@@ -113,6 +113,18 @@ MySQL默认是不区分大小写的，但是在很多情况下需要大小敏感
 
 修改MySql Server安装目录下的 my.ini 文件，在mysqld节下加入下面一行 set-variable=lower_case_table_names=0 （0：大小写敏感；1：大小写不敏感）最后重启一下MySql服务即可。
 
+## 8. MySQL配置局域网可访问
+
+* 两台电脑通过网线连接，配置同一网段
+
+* https://www.cnblogs.com/-ccj/p/12031243.html
+
+  配置用户名、密码
+
+
+
+
+
 ---
 
 # MySQL基本知识
@@ -2218,7 +2230,63 @@ mysql> SELECT * FROM t_user;
 
 可以表达多种条件。
 
-***如果是语句需要加分号***
+* ***如果是语句需要加分号***
+
+* ***CASE WHEN语句中必须要有ELSE语句，不能有所有WHEN情况都不匹配的情况，否则会报错`1339 Case not found for CASE statement`。若ELSE中没有可以可写的，加个BEGIN END即可***
+
+> https://stackoverflow.com/questions/7881211/mysql-case-not-found-for-case-statement-on-a-stored-procedure
+>
+> ```mysql
+> -- 报错：1339 Case not found for CASE statement。正确的见22.事务-(8)
+> CREATE DEFINER=`root`@`localhost` PROCEDURE `p_deleteDevice`(IN ln VARCHAR(20), IN dn VARCHAR(20))
+> BEGIN
+> DECLARE ifAffectedRow TINYINT(1) DEFAULT 1;
+> DECLARE SQL_FOR_UPDATE_device_config VARCHAR(100);
+> 
+> START TRANSACTION;
+> 
+> SET SQL_FOR_UPDATE_device_config=CONCAT('UPDATE device_config SET `DeviceStatus_', dn, '`=0 WHERE LineNO=', ln, ';');
+> SET @sql=SQL_FOR_UPDATE_device_config;
+> PREPARE stmt FROM @sql;
+> EXECUTE stmt;
+> -- 使用PREPARE，获取ROW_COUNT必须要在DEALLOCATE释放sql语句之前
+> CASE ROW_COUNT()
+> WHEN 0 THEN SET ifAffectedRow=0;
+> END CASE;	
+> DEALLOCATE PREPARE stmt;
+> 
+> DELETE FROM device_info WHERE LineNO=ln AND DeviceNO=dn;
+> CASE ROW_COUNT()
+> WHEN 0 THEN SET ifAffectedRow=0;
+> ELSE ALTER TABLE device_info AUTO_INCREMENT=1;
+> END CASE;
+> 
+> DELETE FROM device_info_threshold WHERE LineNO=ln AND DeviceNO=dn;
+> CASE ROW_COUNT()
+> WHEN 0 THEN SET ifAffectedRow=0;
+> ELSE ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
+> END CASE;
+> 
+> DELETE FROM device_info_paranameandsuffix WHERE LineNO=ln AND DeviceNO=dn;
+> CASE ROW_COUNT()
+> WHEN 0 THEN SET ifAffectedRow=0;
+> ELSE ALTER TABLE device_info_paranameandsuffix AUTO_INCREMENT=1;
+> END CASE;
+> 
+> DELETE FROM faults_config WHERE LineNO=ln AND DeviceNO=dn;
+> CASE ROW_COUNT()
+> WHEN 0 THEN SET ifAffectedRow=0;
+> ELSE ALTER TABLE faults_config AUTO_INCREMENT=1;
+> END CASE;
+> 
+> IF(ifAffectedRow=1) THEN COMMIT;
+> ELSE ROLLBACK;
+> END IF;
+> 
+> END
+> ```
+>
+> 
 
 ```mysql
 -- 方式1：
@@ -2242,11 +2310,10 @@ END CASE;
 SELECT
 t.name 姓名,
 (CASE t.sex
-WHEN 1
-THEN '男'
-WHEN 2
-THEN '女'
-ELSE '未知' END) 性别
+WHEN 1 THEN '男'
+WHEN 2 THEN '女'
+ELSE '未知' 
+END) 性别
 FROM t_stu t;
 ```
 
@@ -2254,11 +2321,10 @@ FROM t_stu t;
 SELECT
 t.name 姓名,
 (CASE
-WHEN t.sex = 1
-THEN '男'
-WHEN t.sex = 2
-THEN '女'
-ELSE '未知' END) 性别
+WHEN t.sex = 1 THEN '男'
+WHEN t.sex = 2 THEN '女'
+ELSE '未知' 
+END) 性别
 FROM t_stu t;
 ```
 
@@ -2275,6 +2341,8 @@ ON t1.DeviceNO=t2.DeviceNO
 WHERE t1.LineNO='001'
 ORDER BY t1.`NO`;
 ```
+
+
 
 ### （2）循环语句
 
@@ -2942,33 +3010,43 @@ PREPARE stmt FROM @sql;
 EXECUTE stmt;
 -- 使用PREPARE，获取ROW_COUNT必须要在DEALLOCATE释放sql语句s之前
 CASE ROW_COUNT()	-- 判断语句执行影响表device_config的行数
-WHEN 0 THEN SET ifAffectedRow=0;
+	WHEN 0 THEN 
+		SET ifAffectedRow=0;
+	ELSE 
+		BEGIN END;
 END CASE;	
 DEALLOCATE PREPARE stmt;
 
-
 DELETE FROM device_info WHERE LineNO=ln AND DeviceNO=dn;
 CASE 
-WHEN ROW_COUNT()=0 THEN SET ifAffectedRow=0; 	-- THEN中若是语句需要加分号
-ELSE ALTER TABLE device_info AUTO_INCREMENT=1;
+	WHEN ROW_COUNT()=0 THEN 
+		SET ifAffectedRow=0; 	-- THEN中若是语句需要加分号
+	ELSE 
+		ALTER TABLE device_info AUTO_INCREMENT=1;
 END CASE;
 
 DELETE FROM device_info_threshold WHERE LineNO=ln AND DeviceNO=dn;
 CASE ROW_COUNT()
-WHEN 0 THEN SET ifAffectedRow=0;
-ELSE ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
 END CASE;
 
 DELETE FROM device_info_paranameandsuffix WHERE LineNO=ln AND DeviceNO=dn;
 CASE ROW_COUNT()
-WHEN 0 THEN SET ifAffectedRow=0;
-ELSE ALTER TABLE device_info_paranameandsuffix AUTO_INCREMENT=1;
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_paranameandsuffix AUTO_INCREMENT=1;
 END CASE;
 
 DELETE FROM faults_config WHERE LineNO=ln AND DeviceNO=dn;
 CASE ROW_COUNT()
-WHEN 0 THEN SET ifAffectedRow=0;
-ELSE ALTER TABLE faults_config AUTO_INCREMENT=1;
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE faults_config AUTO_INCREMENT=1;
 END CASE;
 
 IF(ifAffectedRow=1) THEN COMMIT;	-- 若5次操作同时成功则commit，否则rollback
@@ -3065,6 +3143,12 @@ MySQL 5.0 版本开始支持存储过程。
 - 创建的存储过程保存在数据库的数据字典中。
 
 使用存储过程比多条语句效率更高。且存储过程将语句封装，便于调用的人使用时保持代码的一致性。
+
+* 好处
+
+  > 减少编译次数
+  >
+  > 减少了变异次数减少了和数据库的链接次数，提高效率 
 
 ### （2）修改结束符
 
@@ -3437,9 +3521,82 @@ END $
 DELIMITER ;
 ```
 
+### （13）带有输出参数的存储过程
+
+参数列表用OUT修饰
+
+***将存储过程中的参数赋值给最终返回的输出参数，用`SELECT val INTO output`***
+
+```mysql
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_deleteDevice`(IN ln VARCHAR(20), IN dn VARCHAR(20), OUT ifRowAffected INT(1))
+BEGIN
+DECLARE ifAffectedRow TINYINT(1) DEFAULT 1;
+DECLARE SQL_FOR_UPDATE_device_config VARCHAR(100);
+
+START TRANSACTION;
+
+SET SQL_FOR_UPDATE_device_config=CONCAT('UPDATE device_config SET `DeviceStatus_', dn, '`=0 WHERE LineNO=', ln, ';');
+SET @sql=SQL_FOR_UPDATE_device_config;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+-- 使用PREPARE，获取ROW_COUNT必须要在DEALLOCATE释放sql语句之前
+CASE ROW_COUNT()
+	WHEN 0 THEN 
+		SET ifAffectedRow=0;
+	ELSE 
+		BEGIN END;
+END CASE;	
+DEALLOCATE PREPARE stmt;
+
+DELETE FROM device_info WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+	WHEN 0 THEN 
+		SET ifAffectedRow=0;
+	ELSE 
+		ALTER TABLE device_info AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM device_info_threshold WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM device_info_paranameandsuffix WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_paranameandsuffix AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM faults_config WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE faults_config AUTO_INCREMENT=1;
+END CASE;
+
+IF(ifAffectedRow=1) THEN 
+	COMMIT;
+	SELECT ifAffectedRow INTO ifRowAffected;
+ELSE 
+	ROLLBACK;
+END IF;
+
+END
+```
 
 
-### （13）存储过程的导出导入
+
+
+
+
+
+### （14）存储过程的导出导入
 
 https://jingyan.baidu.com/article/b7001fe1b162d80e7282ddcc.html
 
@@ -3449,7 +3606,7 @@ https://jingyan.baidu.com/article/b7001fe1b162d80e7282ddcc.html
 
 ![image-20211123101805218](https://i.loli.net/2021/11/23/RXJyztoaiWhLjBv.png)
 
-
+![image-20211202165717296](https://i.loli.net/2021/12/02/XSyKrsu1xfZMiO3.png)
 
 
 
@@ -3499,6 +3656,8 @@ https://www.cnblogs.com/phpper/p/7587031.html
 
 #### 创建
 
+* 单条语句
+
 ```mysql
 CREATE TRIGGER trigger_name trigger_time trigger_event ON tb_name FOR EACH ROW trigger_stmt
 ```
@@ -3520,6 +3679,8 @@ mysql> CREATE TRIGGER trig1 AFTER INSERT
     -> ON work FOR EACH ROW
     -> INSERT INTO time VALUES(NOW());
 ```
+
+* 多条语句
 
 ```mysql
 DELIMITER $
@@ -3632,6 +3793,16 @@ mysql> select * from information_schema.triggers
 drop trigger if exists trigger_name
 ```
 
+### （4）Navicat查看、修改触发器
+
+https://blog.csdn.net/weixin_40486955/article/details/103871901
+
+
+
+### （5）触发器中调用存储过程
+
+
+
 
 
 ---
@@ -3734,7 +3905,7 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
 ![image-20211118134207028](C:/Users/eivision/AppData/Roaming/Typora/typora-user-images/image-20211118134207028.png)
 
-### （1）.sql
+### （1）导出.sql
 
 * 导出数据库
 
@@ -3768,7 +3939,7 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
   SOURCE route.sql;
   ```
 
-### （2）.csv
+### （2）导出.csv
 
 .csv文件可被Excel打开。
 
@@ -3778,7 +3949,17 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
 * 导入
 
+### （3）导出导入查询
 
+![image-20211202165828229](https://i.loli.net/2021/12/02/19mqr7p53aZvEUy.png)
+
+![image-20211202165856363](https://i.loli.net/2021/12/02/vmH9rC6QF7WotPy.png)
+
+***一条查询对应一个.sql文件，导入时将文件放入文件夹即可，在查询页面F5刷新即可看见保存的查询***
+
+### （4）表、存储过程、视图一起导出
+
+见24.存储过程—(14)
 
 
 ---

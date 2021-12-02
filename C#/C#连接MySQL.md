@@ -74,6 +74,147 @@ static void Main(string[] args)
 }
 ```
 
+### （4）C#调用带参数的存储过程
+
+https://www.cnblogs.com/zeroone/p/6021329.html
+
+* 通过`MySqlParameter`封装参数
+* `string cmd`只存`存储过程名`
+
+```mysql
+CREATE DEFINER=`root`@`localhost` PROCEDURE `p_deleteDevice`(IN ln VARCHAR(20), IN dn VARCHAR(20), OUT ifRowAffected INT(1))
+BEGIN
+DECLARE ifAffectedRow TINYINT(1) DEFAULT 1;
+DECLARE SQL_FOR_UPDATE_device_config VARCHAR(100);
+
+START TRANSACTION;
+
+SET SQL_FOR_UPDATE_device_config=CONCAT('UPDATE device_config SET `DeviceStatus_', dn, '`=0 WHERE LineNO=', ln, ';');
+SET @sql=SQL_FOR_UPDATE_device_config;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+-- 使用PREPARE，获取ROW_COUNT必须要在DEALLOCATE释放sql语句之前
+CASE ROW_COUNT()
+	WHEN 0 THEN 
+		SET ifAffectedRow=0;
+	ELSE 
+		BEGIN END;
+END CASE;	
+DEALLOCATE PREPARE stmt;
+
+DELETE FROM device_info WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+	WHEN 0 THEN 
+		SET ifAffectedRow=0;
+	ELSE 
+		ALTER TABLE device_info AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM device_info_threshold WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM device_info_paranameandsuffix WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_paranameandsuffix AUTO_INCREMENT=1;
+END CASE;
+
+DELETE FROM faults_config WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE faults_config AUTO_INCREMENT=1;
+END CASE;
+
+IF(ifAffectedRow=1) THEN 
+	COMMIT;
+	SELECT ifAffectedRow INTO ifRowAffected;
+ELSE 
+	ROLLBACK;
+END IF;
+
+END
+```
+
+```C#
+// MySQL接口
+//参数列表：存储过程名、封装的参数MySqlParameter数组、输入参数个数、输出参数个数
+public bool _executeProcMySQL(string cmdExecute, MySqlParameter[] parameters, int inParaCount, int outParaCount)
+        {
+            bool flag = false;
+            try
+            {
+                MySqlCommand myCommand = new MySqlCommand(cmdExecute, conn);
+                myCommand.CommandType = CommandType.StoredProcedure;	//一定要把命令类型声明为 存储过程
+                myCommand.CommandTimeout = 12000;
+                if (this.conn.State == ConnectionState.Closed)
+                {
+                    this.conn.Open();		//开启连接
+                }
+                for(int i = 0; i < inParaCount; i++)
+                {
+                    parameters[i].Direction = ParameterDirection.Input;		//每个封装的MySqlParameter都要设定是 输入参数、输出参数
+                    myCommand.Parameters.Add(parameters[i]);			//将MySqlParameter添加到myCommand
+                }
+
+                for(int i = 0; i < outParaCount; i++)
+                {
+                    parameters[inParaCount + i].Direction = ParameterDirection.Output;
+                    myCommand.Parameters.Add(parameters[inParaCount + i]);
+                }
+
+                int rows = myCommand.ExecuteNonQuery();
+                if (rows > 0)
+                {
+                    flag = true;
+                }
+                myCommand.Parameters.Clear();
+            }
+            catch (SystemException ex)
+            {
+                ex.ToString();
+            }
+            return flag;
+        }
+```
+
+```C#
+MySQL.MySQLHelper mysqlHelper1 = new MySQL.MySQLHelper("localhost", "cloud_manage", "root", "ei41");
+            mysqlHelper1._connectMySQL();
+
+            DataRow drSelected = tileView1.GetDataRow(selectRow[0]);    //获取的是grid绑定的表所有列，而不仅仅是显示出来的列
+            
+            MySqlParameter lineNO = new MySqlParameter("ln", MySqlDbType.VarChar, 20);
+            lineNO.Value = this.sideTileBarControl_deviceAdditionDeletion.tagSelectedItem;	//将参数值封装
+            MySqlParameter deviceNO = new MySqlParameter("dn", MySqlDbType.VarChar, 20);
+            deviceNO.Value = drSelected["DeviceNO"];
+            MySqlParameter ifAffected = new MySqlParameter("ifRowAffected", MySqlDbType.Int32, 1);
+            MySqlParameter[] paras = { lineNO, deviceNO, ifAffected };
+            string cmdDeleteDevice = "p_deleteDevice";
+            mysqlHelper1._executeProcMySQL(cmdDeleteDevice, paras, 2, 1);
+
+            this.confirmationBox1.Visible = false;
+            getDtDeviceCanDeleteEachLine(this.sideTileBarControl_deviceAdditionDeletion.tagSelectedItem);   //刷新grid显示
+            
+            if (Convert.ToInt32(ifAffected.Value) == 1)
+            {
+                MessageBox.Show("删除成功");
+            }
+            else if (Convert.ToInt32(ifAffected.Value) == 0)
+            {
+                MessageBox.Show("删除失败");
+            }
+            mysqlHelper1.conn.Close();
+```
+
 ## 2. 流程
 
 * 定义服务器、用户名、密码字符串connStr，创建连接对象conn；
