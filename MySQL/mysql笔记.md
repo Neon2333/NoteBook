@@ -512,6 +512,12 @@ SELECT `field_name1` FROM tb_name;
 select COLUMN_NAME from information_schema.COLUMNS where table_name = 'your_table_name' and table_schema = 'your_db_name';  
 ```
 
+#### 将从表A中查询到数据插入到表B
+
+https://blog.csdn.net/ZZQHELLO2018/article/details/103784869?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-0.no_search_link&spm=1001.2101.3001.4242.1
+
+
+
 ## 10.主键
 
 ### （1）概念
@@ -2710,6 +2716,8 @@ START TRANSACTION READ ONLY;
 > > 束）  
 
 #### 隔离级别
+
+https://blog.csdn.net/weixin_39924486/article/details/113088777
 
 事务隔离级别主要是解决了多个事务之间数据可见性及数据正确性的问题。
 隔离级别分为4种：
