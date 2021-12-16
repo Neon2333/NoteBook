@@ -65,6 +65,8 @@ print((msg1 + " " + msg2).strip().upper())
 
 ### （3）数字转字符串
 
+`str()`
+
 ```python
 num = 30.5
 print(str(num))
@@ -92,7 +94,7 @@ print(str(num))
 """
 ```
 
-### （3）Pycharm快捷键
+### （3）Pycharm注释快捷键
 
 Ctrl+/
 
@@ -128,8 +130,6 @@ list[-2]表示倒数第二个元素
 cars = ['bmw', 'audi', 'toyota', 'subaru']
 print(cars[-1])		#'subaru'
 ```
-
-
 
 ### （3）添加元素
 
@@ -214,9 +214,9 @@ for car in cars:
     print(car)
 ```
 
-### （9）数值列表
+### （9）数值列表创建
 
-#### range()生成一系列数字
+#### <1>	range()生成一系列数字：左闭右开
 
 ```python
 #1~99，步长为1
@@ -227,7 +227,7 @@ for val in range(1, 100, 2):
     print(val)
 ```
 
-#### list()和range()创建数值列表
+#### <2>	list()和range()创建数值列表
 
 ```python
 nums = list(range(1, 100))	#用list创建
@@ -241,27 +241,141 @@ for val in range(1, 100, 2):
 print(ll)
 ```
 
+#### <3>	列表解析创建
+
+```python
+ll = [val**2 for val in range(1, 11)]
+print(ll)
+```
+
 ### （10）数值列表统计
 
+#### 最大值
+
+```python
+max(ll)
+```
+
+#### 最小值
+
+```python
+min(ll)
+```
+
+#### 求和
+
+```python
+sum(ll)
+```
+
+### （11）列表切片
+
+截取列表一部分
+
+#### 左闭右开区间
+
+```python
+players = ['charles', 'martina', 'michael', 'florence', 'eli']
+print(players[1:3])		# martina、michael
+```
+
+#### 省略右侧范围
+
+从左侧范围到**末尾**
+
+```python
+players = ['charles', 'martina', 'michael', 'florence', 'eli']
+print(players[1:])	#martina、michael、florance、eli
+print(players[-2:])	#florance、eli
+print(players[:3])	#charles、martina、michael
+```
+
+#### 遍历切片
+
+```python
+players = ['charles', 'martina', 'michael', 'florence', 'eli']
+for player in players[1:3]:
+    print(player)	#martina、michael
+```
+
+### （12）复制列表
+
+列表不能直接赋值，只能赋值列表切片，需要指定列表的范围
+
+```python
+my_foods = ['pizza', 'falafel', 'carrot cake']
+friend_foods = my_foods[:]
+```
+
+### （13）元组
+
+元组看起来犹如列表，如果需要存储的一组值在程序的整个生命周期内都不变，可使用元组。 
+
+元组的元素值不能修改。但是元组变量可以修改。
+
+```python
+dimensions = (200, 50)	#定义
+print(dimensions[0])	#索引访问
+print(dimensions[1])
+```
+
+```python
+dimensions = (100,300)
+for d in dimensions:
+    print(d)
+
+dimensions = (200,400)	#元组变量可以修改
+for d in dimensions:
+    print(d)
+```
 
 
 
+---
 
-### 
+## 5. 缩进
 
-
-
-
-
+PEP 8建议每级缩进都使用四个空格，这既可提高可读性，又留下了足够的多级缩进空间。在字处理文档中，大家常常使用制表符而不是空格来缩进。对于字处理文档来说，这样做的效果很好，但混合使用制表符和空格会让Python解释器感到迷惑。每款文本编辑器都提供了一种设置，可将输入的制表符转换为指定数量的空格。你在编写代码时应该使用制表符键，但一定要对编辑器进行设置，使其在文档中插入空格而不是制表符。
 
 
 
+---
 
+## 6. if
 
+### （1）运算符
 
+**==**
 
+**!=**
 
+**and——&&**
 
+**or——||**
+
+**in——检查特定值是否在列表中**
+
+**not in——检查特定值是否不在列表中**
+
+### （2）if语句
+
+同C/C++/C#一样，条件语句中某条语句被执行后，其他语句就不会被判断执行
+
+```python
+if con:
+    doSomething
+else:
+    doSomething
+```
+
+```python
+if con1:
+    doSomething
+elif con2:
+    doSomething
+else:
+    doSomething
+```
 
 
 
