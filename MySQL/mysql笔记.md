@@ -2241,7 +2241,7 @@ mysql> SELECT * FROM t_user;
 > https://stackoverflow.com/questions/7881211/mysql-case-not-found-for-case-statement-on-a-stored-procedure
 >
 > ```mysql
-> -- 报错：1339 Case not found for CASE statement。正确的见22.事务-(8)
+> -- 该段SQL报错：1339 Case not found for CASE statement。正确的见22.事务-(8)
 > CREATE DEFINER=`root`@`localhost` PROCEDURE `p_deleteDevice`(IN ln VARCHAR(20), IN dn VARCHAR(20))
 > BEGIN
 > DECLARE ifAffectedRow TINYINT(1) DEFAULT 1;

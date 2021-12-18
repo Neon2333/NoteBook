@@ -789,47 +789,7 @@ MemoryStream(byte[], Boolean);	//同上，多一个可设置CanWrite属性
 >
 > long Seek(long offset, SeekOrigin loc) 	已重写。 将当前流中的位置设置为指定值。起点loc，偏移量offset
 
-# 第四章 常用数据结构
 
-## 1. Queue
-
-### （1）方法
-
-> Enqueue():在队列的末端添加元素
->
-> Dequeue():在队列的头部读取和删除一个元素，注意，这里读取元素的同时也删除了这个元素。如果队列中不再有任何元素。就抛出异常
->
-> Count：返回队列中的元素个数
->
-> Contains():确定某个元素是否在队列中
->
-> Peek():在队列的头读取一个元素，但是不删除它
->
-> ToArray():返回一个包含元素的新数组
->
-> CopyTo():把元素队列复制到一个已有的数组中
-
-## 2. Stack
-
-### （1）方法
-
-> | 1    | **public virtual void Clear();** 从 Stack 中移除所有的元素。 |
-> | ---- | ------------------------------------------------------------ |
-> | 2    | **public virtual bool Contains( object obj );** 判断某个元素是否在 Stack 中。 |
-> | 3    | **public virtual object Peek();** 返回在 Stack 的顶部的对象，但不移除它。 |
-> | 4    | **public virtual object Pop();** 移除并返回在 Stack 的顶部的对象。 |
-> | 5    | **public virtual void Push( object obj );** 向 Stack 的顶部添加一个对象。 |
-> | 6    | **public virtual object[] ToArray();** 复制 Stack 到一个新的数组中。 |
-
-```C#
-Stack st = new Stack();
-st.Push('A');
-st.Push('M');        
-```
-
-
-
-# 第七章 网络编程
 
 
 
