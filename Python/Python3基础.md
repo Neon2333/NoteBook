@@ -683,7 +683,69 @@ for循环用于遍历
   print(pets)
   ```
 
-  
+
+
+
+---
+
+## 10. 函数
+
+### （1）定义函数
+
+**函数体相对于函数声明要缩进。**
+
+**三引号部分——文档字符串，是描述函数功能的注释，用于生成程序中函数的文档。要放在函数体中，要缩进。**
+
+```python
+def greet_user(username):
+	"""显示简单的问候语"""	
+	print("Hello, " + username.title() + "!")
+```
+
+```python
+## 调用函数，传递实参
+greet_user('jesse')
+```
+
+### （2）传递实参
+
+```python
+## 函数定义
+def describe_pet(animal_type, pet_name):
+	"""显示宠物的信息"""
+	print("\nI have a " + animal_type + ".")
+	print("My " + animal_type + "'s name is " + pet_name.title() + ".")
+```
+
+```python
+## 不指定形参名称，传递实参需要按照顺序对应
+describe_pet('hamster', 'harry')
+```
+
+```python
+## 指定了形参的名称后，实参的顺序将不再重要，因为清晰的指定了实参赋值给哪个形参
+describe_pet(pet_name='harry', animal_type='hamster')
+```
+
+### （3）形参默认值
+
+**设定默认值的形参必须放在括号最右侧，若在设定默认值的形参右侧还有不设定默认值的形参则会报错**
+
+```python
+def describe_pet(animal_type, pet_name='33'):
+```
+
+```python
+describe_pet('cat')		## 'cat' '33'
+```
+
+**若在调用函数时，显式的给设定默认值的形参赋值，则默认值将会被覆盖**
+
+```python
+describe_pet(animal_type='cat', pet_name='22')		## 'cat' '22'
+```
+
+
 
 
 
