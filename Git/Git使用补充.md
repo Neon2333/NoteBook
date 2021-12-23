@@ -12,7 +12,7 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 
 [reset加不加hard的区别](https://blog.csdn.net/chenpuzhen/article/details/92006378)
 
-```
+```git
 reset --soft	//仅仅将HEAD指向新版本号
 
 reset	//将HEAD指向新版本号，且更改暂存区（reset --mixed是默认情况，--mixed可省略）

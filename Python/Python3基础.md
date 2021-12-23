@@ -1,3 +1,19 @@
+# pycharm快捷键
+
+注释一行：Ctrl-/
+
+删除一行：Ctrl-Y
+
+开始debugger：shift-F9
+
+结束debugger：Ctrl-F2
+
+不进入函数：F8
+
+单步、进入函数：F7
+
+跳出函数：shift-F8
+
 # 基础数据类型
 
 ## 1. 字符串
@@ -744,6 +760,88 @@ describe_pet('cat')		## 'cat' '33'
 ```python
 describe_pet(animal_type='cat', pet_name='22')		## 'cat' '22'
 ```
+
+#### 形参默认值实现实参列表可选
+
+对于指定了默认值的形参，若不显式对其传参则使用默认值在函数体中进行处理，若显示传参则用传入的参数进行处理。
+
+这样就可使形参中的某几个变为可选，使得传参可以传2个参数也可以传3个参数。
+
+```python
+def get_formatted_name(first_name, last_name, middle_name=''):
+"""返回整洁的姓名"""
+	if middle_name:
+		full_name = first_name + ' ' + middle_name + ' ' + last_name
+	else:
+		full_name = first_name + ' ' + last_name
+	return full_name.title()
+musician = get_formatted_name('jimi', 'hendrix')
+print(musician)
+musician = get_formatted_name('john', 'hooker', 'lee')
+print(musician)
+```
+
+### （4）返回值
+
+* return 
+
+  ```python
+  def get_formatted_name(first_name, last_name, middle_name=''):
+  """返回整洁的姓名"""
+  	if middle_name:
+  		full_name = first_name + ' ' + middle_name + ' ' + last_name
+  	else:
+  		full_name = first_name + ' ' + last_name
+  	return full_name.title()
+  ```
+
+* 返回字典
+
+  ```python
+  def build_person(first_name, last_name, age=''):
+  	"""返回一个字典，其中包含有关一个人的信息"""
+  	person = {'first': first_name, 'last': last_name}
+  	if age != '':
+  		person['age'] = age
+  	return person
+  ```
+
+  
+
+### （5）传参——列表
+
+* 传参同其他数据类型一样直接传
+
+* 直接传入列表时传的是列表的”引用“，在函数中对列表进行修改会导致列表自身的永久改变
+
+* 要想传列表的copy，可使用列表的切片
+
+  ```python
+  def print_models(unprinted_designs, completed_models):
+  	"""
+  	模拟打印每个设计，直到没有未打印的设计为止
+  	打印每个设计后，都将其移到列表completed_models中
+  	"""
+  	while unprinted_designs:
+  		current_design = unprinted_designs.pop()
+  		# 模拟根据设计制作3D打印模型的过程
+  	print("Printing model: " + current_design)
+  	completed_models.append(current_design)	
+  def show_completed_models(completed_models):
+  	"""显示打印好的所有模型"""
+  	print("\nThe following models have been printed:")
+  	for completed_model in completed_models:
+  		print(completed_model)
+  ```
+
+  ```python
+  unprinted_designs = ['iphone case', 'robot pendant', 'dodecahedron']
+  completed_models = []
+  print_models(unprinted_designs[:], completed_models)	##取unprinted_designs列表的副本
+  show_completed_models(completed_models)
+  ```
+
+  
 
 
 
