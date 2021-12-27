@@ -1900,7 +1900,17 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
 
 
-## 7. LayoutControl——
+## 7. SplashScreenManager——添加启动加载窗口和等待提示窗口
+
+https://blog.csdn.net/clearloveq/article/details/80885796
+
+SplashScreenManager很好的封装了日常WInform程序中用到的启动闪屏窗口和在耗时操作中进行等待提示的信息窗口，合理使用可以增加程序界面的友好交换
+
+
+
+
+
+## 8. LayoutControl——
 
 ### （1）属性
 
@@ -1908,25 +1918,25 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
 
 
-## 8. AccordionControl——
+## 9. AccordionControl——
 
 
 
-## 9. TabPane
+## 10. TabPane
 
 
 
-## 10. SearchPanel
+## 11. SearchPanel
 
 
 
-## 11. SidePanel
+## 12. SidePanel
 
 https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layout-managers/side-panel?f=panelControl
 
 
 
-## 12. splitContainerControl——侧边栏收起
+## 13. splitContainerControl——侧边栏收起
 
 
 

@@ -63,6 +63,16 @@ msg2="wk    "
 print((msg1 + " " + msg2).strip().upper())
 ```
 
+### （6）子字符串在字符串中是否存在
+
+关键字`in`
+
+```python
+if str_ in string_
+```
+
+
+
 ## 2. 数字
 
 ### （1）整数
@@ -501,7 +511,7 @@ favorite_languages = {
 'phil': 'python',
 }
 for language in set(favorite_languages.values()):	#用favorite_languages.values()生成的列表初始化set，去重
-print(language.title())
+	print(language.title())
 ```
 
 #### 先排序再遍历
@@ -514,7 +524,7 @@ favorite_languages = {
 'phil': 'python',
 }
 for name in sorted(favorite_languages.keys()):
-print(name.title() + ", thank you for taking the poll.")
+	print(name.title() + ", thank you for taking the poll.")
 ```
 
 ### （7）字典、列表的嵌套
@@ -712,6 +722,8 @@ for循环用于遍历
 
 **三引号部分——文档字符串，是描述函数功能的注释，用于生成程序中函数的文档。要放在函数体中，要缩进。**
 
+每个函数都应包含简要地阐述其功能的注释，该注释应紧跟在函数定义后面，并采用文档字符串格式。
+
 ```python
 def greet_user(username):
 	"""显示简单的问候语"""	
@@ -806,7 +818,6 @@ print(musician)
   	return person
   ```
 
-  
 
 ### （5）传参——列表
 
@@ -841,7 +852,351 @@ print(musician)
   show_completed_models(completed_models)
   ```
 
-  
+
+### （6）接收任意数量参数——元祖
+
+`*var`定义元祖，可接受任意数量的参数。
+
+* 传参方式为位置参数时：
+
+  元祖要放在函数列表最后，前面的实参对应相应的形参后，剩余所有实参放在元祖中
+
+  ```python
+  def make_pizza(size, *toppings):
+  	"""概述要制作的比萨"""
+  	print("\nMaking a " + str(size) +
+  	"-inch pizza with the following toppings:")
+  	for topping in toppings:
+  	print("- " + topping)
+  make_pizza(16, 'pepperoni')
+  make_pizza(12, 'mushrooms', 'green peppers', 'extra cheese')
+  ```
+
+* 传参方式为关键字参数时：
+
+  向函数传实参时用`形参名=实参`的形式，以双星号创建空字典，接收`形参名:实参`。
+
+  ```python
+  def build_profile(first, last, **user_info):
+  	"""创建一个字典，其中包含我们知道的有关用户的一切"""
+  	profile = {}
+  	profile['first_name'] = first
+  	profile['last_name'] = last
+  	for key, value in user_info.items():
+          profile[key] = value
+  		return profile
+  user_profile = build_profile('albert', 'einstein',location='princeton',field='physics')
+  print(user_profile)
+  ```
+
+### （7）模块
+
+模块——代码文件`.py`
+
+#### 导入整个模块，然后使用`模块名.函数名`的方式使用函数。
+
+`import`导入模块后，将读取模块中的函数并复制到调用程序中，随后就可以使用模块中的所有函数。
+
+所有import语句都应放在程序开头。
+
+#### 模块别名——导入整个模块
+
+```python
+import module as md		##将较长的模块名简化，便于
+```
+
+#### 导入模块中指定函数
+
+```python
+from module import function1, function2, function3
+```
+
+#### 给模块中的函数起别名——为了简化函数名称或函数名和当前程序中的函数名冲突
+
+```python
+from module import function1 as func1, function2 as func2, function3 as func3
+```
+
+#### 
+
+---
+
+## 11. 类
+
+### （1）创建类
+
+```python
+class Cat():
+    """这是一个描述小猫的类"""			##文档字符串，描述类功能
+    def __init__(self,name,age):		##构造函数，必须要传入self用以指代实例
+        self.name=name				    ##调用构造函数时，将变量name、age的值赋值给实例self的属性name和age
+        self.age=age
+    def eat():						   ##类中的函数称为方法
+        print(self.name.title() + "is eating")	##方法内以【self.属性】的方式调用属性
+    def meow():
+        print(self.name.title() + "is barking")		##实际项目中方法内放描述Cat meow的实现代码
+```
+
+#### 构造函数
+
+构造函数——`__init__()`
+
+### （2）访问属性、调用方法
+
+`实例.属性`的形式访问
+
+```python
+yuanzi = Dog("yuanzi", 3)	##返回一个对象
+```
+
+`实例.方法`的形式访问
+
+### （3）修改属性
+
+#### 直接访问属性进行修改
+
+```python
+yuanzi.age = 4		##直接访问age进行修改
+```
+
+#### 通过在类中编写函数修改属性
+
+```python
+## 在Cat类中加方法modifyAge()
+def modifyAge(age):
+    self.age = age
+```
+
+```python
+yuanzi.modifyAge(3)
+```
+
+#### 属性默认值
+
+```python
+class Cat():
+    """这是一个描述小猫的类"""			
+    def __init__(self,name,age):		
+        self.name=name				   
+        self.age=age
+        self.height = 20
+```
+
+### （4）继承
+
+子类继承父类将自动获取父类所有的属性和方法，同时还可以对父类的方法进行覆写，从而调用方法时调用的就不再是父类的方法。
+
+#### 构造——调用父类的构造
+
+```python
+class orangeCat(Cat):
+    def __init__(name,age,weight):
+        super.__init__(name,age)
+        self.weight = weight						##定义子类特有的属性
+    def eat():
+        print("fat " + self.name + "is eating!!")	  ##重写eat方法
+```
+
+#### 将实例作为类的属性
+
+```python
+class Car():
+	--snip--
+class Battery():
+	"""一次模拟电动汽车电瓶的简单尝试"""
+	def __init__(self, battery_size=70):	## 电池默认容量70
+        """初始化电瓶的属性"""
+		self.battery_size = battery_size
+	def describe_battery(self):			## Battery的方法
+		"""打印一条描述电瓶容量的消息"""
+		print("This car has a " + str(self.battery_size) + "-kWh battery.")
+class ElectricCar(Car):
+	"""电动汽车的独特之处"""
+	def __init__(self, make, model, year):
+		"""
+		初始化父类的属性，再初始化电动汽车特有的属性
+		"""
+		super().__init__(make, model, year)
+		self.battery = Battery()		## 将Battery实例作为属性
+my_tesla = ElectricCar('tesla', 'model s', 2016)
+print(my_tesla.get_descriptive_name())
+my_tesla.battery.describe_battery()	
+```
+
+### （5）导入模块中的类
+
+#### 导入单个类/多个类
+
+模块`pet.py`
+
+```python
+from pet import Cat
+```
+
+```python
+from pet import Cat,Dog,Bird
+```
+
+#### 导入整个模块
+
+导入整个模块后使用类同使用函数一样，以`模块名.类名`访问
+
+```python
+import pet
+myCat = Cat("yuanzi",3)
+```
+
+#### 模块A中的类依赖另一模块B中的类
+
+需要在模块A中导入另一模块B
+
+当前代码调用模块A中类时，不仅仅需要import模块A还需要import模块B
+
+```python
+## 模块car.py
+"""一组用于表示燃油汽车和电动汽车的类"""
+class Car():
+	--snip--
+class Battery():
+	"""一次模拟电动汽车电瓶的简单尝试"""
+	def __init__(self, battery_size=60):
+		"""初始化电瓶的属性"""
+		self.battery_size = battery_size
+	def describe_battery(self):
+		"""打印一条描述电瓶容量的消息"""
+		print("This car has a " + str(self.battery_size) + "-kWh battery.")
+	def get_range(self):
+		"""打印一条描述电瓶续航里程的消息"""
+		if self.battery_size == 70:
+			range = 240
+		elif self.battery_size == 85:
+			range = 270
+	message = "This car can go approximately " + str(range)
+	message += " miles on a full charge."
+	print(message)
+```
+
+```python
+## 模块electric_car.py
+## 该模块定义了2个类Battery和ElectricCar
+from car import Car
+class Battery():
+	--snip--
+class ElectricCar(Car):
+	--snip--
+```
+
+```python
+## 逻辑代码
+from car import Car
+from electric_car import ElectricCar
+	my_beetle = Car('volkswagen', 'beetle', 2016)
+	print(my_beetle.get_descriptive_name())
+	my_tesla = ElectricCar('tesla', 'roadster', 2016)
+	print(my_tesla.get_descriptive_name())
+```
+
+### （6）Python标准库
+
+一组模块，安装的Python都包含它。可使用标准库中的任何函数和类，为此只需在程序开头包含一条简单的import语句。
+
+### （7）类编码风格
+
+首字母大写+驼峰
+
+### （8）代码开发流程
+
+事先设计好架构：多个模块，各个模块中存放相应的类与函数
+
+一个文件先写好逻辑功能：功能实现后，再对代码进行抽取、梳理架构
+
+
+
+---
+
+## 12. 文本文件IO
+
+### （1）打开文件——open
+
+```python
+with open("\\cc.txt") as file_object:
+```
+
+> file_object——文件对象
+>
+> with——由Python决定文件不再使用时，调用close将文件关闭
+
+### （2）读取文本文件
+
+#### 读取整个文本文件内容——read
+
+我们使用方法read()（前述程序的第2行）读取这个文件的全部内容，并将其作为一个长长的字符串存储在变量contents中。
+
+```python
+with open("\\cc.txt") as file_object:	
+    contents = file_object.read()
+    print(contents.rstrip())		## 相比cc.txt末尾多了一个空字符串，read读到文件末尾时返回一个空字符串，用rstrip去掉
+```
+
+#### 将文件各行存在列表中——readlines
+
+使用关键字with时， open()返回的文件对象只在with代码块内可用。如果要在with代码块外访问文件的内容，可在with代码块内将文件的各行存储在一个列表中，并在with代码块外使用该列表  
+
+```python
+with open("\\cc.txt") as file_object:	
+    lines = file_object.readlines()		 ## 列表lines中存的每行末尾都有\n
+for line in lines:
+    print(line.rstrip())  				## 因为文件的每行末尾有一个\n，print也会在输出内容后加一个\n所有要去掉一个\n
+```
+
+### （3）写入文本文件
+
+#### 指定打开文件方式
+
+> "w"——写入。文件不存在时创建，若文件存在且由内容将清空重写
+>
+> "a"——追加写入
+>
+> "r"——只读。open缺省值为只读
+>
+> "r+"——读写
+
+#### 写入单行——write
+
+```python
+with open(filePath, "w") as file_object:
+    file_object.write("coding")
+```
+
+#### 写入多行
+
+```python
+with open(filePath, "w") as file_object:
+    file_object.write("coding\n")
+    file_object.write("coding\n")
+```
+
+
+
+---
+
+## 13. 异常
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
