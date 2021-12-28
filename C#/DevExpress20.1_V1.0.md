@@ -1902,15 +1902,148 @@ bm.Attach<PagerBehavior>(navigationFrame1, behavior => {
 
 ## 7. SplashScreenManager——添加启动加载窗口和等待提示窗口
 
+https://docs.devexpress.com/WindowsForms/10823/controls-and-libraries/forms-and-user-controls/splash-screen-manager/splash-screen
+
 https://blog.csdn.net/clearloveq/article/details/80885796
 
-SplashScreenManager很好的封装了日常WInform程序中用到的启动闪屏窗口和在耗时操作中进行等待提示的信息窗口，合理使用可以增加程序界面的友好交换
+[重要——Devexpress控件的SplashScreen界面上的文字和进度条动态更新](http://blog.luoboye.com/?p=1182)
+
+* SplashScreenManager很好的封装了日常WInform程序中用到的启动闪屏窗口和在耗时操作中进行等待提示的信息窗口，合理使用可以增加程序界面的友好交换
+* SplashScreenManager显示在单独的线程中。启动画面由启动画面管理器在单独的线程中显示。
+* 您可以在启动画面中更改控件的布局、删除或添加自定义控件、更改默认标签和图像等。
+* 启动画面管理器将在主窗体启动时自动显示活动启动画面，并在主窗体完全初始化和显示后关闭它。
+
+### （1）启动加载窗口
+
+要通过代码与启动窗体交互，您可以通过**SendCommand**方法向它发送命令。要响应命令，请覆盖启动窗体的[SplashFormBase.ProcessCommand](https://docs.devexpress.com/WindowsForms/DevExpress.XtraSplashForm.SplashFormBase.ProcessCommand(System.Enum-System.Object))方法并实现所需的功能。
+
+自定义进度条控件被添加到启动画面。该示例显示了如何通过从启动画面管理器发送命令来动态更新此进度条控件。启动画面由启动画面管理器在单独的线程中显示。与启动画面的交互可以通过命令机制来执行。您可以通过 SplashScreenManager.SendCommand 方法发送命令，并通过覆盖 SplashScreen.ProcessCommand 方法来处理此命令。在示例中，自定义命令被发送到启动画面以推进启动画面的进度条控件的进度。
+
+![image-20211228150657031](https://s2.loli.net/2021/12/28/dlmwSFOKELYkX2n.png)
+
+```C#
+//SplashScreen1页面，ProcessCommand和SplashScreenCommand都自动生成
+using DevExpress.XtraSplashScreen;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+
+namespace CloudManage
+{
+    public partial class SplashScreen1 : SplashScreen
+    {
+        public SplashScreen1()
+        {
+            InitializeComponent();
+            this.labelCopyright.Text = "Copyright © 1998-" + DateTime.Now.Year.ToString();
+        }
+
+        #region Overrides
+
+        public override void ProcessCommand(Enum cmd, object arg)
+        {
+            base.ProcessCommand(cmd, arg);
+            SplashScreenCommand command = (SplashScreenCommand)cmd;
+            if(command == SplashScreenCommand.SetProgress)
+            {
+                int pos = (int)arg;
+                progressBarControl1.Position = pos;
+            }
+        }
+
+        #endregion
+
+        public enum SplashScreenCommand
+        {
+            SetProgress //设置progressBar的position
+        }
+    }
+}
+```
+
+
+
+### （2）等待窗口
+
+https://docs.devexpress.com/WindowsForms/10832/controls-and-libraries/forms-and-user-controls/splash-screen-manager/examples/how-to-dynamically-update-wait-forms-caption-or-description
+
+
+
+## 8. ProgressBarControl——进度条
+
+https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.ProgressBarControl
+
+可显示进度
+
+#### LookAndFeel——皮肤
+
+![image-20211228172559034](https://s2.loli.net/2021/12/28/rhkRI93C5aMgoE4.png)
+
+![image-20211228172626472](https://s2.loli.net/2021/12/28/AXwfBp3USbIT6ur.png)
+
+![image-20211228172736205](https://s2.loli.net/2021/12/28/DbEzdHChtwTYxAX.png)
+
+![image-20211228172754717](https://s2.loli.net/2021/12/28/h5HleDs3GRZKNd8.png)
+
+
+
+#### ProgressBarControl.Position——设置进度
+
+整数值，要设置在Maximum和Minimum之间。
+
+![image-20211228171549379](https://s2.loli.net/2021/12/28/xgMkCEWpD1UVOnS.png)
+
+```C#
+progressBarControl1.Properties.Step = 1;
+progressBarControl1.Properties.PercentView = true;
+progressBarControl1.Properties.Maximum = 100;
+progressBarControl1.Properties.Minimum = 0;
+progressBarControl1.Position = 0;
+```
+
+#### Maximum和Minimum——进度最小值、最大值
+
+![image-20211228172142008](https://s2.loli.net/2021/12/28/bNIto4BjEXrsP26.png)
+
+#### Step——自增步长
+
+
+
+#### PerformStep——按照Step设定值改变进度条
 
 
 
 
 
-## 8. LayoutControl——
+## 9. MarqueeProgressBarControl——循环滚动进度条
+
+https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.MarqueeProgressBarControl?p=netframework
+
+该控件不显示进度，而是通过循环显示动画表现操作正在执行。
+
+#### （1）RepositoryItemMarqueeProgressBar.MarqueeAnimationSpeed——进度条运动速度
+
+数值越小，运动越快
+
+![image-20211228144925612](https://s2.loli.net/2021/12/28/AlxebNV5KUdOv8w.png)
+
+#### （2）RepositoryItemBaseProgressBar.ShowTitle——在进度条上显示文本/数值EditValue
+
+![image-20211228145307284](https://s2.loli.net/2021/12/28/gEq6epH1oJcTIyF.png)
+
+![image-20211228145104455](https://s2.loli.net/2021/12/28/2YMQEFowdLmJ4Ty.png)
+
+![image-20211228145358299](https://s2.loli.net/2021/12/28/DVpYjM4nsJ5ubcL.png)
+
+#### （3）当MarqueeProgressBarControl被嵌入GridControl中，ColumnViewOptionsView.AnimationType可设置动画效果作用于所有行或仅作用于focusd的行
+
+
+
+## 10. LayoutControl——
 
 ### （1）属性
 
@@ -1918,25 +2051,25 @@ SplashScreenManager很好的封装了日常WInform程序中用到的启动闪屏
 
 
 
-## 9. AccordionControl——
+## 11. AccordionControl——
 
 
 
-## 10. TabPane
+## 12. TabPane
 
 
 
-## 11. SearchPanel
+## 13. SearchPanel
 
 
 
-## 12. SidePanel
+## 14. SidePanel
 
 https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layout-managers/side-panel?f=panelControl
 
 
 
-## 13. splitContainerControl——侧边栏收起
+## 15. splitContainerControl——侧边栏收起
 
 
 
