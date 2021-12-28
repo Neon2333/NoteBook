@@ -1182,6 +1182,122 @@ with open(filePath, "w") as file_object:
 
 ## 13. 异常
 
+### （1）try-except-else
+
+```python
+try:
+    code probably error..
+except Error:
+    error dealing..
+else:
+    code run normall
+```
+
+> try——捕获可能发生错误的代码
+>
+> except——发生异常时的处理代码
+>
+> else——代码未发生异常、正常运行时的代码
+>
+> 异常处理——避免给用户暴露出过多的错误信息traceback，可给用户展示更友好的错误信息，避免程序信息过多的展示，向用户显示他不想看到的信息可能会降低程序的可用性。
+
+### （2）pass
+
+在except代码块中明确地**告诉Python什么都不要做**。 Python有一个pass语句，可在代码块中使用它来让Python什么都不要做。
+
+pass语句还充当了**占位符**，它提醒你在程序的某个地方什么都没有做，并且以后也许要在这里做些什么。  
+
+```python
+def count_words(filename):
+	"""计算一个文件大致包含多少个单词"""
+	try:
+		--snip--
+	except FileNotFoundError:
+		pass
+	else:
+		--snip--
+	filenames = ['alice.txt', 'siddhartha.txt', 'moby_dick.txt', 'little_women.txt']
+	for filename in filenames:
+count_words(filename)
+```
+
+
+
+---
+
+## 14. JSON格式存储数据
+
+将程序结果保存在json文件中，实现数据保存、读取，不同程序之间的数据交换，不同编程语言间的数据交换。
+
+### （1）json.dump——写入数据到json文件
+
+```python
+import json
+aa = [1,2,3,4]
+with open("aa.json","w") as f_obj:
+    json.dump(aa,f_obj)
+```
+
+### （2）json.load——从json文件中加载数据到内存
+
+```python
+Import json
+with open("aa.json") as f_obj:
+    aa = json.load()
+print(aa)
+```
+
+```python 
+## 示例
+import json
+try:
+    with open("username.json") as f_obj:
+        username = json.load(f_obj)
+except FileNotFoundError:
+    print("username.json not exist")
+    name = input("please enter your name:")
+    with open("username.json", "w") as f_obj_w:
+        json.dump(name, f_obj_w)
+        print("save you name, we'll remember you next login!")
+else:
+    print("welcome " + username + "!!")
+```
+
+```python
+## 重构
+import json
+def readStoredName():
+    """读取json中的username，若不存在json则返回None"""
+    try:
+        with open("username.json") as f_obj:
+            username = json.load(f_obj)
+    except FileNotFoundError:
+        return None
+    else:
+        return username
+    
+def inputName():
+    """用户输入username，并保存到json中"""
+    name = input("please enter your name:\n")
+    with open("username.json","w") as file_obj_w:
+        json.dump(name,file_obj_w)
+    return name
+
+## 业务逻辑
+def func():
+    username = readStoredName()
+    if username == None:
+        username = inputName()
+        print("welcome " + username + "!! we'll remember next login!!")
+    else:
+        print("welcome " + username + "!!")
+
+func()
+
+```
+
+
+
 
 
 
