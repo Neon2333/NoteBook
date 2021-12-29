@@ -64,6 +64,18 @@ System.Threading.Thread.CurrentThread.CurrentCulture = new System.Globalization.
 
 ---
 
+# 皮肤
+
+https://docs.devexpress.com/WindowsForms/2397/common-features/application-appearance-and-skin-colors/look-and-feel-and-skinning
+
+
+
+
+
+
+
+---
+
 # 窗体
 
 ## 1. XtraForm
@@ -1913,7 +1925,7 @@ https://blog.csdn.net/clearloveq/article/details/80885796
 * 您可以在启动画面中更改控件的布局、删除或添加自定义控件、更改默认标签和图像等。
 * 启动画面管理器将在主窗体启动时自动显示活动启动画面，并在主窗体完全初始化和显示后关闭它。
 
-### （1）启动加载窗口
+### （1）启动加载窗口——splashScreen
 
 要通过代码与启动窗体交互，您可以通过**SendCommand**方法向它发送命令。要响应命令，请覆盖启动窗体的[SplashFormBase.ProcessCommand](https://docs.devexpress.com/WindowsForms/DevExpress.XtraSplashForm.SplashFormBase.ProcessCommand(System.Enum-System.Object))方法并实现所需的功能。
 
@@ -1967,9 +1979,119 @@ namespace CloudManage
 
 
 
-### （2）等待窗口
+### （2）等待窗口——Wait Form
 
-https://docs.devexpress.com/WindowsForms/10832/controls-and-libraries/forms-and-user-controls/splash-screen-manager/examples/how-to-dynamically-update-wait-forms-caption-or-description
+https://docs.devexpress.com/WindowsForms/10824/controls-and-libraries/forms-and-user-controls/splash-screen-manager/wait-form
+
+* [动态更新WaitForm的Caption和Description](https://docs.devexpress.com/WindowsForms/10832/controls-and-libraries/forms-and-user-controls/splash-screen-manager/examples/how-to-dynamically-update-wait-forms-caption-or-description)
+
+  > *  [SplashScreenManager.SetWaitFormCaption](https://docs.devexpress.com/WindowsForms/DevExpress.XtraSplashScreen.SplashScreenManager.SetWaitFormCaption(System.String)?v=20.1)
+  > * [SplashScreenManager.SetWaitFormDescription](https://docs.devexpress.com/WindowsForms/DevExpress.XtraSplashScreen.SplashScreenManager.SetWaitFormDescription(System.String)?v=20.1)
+
+#### 使用方法
+
+https://www.cnblogs.com/wuyifu/p/3373504.html
+
+```C#
+/*第一步:
+
+在程序中拖入: splashScreenManager1 控件
+
+在需要处理的地方 使用以下语句来打开 WaitForm窗体(当然需要在 splashScreenManager1控件中绑定一个 WaitForm窗体(自己添加或者直接在这个控件属性里就可以添加))*/
+
+//第二步:
+
+　　　　　　	splashScreenManager1.ShowWaitForm();
+
+ 
+
+//第三步:
+
+//在过程可以通过以下语句来更改运行过程中的 WaitForm的 Caption 和 Msg
+
+             splashScreenManager1.SetWaitFormCaption("请稍后,正在加载中....");　　　  // 标题
+             splashScreenManager1.SetWaitFormDescription("正在初始化.....");　　　　　// 信息
+
+ //第四步:
+
+//最后通过以下语句来关闭  WaitForm
+
+　　　　　　splashScreenManager1.CloseWaitForm();
+
+ 
+
+//注意: 第三步最好开启另一个线程来操作. 或者添加 Application.DoEvents(); 来保证 WaitForm界面 刷新流畅
+```
+
+
+
+https://www.cnblogs.com/haowuji/p/3469529.html
+
+```C#
+//先创建一个WaitForm1 类
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Text;
+using System.Windows.Forms;
+using DevExpress.XtraWaitForm;
+
+namespace Taxinfo.TaxOA.AppBaseControls
+{
+    public partial class LoadWaitForm : WaitForm
+    {
+        public LoadWaitForm()
+        {
+            InitializeComponent();
+            this.progressPanel1.AutoHeight = true;
+        }
+
+        #region Overrides
+
+        public override void SetCaption(string caption)
+        {
+            base.SetCaption(caption);
+            this.progressPanel1.Caption = caption;
+        }
+        public override void SetDescription(string description)
+        {
+            base.SetDescription(description);
+            this.progressPanel1.Description = description;
+        }
+        public override void ProcessCommand(Enum cmd, object arg)
+        {
+            base.ProcessCommand(cmd, arg);
+        }
+
+        #endregion
+
+        public enum WaitFormCommand
+        {
+        }
+    }
+}
+```
+
+```C#
+//然后使用它的时候
+DevExpress.XtraSplashScreen.SplashScreenManager.ShowForm(typeof(AppBaseControls.LoadWaitForm));
+//..........
+DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm();
+```
+
+
+
+
+
+
+
+### （3）ProgressPanel
+
+WaitForm的一个组成部分
+
+https://docs.devexpress.com/WindowsForms/DevExpress.XtraWaitForm.ProgressPanel
 
 
 
