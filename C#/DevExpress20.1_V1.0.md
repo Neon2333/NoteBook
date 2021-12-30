@@ -70,7 +70,33 @@ https://docs.devexpress.com/WindowsForms/2397/common-features/application-appear
 
 
 
+---
 
+# 数据绑定——Excel、数据库、JSON、XML等
+
+https://docs.devexpress.com/WindowsForms/2395/common-features/data-binding-common-concepts
+
+
+
+
+
+---
+
+# Project Settings
+
+![image-20211230135227439](https://s2.loli.net/2021/12/30/rqtYbSCpZEBgWQx.png)
+
+![image-20211230135247531](https://s2.loli.net/2021/12/30/6wI5tfuY4Vag1pG.png)
+
+## 1. 高DPI
+
+https://docs.devexpress.com/WindowsForms/116666/common-features/high-dpi-support
+
+
+
+## 2. DirectX加速
+
+![image-20211230135650521](https://s2.loli.net/2021/12/30/kIzyFuTdtDiC15l.png)
 
 
 
@@ -1981,6 +2007,10 @@ namespace CloudManage
 
 ### （2）等待窗口——Wait Form
 
+![image-20211230115110272](https://s2.loli.net/2021/12/30/fBVQoe1twnZy9lX.png)
+
+窗口中包含一个progressPanel，progressPanel显示动态图片效果。
+
 https://docs.devexpress.com/WindowsForms/10824/controls-and-libraries/forms-and-user-controls/splash-screen-manager/wait-form
 
 * [动态更新WaitForm的Caption和Description](https://docs.devexpress.com/WindowsForms/10832/controls-and-libraries/forms-and-user-controls/splash-screen-manager/examples/how-to-dynamically-update-wait-forms-caption-or-description)
@@ -2089,8 +2119,6 @@ DevExpress.XtraSplashScreen.SplashScreenManager.CloseForm();
 
 ### （3）ProgressPanel
 
-WaitForm的一个组成部分
-
 https://docs.devexpress.com/WindowsForms/DevExpress.XtraWaitForm.ProgressPanel
 
 
@@ -2138,6 +2166,10 @@ progressBarControl1.Position = 0;
 #### PerformStep——按照Step设定值改变进度条
 
 
+
+#### ProgressViewStyle——设定进度条是实心还是一格一格
+
+![image-20211230143358205](https://s2.loli.net/2021/12/30/YkeRPbwTFlfmzLD.png)
 
 
 
@@ -2295,7 +2327,28 @@ dtCigarettePackaging.Columns.Add("img", typeof(Image));
 
   
 
-  
+### （3）设置层级视图
+
+https://www.cnblogs.com/wuhuacong/p/8796898.html
+
+
+
+### （4）DataSource
+
+#### 绑定表中有DataTime字段时的显示设置
+
+> 选中GridControl控件，点击“RunDesigner”，进入Columns编辑，选中要编辑的列，找到DisPlayFormat属性，展开，点击FormatType选择“DateTime”，然后把FormatString中自动生成的d去掉即可。。。
+>
+> 看到有的人提供的方法是把d改成t，我试了发现这种方法显示的结果只有时跟分，连日期都没了。。。
+> ————————————————
+> 版权声明：本文为CSDN博主「Dummy-0394」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+> 原文链接：https://blog.csdn.net/wk0394/article/details/41575489
+
+
+
+
+
+
 
 
 
