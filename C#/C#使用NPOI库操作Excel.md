@@ -239,7 +239,18 @@ XSSFWorkbook wk = new XSSFWorkbook();	//创建表对象wk
 ISheet isheet = wk.CreateSheet("Sheet1");	//在wk中创建sheet1
 ```
 
-### （3）向单元格中写数据
+### （3）设置列宽、行高
+
+```C#
+SetColumnWidth(isheet, 0, 20);	//colIndex=0
+SetColumnWidth(isheet, 1, 20);	//colIndex=1
+
+IRow row2 =null;
+row2 = isheet.CreateRow(j);
+row2.Height =2 * 256;
+```
+
+### （4）向单元格中写数据
 
 ```C#
  IRow row2 =null;
@@ -249,13 +260,80 @@ ISheet isheet = wk.CreateSheet("Sheet1");	//在wk中创建sheet1
  cell.SetCellValue("哈哈");		//给创建的单元格赋值string
 ```
 
-### （4）通过流将表中写入的数据一次性写入文件中
+### （5）通过流将表中写入的数据一次性写入文件中
 
 ```C#
 wk.Write(filestream);	//通过流filestream将表wk写入文件
 filestream.Close();	//关闭文件流filestream
 wk.Close();	//关闭Excel表对象wk
 ```
+
+### （6）追加数据，保留原有数据
+
+向已存在的Excel追加数据，保留原有数据
+
+```C#
+/// <summary>
+        /// 向已存在的excel追加数据
+        /// </summary>
+        /// <param name="excelPath">已存在的excel路径</param>
+        /// <param name="rowIndex">追加行索引</param>
+        /// <param name="cellData">追加列索引<列索引，单元格值></param>
+        public void addExcelData(string excelPath, int rowIndex, IDictionary<int, string> cellData)
+        {
+            FileStream fs = new FileStream(excelPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);//读取流
+            POIFSFileSystem ps = new POIFSFileSystem(fs);//需using NPOI.POIFS.FileSystem;
+            HSSFWorkbook workbook = new HSSFWorkbook(ps);
+            ISheet sheet = workbook.GetSheetAt(0);//获取工作表
+
+            //设置列宽
+            SetColumnWidth(sheet, 0, 20);
+            SetColumnWidth(sheet, 1, 10);
+            IRow row = sheet.GetRow(rowIndex); //得到表头
+            //设置行高
+            row.Height =2 * 256;
+
+            ICell cell = null;
+            ICellStyle style = null;
+            foreach (KeyValuePair<int, string> keyValue in cellData)
+            {
+                if (keyValue.Key == 1)
+                {
+                    cell = row.CreateCell(keyValue.Key);
+                    cell.SetCellValue(keyValue.Value);
+                   
+                    style = workbook.CreateCellStyle();
+                    //设置左对齐
+                    style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.LEFT;
+                    //设置斜线
+                    style.BorderDiagonal = BorderDiagonal.BACKWARD;
+                    style.BorderDiagonalLineStyle = NPOI.SS.UserModel.BorderStyle.THIN;
+                    //设置换行(若要单元格内换行必须加下面一句)
+                    style.WrapText = true;
+                    cell.CellStyle = style;
+                }
+                else
+                {
+                    cell = row.CreateCell(keyValue.Key);
+                    cell.SetCellValue(keyValue.Value);
+
+                    //设置居中
+                    style = workbook.CreateCellStyle();
+                    style.VerticalAlignment = VerticalAlignment.CENTER;
+                    style.Alignment = NPOI.SS.UserModel.HorizontalAlignment.CENTER;
+                    cell.CellStyle = style;
+                }
+            }
+
+            FileStream fout = new FileStream(excelPath, FileMode.Open, FileAccess.Write, FileShare.ReadWrite);//写入流
+            fout.Flush();
+            workbook.Write(fout);//写入文件
+            workbook = null;
+            fout.Close();
+        }
+```
+
+
 
 ## 6. 日期格式
 
