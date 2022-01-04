@@ -215,7 +215,7 @@ ribbon——RibbonForm上方的菜单栏和图标快捷方式
 
 # Common Controls——通用控件
 
-##  <span id="jump_SimpleButton">1. XtraEditors.SimpleButton——按钮<span id="jump_SimpleButton">
+##  <span id="jump_SimpleButton">1. SimpleButton——按钮<span id="jump_SimpleButton">
 
 **不支持添加背景图片backgroundimage，会被压在skin或Appearance后面。若想实现图片按钮，使用pictureEdit**
 
@@ -453,7 +453,7 @@ private void argsShowing(object sender, XtraMessageShowingArgs e)
 
 ```
 
-## <span id="jump_TextBox">3. XtraEditors.TextEdit——文本框（TextBox）</span>
+## <span id="jump_TextBox">3. TextEdit——文本框（TextBox）</span>
 
 ### （1）属性
 
@@ -519,7 +519,7 @@ private void argsShowing(object sender, XtraMessageShowingArgs e)
 
 
 
-## 4. DevExpress.XtraEditors.SvgImageBox——SVG图片框（ICON）
+## 4.SvgImageBox——SVG图片框（ICON）
 
 https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SvgImageBox?v=20.1
 
@@ -773,7 +773,7 @@ Image的每一个元素都是SvgImageItem类型，由Group element和regular ele
 
 
 
-## <span id="jump1">5. DevExpress.XtraEditors.PictureEdit——图片框</span>
+## <span id="jump1">5. PictureEdit——图片框</span>
 
 ### （1）属性
 
@@ -829,13 +829,13 @@ Properties.Options.OptionsMask.MaskType——Mask的形状
 
 
 
-## 6. DevExpress.XtraEditors.ImageSlider——图片滑动框
+## 6. ImageSlider——图片滑动框
 
 ### <img src="D:\WorkSpace\工作笔记\C#\DevExpress20.1.assets\image-20210715162109333.png" alt="image-20210715162109333" style="zoom:50%;" />
 
 
 
-## <span id="jump2">7. DevExpress.XtraEditors.LabelControl——标签</span>
+## <span id="jump2">7. LabelControl——标签</span>
 
 ### （1）属性
 
@@ -891,7 +891,7 @@ Properties.Options.OptionsMask.MaskType——Mask的形状
 
 
 
-## 8. XtraEditors.ListBoxControl——列表框
+## 8. ListBoxControl——列表框
 
 可填充来自data source的数据。
 
@@ -1088,7 +1088,7 @@ https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SearchControl.Qu
 
   
 
-##  10. XtraEditors.CheckEdit——复选框
+##  10. CheckEdit——复选框
 
 ### （1）属性
 
@@ -1202,7 +1202,7 @@ this.checkEdit42.TabIndex = 1;
 
 
 
-##  12. XtraEditors.ComboBoxEditor——下拉框
+##  12. ComboBoxEditor——下拉框
 
 ### （1）属性
 
@@ -1548,6 +1548,22 @@ protected override bool CanShowPopup { get; }
 
 
 
+## 17.SeparatorControl——分割线
+
+[Readme](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SeparatorControl)
+
+### （1）属性
+
+* LineOrientation——设定分割线的方向
+* LineAlignment——分割线的位置：Near、Center、Far
+* 
+
+
+
+## 18. SplitContainer——由1条分割线划分得到2个Panel的Panel
+
+[Readme](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SplitContainerControl?p=netframework)
+
 
 
 ## 17. XtraCharts——图表
@@ -1560,7 +1576,7 @@ protected override bool CanShowPopup { get; }
 
 
 
-## 19. DevExpress.XtraNavBar.navBarControl——侧面按钮面板
+## 19. navBarControl——侧面按钮面板
 
 
 

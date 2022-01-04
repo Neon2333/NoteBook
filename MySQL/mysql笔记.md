@@ -125,6 +125,10 @@ MySQL默认是不区分大小写的，但是在很多情况下需要大小敏感
 
 https://www.cnblogs.com/devcjq/articles/6020391.html
 
+```mysql
+truncate table table_name;	-- 清空表重新插入
+```
+
 
 
 ---
