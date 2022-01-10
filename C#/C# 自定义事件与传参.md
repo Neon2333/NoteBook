@@ -22,7 +22,7 @@ https://blog.csdn.net/a65135793/article/details/100586465
 
 # C# 自定义事件传值
 
-https://www.bilibili.com/read/cv10462773
+重点——https://www.bilibili.com/read/cv10462773
 
 
 

@@ -651,11 +651,19 @@ FROM device_config;
 
 * curdate()
 
+  CURRENT_DATE()
+
   当前日期
 
 * curtime()
 
+  CURRENT_TIME()
+
   当前时分秒
+
+* CURRENT_TIMESTAMP()
+
+  当前日期时间
 
 * Year(Now())
 

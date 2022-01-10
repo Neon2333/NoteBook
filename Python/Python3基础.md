@@ -14,7 +14,7 @@
 
 跳出函数：shift-F8
 
-# 基础数据类型
+# 基础语法
 
 ## 1. 字符串
 
@@ -1298,9 +1298,36 @@ func()
 
 
 
+---
 
+#  pygame
 
+## 1. 常用函数
 
+### （1）get_rect()
+
+![image-20220110151653929](https://s2.loli.net/2022/01/10/jrQscyVk81G7SUB.png)
+
+### （2）surface.blit()
+
+https://blog.csdn.net/zzwlyj/article/details/82117981
+
+https://blog.csdn.net/m0_64660514/article/details/122191114?spm=1035.2023.3001.6557&utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase&depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase
+
+```python
+# 方法旨在将一个图像绘制到另一个图像的上方
+surface.blit(source，dest=None，special_flags=0)
+```
+
+> 现在主要讲解blit的各个参数使用，主要就是两个，
+>
+> 一个source，很好理解，就是图片。图片用load方法加载
+>
+> ```python
+> image = pygame.image.load('不知名女友.gif')
+> ```
+>
+> 一个是dest我们可以理解为rect，我们可以直接使用rect参数进去
 
 
 
