@@ -688,7 +688,6 @@ msg = input(msgHelp)
   ```
 
 
-
 ---
 
 ## 9. while循环
@@ -1312,6 +1311,7 @@ func()
 
 ---
 
+<<<<<<< Updated upstream
 #  pygame
 
 ## 1. 常用函数
@@ -1321,6 +1321,16 @@ func()
 ![image-20220110151653929](https://s2.loli.net/2022/01/10/jrQscyVk81G7SUB.png)
 
 ### （2）surface.blit()
+=======
+## 15. Pygame
+
+### （1）pygame版本
+
+[下载符合自己Python版本的pygame](https://blog.csdn.net/shizheng_Li/article/details/114731202)
+
+[Python下载地址](https://github.com/pygame/pygame/releases/tag/2.1.2)
+
+>>>>>>> Stashed changes
 
 https://blog.csdn.net/zzwlyj/article/details/82117981
 
