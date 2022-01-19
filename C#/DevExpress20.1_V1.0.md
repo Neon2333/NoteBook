@@ -1564,9 +1564,21 @@ protected override bool CanShowPopup { get; }
 
 [Readme](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.SplitContainerControl?p=netframework)
 
+#### 分割线可移动
 
 
-## 17. XtraCharts——图表
+
+## 17. ChartControl——图表
+
+https://docs.devexpress.com/WindowsForms/DevExpress.XtraCharts.ChartControl
+
+https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.ArgumentDataMember
+
+https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.ValueDataMembers
+
+
+
+
 
 
 
@@ -2253,6 +2265,10 @@ https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layo
 
 ### （1）类型
 
+[多种类型](https://docs.devexpress.com/WindowsForms/DevExpress.XtraGrid.GridControl?v=20.1&p=netframework)
+
+
+
 ![image-20210816083610630](D:\WorkSpace\工作笔记\C#\DevExpress20.1_V1.0.assets\image-20210816083610630.png)
 
 * tileView——磁贴类型
@@ -2351,7 +2367,7 @@ https://www.cnblogs.com/wuhuacong/p/8796898.html
 
 ### （4）DataSource
 
-#### 绑定表中有DataTime字段时的显示设置
+#### DataTime字段时的显示格式设置
 
 > 选中GridControl控件，点击“RunDesigner”，进入Columns编辑，选中要编辑的列，找到DisPlayFormat属性，展开，点击FormatType选择“DateTime”，然后把FormatString中自动生成的d去掉即可。。。
 >
@@ -2378,3 +2394,4 @@ https://www.cnblogs.com/wuhuacong/p/8796898.html
 
 
 
+​		
