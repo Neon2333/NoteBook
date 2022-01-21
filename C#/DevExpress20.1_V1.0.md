@@ -1576,6 +1576,102 @@ https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.Argum
 
 https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.ValueDataMembers
 
+### 步骤
+
+* 创建一个series，添加到chartControl中
+
+* 一个chartControl中可添加好几个series
+
+* chartControl.DataSource可绑定数据源，series.DataSource也可以绑定数据源，当series设定了数据源后chartControl绑定的数据源就被屏蔽。优先级：series.DataSource > chartControl.DataSource
+
+  
+
+#### （1）曲线图
+
+https://blog.csdn.net/MRX220518/article/details/76974808?spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&utm_relevant_index=16
+
+#### 设定光滑曲线/折线
+
+```C#
+Series series = new Series("", ViewType.Spline);	//光滑
+```
+
+```C#
+Series series = new Series("", ViewType.line);		//折线
+```
+
+#### 设定坐标轴参数类型
+
+```C#
+series1.ArgumentScaleType = ScaleType.DateTime;		//X时间
+series1.ValueScaleType = ScaleType.Numerical;		//Y数值
+```
+
+#### 设置坐标轴原点数值
+
+```C#
+diagram.AxisX.WholeRange.SideMarginsValue = 1;          //X轴的原点从-1处开始
+```
+
+#### 设置坐标轴范围
+
+```C#
+diagram.AxisX.WholeRange.SetMinMaxValues(0, 100);		//X轴范围为0~100
+```
+
+#### 设置曲线显示小圆点
+
+```C#
+LineSeriesView view = (LineSeriesView)series.View;
+//view.MarkerVisibility = DevExpress.Utils.DefaultBoolean.True;
+```
+
+#### 显示每个小圆点的数值
+
+```C#
+//显示每个小圆点的数值
+series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;
+series.Label.ResolveOverlappingMode = ResolveOverlappingMode.JustifyAllAroundPoint;
+series.Label.TextPattern = "{V:#.00}";
+```
+
+
+
+
+
+#### 设置曲线显示标签显示数值
+
+```C#
+series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;				   //显示数值标签
+series.Label.ResolveOverlappingMode = ResolveOverlappingMode.HideOverlapped;	//当2个及以上标签出现重叠时，隐藏重叠的标签
+series.Label.TextPattern = "{V:#.00}";
+```
+
+```C#
+series.Label.ResolveOverlappingMode = ResolveOverlappingMode.JustifyAllAroundPoint;	//重新布局所有数值标签的位置，令其分布在对应点周围
+```
+
+```C#
+series.Label.TextPattern = "{V:#.00}";		//#表示数值，#.00表示小数点后两位数字
+```
+
+#### 设置显示坐标轴所有标签
+
+```C#
+DevExpress.XtraCharts.XYDiagram diagram = ((DevExpress.XtraCharts.XYDiagram) chartControl1.Diagram);
+diagram.AxisX.QualitativeScaleOptions.AutoGrid = false;
+diagram.AxisX.Label.ResolveOverlappingOptions.AllowHide = false;
+```
+
+#### 坐标轴是时间
+
+```C#
+//X轴为时间的设置
+diagram.AxisX.Label.TextPattern = "{A:MMM, d (HH:mm)}";
+diagram.AxisX.DateTimeScaleOptions.MeasureUnit = DateTimeMeasureUnit.Hour;
+diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
+```
+
 
 
 
