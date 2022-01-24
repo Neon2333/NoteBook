@@ -2,6 +2,8 @@
 
 
 
+
+
 # 疑问总结
 
 * 注意看designer.cs中的内容，了解代码形式怎么编写
@@ -1582,13 +1584,246 @@ https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.Value
 
 * 一个chartControl中可添加好几个series
 
-* chartControl.DataSource可绑定数据源，series.DataSource也可以绑定数据源，当series设定了数据源后chartControl绑定的数据源就被屏蔽。优先级：series.DataSource > chartControl.DataSource
+* chartControl.DataSource可绑定数据源，series.DataSource也可以绑定数据源，**当series设定了数据源后chartControl绑定的数据源就被屏蔽。**优先级：series.DataSource > chartControl.DataSource
 
   
 
-#### （1）曲线图
+### （1）范例
+
+#### <1> 折线图
 
 https://blog.csdn.net/MRX220518/article/details/76974808?spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&utm_relevant_index=16
+
+### （2）设计器
+
+#### <1> Chart
+
+* Series类型——折线、柱状、饼状等
+
+  ![](https://s2.loli.net/2022/01/24/p8cKiVaJ6MO1N7E.png)
+
+* 配色方案
+
+  ![](https://s2.loli.net/2022/01/24/LopY3x7mvfeEItV.png)
+
+* 背景色
+
+  ![](https://s2.loli.net/2022/01/24/lq9iRwkrUzFHcJV.png)
+
+* 图表边框
+
+  ![](https://s2.loli.net/2022/01/24/KjYwX5iDHpT84uR.png)
+
+  ![image-20220124113232519](https://s2.loli.net/2022/01/24/DmJ5fSpHhjVarvL.png)
+
+* 图表边框宽度
+
+  ![image-20220124113352600](https://s2.loli.net/2022/01/24/klBrYy2zupP7vNo.png)
+
+#### <2> Series
+![](https://s2.loli.net/2022/01/24/sh3LdZTiQfFOuxN.png)
+
+* Visible——Series1是否可见
+
+* Name——Series名称，改变的话Legend也会发生改变
+
+* Show in Legend——Series是否显示在Legend中
+
+* Labels Visibility——显示每个点的标签
+
+  ![image-20220124115926633](C:/Users/eivision/AppData/Roaming/Typora/typora-user-images/image-20220124115926633.png)
+  
+  > Labels Visibility为true时，可设置Label
+  >
+  > ![image-20220124144944522](https://s2.loli.net/2022/01/24/ju6F5owRy1DhG2O.png)
+  >
+  > Position——label位置：曲线外/曲线上
+  >
+  > Line Visibility——点与框之间的线是否可见
+  >
+  > Line Length——点与框之间的线的长度
+  >
+  > Text Pattern——label显示格式
+  >
+  > ![image-20220124143052830](https://s2.loli.net/2022/01/24/JYLZdQRWhz7sF5a.png)
+  >
+  > Text Orientation——label中文本的方向
+  >
+  > ![image-20220124143630212](https://s2.loli.net/2022/01/24/NSBuDIzyrQW74LJ.png)
+  >
+  > Text Color——label文本颜色
+  >
+  > Background Color——label背景色
+  >
+  > Fill Mode——颜色填充方式
+  >
+  > > Gradient——渐变
+  > >
+  > > Hatch——斜线
+  >
+  > Visibility——label边界是否可见
+  >
+  > Color——label边界的颜色
+  >
+  > Thickness——label边界的宽度
+  >
+  > ![image-20220124144904064](https://s2.loli.net/2022/01/24/3P9D6aQzZUnpHBr.png)
+  
+  
+
+* View——线型
+
+  > Bar——柱状图
+  >
+  > Bar3D——3D柱状图
+  >
+  > Point——点状图
+  >
+  > Bubble——气泡
+  >
+  > Line——折线
+  >
+  > Spline——平滑曲线
+  >
+  > Step Line——
+  >
+  > ![image-20220124135425274](https://s2.loli.net/2022/01/24/DZMsoQmBKIpg7VR.png)
+  >
+  > Area——曲线与坐标轴所围面积
+  >
+  > ![image-20220124135600003](https://s2.loli.net/2022/01/24/Q4nq8ZrJxhNDmjv.png)
+  >
+  > Pie——饼图
+  >
+  > Nested Doughnut——甜甜圈图
+  >
+  > ![image-20220124135917867](https://s2.loli.net/2022/01/24/ZPEFjqxbT9MyeG7.png)
+  >
+  > Pie3D——3D饼图
+  >
+  > ![image-20220124135714138](https://s2.loli.net/2022/01/24/zN3IrHfajkJCm5e.png)
+  >
+  > Radar——雷达图
+  >
+  > ![image-20220124140249370](https://s2.loli.net/2022/01/24/xQMPDYrgSbtp6ye.png)
+  >
+  > ，可由`Color Each`设置：Point、Bubble、Radar等图每个点以不同颜色表示，Line、Spline等不同曲线以不同颜色，Bar等不同柱以不同颜色
+  >
+  > ![image-20220124140742549](https://s2.loli.net/2022/01/24/wSx2FUYa9Or5jdE.png)
+  >
+  > ![image-20220124141030458](https://s2.loli.net/2022/01/24/LZ3GBvb68VMDuya.png)
+
+* Marker Visibility——曲线上是否显示小圆点
+
+  ![image-20220124141303755](https://s2.loli.net/2022/01/24/i4XYlTuef8c2m5C.png)
+
+* Color——小圆点颜色（Automatic时跟随曲线颜色或由Color Each自动生成）
+
+![image-20220124141507392](https://s2.loli.net/2022/01/24/covKtOLdXp7eREY.png)
+
+* Size——小圆点尺寸
+
+* Kind——小圆点的类型
+
+![image-20220124141626667](https://s2.loli.net/2022/01/24/9UzBhWIrstNL2V6.png)
+
+* Color——Series颜色
+
+
+
+![image-20220124150429041](https://s2.loli.net/2022/01/24/OwlzgpJHXvj9Gn3.png)
+
+> Font——字体
+>
+> LineColor——方框和点之间线的颜色
+>
+> LineLength——线长
+>
+> Angle——线的角度
+
+#### <3>XY-Diagram
+
+
+
+![image-20220124150726318](https://s2.loli.net/2022/01/24/S3BCuGFpdzy9Rxc.png)
+
+* EnableAxisXScrolling——X轴是否可滚动
+
+* EnableAxisXZooming——X轴是否可缩放
+
+* Rotated——翻转
+
+* SelectionOptions——缩放快捷键设置
+
+* 坐标轴设置
+
+  ![image-20220124151506876](https://s2.loli.net/2022/01/24/EbZshSGmO8HzX5w.png)
+
+> Alignment——坐标轴位置
+>
+> Color——坐标轴颜色
+>
+> Interlaced——
+>
+> ![image-20220124152011297](https://s2.loli.net/2022/01/24/E7zdQXrHfmYDOAe.png)
+>
+> ​	LabelPosition——数字标签位置在图表外还是内
+>
+> ![image-20220124152119010](https://s2.loli.net/2022/01/24/XfdPItkgMEY3D56.png)
+>
+> ![image-20220124152146979](C:/Users/eivision/AppData/Roaming/Typora/typora-user-images/image-20220124152146979.png)
+>
+> Reverse——坐标轴翻转
+>
+> ![image-20220124152304243](https://s2.loli.net/2022/01/24/lpjMoNK6mgO49GF.png)
+>
+> Thickness——坐标轴粗细
+
+#### <4> Legend
+
+![image-20220124173012481](https://s2.loli.net/2022/01/24/hM7DnpoX8LIEO9x.png)
+
+* Visibility——是否可见
+
+* Text Visible——文本数字是否可见
+
+* Marker Mode——选择类型
+
+* Alignment——Legend相对图表的位置
+
+* Direction——排列方向
+
+  ![image-20220124173210007](https://s2.loli.net/2022/01/24/WyObCx1vMaGVF4k.png)
+
+* Marker Height——高度
+* Marker Width——宽度
+* Background Color——Legend框背景色
+* Text Color——Legend文字颜色
+* Visibility——Legend边框是否可见
+* Color——Legend边框颜色
+* Thickness——Legend边框粗细
+
+#### <5> Title
+
+![image-20220124171615792](https://s2.loli.net/2022/01/24/7B8OuLZclX6gFvQ.png)
+
+* TextColor——标题颜色
+
+* Alignment——标题位置：居左、居中、居右
+
+* Dock——图表的上下左右
+
+* Visibility——标题是否可见
+
+* 多行标题
+
+  ![image-20220124171818985](https://s2.loli.net/2022/01/24/VgkQZfKyU5znGL7.png)
+
+
+
+
+
+
 
 #### 设定光滑曲线/折线
 
@@ -1626,20 +1861,7 @@ LineSeriesView view = (LineSeriesView)series.View;
 //view.MarkerVisibility = DevExpress.Utils.DefaultBoolean.True;
 ```
 
-#### 显示每个小圆点的数值
-
-```C#
-//显示每个小圆点的数值
-series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;
-series.Label.ResolveOverlappingMode = ResolveOverlappingMode.JustifyAllAroundPoint;
-series.Label.TextPattern = "{V:#.00}";
-```
-
-
-
-
-
-#### 设置曲线显示标签显示数值
+#### 设置曲线显示标签显示每个点的数值
 
 ```C#
 series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;				   //显示数值标签
@@ -1671,6 +1893,8 @@ diagram.AxisX.Label.TextPattern = "{A:MMM, d (HH:mm)}";
 diagram.AxisX.DateTimeScaleOptions.MeasureUnit = DateTimeMeasureUnit.Hour;
 diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
 ```
+
+
 
 
 
