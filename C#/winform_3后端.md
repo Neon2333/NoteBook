@@ -349,7 +349,189 @@ public partial class FileDialogForm : Form
 }
 ```
 
+## 10. folderBrowserDialog——文件夹浏览对话框
 
+### （1）打开对话框
+
+```C#
+FolderBrowserDialog folderDlg = new FolderBrowserDialog();
+DialogResult drs = folderDlg.ShowDialog();
+if (drs == DialogResult.OK){
+    //code
+}
+else{
+    //code
+}
+```
+
+### （2）记忆上一次选择的路径（软件关闭失效）
+
+```C#
+DataTable dtGrid = (DataTable)this.gridControl_faultHistory.DataSource;
+            string path = String.Empty;
+            FolderBrowserDialog folderDlg = new FolderBrowserDialog();
+            folderDlg.SelectedPath = defaultFolder;     //由上次打开的路径处打开
+            DialogResult drs = folderDlg.ShowDialog();
+            if (drs == DialogResult.OK)
+            {
+                defaultFolder = folderDlg.SelectedPath;		//更新默认路径为上次打开的路径
+                path = defaultFolder + "\\faultsHistory";
+
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                string excelFileName = path + "\\faultsHistory" + excelFileNameIndex++.ToString() + ".xlsx";
+                FileStream filestream = new FileStream(excelFileName, FileMode.OpenOrCreate);
+
+                XSSFWorkbook wk = new XSSFWorkbook();
+                ISheet isheet = wk.CreateSheet("Sheet1");
+
+                IRow row = null;
+                ICell cell = null;
+                //加表头
+                row = isheet.CreateRow(0);
+                cell = row.CreateCell(0);
+                cell.SetCellValue("序号");
+                cell = row.CreateCell(1);
+                cell.SetCellValue("产线名称");
+                cell = row.CreateCell(2);
+                cell.SetCellValue("设备名称");
+                cell = row.CreateCell(3);
+                cell.SetCellValue("故障名称");
+                cell = row.CreateCell(4);
+                cell.SetCellValue("故障时间");
+
+                for (int i = 1; i < dtGrid.Rows.Count + 1; i++)
+                {
+                    row = isheet.CreateRow(i);
+                    for (int j = 0; j < 5; j++)
+                    {
+                        cell = row.CreateCell(j);
+                        cell.SetCellValue(dtGrid.Rows[i - 1][j].ToString());
+                    }
+
+                }
+
+                wk.Write(filestream);   //通过流filestream将表wk写入文件
+                filestream.Close(); //关闭文件流filestream
+                wk.Close(); //关闭Excel表对象wk
+                MessageBox.Show("Excel导出");
+            }
+            else if(drs == DialogResult.Cancel)
+            {
+                folderDlg.Dispose();
+            }
+```
+
+### （3）记忆上一次选择的路径（软件重开后仍然有效）
+
+#### 注册表法
+
+https://www.cnblogs.com/BensonHe/archive/2010/07/24/1784432.html
+
+C#中的FolderBrowserDialog有个RootFolder属性，每次打开文件夹对话框默认指向的就是这个目录。但如果我们需要频繁打开同一个目录，则可以在ShowDialog()函数执行前，对SelectedPath属性赋值，这在程序退出前都有效，如果想要程序下次运行还是打开这个目录，则需要将打开的路径记录下来。可以使用两种方法：一、使用文件记录；二、使用注册表。使用文件记录有一个不好的地方，就是除了可执行程序exe外，还必须有一个配置文件，用户是可知的，这样非常的不好。使用注册表则没有这种烦恼。
+
+```C#
+DataTable dtGrid = (DataTable)this.gridControl_faultHistory.DataSource;
+            string path = String.Empty;
+
+            FolderBrowserDialog folderDlg = new FolderBrowserDialog();
+            //注册表法记录上次打开路径（软件重开后仍然有效）
+            try
+            {
+
+                RegistryKey testKey = Registry.CurrentUser.OpenSubKey("TestKey");
+                if (testKey == null)
+                {
+                    testKey = Registry.CurrentUser.CreateSubKey("TestKey");
+                    testKey.SetValue("OpenFolderDir", "");
+                    testKey.Close();
+                    Registry.CurrentUser.Close();
+                }
+                else
+                {
+                    defaultFolder = testKey.GetValue("OpenFolderDir").ToString();
+                    testKey.Close();
+                    Registry.CurrentUser.Close();
+                }
+            }
+            catch (Exception e)
+            {
+            }
+
+            if (defaultFolder != "")
+            {
+                //设置此次默认目录为上一次选中目录                  
+                folderDlg.SelectedPath = defaultFolder;
+            }
+
+            DialogResult drs = folderDlg.ShowDialog();
+            if (drs == DialogResult.OK)
+            {
+                if (defaultFolder != folderDlg.SelectedPath)
+                {
+                    defaultFolder = folderDlg.SelectedPath;
+                    RegistryKey testKey = Registry.CurrentUser.OpenSubKey("TestKey", true);  //true表示可写，false表示只读
+                    testKey.SetValue("OpenFolderDir", defaultFolder);
+                    testKey.Close();
+                    Registry.CurrentUser.Close();
+                }
+
+                path = defaultFolder + "\\faultsHistory";
+
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                string excelFileName = path + "\\faultsHistory" + excelFileNameIndex++.ToString() + ".xlsx";
+                FileStream filestream = new FileStream(excelFileName, FileMode.OpenOrCreate);
+
+                XSSFWorkbook wk = new XSSFWorkbook();
+                ISheet isheet = wk.CreateSheet("Sheet1");
+
+                IRow row = null;
+                ICell cell = null;
+                //加表头
+                row = isheet.CreateRow(0);
+                cell = row.CreateCell(0);
+                cell.SetCellValue("序号");
+                cell = row.CreateCell(1);
+                cell.SetCellValue("产线名称");
+                cell = row.CreateCell(2);
+                cell.SetCellValue("设备名称");
+                cell = row.CreateCell(3);
+                cell.SetCellValue("故障名称");
+                cell = row.CreateCell(4);
+                cell.SetCellValue("故障时间");
+
+                for (int i = 1; i < dtGrid.Rows.Count + 1; i++)
+                {
+                    row = isheet.CreateRow(i);
+                    for (int j = 0; j < 5; j++)
+                    {
+                        cell = row.CreateCell(j);
+                        cell.SetCellValue(dtGrid.Rows[i - 1][j].ToString());
+                    }
+
+                }
+
+                wk.Write(filestream);   //通过流filestream将表wk写入文件
+                filestream.Close(); //关闭文件流filestream
+                wk.Close(); //关闭Excel表对象wk
+                MessageBox.Show("Excel导出");
+            }
+            else if(drs == DialogResult.Cancel)
+            {
+                folderDlg.Dispose();
+            }
+```
+
+#### 读写文件法
+
+https://blog.csdn.net/D_lunar/article/details/84991615
 
 # 第三章	文件读写
 

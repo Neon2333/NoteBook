@@ -1,9 +1,3 @@
-
-
-
-
-
-
 # 疑问总结
 
 * 注意看designer.cs中的内容，了解代码形式怎么编写
@@ -1594,6 +1588,75 @@ https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.Value
 
 https://blog.csdn.net/MRX220518/article/details/76974808?spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&utm_relevant_index=16
 
+#### 设定光滑曲线/折线
+
+```C#
+Series series = new Series("", ViewType.Spline);	//光滑
+```
+
+```C#
+Series series = new Series("", ViewType.line);		//折线
+```
+
+#### 设定坐标轴参数类型
+
+```C#
+series1.ArgumentScaleType = ScaleType.DateTime;		//X时间
+series1.ValueScaleType = ScaleType.Numerical;		//Y数值
+```
+
+#### 设置坐标轴原点数值
+
+```C#
+diagram.AxisX.WholeRange.SideMarginsValue = 1;          //X轴的原点从-1处开始
+```
+
+#### 设置坐标轴范围
+
+```C#
+diagram.AxisX.WholeRange.SetMinMaxValues(0, 100);		//X轴范围为0~100
+```
+
+#### 设置曲线显示小圆点
+
+```C#
+LineSeriesView view = (LineSeriesView)series.View;
+//view.MarkerVisibility = DevExpress.Utils.DefaultBoolean.True;
+```
+
+#### 设置曲线显示标签显示每个点的数值
+
+```C#
+series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;				   //显示数值标签
+series.Label.ResolveOverlappingMode = ResolveOverlappingMode.HideOverlapped;	//当2个及以上标签出现重叠时，隐藏重叠的标签
+series.Label.TextPattern = "{V:#.00}";
+```
+
+```C#
+series.Label.ResolveOverlappingMode = ResolveOverlappingMode.JustifyAllAroundPoint;	//重新布局所有数值标签的位置，令其分布在对应点周围
+```
+
+```C#
+series.Label.TextPattern = "{V:#.00}";		//#表示数值，#.00表示小数点后两位数字
+```
+
+#### 设置显示坐标轴所有标签
+
+```C#
+DevExpress.XtraCharts.XYDiagram diagram = ((DevExpress.XtraCharts.XYDiagram) chartControl1.Diagram);
+diagram.AxisX.QualitativeScaleOptions.AutoGrid = false;
+diagram.AxisX.Label.ResolveOverlappingOptions.AllowHide = false;
+```
+
+#### 坐标轴是时间
+
+```C#
+//X轴为时间的设置
+diagram.AxisX.Label.TextPattern = "{A:MMM, d (HH:mm)}";
+diagram.AxisX.DateTimeScaleOptions.MeasureUnit = DateTimeMeasureUnit.Hour;
+diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
+```
+
 ### （2）设计器
 
 #### <1> Chart
@@ -1796,12 +1859,30 @@ https://blog.csdn.net/MRX220518/article/details/76974808?spm=1001.2101.3001.6650
   ![image-20220124173210007](https://s2.loli.net/2022/01/24/WyObCx1vMaGVF4k.png)
 
 * Marker Height——高度
+
 * Marker Width——宽度
+
 * Background Color——Legend框背景色
-* Text Color——Legend文字颜色
+
+* Text Color——Legend数字颜色
+
 * Visibility——Legend边框是否可见
+
 * Color——Legend边框颜色
+
 * Thickness——Legend边框粗细
+
+* Visible——Legend标题是否可见
+
+* Text——Legend标题文本
+
+* Text Color——Legend标题文本颜色
+
+* Word Wrap——Legend标题文本换行
+
+  ![image-20220125085747730](https://s2.loli.net/2022/01/25/L2oZvtdngVzXFmS.png)
+
+  
 
 #### <5> Title
 
@@ -1824,75 +1905,6 @@ https://blog.csdn.net/MRX220518/article/details/76974808?spm=1001.2101.3001.6650
 
 
 
-
-#### 设定光滑曲线/折线
-
-```C#
-Series series = new Series("", ViewType.Spline);	//光滑
-```
-
-```C#
-Series series = new Series("", ViewType.line);		//折线
-```
-
-#### 设定坐标轴参数类型
-
-```C#
-series1.ArgumentScaleType = ScaleType.DateTime;		//X时间
-series1.ValueScaleType = ScaleType.Numerical;		//Y数值
-```
-
-#### 设置坐标轴原点数值
-
-```C#
-diagram.AxisX.WholeRange.SideMarginsValue = 1;          //X轴的原点从-1处开始
-```
-
-#### 设置坐标轴范围
-
-```C#
-diagram.AxisX.WholeRange.SetMinMaxValues(0, 100);		//X轴范围为0~100
-```
-
-#### 设置曲线显示小圆点
-
-```C#
-LineSeriesView view = (LineSeriesView)series.View;
-//view.MarkerVisibility = DevExpress.Utils.DefaultBoolean.True;
-```
-
-#### 设置曲线显示标签显示每个点的数值
-
-```C#
-series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;				   //显示数值标签
-series.Label.ResolveOverlappingMode = ResolveOverlappingMode.HideOverlapped;	//当2个及以上标签出现重叠时，隐藏重叠的标签
-series.Label.TextPattern = "{V:#.00}";
-```
-
-```C#
-series.Label.ResolveOverlappingMode = ResolveOverlappingMode.JustifyAllAroundPoint;	//重新布局所有数值标签的位置，令其分布在对应点周围
-```
-
-```C#
-series.Label.TextPattern = "{V:#.00}";		//#表示数值，#.00表示小数点后两位数字
-```
-
-#### 设置显示坐标轴所有标签
-
-```C#
-DevExpress.XtraCharts.XYDiagram diagram = ((DevExpress.XtraCharts.XYDiagram) chartControl1.Diagram);
-diagram.AxisX.QualitativeScaleOptions.AutoGrid = false;
-diagram.AxisX.Label.ResolveOverlappingOptions.AllowHide = false;
-```
-
-#### 坐标轴是时间
-
-```C#
-//X轴为时间的设置
-diagram.AxisX.Label.TextPattern = "{A:MMM, d (HH:mm)}";
-diagram.AxisX.DateTimeScaleOptions.MeasureUnit = DateTimeMeasureUnit.Hour;
-diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
-```
 
 
 

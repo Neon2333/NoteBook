@@ -1322,7 +1322,7 @@ func()
 
 ### （2）surface.blit()
 =======
-## 15. Pygame
+## 2. Pygame
 
 ### （1）pygame版本
 
@@ -1353,11 +1353,249 @@ surface.blit(source，dest=None，special_flags=0)
 
 
 
+---
+
+# MatPlotLib
+
+## 1. 安装
+
+pycharm——File——Settings
+
+![](https://s2.loli.net/2022/01/25/MGn3mFwi52hPN8L.png)
+
+
+
+## 2. 绘制折线图
+
+标题（文本，字体大小）、坐标轴标签（文本，字体大小）、横轴纵轴坐标
+
+```python
+import matplotlib.pyplot as plt
+x = range(1,101)				   ##区间[1,101)
+y = []
+for i in x:
+    y.append(i*i)
+plt.plot(x, y, linewidth = 3)		##plot指定横轴坐标、纵轴坐标、线宽。若不指定横轴坐标，默认x将从0开始计数
+plt.title("y=x^2", fontsize=24)		##图表标题，字体大小
+plt.xlabel("X", fontsize=14)		##横轴标签，字体大小
+plt.ylabel("Y", fontsize=14)		##纵轴标签，字体大小
+plt.tick_params(axis="both", labelsize=10)	##设置坐标轴刻度样式，坐标轴刻度字体大小
+plt.show()
+```
+
+## 3. 绘制折线图
+
+### （1）绘制单个点
+
+```python
+x = range(0, 101)
+for i in x:
+    plt.scatter(i, i*i, s=50)	##s表示点的大小
+plt.title("Square Numbers", fontsize=24)
+plt.xlabel("X", fontsize=10)
+plt.ylabel("Y", fontsize=10)
+plt.tick_params(axis="both", labelsize=10)
+plt.show()
+```
+
+### （2）以列表形式给出一系列点
+
+* scatter参数直接给出2个列表，绘制离散点时分别从2个列表中依次取出1个数值作为横、纵坐标
+
+  ```python
+  x = range(0, 101)
+  y = []
+  for i in x:
+      y.append(i**2)		##i^2
+  plt.scatter(x, y, s=50)
+  plt.show()
+  ```
+
+  ```python
+  x = range(0, 101)
+  y = [i**2 for i in x]	## 用一个列表的元素初始化另一个列表的元素
+  plt.scatter(x, y, s=50)	
+  plt.axis([0, 100, 0,11000])		## axis的4个参数分别指定X轴和Y轴的最小值、最大值
+  plt.show()
+  ```
+
+* 去掉小圆点的黑色边界
+
+  ```python
+  plt.scatter(x, y, edgecolor='none', s=50)
+  ```
+
+* 设定小圆点的颜色
+
+  参数c是一个包含3个分量的元祖，3个分量分别表示RGB，范围0~1，越接近0颜色越深
+
+  ```python
+  plt.scatter(x, y, c=(0.5, 0, 0.5), edgecolor='none', s=50)
+  ```
+
+* 颜色映射
+
+  颜色映射colormap代表一组渐变颜色，通常用颜色变化突出数据变化的规律。
+
+  ```python
+  x = range(0, 101)
+  y = [i**2 for i in x]
+  plt.scatter(x, y, c=y, cmap=plt.cm.Blues, edgecolors='none', s=50)
+  plt.axis([0, 100, 0,11000])
+  plt.show()
+
+![](https://s2.loli.net/2022/01/25/hlnMFgDEmi7Sxd6.png)
+
+* 保存图表
+
+  ```python
+  ##用于将Plt.show出来的图表保存，因此要先savefig在show；否则，代码阻塞在show处无法执行后续的savefig，而关闭show窗口后保存的则是空白
+  plt.savefig("scatterDemo.png", bbox_inches='tight')		##bbox_inches='tight'用于裁剪图表周围空白
+  ```
+
+  ```python
+  x = range(0, 101)
+  y = [i**2 for i in x]
+  plt.scatter(x, y, c=y, cmap=plt.cm.Blues, edgecolors='none', s=50)
+  plt.axis([0, 100, 0, 11000])
+  plt.savefig("scatterDemo.png", bbox_inches='tight')
+  plt.show()
+  ```
+
+## 4. 直方图
+
+https://blog.csdn.net/hohaizx/article/details/79101322
+
+```python
+data = numpy.random.randn(10000)
+plt.hist(data, bins=40, density=True, facecolor='blue', edgecolor='black', alpha=0.7)	
+plt.xlabel("gauss distribution", fontsize=20)
+plt.ylabel("value", fontsize=20)
+plt.show()
+```
+
+> data——数据集
+>
+> bins——长条形数量
+>
+> density——设为True表示显示频率直方图，否则是频数直方图（**normed参数已被新版本matplotlib弃用了**）
+
+![image-20220125171934322](https://s2.loli.net/2022/01/25/PEknyGhxaLFRpQf.png)
+
+
+
+## 5. 条形图
 
 
 
 
 
+## 6. 饼图
+
+
+
+## 7. 随机漫步
+
+```python
+## 随机漫步
+from random import choice
+
+class RandomWalk:
+    def __init__(self, totalPoints):
+        self.x_values = [0]
+        self.y_values = [0]
+        self.totalPoints = totalPoints
+
+    def fillWalk(self):
+        while len(self.x_values) < self.totalPoints:
+            xDir = choice([-1, 1])
+            xStepTemp = choice([0, 1, 2, 3, 4])
+            yDir = choice([-1, 1])
+            yStepTemp = choice([0, 1, 2, 3, 4])
+
+            xStep = xDir * xStepTemp
+            yStep = yDir * yStepTemp
+            if xStep == 0 and yStep == 0:
+                continue
+            xNext = self.x_values[-1] + xStep
+            yNext = self.y_values[-1] + yStep
+            self.x_values.append(xNext)
+            self.y_values.append(yNext)
+
+while True:
+    rw = RandomWalk(500)
+    rw.fillWalk()
+    plt.scatter(rw.x_values, rw.y_values, s=10)
+    plt.show()
+    flag = input("want another walk?(y/n)")
+    if flag == "n":
+        print("walk over..")
+        break
+```
+
+![image-20220125153659538](https://s2.loli.net/2022/01/25/9lhMqZ5GUcdFmbK.png)
+
+```python
+##隐藏坐标轴
+plt.axes().get_xaxis().set_visible(False)
+plt.axes().get_yaxis().set_visible(False)
+```
+
+```python
+##增加颜色映射
+plt.scatter(rw.x_values, rw.y_values, c=list(range(0, rw.totalPoints)), cmap=plt.cm.Blues, edgecolors='none', s=10)
+```
+
+![image-20220125160220895](https://s2.loli.net/2022/01/25/v9kcxIaK24m1S3M.png)
+
+```python
+## 突出起点和终点
+while True:
+    rw = RandomWalk(500)
+    rw.fillWalk()
+    plt.scatter(0, 0, c="green", edgecolors="none", s=100)	## 突出起点
+    plt.scatter(rw.x_values[-1], rw.y_values[-1], c="red", edgecolors="none", s=100)	## 突出终点
+    plt.scatter(rw.x_values, rw.y_values, c=list(range(0, rw.totalPoints)), cmap=plt.cm.Blues, edgecolors='none', s=10)
+    plt.show()
+    flag = input("want another walk?(y/n)")
+    if flag == "n":
+        print("walk over..")
+        break
+```
+
+![image-20220125160837632](https://s2.loli.net/2022/01/25/chXUFoNtBfTn48i.png)
+
+```python
+## 设置窗口大小、颜色
+while True:
+    rw = RandomWalk(500000)
+    rw.fillWalk()
+     plt.figure(dpi = 128, figsize=(10, 6), facecolor='red', edgecolor='yellow')		##dpi——窗口dpi，figsize——尺寸（单位：英寸）
+    plt.scatter(0, 0, c="green", edgecolors="none", s=100)
+    plt.scatter(rw.x_values[-1], rw.y_values[-1], c="red", edgecolors="none", s=100)
+    plt.scatter(rw.x_values, rw.y_values, c=list(range(0, rw.totalPoints)), cmap=plt.cm.Blues, edgecolors='none', s=1)
+    plt.show()
+    flag = input("want another walk?(y/n)")
+    if flag == "n":
+        print("walk over..")
+        break
+```
+
+> https://blog.csdn.net/black_shuang/article/details/81299200
+>
+> ```python
+> matplotlib.pyplot.figure(num=None, figsize=None, dpi=None, facecolor=None, edgecolor=None, frameon=True, FigureClass=<class 'matplotlib.figure.Figure'>, clear=False, **kwargs)
+> ```
+>
+> num——窗口身份标识
+>
+> figsize——窗口尺寸，英寸
+>
+> dpi——分辨率
+>
+> facecolor——窗口背景颜色（不是图表颜色）
+>
+> edgecolor——窗口边框颜色
 
 
 
