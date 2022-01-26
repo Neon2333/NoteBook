@@ -1363,9 +1363,7 @@ pycharm——File——Settings
 
 ![](https://s2.loli.net/2022/01/25/MGn3mFwi52hPN8L.png)
 
-
-
-## 2. 绘制折线图
+## 2. 绘制折线图——plot
 
 标题（文本，字体大小）、坐标轴标签（文本，字体大小）、横轴纵轴坐标
 
@@ -1383,7 +1381,7 @@ plt.tick_params(axis="both", labelsize=10)	##设置坐标轴刻度样式，坐�
 plt.show()
 ```
 
-## 3. 绘制折线图
+## 3. 绘制散点图——scatter
 
 ### （1）绘制单个点
 
@@ -1462,7 +1460,7 @@ plt.show()
   plt.show()
   ```
 
-## 4. 直方图
+## 4. 直方图——hist
 
 https://blog.csdn.net/hohaizx/article/details/79101322
 
@@ -1484,15 +1482,67 @@ plt.show()
 
 
 
-## 5. 条形图
+## 5. 饼图——pie
 
+```python
+size = [40, 40, 20]		##各个part所占比例
+explode = [0.1, 0, 0]	##part从整体中突出的程度
+color = ["red", "green", "blue"]	##各个part的颜色
+label = ["part1", "part2", "part3"]	##各个part的标签
 
+plt.pie(size, explode=explode, colors=color, labels=label, labeldistance=1.1, autopct="%1.1f%%", shadow=False, startangle=90, pctdistance=0.6)
+plt.axis("equal")	
+plt.legend()	##显示legend题注
+plt.show()
+```
 
+`pie`
 
+> labeldistance——外部的label距离圆心的距离（半径倍数）
+>
+> autopct——饼图内部文本的格式
+>
+> shadow——饼图阴影
+>
+> startangle——第一个part的起始角度
+>
+> pctdistance——饼图内文本距离圆心距离（半径倍数）
 
-## 6. 饼图
+## 6. 条形图——bar
 
+```python
+##条形图
+labels = ["2019", "2020", "2021", "2022"]
+num1 = [50, 100, 150, 200]
+num2 = [10, 100, 200, 300]
+a = [0, 1, 2, 3]
+##绘制
+rects1 = plt.bar(a, height=num1, width=0.4, alpha=0.8, color="red", label="department1")	##label是题注显示
+rects2 = plt.bar([i+0.4 for i in a], height=num2, width=0.4, alpha=0.8, color="blue", label="department2")
+##设置坐标轴
+plt.title("company")
+plt.xlabel("year")
+plt.xticks([index + 0.2 for index in a], labels)	##横轴坐标
+plt.ylabel("total count")
+plt.ylim(0, 400)	##纵轴取值范围
+plt.legend(loc="upper left")	
+##条形图上文本
+#for rect in rects1:
+#     height = rect.get_height()
+#     plt.text(rect.get_x(), rect.get_width()/2, height + 1, str(height), ha="center", va="bottom")
 
+plt.show()
+```
+
+```python
+matplotlib.pyplot.legend([“blue”, “green”], bbox_to_anchor=(0.75, 1.15), ncol=2)  
+```
+
+> bbox_to_anchor——题注的坐标
+>
+> loc——题注位置
+>
+> ncol——题注列数
 
 ## 7. 随机漫步
 
@@ -1596,6 +1646,56 @@ while True:
 > facecolor——窗口背景颜色（不是图表颜色）
 >
 > edgecolor——窗口边框颜色
+
+## 8. 数据文件
+
+### （1）CSV文件
+
+CSV（逗号分隔值文件），其文件以纯文本形式存储表格数据，内容是字符序列不含像二进制数据那样需要被解读的数据。CSV文件由任意数目的记录组成，**记录间以某种换行符分**隔；每条记录由字段组成，**字段间的分隔符是**其它字符或字符串，最常见的是**逗号或制表符**。
+
+### （2）显示CSV文件
+
+```python
+import csv
+from datetime import datetime
+filename = 'C:\\Users\\eivision\\Desktop\\222.csv'	
+with open(filename) as f:	##打开文件作为文件对象f
+    reader = csv.reader(f)	##创建和文件对象f关联的阅读器对象
+    header_row = next(reader)	##next返回文件一行，并指向下一行
+    for index, colIndex in enumerate(header_row):
+        print(index, colIndex)
+
+    date = []
+    temperature = []
+    for row in reader:	##因为上面用next，所以这里从第2行开始
+        # curDate = datetime.strptime(row[0], "%Y/%m/%d")
+        # date.append(curDate)
+        date.append(row[0])
+        temperature.append(int(row[1]))		##将纵坐标转为int类型，否则为字符串的话纵坐标将不按照顺序
+    fig = plt.figure(dpi=128, figsize=(10, 6))	##窗口设置
+    plt.plot(date, temperature, c="green")
+    plt.title("csv graph", fontsize=24)
+    plt.xlabel("date", fontsize=10)
+    plt.ylabel("temperature ℃", fontsize=10)
+    plt.ylim(0, 40)
+    plt.tick_params(axis="both", which="major", labelsize=16)	##坐标轴设置
+    fig.autofmt_xdate()		##让x轴的标签斜着排，不会互相遮挡
+    plt.show()
+    print(temperature)
+    print(date)
+```
+
+> enumerate——将一个可遍历的数据对象(如列表、元组或字符串)组合为一个索引序列，**同时列出数据和数据下标**
+>
+> ```python
+> seasons = ['Spring', 'Summer', 'Fall', 'Winter']
+> list(enumerate(seasons))
+> >>> [(0, 'Spring'), (1, 'Summer'), (2, 'Fall'), (3, 'Winter')]
+> list(enumerate(seasons, start=1))       # 下标从 1 开始
+> >>> [(1, 'Spring'), (2, 'Summer'), (3, 'Fall'), (4, 'Winter')]
+> ```
+>
+> 
 
 
 
