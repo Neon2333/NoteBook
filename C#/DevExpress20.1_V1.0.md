@@ -1575,16 +1575,16 @@ https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.Value
 ### 步骤
 
 * 创建一个series，添加到chartControl中
-
 * 一个chartControl中可添加好几个series
-
 * chartControl.DataSource可绑定数据源，series.DataSource也可以绑定数据源，**当series设定了数据源后chartControl绑定的数据源就被屏蔽。**优先级：series.DataSource > chartControl.DataSource
 
-  
+### （1）概念
 
-### （1）范例
+​	https://www.cnblogs.com/DamonOnly/p/3668005.html
 
-#### <1> 折线图
+这个控件包含3层，**最外面的chartControl层、中间的XYDiagram层、最里面的Series层。**功能非常强大，但同时使用起来也相对复杂，需要各个层之间相互协调设置才能达到自己想要的效果。
+
+### （2）折线图
 
 https://blog.csdn.net/MRX220518/article/details/76974808?spm=1001.2101.3001.6650.11&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-11.pc_relevant_paycolumn_v3&utm_relevant_index=16
 
@@ -1657,7 +1657,130 @@ diagram.AxisX.DateTimeScaleOptions.MeasureUnit = DateTimeMeasureUnit.Hour;
 diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
 ```
 
-### （2）设计器
+#### 绑定数据源
+
+**官方文档**
+
+```C#
+            // Create a line series, bind it to data and add to the chart.
+            Series series = new Series("", ViewType.Line);
+            series.DataSource = CreateChartData(500);
+            this.chartControl_line.Series.Add(series);
+
+            series.ArgumentScaleType = ScaleType.Numerical;
+            series.ArgumentDataMember = "Argument";
+            series.ValueScaleType = ScaleType.Numerical;
+            series.ValueDataMembers.AddRange(new string[] { "Value" });
+
+            // 显示小圆点
+            LineSeriesView view = (LineSeriesView)series.View;
+            //view.MarkerVisibility = DevExpress.Utils.DefaultBoolean.True;
+
+            //显示每个小圆点的数值
+            //series.LabelsVisibility = DevExpress.Utils.DefaultBoolean.True;
+            series.Label.ResolveOverlappingMode = ResolveOverlappingMode.HideOverlapped;
+            series.Label.TextPattern = "{V:#.00}";
+
+            // Create a chart title.
+            ChartTitle chartTitle = new ChartTitle();
+            chartTitle.Text = "当前重量变化曲线";
+            chartControl_line.Titles.Add(chartTitle);
+
+            // Customize axes.
+            XYDiagram diagram = chartControl_line.Diagram as XYDiagram;   //as强转关键字，失败时不会引发异常而是返回NULL
+            diagram.AxisX.WholeRange.SetMinMaxValues(0, 100);
+            diagram.AxisX.WholeRange.SideMarginsValue = 1;          //X轴的原点从-1处开始
+            diagram.AxisY.WholeRange.AlwaysShowZeroLevel = false;
+            diagram.AxisY.WholeRange.SetMinMaxValues(0, 20);
+
+            diagram.EnableAxisXScrolling = true;
+            diagram.EnableAxisYScrolling = true;
+            diagram.EnableAxisXZooming = true;
+            X轴为时间的设置
+            diagram.AxisX.Label.TextPattern = "{A:MMM, d (HH:mm)}";
+            diagram.AxisX.DateTimeScaleOptions.MeasureUnit = DateTimeMeasureUnit.Hour;
+            diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
+
+            ((XYDiagram)chartControl_line.Diagram).AxisY.Visibility = DevExpress.Utils.DefaultBoolean.False;
+            chartControl_line.Legend.Visibility = DevExpress.Utils.DefaultBoolean.False;
+
+            this.chartControl_line.Series[0].DataSource = CreateChartData(50);
+            this.chartControl_line.Series[0].ArgumentScaleType = ScaleType.Numerical;
+            this.chartControl_line.Series[0].ArgumentDataMember = "Argument";
+            this.chartControl_line.Series[0].ValueScaleType = ScaleType.Numerical;
+            this.chartControl_line.Series[0].ValueDataMembers.AddRange(new string[] { "Value" });
+
+private DataTable CreateChartData(){
+     DataTable table = new DataTable("Table1");
+
+            // Add two columns to the table.
+            table.Columns.Add("Argument", typeof(Int32));
+            table.Columns.Add("Value", typeof(Int32));
+
+            // Add data rows to the table.
+            Random rnd = new Random();
+            DataRow row = null;
+            for (int i = 0; i < rowCount; i++) {
+                row = table.NewRow();
+                row["Argument"] = i;
+                row["Value"] = rnd.Next(100);
+                table.Rows.Add(row);
+            }
+	return table;
+}
+```
+
+**通过绑定datatable自己生成曲线**
+
+```C#
+//Series[0]访问第一个Series，Series的DataSource优先级高于ChartControl的DataSource
+this.chartControl_line.Series[0].DataSource = CreateChartData(50);		//绑定Datatable
+this.chartControl_line.Series[0].ArgumentScaleType = ScaleType.Numerical;	//设定Argument的类型
+this.chartControl_line.Series[0].ArgumentDataMember = "Argument";		//设定Argument的字段名
+this.chartControl_line.Series[0].ValueScaleType = ScaleType.Numerical;	//设定Value的类型
+this.chartControl_line.Series[0].ValueDataMembers.AddRange(new string[] { "Value" });	
+```
+
+**通过向Series上手动添加点Point生成曲线**
+
+```C#
+ DataTable dt = CreateChartData(50);
+            SeriesPoint point = null;
+            foreach (DataRow row in dt.Rows)
+            {
+                if (row["Argument"] != null)	//字段名Argument
+                {
+                    point = new SeriesPoint(row["Argument"].ToString());
+                    double[] vals = { Convert.ToDouble(row["Value"]) };		//字段名Value
+                    point.Values = vals;
+                    this.chartControl_line.Series[0].Points.Add(point);
+                }
+            }
+```
+
+
+
+
+
+### （4）Series类型为Line的设计器
+
+#### 组成
+
+> Series——可包含多个Series（Line、Pie等）
+>
+> XY-Diagram——坐标轴
+>
+> > Pane
+> >
+> > AxisX
+> >
+> > AxisY
+>
+> Legend
+>
+> Title
+
+
 
 #### <1> Chart
 
@@ -1842,7 +1965,20 @@ diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
 >
 > Thickness——坐标轴粗细
 
-#### <4> Legend
+#### <4> AxisX/AxisY
+
+![image-20220127134617130](https://s2.loli.net/2022/01/27/LS6N83M4jwFWGv2.png)
+
+```python
+## 只有设为Auto时代码设定的坐标轴范围和起点才能生效
+XYDiagram lineDiagram = (XYDiagram)chartControl_line.Diagram;
+lineDiagram.AxisX.WholeRange.SetMinMaxValues(0, 200);
+lineDiagram.AxisX.WholeRange.SideMarginsValue = 1;
+lineDiagram.AxisY.WholeRange.SetMinMaxValues(0, 20);
+lineDiagram.AxisY.WholeRange.SideMarginsValue = 1;
+```
+
+#### <5> Legend
 
 ![image-20220124173012481](https://s2.loli.net/2022/01/24/hM7DnpoX8LIEO9x.png)
 
@@ -1899,6 +2035,8 @@ diagram.AxisX.DateTimeScaleOptions.GridSpacing = 1;
 * 多行标题
 
   ![image-20220124171818985](https://s2.loli.net/2022/01/24/VgkQZfKyU5znGL7.png)
+
+### （5）Series类型为Pie的设计器
 
 
 
