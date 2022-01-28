@@ -1758,11 +1758,7 @@ this.chartControl_line.Series[0].ValueDataMembers.AddRange(new string[] { "Value
             }
 ```
 
-
-
-
-
-### （4）Series类型为Line的设计器
+### （3）设计器
 
 #### 组成
 
@@ -1779,8 +1775,6 @@ this.chartControl_line.Series[0].ValueDataMembers.AddRange(new string[] { "Value
 > Legend
 >
 > Title
-
-
 
 #### <1> Chart
 
@@ -2035,20 +2029,6 @@ lineDiagram.AxisY.WholeRange.SideMarginsValue = 1;
 * 多行标题
 
   ![image-20220124171818985](https://s2.loli.net/2022/01/24/VgkQZfKyU5znGL7.png)
-
-### （5）Series类型为Pie的设计器
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
