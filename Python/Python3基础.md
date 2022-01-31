@@ -687,7 +687,6 @@ msg = input(msgHelp)
   	print("this num is bigger than 10")
   ```
 
-
 ---
 
 ## 9. while循环
@@ -719,7 +718,6 @@ for循环用于遍历
       remove("cat")	## remove只删除第一个指定的元素值
   print(pets)
   ```
-
 
 
 
@@ -1388,7 +1386,7 @@ plt.show()
 ```python
 x = range(0, 101)
 for i in x:
-    plt.scatter(i, i*i, s=50)	##s表示点的大小
+    plt.scatter(i, i**2, s=50)	##s表示点的大小
 plt.title("Square Numbers", fontsize=24)
 plt.xlabel("X", fontsize=10)
 plt.ylabel("Y", fontsize=10)
@@ -1413,7 +1411,7 @@ plt.show()
   x = range(0, 101)
   y = [i**2 for i in x]	## 用一个列表的元素初始化另一个列表的元素
   plt.scatter(x, y, s=50)	
-  plt.axis([0, 100, 0,11000])		## axis的4个参数分别指定X轴和Y轴的最小值、最大值
+  plt.axis([0, 100, 0, 11000])		## axis的4个参数分别指定X轴和Y轴的最小值、最大值
   plt.show()
   ```
 
@@ -1441,6 +1439,7 @@ plt.show()
   plt.scatter(x, y, c=y, cmap=plt.cm.Blues, edgecolors='none', s=50)
   plt.axis([0, 100, 0,11000])
   plt.show()
+  ```
 
 ![](https://s2.loli.net/2022/01/25/hlnMFgDEmi7Sxd6.png)
 
