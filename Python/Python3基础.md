@@ -1516,8 +1516,8 @@ num1 = [50, 100, 150, 200]
 num2 = [10, 100, 200, 300]
 a = [0, 1, 2, 3]
 ##绘制
-rects1 = plt.bar(a, height=num1, width=0.4, alpha=0.8, color="red", label="department1")	##label是题注显示
-rects2 = plt.bar([i+0.4 for i in a], height=num2, width=0.4, alpha=0.8, color="blue", label="department2")
+rects1 = plt.bar(a, height=num1, width=0.4, alpha=0.8, color="red", label="department1")	##label是题注显示。画bar时，a的坐标表示竖条的中心点横坐标
+rects2 = plt.bar([i + 0.4 for i in a], height=num2, width=0.4, alpha=0.8, color="blue", label="department2")
 ##设置坐标轴
 plt.title("company")
 plt.xlabel("year")
@@ -1529,12 +1529,11 @@ plt.legend(loc="upper left")
 #for rect in rects1:
 #     height = rect.get_height()
 #     plt.text(rect.get_x(), rect.get_width()/2, height + 1, str(height), ha="center", va="bottom")
-
 plt.show()
 ```
 
 ```python
-matplotlib.pyplot.legend([“blue”, “green”], bbox_to_anchor=(0.75, 1.15), ncol=2)  
+plt.legend([“blue”, “green”], bbox_to_anchor=(0.75, 1.15), ncol=2)  
 ```
 
 > bbox_to_anchor——题注的坐标
@@ -1677,7 +1676,7 @@ with open(filename) as f:	##打开文件作为文件对象f
     plt.xlabel("date", fontsize=10)
     plt.ylabel("temperature ℃", fontsize=10)
     plt.ylim(0, 40)
-    plt.tick_params(axis="both", which="major", labelsize=16)	##坐标轴设置
+    plt.tick_params(axis="both", which="major", labelsize=16)	##坐标轴刻度设置
     fig.autofmt_xdate()		##让x轴的标签斜着排，不会互相遮挡
     plt.show()
     print(temperature)
