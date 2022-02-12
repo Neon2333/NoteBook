@@ -437,7 +437,7 @@ else:
 ### （2）访问key和value
 
 ```python
-ll = ['color':blue, 'price':10]
+ll = {'color':blue, 'price':10}
 print(ll['color'])
 print(ll['price'])
 ```
@@ -1310,7 +1310,7 @@ func()
 ---
 
 <<<<<<< Updated upstream
-#  pygame
+#  游戏制作库——pygame库
 
 ## 1. 常用函数
 
@@ -1353,13 +1353,17 @@ surface.blit(source，dest=None，special_flags=0)
 
 ---
 
-# MatPlotLib
+# 数据可视化库——MatPlotLib库
 
 ## 1. 安装
 
 pycharm——File——Settings
 
 ![](https://s2.loli.net/2022/01/25/MGn3mFwi52hPN8L.png)
+
+
+
+---
 
 ## 2. 绘制折线图——plot
 
@@ -1378,6 +1382,10 @@ plt.ylabel("Y", fontsize=14)		##纵轴标签，字体大小
 plt.tick_params(axis="both", labelsize=10)	##设置坐标轴刻度样式，坐标轴刻度字体大小
 plt.show()
 ```
+
+
+
+---
 
 ## 3. 绘制散点图——scatter
 
@@ -1459,6 +1467,10 @@ plt.show()
   plt.show()
   ```
 
+
+
+---
+
 ## 4. 直方图——hist
 
 https://blog.csdn.net/hohaizx/article/details/79101322
@@ -1480,6 +1492,10 @@ plt.show()
 ![image-20220125171934322](https://s2.loli.net/2022/01/25/PEknyGhxaLFRpQf.png)
 
 
+
+
+
+---
 
 ## 5. 饼图——pie
 
@@ -1506,6 +1522,10 @@ plt.show()
 > startangle——第一个part的起始角度
 >
 > pctdistance——饼图内文本距离圆心距离（半径倍数）
+
+
+
+---
 
 ## 6. 条形图——bar
 
@@ -1541,6 +1561,10 @@ plt.legend([“blue”, “green”], bbox_to_anchor=(0.75, 1.15), ncol=2)
 > loc——题注位置
 >
 > ncol——题注列数
+
+
+
+---
 
 ## 7. 随机漫步
 
@@ -1645,13 +1669,26 @@ while True:
 >
 > edgecolor——窗口边框颜色
 
-## 8. 数据文件
+
+
+---
+
+## 8. CSV文件数据可视化
 
 ### （1）CSV文件
 
 CSV（逗号分隔值文件），其文件以纯文本形式存储表格数据，内容是字符序列不含像二进制数据那样需要被解读的数据。CSV文件由任意数目的记录组成，**记录间以某种换行符分**隔；每条记录由字段组成，**字段间的分隔符是**其它字符或字符串，最常见的是**逗号或制表符**。
 
 ### （2）显示CSV文件
+
+```python
+import csv
+```
+
+```python
+with open(filepath) as f:
+    ...
+```
 
 ```python
 import csv
@@ -1694,6 +1731,161 @@ with open(filename) as f:	##打开文件作为文件对象f
 > ```
 >
 > 
+
+### （3）从CSV中读取时间
+
+将从CSV文件中读取的字符串转成指定格式的**日期**对象
+
+```python
+from datetime import datetime
+cur_date = '2014-07-07'
+current_date = datetime.strptime(cur_date, '%Y-%m-%d')
+```
+
+### （4）着色填充min-max之间曲线
+
+```python
+matplotlib.pyplot.fill_between(X, Yh, Yl, facecolor ,alpha)
+```
+
+> X——横坐标向量
+>
+> Yh——纵坐标最大值向量
+>
+> Yl——纵坐标最小值向量
+>
+> facecolor——填充曲线中间区域的颜色
+>
+> alpha——颜色透明度
+
+### （5）CSV文件中数据缺失使用异常处理
+
+若row[0]、row[1]、row[2]中有数据不存在，则捕获到valueError
+
+```python
+try:
+	current_date = datetime.strptime(row[0], "%Y-%m-%d")
+	high = int(row[1])
+	low = int(row[3])
+except ValueError:
+	print(current_date, 'missing data')
+else:
+	dates.append(current_date)
+	highs.append(high)
+	lows.append(low)
+```
+
+
+
+---
+
+# 数据可视化库——pygal库
+
+##  1. JSON文件数据可视化
+
+python操作json文件通过了两种方法：load()：用于读取json文件；dump()：用于写入json文件 
+
+```python
+# 读取json文件内容,返回字典格式
+with open('./source_file/info.json','r',encoding='utf8')as fp:
+    json_data = json.load(fp)
+    print('这是文件中的json数据：',json_data)
+    print('这是读取到文件数据的数据类型：', type(json_data))
+```
+
+```python
+# 将字典数据写入到json文件中
+dict1 = {'name': '张三', 'age': 18, 'sex': '男'}
+with open('./source_file/info.json','a',encoding='utf8')as fp:
+    json.dump(dict1,fp,ensure_ascii=False)　　
+ #  如果ensure_ascii ' '为false，则返回值可以包含非ascii值
+```
+
+
+
+## 2. WebAPI
+
+#### Github网站API
+
+```python
+# 调用GitHub的WebAPI获取数据
+import requests
+
+url = 'https://api.github.com/search/repositories?q=language:python&sort=stars'
+r = requests.get(url)
+print("status code = ", r.status_code)  # 状态码
+
+response_dict = r.json()    # 返回结果（json），通过json()转化为字典
+print("total repositories = ", response_dict['total_count'])    # 所有仓库数
+
+repos = response_dict['items'] # 返回字典的列表
+print('returned repositories = ', len(repos))   # 返回的仓库数
+
+repo_first = repos[0]   # 第一个仓库（字典）
+print(repo_first)
+print('repo_first_len = ', len(repo_first))     # 第一个仓库中Key的个数
+for key in sorted(repo_first.keys()):
+    print(key)      # 打印第一个仓库的每个key
+
+# 输出第一个仓库的一些基本信息
+print('name of first repo = ', repo_first['name'])
+print("owner of first repo = ", repo_first['owner']['login']) # repo_first['owner']仍然是字典
+print('starts = ', repo_first['stargazers_count'])
+print('created_date = ', repo_first['created_at'])
+print('repository = ', repo_first['html_url'])
+print('updated_date = ', repo_first['updated_at'])
+print('description = ', repo_first['description'])
+
+# 使用pygal可视化上述获取所有仓库信息
+import pygal
+from pygal.style import LightColorizedStyle as LCS, LightenStyle as LS
+
+repo_names = []
+repo_stars = []
+for repo in repos:
+    repo_names.append(repo['name'])
+    repo_star = {'value': repo['stargazers_count'],
+                 'label': repo['description'],
+                 'xlink': repo['html_url']
+                 }   
+    # value作为纵坐标值，label是鼠标移动到bar时的工具提示，xlink用于给各个bar添加可点击的链接
+    repo_stars.append(repo_star)
+
+my_style = LS('#333366', base_style=LCS)    # 样式
+my_config = pygal.Config()          # 参数
+my_config.x_label_rotation = 45     # 横轴label旋转45度
+my_config.show_legend = True        # 图表左上方的图例是否显示
+my_config.title_font_size = 24      # 标题字体大小
+my_config.label_font_size = 14      # 副标签字体大小
+my_config.major_label_font_size = 18    # 主标签字体大小（）
+my_config.truncate_label = 15       # 标签字符较长时缩短到15个字符
+my_config.show_y_guides = False     # 不显示水平虚线
+my_config.width = 1000              # 自定义图表在浏览器中显示的宽度
+
+chart = pygal.Bar(my_config, style = my_style)
+chart.title = 'projects on github sorted by stars'  # 标题
+chart.x_labels = repo_names
+chart.add('各项目的star数', repo_stars)
+chart.render_to_file('C:\\Users\\25224\\Desktop\\github_repos.svg')     # 导出到svg文件，浏览器打开
+```
+
+> requests库解析网站数据，返回数据是json，通过json()转化为字典
+>
+> 纵轴数据源repo_stars是字典的列表，字典有3个key
+>
+> > value——bar的纵轴值
+> >
+> > label——鼠标移动到bar上时的描述
+> >
+> > xlink——鼠标单击时跳转的url
+
+#### [BiliBili网站API](https://pypi.org/project/bilibili-api/#description)
+
+
+
+
+
+
 
 
 
