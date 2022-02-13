@@ -1374,7 +1374,7 @@ import matplotlib.pyplot as plt
 x = range(1,101)				   ##区间[1,101)
 y = []
 for i in x:
-    y.append(i*i)
+    y.append(i**2)
 plt.plot(x, y, linewidth = 3)		##plot指定横轴坐标、纵轴坐标、线宽。若不指定横轴坐标，默认x将从0开始计数
 plt.title("y=x^2", fontsize=24)		##图表标题，字体大小
 plt.xlabel("X", fontsize=14)		##横轴标签，字体大小
@@ -1445,7 +1445,7 @@ plt.show()
   x = range(0, 101)
   y = [i**2 for i in x]
   plt.scatter(x, y, c=y, cmap=plt.cm.Blues, edgecolors='none', s=50)
-  plt.axis([0, 100, 0,11000])
+  plt.axis([0, 100, 0, 11000])
   plt.show()
   ```
 
