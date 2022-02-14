@@ -1305,6 +1305,31 @@ func()
 
 ```
 
+---
+
+## 15. lambda
+
+定义匿名函数
+
+```python
+g = lambda x:2*x+10
+g(10)
+```
+
+```python
+lambda x:2*x+10(10)
+```
+
+> ​		lambda 定义了一个匿名函数
+>
+> 　　lambda 并不会带来程序运行效率的提高，只会使代码更简洁。
+>
+> 　　如果可以使用for...in...if来完成的，坚决不用lambda。
+>
+> 　　如果使用lambda，lambda内不要包含循环，如果有，我宁愿定义函数来完成，使代码获得可重用性和更好的可读性。
+
+
+
 
 
 ---
@@ -1536,7 +1561,7 @@ num1 = [50, 100, 150, 200]
 num2 = [10, 100, 200, 300]
 a = [0, 1, 2, 3]
 ##绘制
-rects1 = plt.bar(a, height=num1, width=0.4, alpha=0.8, color="red", label="department1")	##label是题注显示。画bar时，a的坐标表示竖条的中心点横坐标
+rects1 = plt.bar(a, height=num1, width=0.4, alpha=0.8, color="red", edgecolor = 'blue', label="department1")	##label是题注显示。画bar时，a的坐标表示竖条的中心点横坐标
 rects2 = plt.bar([i + 0.4 for i in a], height=num2, width=0.4, alpha=0.8, color="blue", label="department2")
 ##设置坐标轴
 plt.title("company")
