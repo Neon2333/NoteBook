@@ -18,8 +18,6 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
 
 ## 2. 创建和使用线程
 
-
-
 ### Thread类
 
 * 使用Thread类通过**ThreadStart**（**不给子线程传参数**，无返回值）或**ParameterizedThreadStart**（**给子线程传一个输入参数**，无返回值）类型的委托创建一个Thread对象，开启一个新线程，执行委托传递的回调函数。
@@ -32,7 +30,23 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
 
 * Thread创建的线程是**前台线程**，可通过**IsBackGround**设置是前台线程还是后台线程。通过**Priority**设置优先级。
 
+* Thread.Name——设定线程名，这意味着每个线程可以设定一个Name属性来标志它们。线程的Name属性默认情况下是null。**该值只能被赋值一次**, 如果已经赋值一次的情况下再次赋值, 将抛出InvalidOperationException异常。这种设计应该是为了保证线程的名字不被改变而安排的。
+
 * 如需中止线程，调用**Abort()**方法，在调用该方法的线程上抛出**ThreadAbortException**异常，以结束该线程。**线程内部**可以通过try catch捕获该异常，在catch模块中进行一些必要的处理，如释放持有的锁和文件资源等。但是通常来说，应当慎重使用Abort()方法，如果在当前线程中抛出该异常，其结果是可预测的，但是对于其他线程，它会中断任何正在执行的代码，有可能中断静态对象的生成，造成不可预测的结果。
+
+* 线程太多，未控制好导致线程无法回收，随着时间流逝积累的线程越来越多
+
+  > ```C#
+  > //获取当前进程的所有线程，并查看某一指定线程的状态或运行时间
+  > Process current = Process.GetCurrentProcess();
+  > ProcessThreadCollection allThreads = current.Threads;
+  > //通过创建线程时的Name获得线程的信息，因此需要用ID获取Name
+  > string threadID = Thread.CurrentThread.ManagedThreadId.ToString();
+  > ```
+  >
+  > **方案：**
+  >
+  > 定义一个全局的map，其中以线程i的为key，线程名称为value，每次新线程启动就保存进去，线程结束就删除，这样就可以根据名称确认是不是你的目标线程了。
 
   ```C#
    public static void CallToChildThread1(){
@@ -51,11 +65,11 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
   	finally{
                   Console.WriteLine("finish something");
   	}
-	}
+  }
   
-	 public static void CallToChildThread2(object arg){
+   public static void CallToChildThread2(object arg){
   	try{
-	              	Console.WriteLine("Child thread starts");
+                	Console.WriteLine("Child thread starts");
                   Console.WriteLine(arg);
                   Console.WriteLine("Child Thread Completed");
       }
@@ -70,6 +84,7 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
   //使用ThreadStart创建
   Thread thread1 = new Thread(new ThreadStart(CallToChildThread1));
   thread1.IsBackGround=true;	//设未后台线程
+  thread1.Name = "thread1";	//设置线程名
   thread1.Start();	//启动线程，无参数传入回调
   thread1.join();	//阻塞主线程直到thread1执行完
   thread1.sleep(1000);	//thread1休眠1000ms
@@ -80,9 +95,9 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
   Thread parameterizedThread = new Thread(new ParameterizedThreadStart(CallToChildThread2));
   parameterizedThread.Start("test");	//将参数传递给CallToChildThread2
   ```
-  
+
   * 属性
-  
+
     > CurrentThread：获取当前正在运行的线程
     >
     > **ThreadState**：获取一个值，该值包含当前线程的状态
@@ -98,7 +113,7 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
     > ManagedThreadId：获取当前托管线程的唯一标识符
     
   * 成员方法
-  
+
     > **public void Abort()**：调用此方法的线程上引发 ThreadAbortException，以开始终止此线程的过程
     >
     > **public void Join()**：阻塞调用线程，直到某个线程终止为止。有不同的重载形式

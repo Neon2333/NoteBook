@@ -491,7 +491,7 @@ UPDATE tb_name SET `field_name` = newVal;
 //显示某个字段
 SELECT `field_name1` FROM tb_name; 
 //复制表中记录（其中，字段1的值不是表中的，其他字段是从表中查询得到的）
-insert into table(字段1,字段2,字段3,...) select 自定义的值 as 字段1,字段2,字段3,... from table where....;
+insert into tablename (字段1,字段2,字段3,...) select 自定义的值 as 字段1,字段2,字段3,... from tablename where....;
 ```
 
 * MODIFY和CHANGE的区别：

@@ -2832,6 +2832,12 @@ https://www.cnblogs.com/wuhuacong/p/8796898.html
 
 
 
+## 2. sqlDataSource绑定数据库
+
+https://blog.csdn.net/f1121814098/article/details/77822237?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&utm_relevant_index=10
+
+对数据源进行了重新封装产生了只读数据源SqlDataSource，使用它来提供对DevExpress.XtraGrid.GridControl，DevExpress.XtraTreeList.TreeList，DevExpress.XtraCharts.ChartControl或可以通过数据源配置向导配置的任何其他DevExpress控件的数据库访问。
+
 
 
 
