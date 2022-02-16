@@ -1,6 +1,16 @@
-# [官网文档](https://matplotlib.org/stable/tutorials/)
+# 官网文档](https://matplotlib.org/stable/tutorials/)
+
+![image-20220216091645530](https://s2.loli.net/2022/02/16/Lvu1N8Ik7in34s2.png)
 
 # 1. matplotlib绘图的组成元素
+
+https://zhuanlan.zhihu.com/p/231994155
+
+![image-20220216090236653](https://s2.loli.net/2022/02/16/XTMRE4awAvjzZtS.png)
+
+
+
+![image-20220216090311314](https://s2.loli.net/2022/02/16/7i9CwFNBE8yp5kI.png)
 
 ### figure——窗口（画布）
 
@@ -53,19 +63,19 @@ plt.plot(x,y,ls="-.",lw=2,c="c",label="plot figure")
 >
 > c——颜色
 >
-> label——该曲线的标签（显示在legend中）
+> **label——该曲线的标签（显示在legend中），若在legend中指定了labels，该label会被覆盖。**
 
 ### legend——**图例**
 
 先plot()后legend()
 
 ```python 
-plt.legend(wedges, labels, loc = 'best', bbox_to_anchor = (num1, num2), ncol = 2,title = '图例标题', edgecolor = 'black', facecolor = 'pink')
+plt.legend(wedges, labels, loc = 'best', bbox_to_anchor = (num1, num2, num3, num4), ncol = 2, title = '图例标题', edgecolor = 'black', facecolor = 'pink', shadow = True, fancybox = True)
 ```
 
 > **wedges——饼片实例列表。就可以将饼片外部的文本标签放在图例中，而饼片的数值标签仍然放在饼片内部**
 >
-> **labels——文本标签。若缺省则显示pie等绘图函数中的labels。**
+> **labels——文本标签。若缺省则显示pie等绘图函数中的labels，优先级大于plot中的label。**
 >
 > > 可用matplotlib自带TeX功能实现对数学表达式的编辑
 > >
@@ -114,7 +124,13 @@ plt.grid(True, which = 'major', axis = 'both',ls = ':', lw = 1, c = 'y')
 >
 > axis——以哪个坐标轴的刻度生成网格
 
-### 注释文本
+### marker——点的形状
+
+```python
+plt.plot(x, y, color='r', marker='o', linestyle='dashed')		## 点形状为圆圈标记circle marker
+```
+
+### text——注释文本
 
 在图形的指定位置添加文本，用于对图形进行说明
 
@@ -126,7 +142,7 @@ plt.text(2.8, 0.3, s= 'sin(x)', weight = 'bold', color = 'blue')
 
 ```python
 from pylab import *
-plt.annotate(text ="(0,1)", xy = (0,1), xytext = (1,1.5), weight = 'bold', color = 'red', arrowprops = dict(arrowstyle = '-|>', color = 'black', connectionstyle = 'arc3, rad = 0.5'), bbox=dict(boxstyle='round,pad=0.5', fc='yellow', ec='k',lw=1 ,alpha=0.4))
+plt.annotate(text ="(0,1)", xy = (0,1), xytext = (1,1.5), weight = 'bold', color = 'red', arrowprops = dict(arrowstyle = '-|>', color = 'black', connectionstyle = 'arc3, rad = 0.5'), bbox=dict(boxstyle='round,pad=0.5', facecolor='yellow', edgecolor='k', lw=1, alpha=0.4))
 ```
 
 > * xy——箭头起点坐标
@@ -135,22 +151,20 @@ plt.annotate(text ="(0,1)", xy = (0,1), xytext = (1,1.5), weight = 'bold', color
 >
 > * annotate中最重要的控制，全部由**arrowprops**这个变量完成，它是一个字典类型，可以控制箭头的诸多属性
 >
-> * bbox——text的bbox属性，注释文本外框
+> * bbox——text的bbox属性，注释文本的外框
 >
->   
->
-> * connectionstyle——弯曲箭头arc3、angle3
+>   * connectionstyle——弯曲箭头arc3、angle3
 >
 >   ```python
->   connectionstyle = 'arc3, rad = 0.5'
+>  connectionstyle = 'arc3, rad = 0.5'
 >   ```
->
+> 
 >   ![preview](https://s2.loli.net/2022/02/13/fqDcKE9NbenaBoP.png)
 >
 >   ```python
->   connectionstyle = 'angle3, angleA=-90,angleB=0'
+>  connectionstyle = 'angle3, angleA=-90,angleB=0'
 >   ```
->
+> 
 >   ![preview](https://s2.loli.net/2022/02/13/pMTfaXEHFLDZYur.png)
 
 ### [axhline](https://matplotlib.org/stable/api/_as_gen/matplotlib.axes.Axes.axhline.html)——水平参考线
@@ -184,6 +198,154 @@ axvspan(xmin, xmax, ymin, ymax, color, alpha)	##竖直矩形的xmin和xmax不能
 ### 颜色代码
 
 ![img](https://s2.loli.net/2022/02/15/cbfGKRd2vDBWq9w.png)
+
+### [填充区域](https://blog.csdn.net/HHG20171226/article/details/101650909?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_paycolumn_v3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_paycolumn_v3&utm_relevant_index=10)
+
+#### fill
+
+和plot功能类似，可绘图
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+x = np.linspace(0, 5 * np.pi, 1000)
+y1 = np.sin(x)
+y2 = np.sin(2 * x)
+
+plt.fill(x, y1, color = 'darkorange', alpha = 0.4, label="$ y = sin(x) $")
+plt.fill(x, y2, color = 'violet', alpha = 0.4, label="$ y = sin(2x) $")
+
+plt.legend(loc='best')
+plt.show()
+```
+
+![image-20220216143314887](https://s2.loli.net/2022/02/16/qcCAV29UbRxZTM1.png)
+
+#### fill_between
+
+作用是填充两条水平曲线`y=f(x)`之间的区域
+
+**简单的填充所围区域：x规定横轴范围，y1和y2之间所围。**
+
+```python
+plt.fill_between(x, y1, y2 = 0, where = None)
+```
+
+> x——横轴范围，必须参数
+>
+> **y1、y2——两条水平曲线。可以是数值，数值就是一条水平线**
+>
+> where——条件，去掉一些区域
+
+```python
+x = np.linspace(-2*np.pi, 2*np.pi, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+plt.plot((x.min(), x.max()), (0, 0))	## 绘制x=0水平线
+plt.plot(x, y1, color = 'blue', label = '$sin(x)$')
+plt.plot(x ,y2, color = 'red', label = '$cos(x)$')
+# plt.fill_between(x, y2, y1, where = (x>0)&(x<np.pi/2), color = 'darkorange', alpha = 0.4)
+plt.fill_between(x, y1, y2, where = (y1<y2), color = 'violet', alpha = 0.4)
+plt.legend(loc = 'best')
+plt.show()
+```
+
+![image-20220216152809781](https://s2.loli.net/2022/02/16/FObPjABkyhmLKN6.png)
+
+```python
+x = np.linspace(-2*np.pi, 2*np.pi, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+plt.plot((x.min(), x.max()), (0, 0))
+plt.plot(x, y1, color = 'blue', label = '$sin(x)$')
+plt.plot(x ,y2, color = 'red', label = '$cos(x)$')
+plt.fill_between(x, y2, y1, where = (x>0)&(x<np.pi/2), color = 'darkorange', alpha = 0.4)
+# plt.fill_between(x, y1, y2, where = (y1<y2), color = 'violet', alpha = 0.4)
+plt.legend(loc = 'best')
+plt.show()
+```
+
+![image-20220216152914036](https://s2.loli.net/2022/02/16/vVAeZrdl5NPMUTj.png)
+
+```python
+x = np.linspace(-2*np.pi, 2*np.pi, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+plt.plot((x.min(), x.max()), (0, 0))
+plt.plot(x, y1, color = 'blue', label = '$sin(x)$')
+plt.plot(x ,y2, color = 'red', label = '$cos(x)$')
+# plt.fill_between(x, y2, y1, where = (x>0)&(x<np.pi/2), color = 'darkorange', alpha = 0.4)
+# plt.fill_between(x, y1, y2, where = (y1<y2), color = 'violet', alpha = 0.4)
+plt.fill_between(x, y1, 0, where = (x>0)&(x<2*np.pi), color = 'violet', alpha = 0.5)
+plt.legend(loc = 'best')
+plt.show()
+```
+
+![image-20220216153149026](https://s2.loli.net/2022/02/16/pVKIlfHyq3xtFTJ.png)
+
+```python
+x = np.linspace(-2*np.pi, 2*np.pi, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+plt.plot((x.min(), x.max()), (0, 0))
+plt.plot(x, y1, color = 'blue', label = '$sin(x)$')
+plt.plot(x ,y2, color = 'red', label = '$cos(x)$')
+# plt.fill_between(x, y2, y1, where = (x>0)&(x<np.pi/2), color = 'darkorange', alpha = 0.4)
+# plt.fill_between(x, y1, y2, where = (y1<y2), color = 'violet', alpha = 0.4)
+plt.fill_between(x, y1, 0.5, where = (x>0)&(x<np.pi), color = 'violet', alpha = 0.5)
+plt.legend(loc = 'best')
+plt.show()
+```
+
+![image-20220216153635452](https://s2.loli.net/2022/02/16/SMuAmTvrI8HLK9E.png)
+
+```python
+x = np.linspace(-2*np.pi, 2*np.pi, 100)
+y1 = np.sin(x)
+y2 = np.cos(x)
+plt.plot((x.min(), x.max()), (0, 0))
+plt.plot(x, y1, color = 'blue', label = '$sin(x)$')
+plt.plot(x ,y2, color = 'red', label = '$cos(x)$')
+# plt.fill_between(x, y2, y1, where = (x>0)&(x<np.pi/2), color = 'darkorange', alpha = 0.4)
+# plt.fill_between(x, y1, y2, where = (y1<y2), color = 'violet', alpha = 0.4)
+plt.fill_between(x, y1, 0.5, where = (y1>0.5)&(x>0)&(x<np.pi), color = 'violet', alpha = 0.5)
+plt.legend(loc = 'best')
+plt.show()
+```
+
+![image-20220216153726394](https://s2.loli.net/2022/02/16/TBlArND3MvGydtq.png)
+
+
+
+#### fill_betweenx
+
+填充两条垂直曲线`x=f(y)`之间的区域
+
+```python
+import matplotlib.pyplot as plt
+import numpy as np
+y = np.arange(0.0, 2, 0.01)
+x1 = np.sin(2 * np.pi * y)
+x2 = 1.2 * np.sin(4 * np.pi * y)
+
+fig, [ax1, ax2, ax3] = plt.subplots(1, 3, sharey=True, figsize=(6, 6))
+
+ax1.fill_betweenx(y, 0, x1)
+ax1.set_title('between (x1, 0)')
+
+ax2.fill_betweenx(y, x1, 1)
+ax2.set_title('between (x1, 1)')
+ax2.set_xlabel('x')
+
+ax3.fill_betweenx(y, x1, x2)
+ax3.set_title('between (x1, x2)')
+```
+
+![image-20220216154019845](https://s2.loli.net/2022/02/16/Oq9bW3XY1Feg2al.png)
+
+
+
+
 
 ### 基本plot流程
 
@@ -245,7 +407,7 @@ plt.bar(x,y,align="center",color="blue",width= 3, edgecolor = 'red', tick_label=
 > 也可以不用x用另外设定的**x轴标签**——**plt.xticks或tick_label**
 >
 > ```python
-> plt.xticks(np.arange(4), ('A','B', 'C', 'D'), rotation=30) #rotation控制倾斜角度
+> plt.xticks(np.arange(4), ('A','B', 'C', 'D'), rotation=30) #np.arange指定刻度位置ticks，rotation控制倾斜角度
 > ## 此时横轴标签变为：A、B、C、D
 > ```
 >
@@ -394,15 +556,15 @@ weight = [0.15,0.35,0.25,0.25]		## 饼片的权重（和为1）
 colors = ["#377eb8","#4daf4a","#984ea3","#ff7f00"]		## 饼片的颜色
 explode = (0.1,0,0,0)	## 饼片突出的程度
 
-wedges, texts, autotexts = plt.pie(weight, labels = labels, explode = explode, autopct = "%3.1f%%", colors = colors, shadow = True, startangle = 45, radius = 0.7, labeldistance = 1.1, pctdistance = 0.7, textprops = dict('fontsize':13, 'color':'black'), wedgeprops = {'linewidth':0.3, 'edgecolor':'white'}, frame = True, center = (1,1))
+wedges, texts, autotexts = plt.pie(weight, labels = labels, explode = explode, autopct = "%3.1f%%", colors = colors, shadow = True, startangle = 45, radius = 0.7, labeldistance = 1.1, pctdistance = 0.7, textprops = dict('fontsize' = 13, 'color' = 'black'), wedgeprops = {'linewidth':0.3, 'edgecolor':'white'}, frame = True, center = (1,1))
 
 ## 图例函数“plt.legend(wedges,elements)”，我们就可以将饼片外部的文本标签放在图例中，而饼片的数值标签仍然放在饼片内部。函数legend()的参数wedges和elements分别表示饼片实例列表和文本标签列表
-plt.legend(wedges,elements,fontsize=12,title="配料表",loc="center left",bbox_to_anchor=(0.91, 0, 0.3, 1))
+plt.legend(wedges,weight,fontsize=12,title="配料表",loc="center left",bbox_to_anchor=(0.91, 0, 0.3, 1))
 
 plt.axis('equal')	## 让显示的饼图保持圆形，需要添加axis保证长宽一样
 ```
 
-> vals——饼图取值
+> weight——饼图饼片权重值
 >
 > **explode——饼片分裂的程度。explode=None饼片不分裂。**
 >
@@ -497,14 +659,116 @@ plt.legend(wedges1, labels1, loc = 'upper right', title = '外环', edgecolor = 
 # plt.legend(wedges2, labels2, loc = 'lower right', title = '内环', edgecolor = 'red', facecolor = 'pink', fontsize =10)
 
 plt.title("title", style = 'oblique', size = 'xx-large', color = 'c', family="Comic Sans MS")
+
+plt.table([students1, students2], cellLoc='center', colWidths=[0.4, 0.4, 0.4, 0.4], colLabels=labels1, colColours=colors1, rowLabels=['外环数据', '内环数据'], rowLoc='center', loc = 'bottom')
+
 plt.show()
 ```
 
-![image-20220215141018335](https://s2.loli.net/2022/02/15/PL7rkEamHbVhDeB.png)
-
-
+![image-20220216104128160](https://s2.loli.net/2022/02/16/aC7DREPqnBsJd64.png)
 
 ### 箱线图
+
+* 四分位数
+
+  是统计学中分位数的一种，即把所有[数值](https://baike.baidu.com/item/数值/2013853)由小到大[排列](https://baike.baidu.com/item/排列/7804523)并分成四等份，处于三个分割点[位置](https://baike.baidu.com/item/位置/36166)的数值就是四分位数。第三四分位数与第一四分位数的[差距](https://baike.baidu.com/item/差距/1855729)又称四分位距IQR（IQR = Q3 - Q1）。与[方差](https://baike.baidu.com/item/方差)、[标准差](https://baike.baidu.com/item/标准差)一样，**表示统计资料中各变量分散情形**。
+
+  - **第一四分位数**(Q1)，又称“较小四分位数”，等于该样本中所有数值由小到大排列后第25%的数字。
+  - **第二四分位数**(Q2)，又称“[中位数](https://baike.baidu.com/item/中位数)”，等于该样本中所有数值由小到大排列后第50%的数字。
+  - **第三四分位数**(Q3)，又称“较大四分位数”，等于该样本中所有数值由小到大排列后第75%的数字。
+
+* 四分位距
+
+  QD = IQR / 2
+
+* 组成
+
+  箱体的组成部分有：箱体、箱须和离群值，其中，箱体主要由第一四分位数、中位数和第三四分位数组成，箱须又分为上箱须和下箱须。
+
+  上箱须 = Q3 + whis * IQR
+
+  下箱须 = Q1 - whis * IRQ
+
+  在上箱须、下箱须范围以外的数据为离群值
+
+  ![image-20220216112114255](https://s2.loli.net/2022/02/16/EbOY8kyDqXSguPF.png)
+
+```python
+bplot = plt.boxplot(testList,whis=whis,
+widths=width,
+sym="o",
+labels=labels,
+patch_artist=True,
+vert = True, showfliers = True, notch = False)
+```
+
+> **whis——箱须位置（数据离群范围）**
+>
+> widths——箱体宽度
+>
+> sym——离群数据点表示图形
+>
+> **patch_artist——是否给箱体上色（要给箱体上色，需要设为True）**
+>
+> vert——箱体方向：True为竖向，False为横向
+>
+> showfliers——是否显示离群值
+>
+> notch——箱体是否V型。True时为V型。
+
+```python
+## 我们要对箱线图的返回值进行操作，这个返回值是一个字典数据结构，由于需要对箱体添加颜色，所以使用键“boxes”来调出键值“bplot["boxes"]”。最后，使用内置函数zip()生成元组列表zip(bplot["boxes"],colors)，使用for循环对每个箱体进行颜色填充
+colors = ["#1b9e77","#d95f02"]
+for patch,color in zip(bplot["boxes"],colors):
+patch.set_facecolor(color)
+```
+
+```python
+## 竖向箱线图
+import matplotlib as mpl
+mpl.rcParams["font.sans-serif"]=["FangSong"]
+mpl.rcParams["axes.unicode_minus"]=False
+testA = np.random.randn(5000)
+testB = np.random.randn(5000)
+testList = [testA,testB]
+labels = ["随机数生成器AlphaRM","随机数生成器BetaRM"]
+colors = ["#1b9e77","#d95f02"]
+whis = 1.6
+width = 0.35
+bplot = plt.boxplot(testList, whis=whis, widths=width, sym="+", labels=labels, patch_artist=True,vert = True, showfliers = True)
+for patch,color in zip(bplot["boxes"],colors):
+    patch.set_facecolor(color)
+plt.ylabel("随机数值")
+plt.title("生成器抗干扰能力的稳定性比较")
+plt.grid(axis="y",ls=":",lw=1,color="gray",alpha=0.4)
+plt.show()
+```
+
+```python
+## 横向箱线图
+import matplotlib as mpl
+mpl.rcParams["font.sans-serif"]=["FangSong"]
+mpl.rcParams["axes.unicode_minus"]=False
+testA = np.random.randn(5000)
+testB = np.random.randn(5000)
+testList = [testA,testB]
+labels = ["随机数生成器AlphaRM","随机数生成器BetaRM"]
+colors = ["#1b9e77","#d95f02"]
+whis = 1.6
+width = 0.35
+bplot = plt.boxplot(testList, whis=whis, widths=width, sym="+", patch_artist=True,vert = False, showfliers = True)
+for patch,color in zip(bplot["boxes"],colors):
+    patch.set_facecolor(color)
+plt.xlabel("随机数值")
+plt.yticks(ticks= [1, 2], labels= labels, rotation = 90)	## 这里不把labels放到boxplot中，因为文字方向无法旋转。所以用yticks手动设置刻度标签
+plt.title("生成器抗干扰能力的稳定性比较")
+plt.grid(axis="y",ls=":",lw=1,color="gray",alpha=0.4)
+plt.show()
+```
+
+![image-20220216134222345](https://s2.loli.net/2022/02/16/rV58WEjflpM7gJF.png)
+
+![image-20220216134254370](https://s2.loli.net/2022/02/16/2tkam3RXJH4UpVf.png)
 
 
 
@@ -544,11 +808,104 @@ plt.legend(x, y, label = r'$sin(x)$', shadow = True, fancybox = True)
 plt.title("title", loc = 'left', style = 'oblique', size = 'xx-large', color = 'c', family="Comic Sans MS")
 ```
 
+> loc——'left'、'right'、'center'
+>
 > style——字体风格
 >
 > family——字体类别
 
+### 坐标轴刻度范围
 
+```python
+plt.xlim(xstart, xend)
+plt.ylim(ystart, yend)
+```
+
+> xstart——刻度的起点
+>
+> xend——刻度的终点
+>
+> 起点、终点不具有大小关系的限制，xstart > xend也可，坐标轴刻度将**由大到小**。
+
+### 坐标轴刻度位置、标签
+
+```python
+plt.xticks(ticks, labels, **kwargs)
+```
+
+> ticks——刻度位置。传递一个空列表会删除所有xticks。
+>
+> labels——刻度标签
+>
+> kwargs——刻度标签外观
+>
+> ```python
+> rotation = 20	##旋转20度
+> rotation = 'vertical'	## 标签竖直
+> ```
+
+```python
+>>> locs, labels = xticks()  # Get the current locations and labels.
+>>> xticks(np.arange(0, 1, step=0.2))  # Set label locations.
+>>> xticks(np.arange(3), ['Tom', 'Dick', 'Sue'])  # Set text labels.
+>>> xticks([0, 1, 2], ['January', 'February', 'March'],rotation=20)  # Set text labels and properties.
+>>> xticks([0, 1, 2], ['January', 'February', 'March'],rotation='vertical')  # Set text labels and properties.
+>>> xticks([])  # Disable xticks.
+```
+
+
+
+---
+
+## 4. figure上添加表格
+
+```python
+plt.table(cellText, cellLoc="center", colWidths=[0.1]*4, colLabels=colLabels, colColours=colColors, rowLabels=rowLabels, rowLoc="center", loc="bottom")
+```
+
+> cellText——表格中文本
+>
+> cellLoc——表格中文本在表格中的位置
+>
+> colWidths——列宽
+>
+> colLabels——列名称
+>
+> colColours——列名称颜色
+>
+> rowlabels——行名称
+>
+> rowLoc——行名称文本在表格中的位置
+>
+> loc——表格在figure中的位置
+
+```python
+plt.table([students1, students2], cellLoc='left', colWidths=[0.4, 0.4, 0.4, 0.4], colLabels=labels1, colColours=colors1, rowLabels=['外环数据', '内环数据'], rowColours=['orange', 'limegreen'], rowLoc='right', loc = 'bottom')
+
+```
+
+![image-20220216104054745](https://s2.loli.net/2022/02/16/yibIABEQUTKls7m.png)
+
+## 5. 画布分割
+
+子区函数subplot(211)和子区函数subplot(212)代表首先在画布上分隔出一个2行1列的画布格式，然后在一个2行1列的画布格式上分别绘制图形1和图形2。
+
+先确定当前在哪个画布上绘制，再设置坐标轴和绘制。
+
+```python
+subplot(211)
+plt.title('title1')
+plt.xlabel('x1')
+plt.ylabel('y1')
+plt.xticks([1,2,3], ['label1, label2, label3'], rotation = 90)
+plot(x1, y1)
+subplot(212)
+plt.title('title2')
+plt.xlabel('x2')
+plt.ylabel('y2')
+plt.xticks([1,2,3], ['label1, label2, label3'], rotation = 90)
+plot(x2, y2)
+```
 
 
 
