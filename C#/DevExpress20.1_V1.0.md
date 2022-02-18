@@ -1572,6 +1572,8 @@ https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.Argum
 
 https://docs.devexpress.com/CoreLibraries/DevExpress.XtraCharts.SeriesBase.ValueDataMembers
 
+https://blog.csdn.net/qq_33459369/article/details/79423756
+
 ### 步骤
 
 * 创建一个series，添加到chartControl中
@@ -2030,7 +2032,105 @@ lineDiagram.AxisY.WholeRange.SideMarginsValue = 1;
 
   ![image-20220124171818985](https://s2.loli.net/2022/01/24/VgkQZfKyU5znGL7.png)
 
+### （4）饼图
 
+https://www.cnblogs.com/xumingyang/p/4600443.html
+
+https://supportcenter.devexpress.com/ticket/details/t116685/how-to-convert-obsolete-pointoptions-and-legendpointoptions-properties-to-textpattern
+
+https://blog.csdn.net/qq_36248777/article/details/105745481
+
+#### 方案一
+
+* 绑定到DataTable，2列分别代表**饼片**、**饼片的值**，各行代表各个饼片。
+
+* 饼图自动根据数值计算占比。若`Legend.Visible=true`但不设置Legend的格式`LegendTextPattern`则默认会在Legend中显示各部分占比。
+
+  ![image-20220218135531910](https://s2.loli.net/2022/02/18/IW1KUEqRuhOvMBx.png)
+
+* 设置Legend格式
+
+  新标准Legend设置方法：https://supportcenter.devexpress.com/ticket/details/t116685/how-to-convert-obsolete-pointoptions-and-legendpointoptions-properties-to-textpattern
+  
+  ```C#
+  // Series1.LegendPointOptions.PointView = PointView.ArgumentAndValues中LegendPointOptions属性已被弃用
+  ```
+  
+  ```C#
+  //图例格式"Argument:Value"。V:n2为Value:numeric小数点后2位，显示原始数值
+  this.chartControl_pie.Series[0].LegendTextPattern = "{A}：{V:n2}";  
+  ```
+  
+  > 此时显示的Value为原始数值
+  >
+  > ![image-20220218142138673](https://s2.loli.net/2022/02/18/J2tLN5i9OIDvnfb.png)
+
+```C#
+//VP:p2为Value:percent小数点后2位，显示百分比
+this.chartControl_pie.Series[0].LegendTextPattern = "{A}：{VP:p2}";  
+```
+
+#### 方案二
+
+不用DataTable，手动添加点
+
+https://www.cnblogs.com/xumingyang/p/4600443.html
+
+* demo
+
+```C#
+private DataTable dtPie = new DataTable("tablePie");    //饼图数据源，只要不更换brand就一直累计
+dtPie.Columns.Add("status", typeof(String));
+dtPie.Columns.Add("countCur", typeof(Int32));
+
+private void bindPieData()
+        {
+            this.chartControl_pie.Series[0].DataSource = dtPie;
+            this.chartControl_pie.Series[0].ArgumentDataMember = "status";
+            this.chartControl_pie.Series[0].ArgumentScaleType = ScaleType.Auto;
+            this.chartControl_pie.Series[0].ValueDataMembers.AddRange(new string[] { "countCur" });
+            this.chartControl_pie.Series[0].ValueScaleType = ScaleType.Numerical;
+            this.chartControl_pie.Series[0].LegendTextPattern = "{A}：{VP:p2}";  //图例格式"Argument:Value"。V:n2为Value:numeric小数点后2位，VP:p2为Value:percent小数点后2位
+        }
+
+private void updateChartPieData()
+        {
+            if (dtPie.Rows.Count == 0)
+            {
+                DataRow drCountUnderWeight = dtPie.NewRow();
+                drCountUnderWeight["status"] = "欠重";
+                drCountUnderWeight["countCur"] = Global.curStatus.countUnderWeight;
+                dtPie.Rows.Add(drCountUnderWeight);
+
+                DataRow drCountOverWeight = dtPie.NewRow();
+                drCountOverWeight["status"] = "超重";
+                drCountOverWeight["countCur"] = Global.curStatus.countOverWeight;
+                dtPie.Rows.Add(drCountOverWeight);
+
+                DataRow drCountNormal = dtPie.NewRow();
+                drCountNormal["status"] = "正常";
+                drCountNormal["countCur"] = Global.curStatus.countDetection - Global.curStatus.countOverWeight - Global.curStatus.countUnderWeight;
+                dtPie.Rows.Add(drCountNormal);
+
+
+            }
+            else
+            {
+                dtPie.Rows[0]["countCur"] = Global.curStatus.countUnderWeight;
+                dtPie.Rows[1]["countCur"] = Global.curStatus.countOverWeight;
+                dtPie.Rows[2]["countCur"] = Global.curStatus.countDetection - Global.curStatus.countOverWeight - Global.curStatus.countUnderWeight;
+            }
+
+        }
+```
+
+
+
+
+
+
+
+---
 
 ## 18. WebChartControl
 

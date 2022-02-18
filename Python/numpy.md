@@ -10,9 +10,9 @@ https://www.runoob.com/numpy/numpy-dtype.html
 
 #### **NumPy** 
 
-* 是一个 Python 的[第三方库](https://so.csdn.net/so/search?q=第三方库&spm=1001.2101.3001.7020)，代表 “**Numeric Python**”，主要用于数学/科学计算。 它是一个由[多维数组](https://so.csdn.net/so/search?q=多维数组&spm=1001.2101.3001.7020)对象和用于处理数组的例程集合组成的库。
+* 是一个 Python 的第三方库，代表 “Numeric Python”，主要用于数学/科学计算。 它是一个由多维数组对象和用于处理数组的例程集合组成的库。
 
-* 使用 **Numpy** 我们可以轻松进行如下等计算：
+* 使用 Numpy 我们可以轻松进行如下等计算：
 
 > * 数组的算数和逻辑运算。
 >
@@ -31,10 +31,11 @@ https://www.runoob.com/numpy/numpy-dtype.html
 
   可以把axis看成是存放下标的一个框框（虽然不准确，但是这么理解用起来没有问题），第一个框就是第0个axis, 第二个框就是第1个axis……
 
-  对于矩阵$T_{ijk}(i=0,1,2;j=0,1,2,3;k=0,1,2,3,4)$，axis=0即$T_{jk}=\sum_{i}{T_{jk}}$
+  对于矩阵$T_{ijk}(i=0,1,2;j=0,1,2,3;k=0,1,2,3,4)$，==sum(axis=0)==即$T_{jk}=\sum_{i=0}^{2}{T_{jk}}$
 
   ```python
-  np.ones((3,4,5)) = [[[1. 1. 1. 1. 1.]
+  np.ones((3,4,5)) = 
+  [[[1. 1. 1. 1. 1.]
     [1. 1. 1. 1. 1.]
     [1. 1. 1. 1. 1.]
     [1. 1. 1. 1. 1.]]
@@ -63,6 +64,27 @@ https://www.runoob.com/numpy/numpy-dtype.html
          [5., 5., 5., 5.],
          [5., 5., 5., 5.]])
   ```
+  
+  ```python
+  >>> b = np.arange(12).reshape(3,4)
+  >>> b
+  array([[ 0,  1,  2,  3],
+         [ 4,  5,  6,  7],
+         [ 8,  9, 10, 11]])
+  >>>
+  >>> b.sum(axis=0)                            # sum of each column
+  array([12, 15, 18, 21])
+  >>>
+  >>> b.min(axis=1)                            # min of each row
+  array([0, 4, 8])
+  >>>
+  >>> b.cumsum(axis=1)                         # cumulative sum along each row
+  array([[ 0,  1,  3,  6],
+         [ 4,  9, 15, 22],
+         [ 8, 17, 27, 38]])
+  ```
+
+
 
 ## 数组ndarray
 
@@ -331,7 +353,7 @@ https://zhuanlan.zhihu.com/p/147290117
 * random.randint()——生成范围内服从正态分布的随机数
 
 ```python
-random.randint(low = 0, high = 10, size = 5, dtype)
+random.randint(low = 0, high = 10, size = (5,3), dtype)
 ```
 
 > 生成整数范围[low, high)，若high省略则为[0,low)
@@ -387,16 +409,16 @@ print(A)  # 结果 [1.  1.6 2.2 2.8 3.4 4.  4.6 5.2]
 会获得一个既==包含起始值又包含终止值==的==点个数确定==的数组，而且元素之间的步长（间隔）是相同的。
 
 ```python
-np.linspace(start, stop, step, endpoint = True)
+np.linspace(start, stop, num, endpoint = True)
 ```
 
 > start——起始值
 >
 > stop——终止值（包含）
 >
-> step——步长
+> num——指定取值的个数
 >
-> endpoint——True（默认）：包含终止值（start~stop分成step-1份），False：不包含终止值（start~stop分成step份）
+> endpoint——True（默认）：包含终止值（start~stop分成num-1份），False：不包含终止值（start~stop分成num份）
 
 ## 4. power()
 
