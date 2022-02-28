@@ -767,3 +767,13 @@ https://blog.csdn.net/weixin_44228698/article/details/108524804
 
 # 4. 这么多种创建线程的方法该选哪种？
 
+# 5. 子线程里访问主线程创建的控件
+
+微软不让你在子线程里访问主线程创建的控件，他认为这个是不安全的。所以就开了一个委托来异步操作一下
+
+```C#
+Invoke((EventHandler)delegate {progressBar.Value = val});	//子线程里修改progressBar的进度值
+```
+
+
+
