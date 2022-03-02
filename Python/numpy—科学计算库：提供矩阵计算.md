@@ -124,7 +124,7 @@ print(x.dtype)                         # Prints "int64"
 a = numpy.empty(shape, dtype) # 创建指定形状和dtype的未初始化数组。其初始内容是随机的，取决于内存的状态
 a = numpy.zeros(shape, dtype) # 返回特定大小，以 0 填充的新数组
 a = numpy.ones(shape, dtype) # 返回特定大小，以 1 填充的新数组
-a= numpy.full((2,2), 3)	# 返回指定大小的常数矩阵[[3 3] 
+a= numpy.full((2,2), 3, dtype)	# 返回指定大小的常数矩阵[[3 3] 
 										# [3 3]]
 a = numpy.eye(2)	# 生成2*2单位矩阵
 ```
@@ -145,7 +145,7 @@ numpy.asarray(a, dtype) # 类似于numpy.array(a)
 numpy.fromiter(a, dtype) # 此函数从任何可迭代对象构建一个ndarray对象，返回一个新的一维数组。
 ```
 
-> **asaary和array区别点：
+> **asarry和array区别点：
 > （1）当他们的参数是列表型数据(list)时，二者没有区别；
 > （2）当他们的参数是数组类型(array)时，==np.array()会返回参数数组的一个副本==(copy，两者值一样但指向不同的内存),==np.asarray()会返回参数数组的一个引用==(两者指向同一块内存).**
 
@@ -281,11 +281,10 @@ print(a) #[0. 1. 2. 3. 4.]
           [1., 1.]]])
   >>> (a*b).shape
   (2, 3, 2)
-  
   ```
-
+  
   **a被扩展为（2,3,2)shape的数组，$a[1][i][j]=a[0][i][j]$。b也同理被扩展为(2,3,2)shape的数组，$b[i][j][1]=b[i][j][0]$。**
-
+  
 * **demo**
 
 ```python
@@ -404,7 +403,7 @@ print(np.sqrt(x))
 
 ```python
 a[1:4]	## 切片的索引范围是1~3
-a[:3]	## 索引范围是1~2
+a[:3]	## 索引范围是0~2
 ```
 
 ```python

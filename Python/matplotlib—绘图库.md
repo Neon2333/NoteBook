@@ -65,6 +65,23 @@ plt.plot(x,y,ls="-.",lw=2,c="c",label="plot figure")
 >
 > **label——该曲线的标签（显示在legend中），若在legend中指定了labels，该label会被覆盖。**
 
+```python
+import matplotlib.pyplot as plt
+
+a = np.linspace(0, 2 * np.pi, 50)
+b = np.sin(a)
+plt.plot(a,b)
+mask = b >= 0			
+plt.plot(a[mask], b[mask], 'bo')		## 绘制满足条件mask的图
+mask = (b >= 0) & (a <= np.pi / 2)
+plt.plot(a[mask], b[mask], 'go')		
+plt.show()
+```
+
+![image-20220228151527836](C:/Users/eivision/AppData/Roaming/Typora/typora-user-images/image-20220228151527836.png)
+
+
+
 ### legend——**图例**
 
 先plot()后legend()
@@ -1293,7 +1310,7 @@ ax3 = plt.add_subplot(124)	## 1行2列布局的第4个子区的位置
 ax3.plot()
 ```
 
-![image-20220224100954127](https://s2.loli.net/2022/02/24/mRVyXegjEPc3naq.png)
+![image-20220224100954127](https://s2.loli.net/2022/02/28/8FzrufJdwK6tDWh.png)
 
 ```python
 import matplotlib.pyplot as plt
