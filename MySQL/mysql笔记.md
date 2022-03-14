@@ -424,9 +424,53 @@ http://c.biancheng.net/view/2448.html
   SELECT id,productName,dir_id FROM product WHERE dir_id IS NOT NULL
   ```
   
-  
 
-## 9.常用指令
+
+
+## 9. 唯一约束
+
+#### 定义
+
+==MySQL唯一约束（Unique Key）是指所有记录中字段的值不能重复出现。==例如，为 id 字段加上唯一性约束后，每条记录的 id 值都是唯一的，不能出现重复的情况。如果其中一条记录的 id 值为‘0001’，那么该表中就不能出现另一条记录的 id 值也为‘0001’。
+
+唯一约束与主键约束相似的是它们都可以确保列的唯一性。不同的是，唯一约束在一个表中可有多个，并且设置唯一约束的列允许有空值，但是只能有一个空值。而主键约束在一个表中只能有一个，且不允许有空值。比如，在用户信息表中，为了避免表中用户名重名，可以把用户名设置为唯一约束。
+
+#### 建表时添加唯一约束
+
+```mysql
+mysql> CREATE TABLE tb_dept2
+    -> (
+    -> id INT(11) PRIMARY KEY,
+    -> name VARCHAR(22) UNIQUE,
+    -> location VARCHAR(50)
+    -> );
+```
+
+#### 修改表时添加唯一约束
+
+```mysql
+ALTER TABLE tb_name ADD CONSTRAINT unique_name UNIQUE(col_name);
+```
+
+```mysql
+mysql> ALTER TABLE tb_dept1
+    -> ADD CONSTRAINT unique_name UNIQUE(name);
+```
+
+#### 删除唯一约束
+
+```mysql
+ALTER TABLE <表名> DROP INDEX <唯一约束名>;
+```
+
+```mysql
+mysql> ALTER TABLE tb_dept1
+    -> DROP INDEX unique_name;
+```
+
+
+
+## 10.常用指令
 
 #### 库操作
 
@@ -464,6 +508,7 @@ ALTER TABLE tb_name ADD COLUMN `newField` typename(n) NOT NULL DEFAULT '...' COM
 ALTER TABLE tb_name DROP COLUMN field_;
 ALTER TABLE tb_name MODIFY COLUMN field_ typename(n) NOT NULL DEFAULT '' COMMENT AFTER field_pre;
 ALTER TABLE tb_name CHANGE COLUMN field_old field_new typename(n) NOT NULL DEFAULT '' COMMENT '' AFTER field_;
+ALTER TABLE tb_name ADD CONSTRAINT <唯一约束名> UNIQUE(<列名>);
 ```
 
 用Navicat修改表结构：

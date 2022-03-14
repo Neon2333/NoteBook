@@ -2811,7 +2811,13 @@ https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layo
 
 # DataAndAnalytics
 
-## 1. GridControl
+## 1. GridControl——GridView
+
+![image-20220314143937029](https://s2.loli.net/2022/03/14/mZXRcPUtbkOfrpo.png)
+
+![image-20220314144014386](https://s2.loli.net/2022/03/14/5k8zN9oKiuRXOIb.png)
+
+
 
 ### （1）类型
 
@@ -2928,11 +2934,131 @@ https://www.cnblogs.com/wuhuacong/p/8796898.html
 
 
 
+## 2. GridControl——WinExplorerView
+
+https://www.freesion.com/article/64241388773/
+
+```C#
+        public string picOKPath = @"D:\WorkSpace\deeplearning\train\OK";    //OK路径
+        public string picNGPath = @"D:\WorkSpace\deeplearning\train\NG";    //NG路径
+
+        class Pics
+        {
+            public string picName { get; set; }
+            public Image pic { get; set; }
+
+            public Pics(string name, Image img)
+            {
+                this.picName = name;
+                this.pic = img;
+            }
+        }
+
+        List<Pics> picsOK = new List<Pics>();
+        List<Pics> picsNG = new List<Pics>();        
+
+	   public void initDataPreparation()
+        {
+            bindPicsOKToGrid();
+            bindPicsNGToGrid();
+        }
+
+
+        public void bindPicsOKToGrid()
+        {
+            this.gridControl_displayOKPics.BeginUpdate();
+
+            readPicsOKToList();
+
+            this.gridControl_displayOKPics.DataSource = picsOK;
+
+            this.gridControl_displayOKPics.EndUpdate();
+        }
+
+        private void readPicsOKToList()
+        {
+            DirectoryInfo dirPics = new DirectoryInfo(picOKPath);
+            FileInfo[] fileInfos = dirPics.GetFiles();
+
+            foreach(var item in fileInfos)
+            {
+                string itemName = item.Name;
+                string itemPath = item.FullName;
+
+                picsOK.Add(new Pics(itemName, Image.FromFile(itemPath)));
+            }
+
+        }
+
+        public void bindPicsNGToGrid()
+        {
+            this.gridControl_displayNGPics.BeginUpdate();
+
+            readPicsNGToList();
+
+            this.gridControl_displayNGPics.DataSource = picsNG;
+
+            this.gridControl_displayNGPics.EndUpdate();
+        }
+
+        private void readPicsNGToList()
+        {
+            DirectoryInfo dirPics = new DirectoryInfo(picNGPath);
+            FileInfo[] fileInfos = dirPics.GetFiles();
+
+            foreach (var item in fileInfos)
+            {
+                string itemName = item.Name;
+                string itemPath = item.FullName;
+
+                picsNG.Add(new Pics(itemName, Image.FromFile(itemPath)));
+            }
+
+        }
+
+ private void delPicsInDir(string picPath)
+        {
+            if (System.IO.File.Exists(picPath))
+            {
+                System.IO.File.Delete(picPath);
+            }
+        }
+
+        private void delPicsInDirByListIndex(List<Pics> pics, int[] picIndex)
+        {
+            foreach(var i in picIndex)
+            {
+                if(pics.Count >= picIndex.Length)
+                {
+                    delPicsInDir(pics.ElementAt(i).picPath);    
+                }
+            }
+        }
+
+        private void simpleButton_delPicsOK_Click(object sender, EventArgs e)
+        {
+            this.gridControl_displayOKPics.BeginUpdate();
+
+            int[] delPicsOKIndex = this.winExplorerView_displayPicsOK.GetSelectedRows();
+            delPicsInDirByListIndex(picsOK, delPicsOKIndex);            //删除文件夹中图片
+            this.winExplorerView_displayPicsOK.DeleteSelectedRows();    //删除控件显示的pic以及DataSource中元素
+
+            this.gridControl_displayOKPics.EndUpdate();
+
+            if (this.winExplorerView_displayPicsOK.RowCount > 0)
+            {
+                this.winExplorerView_displayPicsOK.SelectRow(0);    //删除当前选中图片后，默认选中index=0的图片
+            }
+        }
+```
 
 
 
 
-## 2. sqlDataSource绑定数据库
+
+
+
+## 3. sqlDataSource绑定数据库
 
 https://blog.csdn.net/f1121814098/article/details/77822237?spm=1001.2101.3001.6650.5&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7EBlogCommendFromBaidu%7ERate-5.pc_relevant_default&utm_relevant_index=10
 
