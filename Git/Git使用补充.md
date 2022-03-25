@@ -26,9 +26,9 @@ reset --hard	//将HEAD指向新版本号，且暂存区和工作区一起更改
 >
 > HEAD^和HEAD~
 >
-> ![image-20210726150257425](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726150257425-1627282981520.png)
+> ![image-20210726150257425](https://s2.loli.net/2022/03/23/Zwqb62zyUT1daOc.png)
 >
-> ![image-20210726150413658](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726150413658-1627283055489.png)
+> ![image-20210726150413658](https://s2.loli.net/2022/03/23/jKPBDg3cuJnUx4X.png)
 >
 > HEAD~默认是HEAD^
 
@@ -128,7 +128,7 @@ commit后才会新建分支master，这之后才可以新建其他分支
 git branch daily/0.0.0	//新建日常开发分支daily/0.0.0
 ```
 
-![image-20210726093541204](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726093541204-1627263344263.png)
+![image-20210726093541204](https://s2.loli.net/2022/03/23/h2zsVWrSMjn5LvF.png)
 
 ### （2）重命名分支
 
@@ -274,7 +274,7 @@ git checkout -b dev origin/dev	//origin/dev是拉取到本地的远端仓库
 
 [修改default分支](https://blog.csdn.net/xuchaoxin1375/article/details/111414527?utm_term=github%E5%88%86%E6%94%AFdefault&utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~all~sobaiduweb~default-0-111414527&spm=3001.4430)
 
-![image-20210729100510261](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210729100510261-1627524312032.png)
+![image-20210729100510261](https://s2.loli.net/2022/03/23/S78kHKR3QsnFoAe.png)
 
 > Settings----->Branches------->右侧箭头
 
@@ -392,7 +392,7 @@ git reset --hard HEAD~
 git merge --ff
 ```
 
-![merge--ff](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\merge--ff-1627609842321.gif)
+![merge--ff](https://s2.loli.net/2022/03/23/LKDuJhZszTpREcw.gif)
 
 #### no-fast-forward模式
 
@@ -404,7 +404,7 @@ git merge --ff
 git merge --no-ff
 ```
 
-![merge--no-ff](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\merge--no-ff-1627611067936.gif)
+![merge--no-ff](https://s2.loli.net/2022/03/23/j5xEtVru6cqiMPn.gif)
 
 ### （4）rebase
 
@@ -514,7 +514,7 @@ rebase主要有两个用法：
 
 https://blog.csdn.net/weixin_41975655/article/details/82887273
 
-![image-20210726171937862](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726171937862-1627291178971.png)
+![image-20210726171937862](https://s2.loli.net/2022/03/23/PKvNLms5dWoAyBG.png)
 
 ---
 
@@ -771,9 +771,9 @@ git push origin publish/0.0.1	//推送到服务器
 git commit -m "commit title" -m "commit description"
 ```
 
-![image-20210726104439361](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726104439361-1627267481057.png)
+![image-20210726104439361](https://s2.loli.net/2022/03/23/eqBvwUy8iCXLZO2.png)
 
-![image-20210726104508385](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726104508385-1627267509742.png)
+![image-20210726104508385](https://s2.loli.net/2022/03/23/OleLjgUrK9dMz6T.png)
 
 ### git commit --amend——修改最新一条提交记录的message
 
@@ -798,7 +798,7 @@ git commit --amend --no-edit
 git status -s
 ```
 
-![image-20210726105245260](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210726105245260-1627267966494.png)
+![image-20210726105245260](https://s2.loli.net/2022/03/23/C9vY7MzZm5wQLpJ.png)
 
 ## 4. git blame \<filename>
 
@@ -826,7 +826,7 @@ git status -s
 >
 > X: 未知状态。(很可能是遇到git的bug了，你可以向git提交bug report)
 
-![image-20210729102540996](D:\WorkSpace\工作笔记\Git\Git使用补充.assets\image-20210729102540996-1627525543734.png)
+![image-20210729102540996](https://s2.loli.net/2022/03/23/vCkaXQ347EweTUP.png)
 
 ## 7. git log --pretty=oneline --graph --decorate --all
 
@@ -866,3 +866,4 @@ git reflog常用于恢复本地的错误操作
 ### 方案二
 
 https://blog.csdn.net/weixin_37557729/article/details/107012028
+

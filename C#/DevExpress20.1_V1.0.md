@@ -1760,6 +1760,12 @@ this.chartControl_line.Series[0].ValueDataMembers.AddRange(new string[] { "Value
             }
 ```
 
+#### 显示峰值、谷值、平均值线（垂直x轴和垂直y轴直线）
+
+
+
+
+
 ### （3）设计器
 
 #### 组成

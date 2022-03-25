@@ -420,6 +420,8 @@ mpl.rcParams["font.sans-serif"]=["SimHei"]	## 设置字体为SimHei，从而可�
 mpl.rcParams["axes.unicode_minus"]=False	## 不使用默认的“Unicode minus”模式来处理坐标轴轴线的刻度标签是负数的情况，一般可以使用“ASCII hyphen”模式来处理坐标轴轴线的负刻度值的情况	
 ```
 
+
+
 ### 柱状图
 
 ```python

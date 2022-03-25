@@ -2,13 +2,18 @@
 
 ## 1. MySQL相关
 
-### （1）用到的头文件
+### （1）用到的dll和头文件
 
-​      **都给它包含进去再说**
+**DLL——MySql.Data.dll**
 
-```mysql
+**头文件**
 
+```C#
+using MySql.Data;
+using MySql.Data.MySqlClient;
 ```
+
+
 
 https://www.cnblogs.com/gaokaitai/p/10633858.html
 
