@@ -1762,7 +1762,37 @@ this.chartControl_line.Series[0].ValueDataMembers.AddRange(new string[] { "Value
 
 #### 显示峰值、谷值、平均值线（垂直x轴和垂直y轴直线）
 
+```C#
+XYDiagram diagram1 = ((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram));
+diagram1.AxisY.ConstantLines.Clear();
 
+ConstantLine clYPeak = new ConstantLine("峰值：", Global.sensorRealTimeDataPeak);
+ConstantLine clYValley = new ConstantLine("谷值：", Global.sensorRealTimeDataValley);
+ConstantLine clYAvg = new ConstantLine("平均值：", Global.sensorRealTimeDataAvg);
+clYPeak.Color = Color.FromArgb(111, 186, 208);
+clYValley.Color = Color.FromArgb(230, 108, 125);
+clYAvg.Color = Color.FromArgb(94, 196, 104);
+
+diagram1.AxisY.ConstantLines.Add(clYPeak);
+diagram1.AxisY.ConstantLines.Add(clYValley);
+diagram1.AxisY.ConstantLines.Add(clYAvg);
+```
+
+#### 坐标轴和放大设置
+
+useTouchDevice——可触摸放大
+
+AxisX.VisualRange.MinValue——横轴的可见范围的最小值
+
+AxisX.VisualRange.MaxValue——横轴的可见范围的最大值
+
+![image-20220328153942707](https://s2.loli.net/2022/03/28/Fgu25vLOVpQJGyl.png)
+
+![image-20220328154418380](https://s2.loli.net/2022/03/28/65fwKcZdTzk4Csi.png)
+
+Visual Range——坐标轴显示的部分。必须比Whole Range范围小。本质是放大，通过放大显示Whole Range的一部分，可通过滚轮缩放将Visual Range改变。
+
+Whole Range——整个坐标轴的范围。
 
 
 
@@ -2147,6 +2177,16 @@ private void updateChartPieData()
 ## 19. navBarControl——侧面按钮面板
 
 
+
+## 20. 缩放滑动条——ZoomTrackBarControl
+
+![image-20220328152825696](https://s2.loli.net/2022/03/28/f4OABmI27eFKjLd.png)
+
+Value——设置滑动条位置
+
+Properties.Maximum——设置Value最大可到的值
+
+![image-20220328153013874](https://s2.loli.net/2022/03/28/95vEgeoPMQWqIOp.png)
 
 
 
