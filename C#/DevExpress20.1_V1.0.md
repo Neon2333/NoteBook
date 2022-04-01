@@ -1760,7 +1760,11 @@ this.chartControl_line.Series[0].ValueDataMembers.AddRange(new string[] { "Value
             }
 ```
 
-#### 显示峰值、谷值、平均值线（垂直x轴和垂直y轴直线）
+#### 常数线——峰值、谷值、平均值线（垂直x轴和垂直y轴直线）
+
+![](https://s2.loli.net/2022/04/01/IaknJcLGS5ZCM9P.png)
+
+![](https://s2.loli.net/2022/04/01/D7TcJdVZhilXoSv.png)
 
 ```C#
 XYDiagram diagram1 = ((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram));
@@ -1999,16 +2003,51 @@ Whole Range——整个坐标轴的范围。
 
 #### <4> AxisX/AxisY
 
+* **VisualRange的范围应 小于等于 WholeRange范围**
+
 ![image-20220127134617130](https://s2.loli.net/2022/01/27/LS6N83M4jwFWGv2.png)
 
-```python
-## 只有设为Auto时代码设定的坐标轴范围和起点才能生效
-XYDiagram lineDiagram = (XYDiagram)chartControl_line.Diagram;
-lineDiagram.AxisX.WholeRange.SetMinMaxValues(0, 200);
-lineDiagram.AxisX.WholeRange.SideMarginsValue = 1;
-lineDiagram.AxisY.WholeRange.SetMinMaxValues(0, 20);
-lineDiagram.AxisY.WholeRange.SideMarginsValue = 1;
+* **WholeRange**——整个坐标轴的范围
+
+`WholeRange.Auto = true`时会自动根据数据点的坐标设定坐标轴范围。
+
+要想可以手动设定坐标轴范围，需要`WholeRange.Auto = false`
+
+```C#
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisX.WholeRange.Auto = false;
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisY.WholeRange.Auto = false;
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisX.WholeRange.SetMinMaxValues(xMinWholeRange, xMaxWholeRange);
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisY.WholeRange.SetMinMaxValues(yMinWholeRange, yMaxWholeRange);
 ```
+
+min出现大于max的情况时会报错
+
+![](https://s2.loli.net/2022/04/01/mS5sZCti98g6Lou.png)
+
+![](https://s2.loli.net/2022/04/01/eglQXNnuSd8OIVq.png)
+
+![](https://s2.loli.net/2022/04/01/IyBq9eOhsGK3dMm.png)
+
+![](https://s2.loli.net/2022/04/01/oZ2KmQsaYPwcTWR.png)
+
+* **VisualRange**——坐标轴的可见范围（缩放，可通过拖动滑动条改变显示）
+
+同上，Auto设为true时范围自动
+
+```C#
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisX.VisualRange.Auto = true;
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisY.VisualRange.Auto = true;
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisX.WholeRange.SetMinMaxValues(xMinWholeRange, xMaxWholeRange);
+((XYDiagram)(chartControl_weighterSensorRealTimeData.Diagram)).AxisY.WholeRange.SetMinMaxValues(yMinWholeRange, yMaxWholeRange);
+```
+
+**但是，VisualRange的min和max设定需保证不超过WholeRange的范围**
+
+若VisualRangeMin<WholeRangeMin或VisualRangeMax>WholeRangeMax，则整个VisualRange将会变为WholeRange。
+
+![](https://s2.loli.net/2022/04/01/eCZP59jERMKL46D.png)
+
+StartSideMargin和EndSideMargin同上。
 
 #### <5> Legend
 
