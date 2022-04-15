@@ -1639,7 +1639,13 @@ series.Label.ResolveOverlappingMode = ResolveOverlappingMode.JustifyAllAroundPoi
 ```
 
 ```C#
-series.Label.TextPattern = "{V:#.00}";		//#表示数值，#.00表示小数点后两位数字
+series.Label.TextPattern = "{V:#.00}";		//V表示数值value，#.00表示小数点后两位数字
+或
+series.Label.TextPattern = "{V:F2}";		//V表示数值value，F2表示float数据保留小数点后两位数字
+
+series.label.TextPattern = "({A}, {V:#.000})"	//A表示横坐标,V表示纵坐标
+或
+series.label.TextPattern = "({A}, {V:F3})"		
 ```
 
 #### 设置显示坐标轴所有标签
