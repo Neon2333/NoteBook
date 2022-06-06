@@ -18,7 +18,7 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
 
 ## 2. 创建和使用线程
 
-### Thread类
+### （1）常用——Thread类
 
 * 使用Thread类通过**ThreadStart**（**不给子线程传参数**，无返回值）或**ParameterizedThreadStart**（**给子线程传一个输入参数**，无返回值）类型的委托创建一个Thread对象，开启一个新线程，执行委托传递的回调函数。
 
@@ -124,9 +124,67 @@ CLR可以区分两种线程：前台前程、后台线程。主线程是一个�
     >
     > **public static bool Yield()**：导致调用线程执行准备好在当前处理器上运行的另一个线程。由操作系统选择要执行的线程
 
+### （2）常用——委托的BeginInvoke和EndInvoke异步调用
 
+* 用委托(Delegate)的BeginInvoke和EndInvoke方法操作线程。在创建了委托对象的线程上异步执行委托指向的函数。
 
-### 常用方法——适用需要传递多个参数到子线程中
+  BeginInvoke方法可以使用线程异步地执行委托所指向的方法。
+
+  **由于使用BeginInvoke创建的线程都是后台线程**
+
+  然后通过EndInvoke方法获得方法的返回值（EndInvoke方法的返回值就是被调用方法的返回值），或是确定方法已经被成功调用。
+
+  使用BeginInvoke异步调用方法时，如果方法未执行完，EndInvoke方法就会**一直阻塞**，直到被调用的方法执行完毕。
+
+```C#
+using System.Threading; 
+namespace MyThread 
+{ 
+  class Program 
+  { 
+	private static int newTask(int ms) 
+	{ 
+		Console.WriteLine("任务开始"); 
+		Thread.Sleep(ms); 
+		Random random = new Random(); 
+		int n = random.Next(10000); //返回小于指定maxVal的非负整数
+		Console.WriteLine("任务完成"); 
+		return n; 
+	} 
+
+		private delegate int NewTaskDelegate(int ms); 
+		static void Main(string[] args) 
+	{ 
+		NewTaskDelegate task = newTask; //声明委托对象指向函数newTask
+		IAsyncResult asyncResult = task.BeginInvoke(2000, null, null); // EndInvoke方法将被阻塞2秒 
+		int result = task.EndInvoke(asyncResult); 
+		Console.WriteLine(result);
+ 	}
+   }
+ }
+```
+
+* 使用IAsyncResult asyncResult属性来判断异步调用是否完成   
+
+  虽然上面的方法可以很好地实现异步调用，但是当调用EndInvoke方法获得调用结果时，若异步调用未完成则EndInvoke就会一直阻塞，整个程序就象死了一样，这样做用户的感觉并不会太好，因此，我们可以使用asyncResult来判断异步调用是否完成，并显示一些提示信息。这样做可以增加用户体验
+
+  ```C#
+  static void Main(string[] args) 
+  	{ 
+  		NewTaskDelegate task = newTask; //声明委托对象指向函数newTask
+  		IAsyncResult asyncResult = task.BeginInvoke(2000, null, null); // EndInvoke方法将被阻塞2秒 
+  		while(!asyncResult.IsCompleted){
+              Console.Write("*");
+              Thread.sleep(100);	//主线程阻塞1000ms，不然判断过于频繁消耗资源
+          }
+      	int result = task.EndInvoke(asyncResult); //主线程执行到这里表明异步调用已完成
+  		Console.WriteLine(result);
+   	}
+  ```
+
+  
+
+### （3）常用——适用需要传递多个参数到子线程中
 
 * 将子线程需要执行的回调函数，封装成类，通过构造函数船体多个参数。然后传递到ThreadStart()
 
@@ -202,7 +260,7 @@ this.Result = this.Parame * ra.Next(10, 100);
 
   
 
-### 线程池
+### （4）线程池
 
 * ThreadPool类维护一个线程的列表，提供给用户以执行不同的小任务，减少频繁创建线程的开销。ThreadPool的使用比较简单，只需调用ThreadPool.QueueUserWorkItem()方法，传递一个WaitCallback类型的委托，线程池即从池中选择一个线程执行该任务。
 
@@ -240,67 +298,9 @@ this.Result = this.Parame * ra.Next(10, 100);
 
 
 
-### 委托的BeginInvoke和EndInvoke方法
 
-* 用委托(Delegate)的BeginInvoke和EndInvoke方法操作线程。在创建了委托对象的线程上异步执行委托指向的函数。
 
-  BeginInvoke方法可以使用线程异步地执行委托所指向的方法。
-
-  **由于使用BeginInvoke创建的线程都是后台线程**
-
-  然后通过EndInvoke方法获得方法的返回值（EndInvoke方法的返回值就是被调用方法的返回值），或是确定方法已经被成功调用。
-
-  使用BeginInvoke异步调用方法时，如果方法未执行完，EndInvoke方法就会**一直阻塞**，直到被调用的方法执行完毕。
-
-```C#
-using System.Threading; 
-namespace MyThread 
-{ 
-  class Program 
-  { 
-	private static int newTask(int ms) 
-	{ 
-		Console.WriteLine("任务开始"); 
-		Thread.Sleep(ms); 
-		Random random = new Random(); 
-		int n = random.Next(10000); //返回小于指定maxVal的非负整数
-		Console.WriteLine("任务完成"); 
-		return n; 
-	} 
-
-		private delegate int NewTaskDelegate(int ms); 
-		static void Main(string[] args) 
-	{ 
-		NewTaskDelegate task = newTask; //声明委托对象指向函数newTask
-		IAsyncResult asyncResult = task.BeginInvoke(2000, null, null); // EndInvoke方法将被阻塞2秒 
-		int result = task.EndInvoke(asyncResult); 
-		Console.WriteLine(result);
- 	}
-   }
- }
-```
-
-* 使用IAsyncResult asyncResult属性来判断异步调用是否完成   
-
-  虽然上面的方法可以很好地实现异步调用，但是当调用EndInvoke方法获得调用结果时，若异步调用未完成则EndInvoke就会一直阻塞，整个程序就象死了一样，这样做用户的感觉并不会太好，因此，我们可以使用asyncResult来判断异步调用是否完成，并显示一些提示信息。这样做可以增加用户体验
-
-  ```C#
-  static void Main(string[] args) 
-  	{ 
-  		NewTaskDelegate task = newTask; //声明委托对象指向函数newTask
-  		IAsyncResult asyncResult = task.BeginInvoke(2000, null, null); // EndInvoke方法将被阻塞2秒 
-  		while(!asyncResult.IsCompleted){
-              Console.Write("*");
-              Thread.sleep(100);	//主线程阻塞1000ms，不然判断过于频繁消耗资源
-          }
-      	int result = task.EndInvoke(asyncResult); //主线程执行到这里表明异步调用已完成
-  		Console.WriteLine(result);
-   	}
-  ```
-
-  
-
-### Task类
+### （5）Task类
 
 https://docs.microsoft.com/zh-cn/dotnet/api/system.threading.tasks?view=net-5.0
 
@@ -328,7 +328,7 @@ https://docs.microsoft.com/zh-cn/dotnet/csharp/language-reference/keywords/lock-
 
 调用系统API或者利用语言的多线程操作。
 
-### 3. C#自身语法
+### 3. 常用 ——C#语法的线程同步方法
 
 #### （1）lock
 
@@ -749,7 +749,7 @@ Queue Size:0
 
 
 
-### 4. 调用系统层
+### 4. 系统调用
 
 * Mutex
 
