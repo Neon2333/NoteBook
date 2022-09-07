@@ -117,9 +117,11 @@ OS为了向应用程序提供一些操作高权限资源的功能，会
 
 ## 14. C库内存操作函数
 
-### （1）内存类型
+### （1）内存空间结构
 
-* 
+![](https://raw.githubusercontent.com/WangKun233/ImageHost/main/mmmm.PNG)
+
+
 
 
 
