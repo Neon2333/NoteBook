@@ -4,25 +4,82 @@
 
 https://blog.csdn.net/u012326462/article/details/82081756
 
+```mysql
+INSERT INTO t1 (`id`,`login_time`) VLAUES (1,CURRENT_TIMESTAMP);
+INSERT INTO t1 (`id`,`login_time`) VLAUES (1,CURRENT_TIME);
+INSERT INTO t1 (`id`,`login_time`) VLAUES (1,CURRENT_DATE);
+```
+
 ## 2. INSERT INTO指令中赋值字符串用单引号
+
+## 3. id字段用什么类型好？
+
+* 一般都是 int 自增设置为主键。
+
+* int就是integer，范围-2,147,483,648到2,147,483,647；unsigned int范围0到4,294,967,295。如果int不够用，使用bigint，范围-9,223,372,036,854,775,808到9,223,372,036,854,775,807。unsinged bigint范围0到18,446,744,073,709,551,615。
+
+* 尽可能地避免使用字符串作为 id，一是字符串占据的空间更大，二是通常会比整型慢。选用字符串作为 id 时，还需要特别注意 MD5、SHA1和 UUID 这些函数。每个值是在很大范围的随机值，没有次序，这会导致插入和查询更慢：
+  插入的时候，由于建立索引是随机位置（会导致分页、随机磁盘访问和聚集索引碎片），会降低插入速度。
+  查询的时候，相邻的数据行在磁盘或内存上上可能跨度很大，也会导致速度更慢。
 
 ## 3. Windows安装
 
-> * https://www.runoob.com/mysql/mysql-install.html
->
->   #### MySQL版本为8+不需要配置my.ini中的datadir
->
-> * root密码为空时，设置root密码
->
->   https://blog.csdn.net/fengzhantian/article/details/90213785
->
-> * 配置环境变量
->
->   https://blog.csdn.net/wd2011063437/article/details/78793917
->
-> * 修改root密码
+### （1）root密码为空时，设置root密码
+
+http://c.biancheng.net/view/7152.html
+
+https://blog.csdn.net/fengzhantian/article/details/90213785
+
+```mysql
+set password for username @localhost = password(newpwd);
+```
+
+### （2）修改root密码
+
+```mysql
+set password for username @localhost = password('321');		#密码修改为321
+```
+
+### （3）修改环境变量
+
+https://blog.csdn.net/wd2011063437/article/details/78793917
+
+### （4）MySQL版本为8+不需要配置my.ini中的datadir
+
+https://www.runoob.com/mysql/mysql-install.html
+
+## 4. 查看用户
+
+### （1）查看所有用户
+
+```mysql
+>Mysql -u root -p
+>Enter password:你的密码
+mysql>use mysql;
+Datase changed
+mysql>select user,host from user;
+```
+
+### （2）查看当前用户
+
+```mysql
+SELECT current_user();
+```
+
+
 
 ## 4. 不是只有主键可以自增，给非主键设置自增时需要设成唯一主键
+
+每张表只能有一个自增的字段，但这个字段并不一定要是主键。给非主键设置AUTO_INCREMENT需要给该字段设置Unique
+
+```mysql
+create table t1(
+`id` int(10) NOT NULL COMMENT "ID",
+`name` varchar(10) NOT NULL COMMENT "姓名",
+`num` int(10) NOT NULL COMMENT "编号" AUTO_INCREMENT UNIQUE,
+PRIMARY KEY(`id`)
+);
+```
 
 https://www.cnblogs.com/mm20/p/8060425.html
 
@@ -30,9 +87,26 @@ PRIMARY KEY (主键的列不能为NULL)
 
 ## 5.批量插入大量数据
 
-#### 通过INSERT INTO插入
+### （1）Navicat通过Excel导入
+
+https://www.cnblogs.com/vuciao/p/10586766.html
+
+![image-20211028104242895](https://i.loli.net/2021/10/28/UwR8tMgOQ7ZEbDf.png)
+
+![image-20211028104323228](https://i.loli.net/2021/10/28/UNGSHleYkIh5z8x.png)
+
+![image-20211028104346101](https://i.loli.net/2021/10/28/f4MvY7pnSdWjuKN.png)
+
+![image-20211028104425922](https://i.loli.net/2021/10/28/3DPeS6nsKoHZ4cl.png)
+
+
+
+![image-20211028104532953](https://i.loli.net/2021/10/28/fgLslb7o3XAdIRu.png)
+
+### （2）通过INSERT INTO插入（数据量不大时可使用）
 
 ```mysql
+-- 将下列SQL语句拼接成字符串
 INSERT INTO device_config(
 `LineNO`, 
 `DeviceStatus_001`, 
@@ -72,40 +146,62 @@ VALUES
 ('102','0','0','0','0','0','0','1','1','1','0','0','0','0','0','0','0','0','0'),
 ('103','0','0','0','0','0','0','0','0','0','1','1','1','0','0','0','0','0','0'),
 ('104','0','0','0','0','0','0','0','0','0','0','0','0','1','1','1','0','0','0'),
-('105','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','1','1','1');
+('105','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','1','1','1');	
 ```
 
-#### 通过Excel导入
+```C#
+  public static void MySqlExcuteBatch(List<string> sqlList, string conStr)		//将上面拼接的字符串传到conStr
+    {
+        using (MySqlConnection conn = new MySqlConnection(conStr))
+        {
+            using (MySqlCommand cmd = new MySqlCommand())
+            {
+                cmd.Connection = conn;
 
-https://www.cnblogs.com/vuciao/p/10586766.html
+                cmd.CommandType = CommandType.Text;
+                if (conn.State != ConnectionState.Open)
+                    conn.Open();
+                MySqlTransaction tx = conn.BeginTransaction();
+                cmd.Transaction = tx;
+                try
+                {
+                    for (int n = 0; n < sqlList.Count; n++)
+                    {
+                        string strsql = sqlList[n].ToString();
+                        if (strsql.Trim().Length > 1)
+                        {
+                            cmd.CommandText = strsql;
+                            cmd.ExecuteNonQuery();
+                        }
 
-![image-20211028104242895](https://i.loli.net/2021/10/28/UwR8tMgOQ7ZEbDf.png)
+                        if (n > 0 && (n % 800 == 0 || n == sqlList.Count - 1))
+                        {
+                            tx.Commit();
+                            tx = conn.BeginTransaction();
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    tx.Rollback();
+                    throw new Exception(e.Message);
+                }
+            }
+        }
+    }
+```
 
-![image-20211028104323228](https://i.loli.net/2021/10/28/UNGSHleYkIh5z8x.png)
-
-![image-20211028104346101](https://i.loli.net/2021/10/28/f4MvY7pnSdWjuKN.png)
-
-![image-20211028104425922](https://i.loli.net/2021/10/28/3DPeS6nsKoHZ4cl.png)
-
-
-
-![image-20211028104532953](https://i.loli.net/2021/10/28/fgLslb7o3XAdIRu.png)
-
-#### 通过代码+事务插入
+### （3）C#通过读取CSV文件导入（速度快，数据量大时不要用（2），用这个）
 
 https://www.jianshu.com/p/63bd412cb030
 
-#### 通过脚本插入
+### （4）通过SQL脚本插入
 
 https://www.jb51.net/article/163001.htm
-
-
 
 ## 6. 关于反引号
 
 反引号一般用于把字段名、表名括起来，但一般来说字段名、表名若不会与关键字混淆，就不需要加。
-
-
 
 ## 7. MySQL默认不区分大小写
 
@@ -129,7 +225,37 @@ https://www.cnblogs.com/devcjq/articles/6020391.html
 truncate table table_name;	-- 清空表重新插入
 ```
 
+## 10. 远程连接
 
+MySQL：
+
+https://blog.csdn.net/hj33_/article/details/127025265
+
+https://blog.csdn.net/qq_28742901/article/details/123866228
+
+Mariadb：
+
+https://blog.csdn.net/weixin_43919932/article/details/123193962
+
+### （1）查看MySQL服务端口
+
+![image-20221203000725964](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221203000725964.png)
+
+```bash
+netstat -tunlp | grep mysql
+```
+
+![image-20221203002254633](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221203002254633.png)
+
+### （2）Navicat连接虚拟机中的MySQL/Mariadb
+
+**重点在修改配置文件，修改bind-address = 0.0.0.0（设为可被外部访问，如果设成127.0.0.1则只能本地访问。）**
+
+![image-20221203005527752](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221203005527752.png)
+
+![image-20221203005557512](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221203005557512.png)
+
+![image-20221203005624122](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221203005624122.png)
 
 ---
 
@@ -153,7 +279,45 @@ truncate table table_name;	-- 清空表重新插入
 
 ## 2. 数据结构
 
+### （1）字符串
 
+* CHAR(n)
+
+  n最大是255，最大255个字节/字符。
+
+  CHAR(n)用在存储定长字符串的场景。n表示字符串长度（有多少个字符/多少个字节），若填充的字符串中字符个数少于n，多出来的将填充空字符。
+
+* VARCHAR(n)
+
+  n最大是65535，最大是65535个字节/字符。
+
+  VARCHAR(n)用在存储变长字符串的场景。
+
+* 例
+
+  “abc”存储在CHAR(10)中：占用3个字节，剩下7字节存储空字符。
+
+  "abc"存储在VARCHAR(10)中：只占用3个字节。最多可存储10个字节。
+
+### （2）整数
+
+int(n)
+
+* 无论n是多少，int永远都是4字节。
+
+  n表示显示宽度。若数字位数多于n则无视n直接显示整个数字，若数字位数少于n则其他位填充0（要设置unsigned zerofill）。
+
+* 省略n
+
+  长度为该整数类型在无符号情况下最大数值的位数。
+
+  如：int 为 2^32-1
+
+### （3）日期
+
+* DATE
+* TIME
+* TIMESTAMP
 
 ## 3.SHOW命令
 
@@ -418,8 +582,6 @@ http://c.biancheng.net/view/2448.html
   SELECT id,productName,dir_id FROM product WHERE dir_id IS NULL
   ```
 
-  
-  
   ```mysql
   SELECT id,productName,dir_id FROM product WHERE dir_id IS NOT NULL
   ```
@@ -528,15 +690,15 @@ SHOW TABLES;	//显示当前库中所有的表
 
 ```mysql
 //插入记录
-INSERT INTO tb_name (field1,field2) VALUES (val11,val12),(val21,val22),(val31,val32);		//若每个字段都按顺序赋值则可省略字段名，若有字段被省略，则需要将赋值的字段写出来
+INSERT INTO tb_name (field1,field2) VALUES (val11,val12),(val21,val22),(val31,val32);		//若每个字段都按顺序赋值则可省略字段名，若有字段值被省略，则需要将所有赋值的字段写出来
 //删除记录
 DELETE FROM tb_name [WHERE clause];
 //修改某条记录的某个字段的值
 UPDATE tb_name SET `field_name` = newVal;
-//显示某个字段
+//查询
 SELECT `field_name1` FROM tb_name; 
-//复制表中记录（其中，字段1的值不是表中的，其他字段是从表中查询得到的）
-insert into tablename (字段1,字段2,字段3,...) select 自定义的值 as 字段1,字段2,字段3,... from tablename where....;
+//复制表中记录（其中，字段1的值不是表中的，其他字段是从表中查询得到的要拷贝插入的）
+insert into tablename (字段1,字段2,字段3,...) select 自己赋值的值 as 字段1,字段2,字段3,... from tablename where....;
 ```
 
 * MODIFY和CHANGE的区别：
@@ -678,11 +840,11 @@ FROM device_config;
 
   当前年月日时分秒，YYYY-MM-DD格式
 
-* Date()
+* **Date()**
 
   日期时间中的日期
 
-* Time()
+* **Time()**
 
   日期时间中的时间
 
@@ -706,7 +868,7 @@ FROM device_config;
 
   当前时分秒
 
-* CURRENT_TIMESTAMP()
+* **CURRENT_TIMESTAMP()**
 
   当前日期时间
 
@@ -4176,8 +4338,6 @@ https://www.cnblogs.com/zhou2019/p/10918131.html
   SET PASSWORD FOR user_name = PASSWORD('password');
   ```
 
-
-
 ---
 
 ## 35. 日志
@@ -4186,19 +4346,21 @@ https://blog.csdn.net/defonds/article/details/46858949
 
 需要配置启用日志。
 
-
-
 ---
 
 ## 36.存储图片
 
 图片/视频不直接存在数据库中（要以二进制数据存），而是存在文件系统中，将图片的路径存在数据库中。
 
+---
+
+## 37. 多线程读写MySQL线程安全
+
 
 
 ---
 
-## 37.MySQL与NoSQL
+## 38.MySQL与NoSQL
 
 http://www.cppblog.com/sunicdavy/archive/2015/07/20/210992.html
 
@@ -4228,7 +4390,7 @@ value为document类型, 基于BSON的value序列化
 
 转载请注明: 战魂小筑http://www.cppblog.com/sunicdavy
 
- 
+
 
 ## redis
 
@@ -4283,6 +4445,4 @@ value限制1M
 
 
 ---
-
-## 39. 多线程读写MySQL线程安全
 
