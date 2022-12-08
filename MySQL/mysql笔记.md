@@ -10,7 +10,11 @@ INSERT INTO t1 (`id`,`login_time`) VLAUES (1,CURRENT_TIME);
 INSERT INTO t1 (`id`,`login_time`) VLAUES (1,CURRENT_DATE);
 ```
 
+
+
 ## 2. INSERT INTO指令中赋值字符串用单引号
+
+
 
 ## 3. id字段用什么类型好？
 
@@ -22,7 +26,9 @@ INSERT INTO t1 (`id`,`login_time`) VLAUES (1,CURRENT_DATE);
   插入的时候，由于建立索引是随机位置（会导致分页、随机磁盘访问和聚集索引碎片），会降低插入速度。
   查询的时候，相邻的数据行在磁盘或内存上上可能跨度很大，也会导致速度更慢。
 
-## 3. Windows安装
+
+
+## 4. Windows安装
 
 ### （1）root密码为空时，设置root密码
 
@@ -48,7 +54,9 @@ https://blog.csdn.net/wd2011063437/article/details/78793917
 
 https://www.runoob.com/mysql/mysql-install.html
 
-## 4. 查看用户
+
+
+## 5. 查看用户
 
 ### （1）查看所有用户
 
@@ -68,9 +76,11 @@ SELECT current_user();
 
 
 
-## 4. 不是只有主键可以自增，给非主键设置自增时需要设成唯一主键
+## 6. 不是只有主键可以自增，给非主键设置自增时需要设成唯一主键
 
-每张表只能有一个自增的字段，但这个字段并不一定要是主键。给非主键设置AUTO_INCREMENT需要给该字段设置Unique
+每张表只能有一个自增的字段，但这个字段并不一定要是主键。给非主键设置AUTO_INCREMENT需要给该字段设置Unique。
+
+即：只有PAIMARY KEY或UNIQUE可设置为自增。
 
 ```mysql
 create table t1(
@@ -85,7 +95,9 @@ https://www.cnblogs.com/mm20/p/8060425.html
 
 PRIMARY KEY (主键的列不能为NULL)
 
-## 5.批量插入大量数据
+
+
+## 7. 批量插入大量数据
 
 ### （1）Navicat通过Excel导入
 
@@ -199,17 +211,23 @@ https://www.jianshu.com/p/63bd412cb030
 
 https://www.jb51.net/article/163001.htm
 
-## 6. 关于反引号
+
+
+## 8. 关于反引号
 
 反引号一般用于把字段名、表名括起来，但一般来说字段名、表名若不会与关键字混淆，就不需要加。
 
-## 7. MySQL默认不区分大小写
+
+
+## 9. MySQL默认不区分大小写
 
 MySQL默认是不区分大小写的，但是在很多情况下需要大小敏感
 
 修改MySql Server安装目录下的 my.ini 文件，在mysqld节下加入下面一行 set-variable=lower_case_table_names=0 （0：大小写敏感；1：大小写不敏感）最后重启一下MySql服务即可。
 
-## 8. MySQL配置局域网可访问
+
+
+## 10. MySQL配置局域网可访问
 
 * 两台电脑通过网线连接，配置同一网段
 
@@ -217,7 +235,9 @@ MySQL默认是不区分大小写的，但是在很多情况下需要大小敏感
 
   配置用户名、密码
 
-## 9. 插入/删除记录后将表的主键ID重排
+
+
+## 11. 插入/删除记录后将表的主键ID重排
 
 https://www.cnblogs.com/devcjq/articles/6020391.html
 
@@ -225,7 +245,9 @@ https://www.cnblogs.com/devcjq/articles/6020391.html
 truncate table table_name;	-- 清空表重新插入
 ```
 
-## 10. 远程连接
+
+
+## 12. 远程连接MySQL
 
 MySQL：
 
@@ -257,9 +279,19 @@ netstat -tunlp | grep mysql
 
 ![image-20221203005624122](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221203005624122.png)
 
+### （3）命令行连接
+
+```mysql
+mysql -h192.168.42.128 -uroot -p
+```
+
+
+
 ---
 
-# MySQL基本知识
+# MySQL基础
+
+
 
 ## 1.基本概念
 
@@ -268,7 +300,7 @@ netstat -tunlp | grep mysql
   常用客户端有GUI的也有CLI的，如cmd中的mysql、Navicat等。在cmd中输入mysql调用CLI形式的Client软件，直接输入mysql可能报错，因为该CLI客户端软件没有用户名和密码来连接服务器。
 
   ```mysql
-  mysql -hlocalhost -p3036 -uroot -p 	//输入用户名和密码，调用CLI，连接服务器
+  mysql -hIP -p3036 -uroot -p 	//输入用户名和密码，调用CLI，连接服务器
   ```
 
 * 注释
@@ -276,6 +308,14 @@ netstat -tunlp | grep mysql
   单行：--空格，或#
 
   多行/**/
+
+* 启动服务
+
+  ```bash
+  systemctl restart mysql
+  ```
+
+
 
 ## 2. 数据结构
 
@@ -289,13 +329,13 @@ netstat -tunlp | grep mysql
 
 * VARCHAR(n)
 
-  n最大是65535，最大是65535个字节/字符。
+  n最大是65535，最大是65535个字节/字符。实际长度是字符串长度。
 
   VARCHAR(n)用在存储变长字符串的场景。
 
 * 例
 
-  “abc”存储在CHAR(10)中：占用3个字节，剩下7字节存储空字符。
+  "abc"存储在CHAR(10)中：占用3个字节，剩下7字节存储空字符。
 
   "abc"存储在VARCHAR(10)中：只占用3个字节。最多可存储10个字节。
 
@@ -305,13 +345,48 @@ int(n)
 
 * 无论n是多少，int永远都是4字节。
 
-  n表示显示宽度。若数字位数多于n则无视n直接显示整个数字，若数字位数少于n则其他位填充0（要设置unsigned zerofill）。
+  **n只表示显示宽度。**
 
-* 省略n
+  若数字位数多于n则无视n直接显示整个数字，**若数字位数少于n则其他位填充0（要设置unsigned zerofill）。**
 
-  长度为该整数类型在无符号情况下最大数值的位数。
+  **n和字节数之间没有任何关系，字节数只是能表示数字的范围，n表示数字的显示宽度。**
 
-  如：int 为 2^32-1
+  ```mysql
+  `id` int(5) unsigned fillzero primary key
+  -- 00001
+  ```
+
+
+* tinyint占1字节，无符数可表示0~2^8-1，有符数可表示-2^7~2^7-1。
+* smallint占2字节
+* int占4字节
+* bigint占8字节
+
+decimal(m,n)
+
+* decimal也可以设置zerofill
+
+* m表示整数位数+小数位数，可取范围：1~65
+
+* n表示小数位数，可取范围：0~30，且不能超过m
+
+  ```mysql
+  amount decimal(6,2)		#表示amount的取值范围为-9999.99~9999.99
+  ```
+
+* n省略时的默认值为0
+
+  ```mysql
+  amount decimal(6)		#表示amount没有小数
+  ```
+
+* m省略时的默认值为10
+
+  ```mysql
+  amount decimal		#表示amount一共10位整数
+  ```
+
+  
 
 ### （3）日期
 
@@ -319,17 +394,21 @@ int(n)
 * TIME
 * TIMESTAMP
 
+
+
 ## 3.SHOW命令
 
 ```mysql
 show databases;	//显示所有数据库
-show tables;	//显示所有表
-desc t_name;	//显示表结构
 show create database db_name;	//显示数据库db_name创建时的信息
+show tables from db;	//显示库db的所有表
+desc t_name;	//显示表结构
 show create table t_name;	//显示表t_name创建时的信息
 ```
 
-## 4.检索数据
+
+
+## 4.查询数据
 
 * 检索出来的原始数据需要应用程序规定显示的格式
 
@@ -373,7 +452,7 @@ show create table t_name;	//显示表t_name创建时的信息
 * 完全限定名
 
   ```mysql
-  SELECT t_name.filed_name FROM db_name.t_name;
+  SELECT t_name.field_name FROM db_name.t_name;
   //使用.标识字段所在表和表所在数据库
   ```
 
@@ -407,6 +486,7 @@ show create table t_name;	//显示表t_name创建时的信息
 * 语句顺序
 
   SELECT => FROM => ORDER BY => LIMIT
+
 
 
 ## 5. 过滤数据
@@ -464,6 +544,10 @@ show create table t_name;	//显示表t_name创建时的信息
 
   操作符 BETWEEN ... AND 会选取介于两个值之间的数据范围，这些值**可以是数值、文本或者日期，属于一个闭区间查询。  **
 
+
+* NOT BETWEEN AND
+
+
 * LIKE模式，使用通配符进行过滤
 
   LIKE谓词：在子句中使用LIKE表明子句中使用的搜索模式，是通配符匹配而不是相等匹配。
@@ -472,19 +556,21 @@ show create table t_name;	//显示表t_name创建时的信息
   SELECT field_name1,field_name2,field_name3 FROM t_name 
   WHERE field_name1 LIKE 'jet%';
   ```
-  
+
   %可在搜索模式中任意位置，区分大小写，可有多个。可匹配0/1/多个字符。
-  
+
   注意：待匹配字符串末尾有空格，需要用函数去掉首尾空格。
-  
+
   _只能匹配一个字符
-  
+
   通配符速度慢，不要滥用，尽量不把通配符放在字符串开头。
-  
+
   ```mysql
   -- 24、查询id、货品名称、分类编号，零售价大于等于80并且货品名称匹配'%罗技M1_ _'：
   SELECT id,productName,dir_id,salePrice FROM product WHERE salePrice>=80 AND productName LIKE '%罗技M1__'
   ```
+
+
 
 ## 6.正则表达式
 
@@ -531,12 +617,14 @@ show create table t_name;	//显示表t_name创建时的信息
 * 练习
 
   https://blog.csdn.net/qq_28633249/article/details/77686976
+  
+  
 
 ## 7.默认值约束
 
-* DEFAULT用于约束字段，当字段未输入值时，自动添加一个预设的值。
+* DEFAULT用于约束字段，即当在表中插入一条新纪录时，如果没有给这个字段赋值，那么，数据库系统会自动为这个字段插入默认值。
 
-  一般用于NOT NULL，防止未输入值导致出错。
+  **用了非空约束NOT NULL，一定要指定default值。**
 
   http://c.biancheng.net/view/2447.html
 
@@ -567,7 +655,7 @@ show create table t_name;	//显示表t_name创建时的信息
 
 http://c.biancheng.net/view/2448.html
 
-* 字段不指定时，默认为可为NULL
+* 字段不指定时，默认为NULL
 
 * 删除NOT NULL约束
 
@@ -595,7 +683,7 @@ http://c.biancheng.net/view/2448.html
 
 ==MySQL唯一约束（Unique Key）是指所有记录中字段的值不能重复出现。==例如，为 id 字段加上唯一性约束后，每条记录的 id 值都是唯一的，不能出现重复的情况。如果其中一条记录的 id 值为‘0001’，那么该表中就不能出现另一条记录的 id 值也为‘0001’。
 
-唯一约束与主键约束相似的是它们都可以确保列的唯一性。不同的是，唯一约束在一个表中可有多个，并且设置唯一约束的列允许有空值，但是只能有一个空值。而主键约束在一个表中只能有一个，且不允许有空值。比如，在用户信息表中，为了避免表中用户名重名，可以把用户名设置为唯一约束。
+**唯一约束与主键约束相似的是它们都可以确保列的唯一性。不同的是，唯一约束在一个表中可有多个**，并且设置唯一约束的列允许有空值，但是只能有一个空值。而主键约束在一个表中只能有一个，且不允许有空值。比如，在用户信息表中，为了避免表中用户名重名，可以把用户名设置为唯一约束。
 
 #### 建表时添加唯一约束
 
@@ -632,7 +720,7 @@ mysql> ALTER TABLE tb_dept1
 
 
 
-## 10.常用指令
+## 10.增删改查常用指令
 
 #### 库操作
 
@@ -650,12 +738,11 @@ SELECT DATABASE();	//当前使用的库
 ```mysql
 //增
 CREATE TABLE IF NOT EXISTS runoob_tbl(
-   `runoob_id` INT UNSIGNED NOT NULL AUTO_INCREMENT,	--默认非NULL，自增
-   `runoob_title` VARCHAR(100) NOT NULL,				--默认非NULL
+   `runoob_id` INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,	--默认非NULL，自增，这里不能写AUTO_INCREMENT=10
+   `runoob_title` VARCHAR(100) NOT NULL DEFAULT 'title',				--默认非NULL
    `runoob_author` VARCHAR(40) DEFAULT NULL,			--默认值NULL
    `submission_date` DATE	DEFAULT NULL,
-   PRIMARY KEY ( `runoob_id` )
-)ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;
+)ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8;	-- AUTO_INCREMENT=10表示自增从10开始
 ```
 
 ```mysql
@@ -668,8 +755,8 @@ TRUNCATE TABLE runoob_tb1;	//表还在，但是表中记录都被清空
 //改
 ALTER TABLE tb_name ADD COLUMN `newField` typename(n) NOT NULL DEFAULT '...' COMMENT '...' AFTER field_;
 ALTER TABLE tb_name DROP COLUMN field_;
-ALTER TABLE tb_name MODIFY COLUMN field_ typename(n) NOT NULL DEFAULT '' COMMENT AFTER field_pre;
-ALTER TABLE tb_name CHANGE COLUMN field_old field_new typename(n) NOT NULL DEFAULT '' COMMENT '' AFTER field_;
+ALTER TABLE tb_name MODIFY COLUMN field_ typename(n) NOT NULL DEFAULT '' COMMENT '..';
+ALTER TABLE tb_name CHANGE COLUMN field_old field_new typename(n) NOT NULL DEFAULT '' COMMENT '..'';
 ALTER TABLE tb_name ADD CONSTRAINT <唯一约束名> UNIQUE(<列名>);
 ```
 
@@ -683,7 +770,7 @@ ALTER TABLE tb_name ADD CONSTRAINT <唯一约束名> UNIQUE(<列名>);
 
 ```mysql
 //查
-SHOW TABLES;	//显示当前库中所有的表
+SHOW TABLES FROM db_name;	//显示库db_name中所有的表
 ```
 
 #### 字段操作
@@ -697,8 +784,11 @@ DELETE FROM tb_name [WHERE clause];
 UPDATE tb_name SET `field_name` = newVal;
 //查询
 SELECT `field_name1` FROM tb_name; 
-//复制表中记录（其中，字段1的值不是表中的，其他字段是从表中查询得到的要拷贝插入的）
-insert into tablename (字段1,字段2,字段3,...) select 自己赋值的值 as 字段1,字段2,字段3,... from tablename where....;
+```
+
+```mysql
+INSERT INTO t_student (name,age,email) values ('张三',18,'10000@qq.com');
+INSERT INTO t_student (name,age) values ('周七',22);
 ```
 
 * MODIFY和CHANGE的区别：
@@ -721,6 +811,18 @@ insert into tablename (字段1,字段2,字段3,...) select 自己赋值的值 as
 
   字段：INSERT INTO/DELETE FROM/UPDATE SET/SELECT FROM，且不要加上TABLE关键字。
 
+#### 复制表中一行的数据并修改某些字段的值插入当前表
+
+```mysql
+//复制表中记录（其中，字段3、字段4的值不是表中的，其他字段是从表中查询得到的要拷贝插入的）
+insert into tablename (字段1,字段2,字段3,字段4...) select 字段1,字段2,自己赋值字段3的值 AS 字段3, 自己赋值的字段4的值 AS 字段4, from tablename where....;
+```
+
+```mysql
+-- 例
+insert into person_ (job,name,age) select 'doctor' as `job`,`name`,`age` from person_ where id=2;
+```
+
 #### 获取表的所有字段名
 
 ```mysql
@@ -739,13 +841,38 @@ https://blog.csdn.net/ZZQHELLO2018/article/details/103784869?utm_medium=distribu
 
 #### 主键
 
+**一张表只能有一个主键。**
 
+确保字段的值不重复，不能为NULL。
+
+可设置自增。
+
+```mysql
+`id` int(5) unsigned PRIMARY KEY AUTO_INCREMENT
+```
+
+#### 联合主键
+
+联合主键：主键由多个字段共同组成。
+
+联合主键不能直接在字段定义后以PRIMARY KEY声明。
+
+使用场景：当一个字段无法唯一区分一条记录时，可用多个字段共同作为主键。
+
+```mysql
+-- 比如，设置学生选课数据表时，使用学生编号做主键还是用课程编号做主键呢？如果用学生编号做主键，那么一个学生就只能选择一门课程。如果用课程编号做主键，那么一门课程只能有一个学生来选。显然，这两种情况都是不符合实际情况的。实际上设计学生选课表，要限定的是一个学生只能选择同一课程一次。因此，学生编号和课程编号可以放在一起共同作为主键，这也就是联合主键了。
+PRIMARY KEY(`student_id`, `course_id`
+```
 
 #### 唯一主键
 
+也能确保字段值不重复，可以为NULL，但一张表的字段只能有一个NULL。
 
+可设置自增。
 
-
+```mysql
+`name` varchar(10) UNIQUE	-- 设置名字不重复
+```
 
 ### （2）Navicat中给表添加主键
 
@@ -763,9 +890,10 @@ concat(field1, '(', field2 ,')')
 
 ```MYSQL
 SELECT t1.DeviceNO,t2.DeviceName,
-(CASE WHEN t1.DeviceStatus=1 THEN '正常'
+(CASE 
+WHEN t1.DeviceStatus=1 THEN '正常'
 WHEN t1.DeviceStatus=0 THEN '异常'
-WHEN t1.DeviceStatus=-1 THEN '无效'
+WHEN t1.DeviceStatus IS null THEN '无效'
 END) AS DeviceStatus,
 t1.TestingNum,t1.DefectNum,
 CONCAT(t1.CPUTemperature,'℃') AS CPUTemperature,CONCAT(t1.CPUUsage,'%') AS CPUUsage,CONCAT(t1.MemoryUsage,'%') AS MemoryUsage
@@ -788,7 +916,7 @@ RTrim(field)	//去掉右侧的空格
 AS 后跟字符串单引号
 
 ```mysql
-SELECT CONCAT(`id`,'(',`name`,')') AS 'result'
+SELECT CONCAT('(', `id`,`name`,')') AS 'result'
 FROM `student`
 WHERE `department`='中文系'
 ORDER BY `id`;
@@ -796,7 +924,7 @@ ORDER BY `id`;
 
 ### （4）计算字段
 
-不仅已有字段可以作为字段由SELECT显示，已有字段的计算表达式也可，还可用AS取一个别名。
+不仅已有字段可以作为字段由SELECT显示，**已有字段的计算表达式也可，还可用AS取一个别名。**
 
 ```mysql
 SELECT prod_id,prod_quantity,prod_price,
@@ -827,12 +955,12 @@ DeviceStatus_103 +
 DeviceStatus_104 +
 DeviceStatus_105
 )AS DeviceTotalNum
-FROM device_config;
+FROM device_config;		-- 设备总数
 ```
 
-
-
 ### （5）日期时间
+
+https://www.cnblogs.com/yuezc/p/12149234.html
 
 养成对应含有日期时间的字段，若需要时间则加上TIME()，若需要日期则加上DATE()的习惯。
 
@@ -910,7 +1038,7 @@ WHERE Year(order_date)=2020 AND Month(order_date)=9;
 求均值的列的字段作为函数参数。
 
 ```mysql
-SELECT AVG(prod_price) AS 'result'
+SELECT AVG(prod_price) AS 'avg_result'
 FROM products
 WHERE `prod_id` IN(1001,1002,1003);
 ```
@@ -1055,6 +1183,8 @@ HAVING COUNT(*)>=2;
 ORDER BY `prod_num`;                    //按照prod_num排序
 ```
 
+
+
 ## 13. LIMIT
 
 * LIMIT后跟的：不能是负数、只能是明确的数字不能是表达式
@@ -1088,6 +1218,8 @@ SELECT * FROM t_name ORDER BY `age` desc LIMIT 2,2;		-- 第二页
 SELECT * FROM t_name ORDER BY `age` desc LIMIT 4,2;		-- 第三页
 ```
 
+
+
 ## 14.分组——GROUP BY（重点）
 
 ### （1）注意事项
@@ -1102,7 +1234,7 @@ SELECT * FROM t_name ORDER BY `age` desc LIMIT 4,2;		-- 第三页
   > 文中使用的是5.7版本，默认是按照这种规范来的。
   > mysql早期的一些版本，没有上面这些要求，select后面可以跟任何合法的列  
 
-* ***特别的，若SELECT后不是聚合函数，也非GROUP BY后的字段，则显示原始表格分组后分组中第一条记录的该字段值，不受前面几个SELECT字段的影响。***
+* **特别的，若SELECT后不是聚合函数，也非GROUP BY后的字段，则显示原始表格分组后分组中第一条记录的该字段值，不受前面几个SELECT字段的影响。**
 
   ```mysql
   -- 需求：获取每个用户下单的最大金额及下单的年份，输出：用户id，最大金额，年份
@@ -1156,8 +1288,6 @@ WHERE
 t1.user_id = t2.uid
 AND t1.price = t2.pc;
 ```
-
-
 
 * **建议：在写分组查询的时候，最好按照标准的规范来写，select后面出现的列必须在group by中或者必
   须使用聚合函数。  **
@@ -1255,6 +1385,8 @@ limit [offset,] count;
 
 ![image-20211026085535132](https://i.loli.net/2021/10/26/Cwy6hxOYGn3IiZN.png)
 
+
+
 ## 15. 日期和时间
 
 | 函数名称                | 作 用                                                        |
@@ -1291,7 +1423,7 @@ limit [offset,] count;
 
 ### （2）from_unixtime——时间戳转日期  
 
-> FROM_UNIXTIME(unix_timestamp[,format]) 函数把 UNIX 时间戳转换为普通格式的日期时间
+> FROM_UNIXTIME(unix_timestamp, [format]) 函数把 UNIX 时间戳转换为普通格式的日期时间
 > 值，与 UNIX_TIMESTAMP () 函数互为反函数。
 > 有2个参数：
 > unix_timestamp：时间戳（秒）
@@ -1394,8 +1526,7 @@ mysql> select sec_to_time(100),sec_to_time(10000);
 
 DATE_FORMAT(date，format) 函数是根据 format 指定的格式显示 date 值。
 DATE_FORMAT() 函数接受两个参数：
-date：是要格式化的有效日期值format：是由预定义的说明符组成的格式字符串，每个说明符前
-面都有一个百分比字符(%)。
+date：是要格式化的有效日期值
 format：格式和上面的函数 from_unixtime 中的format一样，可以参考上面的。  
 
 ```mysql
@@ -1426,7 +1557,7 @@ MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但�
 
 * UNION ALL
 
-  不去重
+  不去重，允许出现重复的记录
 
 * 连接的语句最好用括号括起来，括号内部的ORDER BY / LIMIT作用于括号内的SELECT语句。否则ORDER BY/LIMIT语句放在最后一条SELECT后，作用的是整个表，而不是最后一条SELECT查询到的表。见T2-8。
 
@@ -1434,9 +1565,9 @@ MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但�
 
 ## 18.子查询（重点）
 
-https://www.cnblogs.com/xiaoxi/p/6734025.html
-
 https://blog.csdn.net/weixin_35782148/article/details/113089077
+
+https://www.cnblogs.com/xiaoxi/p/6734025.html
 
 https://www.cnblogs.com/zhuiluoyu/p/5822481.html
 
@@ -1462,19 +1593,27 @@ https://www.cnblogs.com/zhuiluoyu/p/5822481.html
 
 * 操作符
 
-   可以使用的操作符：= > < >= <= <> ANY IN SOME ALL EXISTS  
+   可以使用的操作符：= > < >= <= <> IN ANY  ALL EXISTS  
+   
+   **ANY：**对于子查询返回的列中的任何一个数值，如果比较结果为TRUE，就返回TRUE。好比“10 >any(11, 20, 2, 30)”，由于10>2，所以，该该判断会返回TRUE；只要10与集合中的任意一个进行比较，得到TRUE时，就会返回TRUE。　　
+   
+   **IN：**in的意思就是指定的一个值是否在这个集合中，如何在就返回TRUE；否则就返回FALSE了。
+   
+   **ALL：**all必须与比较操作符一起使用。all的意思是“对于子查询返回的列中的所有值，如果比较结果为TRUE，则返回TRUE”。
+   
+   **EXISTS：**
 
 ### （1）子查询作为过滤条件
 
-#### 子查询的结果是一个值
+#### ——子查询的结果是一个值
 
 ​	SELECT 查询字段 FROM 表 **WHERE 字段=（**子查询**）;** 
 
-#### 子查询结果是多行单列的时候
+#### ——子查询结果是多行单列的时候
 
 ​	SELECT 查询字段 FROM 表 **WHERE 字段 IN （子查询）** 
 
-#### 子查询的结果是多行多列
+#### ——子查询的结果是多行多列
 
 ​	**子查询结果是多行多列的临时表**，肯定接在FROM后
 
@@ -1485,7 +1624,7 @@ https://www.cnblogs.com/zhuiluoyu/p/5822481.html
 ```mysql
  SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,tmp.`total` FROM
 (SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,COUNT(`goods_id`) AS 'total' FROM goods ORDER BY `cat_id` ASC,`goods_id` DESC) AS tmp
-GROUP BY `cat_id`;
+GROUP BY `cat_id`; -- `cat_id` ASC,`goods_id` DESC 表示在cat_id相同的情况下goods_id降序
 ```
 
 ![微信截图 20210507142031](https://i.loli.net/2021/11/15/7V48GbWyas6CMqp.png)
@@ -1495,8 +1634,10 @@ GROUP BY `cat_id`;
 * Q：主查询中未使用聚合函数，却使用GROUP BY。按照cat_id分组，查询goods_id,goods_name,cat_id,shop_price等字段，为什么每个cat_id只显示一条记录（cat_id分组下的第一条记录）？
 
   不规范的用法？？？
+  
+  A：见14分组，当SELECT后跟的字段不是分组依据字段或聚合函数时，只显示分组的第一条记录。
 
-#### with as将临时表作为变量再操作
+#### ——with as将临时表作为变量再操作
 
 **MySQL8.0以上版本的特性，版本低于8.0使用该语法将会显示错误**
 
@@ -1561,7 +1702,7 @@ T1-3
 > 列子查询，一般搭配着多行操作符使用
 
 > **in(not in)**——列表中的“任意一个”
-> **any或者some**——和子查询返回的“某一个值”比较，比如**a>some(10,20,30)**，a大于子查询中
+> **any**——和子查询返回的“某一个值”比较，比如**a>any(10,20,30)**，a大于子查询中
 > 任意一个即可，a大于子查询中最小值即可，等同于a>min(10,20,30)。
 > **all**——和子查询返回的“所有值”比较，比如**a>all(10,20,30)**，a大于子查询中所有值，换句话
 > 说，a大于子查询中最大值即可满足查询条件，等同于a>max(10,20,30);
@@ -2299,6 +2440,13 @@ FROM productionline AS t1 LEFT JOIN faults_time AS t2
 ON t1.LineNO=t2.LineNO
 GROUP BY LineName
 ORDER BY t1.`NO`;
+
+SELECT LineName, 
+IF(COUNT(faultTime)>0,1,0) AS LineStatus
+FROM productionline AS t1 LEFT JOIN faults_current AS t2
+ON t1.LineNO=t2.LineNO
+GROUP BY LineName
+ORDER BY t1.`NO`;
 ```
 
 ### （4）在联结中使用聚集函数
@@ -2310,6 +2458,12 @@ ORDER BY t1.`NO`;
 ### （5）自联结
 
 一张表看成两张表，要取2个别名。否则字段指定存在歧义。
+
+```mysql
+select e.ename '无领导ename',le.ename '领导ename'
+     from emp e(表别名) left join emp le
+     on e.leaderid = le.eid;
+```
 
 
 
@@ -2335,6 +2489,8 @@ ORDER BY t1.`NO`;
 ### （1）条件语句
 
 #### IF函数
+
+**适用场景：两种情况的判断**
 
 ```mysql
 IF(expr1, val1, val2)	-- 如果第一个条件为True,则返回第二个参数，否则返回第三个
@@ -2451,7 +2607,7 @@ mysql> SELECT * FROM t_user;
 
 #### CASE-WHEN-THEN
 
-数据SQL CASE 表达式是一种通用的条件表达式，类似于其它语言中的 if/else 语句。
+数据SQL CASE 表达式是一种通用的条件表达式，**类似于其它语言中的switch语句**。
 
 可以表达多种条件。
 
@@ -2511,7 +2667,6 @@ mysql> SELECT * FROM t_user;
 > END
 > ```
 >
-> 
 
 ```mysql
 -- 方式1：
@@ -2520,7 +2675,7 @@ WHEN 值1 THEN 结果1或者语句1
 WHEN 值2 THEN 结果2或者语句2
 ...
 ELSE 结果n或者语句n
-END CASE; （如果是放在BEGIN END之间需要加CASE，如果在SELECT后则不需要）
+END CASE; 
 
 -- 方式2：
 CASE
@@ -2567,8 +2722,6 @@ WHERE t1.LineNO='001'
 ORDER BY t1.`NO`;
 ```
 
-
-
 ### （2）循环语句
 
 https://www.cnblogs.com/chenliyang/p/6553068.html
@@ -2576,7 +2729,7 @@ https://www.cnblogs.com/chenliyang/p/6553068.html
 #### WHILE循环
 
 ```mysql
-[标签:]while 循环条件 do
+标签:while 循环条件 do
 循环体
 end while [标签];
 ```
@@ -2675,6 +2828,8 @@ mysql> SELECT * from test2;
 +---+---+
 6 rows in set (0.00 sec)
 ```
+
+
 
 ## 21.索引
 
@@ -3285,8 +3440,6 @@ END
 
 
 
-
-
 ## 23. 变量
 
 变量分为系统变量、自定义变量
@@ -3311,10 +3464,6 @@ select 局部变量名:=值;
 /*方式2*/
 select 字段 into 局部变量名 from 表;
 ```
-
-
-
-
 
 ### （2）用户变量
 
@@ -4354,7 +4503,17 @@ https://blog.csdn.net/defonds/article/details/46858949
 
 ---
 
-## 37. 多线程读写MySQL线程安全
+## 37. MySQL规范及性能优化
+
+### （1）MySQL三表禁止join
+
+[很有启发的一篇blog](https://blog.csdn.net/hnjsjsac/article/details/116023502)
+
+
+
+### （2）表联结的字段必须加索引
+
+
 
 
 
@@ -4427,22 +4586,4 @@ value限制1M
 应用场景: 动态系统中的缓冲, 适合多读少写
 
 
-
----
-
-## 38. MySQL规范及性能优化
-
-### （1）MySQL三表禁止join
-
-[很有启发的一篇blog](https://blog.csdn.net/hnjsjsac/article/details/116023502)
-
-
-
-### （2）表联结的字段必须加索引
-
-
-
-
-
----
 

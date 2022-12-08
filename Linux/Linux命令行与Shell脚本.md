@@ -509,6 +509,9 @@ ln -s /home/wk/workspace/1.sh /opt/2.sh
   put 文件名		#Windows本地上传到Linux服务器
   get	文件名		#Linux服务器下载文件到Windows本地
   
+  put -r 目录名		#Windows本地上传文件夹到Linux服务器
+  get -r 目录名		#Linux服务器加载文件夹到Windows本地
+  
   exit		#退出sftp
   ```
 
@@ -637,7 +640,11 @@ find ./ -name 1.out -ok rm -r {} \;		#例子
 > >
 > > type：文件类型
 > >
-> > > f——文件
+> > > f——文件 
+> > >
+> > > ```bash
+> > > find path -type f -name "1.sh" 
+> > > ```
 > > >
 > > > d——目录
 > > >
@@ -1158,6 +1165,8 @@ ssh root@私有IP
 ![image-20221201020859292](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221201020859292.png)
 
 ### （2）配置云服务器的安全组/访问策略（访问规则）
+
+公网访问服务器通过2道防火墙。
 
 讲解视频：https://www.bilibili.com/video/BV1QG4y1t7ME?p=29&spm_id_from=pageDriver&vd_source=3b08e97e50222fa2ec22737f6dcb2202
 
