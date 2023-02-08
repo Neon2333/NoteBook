@@ -66,7 +66,7 @@ int  numsOfRows = sheet.LastRowNum + 1;	//sheet.LastRowNum为最后一行的inde
 ### （4）读取某行的单元格内的数据（单元格内可存不同数据类型）
 
 ```C#
-ICell cell = row.GetCell(i);	//获取row行的第i列的数据
+ICell cell = row.GetCell(j);	//获取row行的第j列的数据
 ```
 
 ```C#
@@ -235,8 +235,8 @@ public enum FileMode
 ### （2）创建表和sheet
 
 ```C#
-XSSFWorkbook wk = new XSSFWorkbook();	//创建表对象wk
-ISheet isheet = wk.CreateSheet("Sheet1");	//在wk中创建sheet1
+XSSFWorkbook wb = new XSSFWorkbook();	//创建表对象wb
+ISheet isheet = wb.CreateSheet("Sheet1");	//在wb中创建sheet1
 ```
 
 ### （3）设置列宽、行高
@@ -263,7 +263,7 @@ row2.Height =2 * 256;
 ### （5）通过流将表中写入的数据一次性写入文件中
 
 ```C#
-wk.Write(filestream);	//通过流filestream将表wk写入文件
+wb.Write(filestream);	//通过流filestream将表wb写入文件
 filestream.Close();	//关闭文件流filestream
 wk.Close();	//关闭Excel表对象wk
 ```

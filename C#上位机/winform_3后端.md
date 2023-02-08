@@ -564,7 +564,152 @@ https://blog.csdn.net/deni2000/article/details/102023993
 * File性能低，若要多次操作文件，使用FileInfo。
 * **FileStream、StreamWriter/StreamReader、BinaryWriter/BinaryReader使用完记得.Close()关闭流。**
 
-## 2. File类
+## 2. FileStream——文件流
+
+**以字节byte为单位操作数据。**
+
+提供文件读写，必须要实例化对象后才可操作文件。
+
+用FileStream关联文件，再看具体是文本文件还是二进制文件。选择用StreamWriter或StreamReader读写文本。或BinaryWriter或BinaryReader读写二进制文件。
+
+### （1）构造
+
+```C#
+string path = "";
+FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Write, FileShare fileshare, Int32 bufferSize);
+```
+
+**FileMode**——打开文件的方式
+
+> OpenOrCreate——若已存在则打开，若不存在则创建
+>
+> CreateNew——创建新文件
+>
+> Create——文件不存在则创建，若已存在则覆盖
+>
+> Append——在现有文件后添加，与FileAccess.Write一起使用
+>
+> Truncate——覆盖文件
+
+**FileAccess**——Read、Write、ReadWrite
+
+**FileShare**——是否允许其他线程共享访问：None（拒绝共享）、Read、Write、ReadWrite（同时读写）、Delete
+
+**bufferSize**——缓冲区大小
+
+### （2）方法
+
+```C# 
+int fs.Read(byte[] buffer, int offset, int count);	//从流中将从offset起的count个字节读取到缓冲区字节数组buffer中
+```
+
+```C#
+void fs.Write(byte[] buffer, int offset, int count);
+```
+
+```C# 
+close();	//关闭文件流
+Dispose();	//释放流使用的所有资源
+```
+
+```C#
+CopyTo(Stream)	//从当前流中读取所有字节并将其写入目标流。具体使用查资料
+```
+
+## 3. StreamWriter/StreamReader
+
+StreamWriter、StreamReader读写文本文件，**以字符char为单位操作数据。**
+
+与FileStream相比，StreamWriter和StreamReader封装了更多的方法，前者更加的底层、多用于大文件的读写。
+
+### （1）构造
+
+```C#
+FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.ReadWrite);
+StreamWriter sw = new StreamWriter(fs);
+StreamReader sr = new StreamReader(fs);
+```
+
+### （2）方法
+
+> * sr.ReadLine()——读取一行
+>
+>   仅仅需要读取文本的第一行。因为如果整个文本读取出来再获得第一行的话，比较占用内存。因为那个文本足足有几M大。因此用到了StreamReader的ReadLine()方法。
+>
+> * sr.ReadToEnd()——从开头读取到末尾
+>
+> * sr.Read()——读取流的下一个字符或一组字符
+> * sr.Close()——关闭当前流、释放资源
+
+> * sw.WriteLine()——写入一行，添加行结束符
+> * sw.Write()——写入数据
+> * sw.Close()——关闭流，释放资源
+
+## 4.BinaryWriter/BinaryReader
+
+BinaryWriter、BinaryReader读写二进制文件（**图片等文件**）
+
+### （1）构造
+
+构造必须要对FileStream对象上进行封装。
+
+```C#
+FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.ReadWrite);
+BinaryWriter bw = new BinaryWriter(fs);
+//BianryWriter bw = new BinaryWriter(File.Open(path, FileMode.OpenorCreate, FileAccess.ReadWrite));
+bw.Write(autoSaveTime);
+bw.Close();
+fs.Close();
+```
+
+### （2）读二进制文件
+
+```C#
+//从当前流中读取指定的字节数以写入字节数组中，并将当前位置前移相应的字节数
+public virtual byte[] binaryReader.ReadBytes(int len);
+```
+
+```c#
+FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Read);
+BinaryReader binaryReader = new BinaryReader(fs);
+byte[] fileBytes = binaryReader.ReadBytes((int)fs.Length)	//FileStream.Length获得文件大小字节数
+```
+
+### （3）写二进制文件
+
+```C#
+public virtual void Write(char[] chars, int index, int count);
+public virtual void Write(string value);
+public virtual void Write(float value);
+public virtual void Write(ulong value);
+public virtual void Write(long value);
+public virtual void Write(uint value);
+public virtual void Write(int value);
+public virtual void Write(ushort value);
+public virtual void Write(short value);
+public virtual void Write(byte[] buffer, int index, int count);
+public virtual void Write(double value);
+public virtual void Write(char[] chars);
+public virtual void Write(char ch);
+public virtual void Write(byte[] buffer);
+public virtual void Write(sbyte value);
+public virtual void Write(byte value);
+public virtual void Write(bool value);
+public virtual void Write(decimal value);
+```
+
+```c#
+byte[] fileBytes;
+binaryweader.Write(fileBytes);	//将二进制流fileBytes写入文件
+binaryweader.flush();	//清理“编写器”的缓冲区，将数据写入基础设备
+binaryweader.Close();
+```
+
+## 
+
+## 5. File类和FileInfo类
+
+### （1）File
 
 > bool Exists(string path)——判断指定路径的文件是否存在
 >
@@ -589,7 +734,22 @@ string file = @"C:\1.txt";
 bool flag = File.Exists(file);
 ```
 
-## 3. FileInfo类
+* File.Open方法
+
+  ```C#
+  string path = "";
+  FileStream fs;
+  fs = File.Open(path, FileMode.OpenorCreate, FileAccess.Read, FileShare fileshare);
+  ```
+
+* File.Create方法
+
+  ```C#
+  string path = "";
+  FileStream fs = File.Create(path, FileMode.Create, FileAccess.Write, FileShare fileshare);
+  ```
+
+### （2）FileInfo类
 
 **一个实例关联一个文件**
 
@@ -633,13 +793,9 @@ bool flag = fileinfo.Exists;
 >
 > **StreamReader** OpenText()——创建从当前文件中以UTF-8**读取**字符的StreamReader
 
-## 4. Directory类
+## 6. Directory类和DirectoryInfo类
 
-### （1）属性
-
-> 
-
-### （2）方法
+### （1）Directory类
 
 > bool Exists(string path)——目录是否存在
 >
@@ -714,11 +870,9 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
 }
 ```
 
-## 5. DirectoryInfo类
-
 公开用于创建、移动和枚举目录和子目录的**实例方法**。
 
-### （1）属性
+### （2）DirectoryInfo类
 
 > CreationTime——获取/设置当前文件夹的创建时间
 >
@@ -734,193 +888,7 @@ public bool directoryOption(string dirPath, string targetDirPath, Int16 optionMe
 >
 > Root——返回根目录
 
-### （2）方法
-
-
-
-## 6. FileStream——文件流
-
-提供文件读写，必须要实例化对象后才可操作文件。
-
-用FileStream关联文件，再看具体是文本文件还是二进制文件。选择用StreamWriter或StreamReader读写文本。或BinaryWriter或BinaryReader读写二进制文件。
-
-### （1）打开或创建
-
-* 构造
-
-  ```C#
-  string path = "";
-  FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Write, FileShare fileshare);
-  StreamWriter sw = new StreamWriter(fs, Encoding.Default);	//StreamWriter和StreamReader要指定编码
-  ```
-
-  ### FileMode——打开文件的方式
-
-  > Append——在现有文件后添加，与FileAccess.Write一起使用
-  >
-  > Create——文件不存在则创建，若已存在则覆盖
-  >
-  > OpenOrCreate——若已存在则打开，若不存在则创建
-  >
-  > CreateNew——创建新文件
-
-  FileAccess——Read、Write、ReadWrite
-
-  FileShare——是否允许其他线程共享访问（具体看书）
-
-* File.Open方法
-
-  ```C#
-  string path = "";
-  FileStream fs;
-  fs = File.Open(path, FileMode.OpenorCreate, FileAccess.Read, FileShare fileshare);
-  ```
-
-* File.Create方法
-
-  ```C#
-  string path = "";
-  FileStream fs = File.Create(path, FileMode.Create, FileAccess.Write, FileShare fileshare);
-  ```
-
-### （2）读写文本文件
-
-```C#
-//打开现有文本文件
-string path = @".txt";
-FileStream openFileStream = new FileStream(path, FileMode.Open, FileAccess.Read);
-StreamReader sr = new StreamReader(openFileStream, Encoding.Default);
-richTextBox.Text = sr.ReadToEnd();
-sr.Close();
-openFileStream.Close();
-//创建文本文件
-string path = @".txt";
-FileStream openFileStream = new FileStream(path, FileMode.Create, FileAccess.ReadWrite);
-StreamWriter sw = new StreamReader(openFileStream, Encoding.Default);
-sw.write(richTextBox.Text);	//将richTextBox中的文本写入文件
-sr.Close();
-openFileStream.Close();
-```
-
-## 7.编写器、读取器——BinaryWriter/BinaryReader/StreamWriter/StreamReader
-
-BinaryWriter、BinaryReader读写二进制文件（图片等文件）
-
-StreamWriter、StreamReader读写文本文件
-
-### （1）构造
-
-构造必须要对FileStream对象上进行封装。
-
-```C#
-FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.ReadWrite);
-BinaryWriter bw = new BinaryWriter(fs);
-//BianryWriter bw = new BinaryWriter(File.Open(path, FileMode.OpenorCreate, FileAccess.ReadWrite));
-bw.Write(autoSaveTime);
-bw.Close();
-fs.Close();
-```
-
-### （2）读二进制文件
-
-```C#
-//从当前流中读取指定的字节数以写入字节数组中，并将当前位置前移相应的字节数
-public virtual byte[] binaryReader.ReadBytes(int len);
-```
-
-```c#
-FileStream fs = new FileStream(path, FileMode.OpenorCreate, FileAccess.Read);
-BinaryReader binaryReader = new BinaryReader(fs);
-byte[] fileBytes = binaryReader.ReadBytes((int)fs.Length)	//FileStream.Length获得文件大小字节数
-```
-
-### （3）写二进制文件
-
-```C#
-public virtual void Write(char[] chars, int index, int count);
-public virtual void Write(string value);
-public virtual void Write(float value);
-public virtual void Write(ulong value);
-public virtual void Write(long value);
-public virtual void Write(uint value);
-public virtual void Write(int value);
-public virtual void Write(ushort value);
-public virtual void Write(short value);
-public virtual void Write(byte[] buffer, int index, int count);
-public virtual void Write(double value);
-public virtual void Write(char[] chars);
-public virtual void Write(char ch);
-public virtual void Write(byte[] buffer);
-public virtual void Write(sbyte value);
-public virtual void Write(byte value);
-public virtual void Write(bool value);
-public virtual void Write(decimal value);
-```
-
-```c#
-byte[] fileBytes;
-binaryweader.Write(fileBytes);	//将二进制流fileBytes写入文件
-binaryweader.flush();	//清理“编写器”的缓冲区，将数据写入基础设备
-binaryweader.Close();
-```
-
-## 8. 小结
-
-文件不存在
-
-> FileMode.Create
->
-> FileAccess.Write
->
-> File.CreateText
->
-> StreamWriter
-
-文件已存在——有两种情况：读取或者在现有文件上追加内容
-
-​	读取
-
-> FileMode.Open
->
-> FileAccess.Read
->
-> File.OpenText
->
-> StreamReader
-
-​	追加
-
-> FileMode.Append
->
-> FileAccess.Write
->
-> File.AppendText
->
-> StreamWriter
-
-```C#
-string path = @"";
-
-/*用FileStream关联文件，再依文件类型使用相应的文本流或二进制流封装文件流进行读写*/
-FileStream fs1 = new FileStream(filepathTarget, FileMode.OpenorCreate ,FileAccess.ReadWrite);
-BinaryWrite bw = new BinaryWrite(fs1);
-FileStream fs2 = File.Open(filepathSource, FileMode.OpenorCreate ,FileAccess.ReadWrite);
-BinaryReader br = new BinaryReader(fs2);
-byte[] fileBytes = br.ReadBytes((int)fs2.Length);	//从filepathSource中读取二进制数据
-bw.Write(fileBytes);	//将二进制数据写入filepathTarget
-
-//使用FileInfo/File，若是文本文件可直接使用CreateText或OpenText，返回StreamWriter或StreamReader进行读写
-string content="hello world!";
-FileInfo fi = new FileInfo(filepath, FileMode.Append ,FileAccess.ReadWrite);	//文件已存在
-//StreamReader sw = fi.OpenText();	//OpenText只能读取
-StreamWriter sw = fi.AppendText();
-sw.Write(content);
-
-//若是二进制文件就饶了一个远路，再返回FileStream，再用Binary流封装进行读写
-
-```
-
-## 9. MemoryStream——读写内存流
+## 7. MemoryStream——读写内存流
 
 MemoryStream为系统内存提供流式的读写操作。常作为其他流数据交换时的中间对象操作。
 
@@ -971,7 +939,383 @@ MemoryStream(byte[], Boolean);	//同上，多一个可设置CanWrite属性
 >
 > long Seek(long offset, SeekOrigin loc) 	已重写。 将当前流中的位置设置为指定值。起点loc，偏移量offset
 
+## 8. 开发中使用的code
 
+https://blog.csdn.net/Yandning/article/details/126746332?app_version=5.7.3&csdn_share_tail=%7B%22type%22%3A%22blog%22%2C%22rType%22%3A%22article%22%2C%22rId%22%3A%22126746332%22%2C%22source%22%3A%22unlogin%22%7D&utm_source=app
+
+### （1）文件流FileStream直接读写字节数组
+
+```C#
+using System.IO;
+
+void FileStreamRW(string filePathR, string filePathW){
+    #region	读取文件字节到字节数组buffer
+    byte[] buffer;
+    using(FileStream fs = new FileStream(filePathR, FileMode.Open, FileAccess.Read)){
+        buffer = new byte[fs.Length];		//FileStream以字节为单位进行操作
+        fs.Read(buffer, 0, buffer.Length);	//从流fs中读取offset=0、count=buffer.Length的这块字节写入缓冲区buffer中
+    }
+    #endregion
+        
+    #region	将buffer中内容添加文字后写入文件
+    using(FileStream fs = new FileStream(filePathW, FileMode.Create, FileAccess.Write)){
+        buffer = Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(buffer)+"\n欲穷千里目");	//在buffer的基础上添加文字
+        fs.Write(buffer, 0, buffer.Length);		//将buffer中offset=0、count=buffer.Length的内容写到文件中
+    }
+    #endregion
+}
+```
+
+### （2）文本流StreamWriter/StreamReader读写字符
+
+```C#
+using System.IO;
+
+void StreamRW(){
+    string text = "";
+    #region 读取
+    using (StreamReader reader = new StreamReader(filePath3))
+    {
+        text = reader.ReadToEnd();	//从头读到尾
+        text = reader.ReadLine();	//读取一行
+        Console.WriteLine(text);
+    }
+    #endregion
+
+    #region 写入
+    using (FileStream fs = new FileStream(filePath4, FileMode.Create))
+    {
+        using (StreamWriter writer = new StreamWriter(fs))
+        {
+            writer.Write(text+"\nThis is tuesday!");
+        }
+    }
+    #endregion
+}
+```
+
+### （3）二进制流BinaryWriter/BinaryReader读写
+
+```C#
+void BinaryDo()
+{
+    #region 读取
+    byte[] buffer;
+    //方式1
+    //Stream类操作字符数据。字符数据易于使用
+    using (Stream stream = File.Open(filePath2, FileMode.Open))
+    {
+        using (BinaryReader reader = new BinaryReader(stream))
+        {
+            buffer = reader.ReadBytes((int)stream.Length); //将流读入到字节数组中
+        }
+    }
+    #endregion
+    #region 写入
+    using (Stream stream = File.Open(filePath3, FileMode.Create))
+    {
+        using (BinaryWriter writer = new BinaryWriter(stream))
+        {
+            writer.Write(Encoding.UTF8.GetBytes(Encoding.UTF8.GetString(buffer) + "\n更上一层楼"));
+        }
+    }
+    #endregion
+}
+```
+
+### （4）读写JSON
+
+```C#
+Install - Package Newtonsoft.Json	//首先安装依赖包
+```
+
+```json
+config.json内容如下：
+
+{
+  "server": "1.1.1.1",
+  "user": "sa",
+  "passwd": "1"
+}
+```
+
+```C#
+void Get_Json()
+{
+    try
+    {
+        StreamReader reader = File.OpenText(filePath5);
+        JsonTextReader jsonTextReader = new JsonTextReader(reader);
+        JObject jsonObject = (JObject)JToken.ReadFrom(jsonTextReader);
+        string server = jsonObject["server"].ToString(); //user ,passwd 类似
+        reader.Close();
+        Console.WriteLine(server);
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine("读取错误" + ex);
+    }
+}
+
+void Set_Json(string server)
+{
+    try
+    {
+        StreamReader reader = File.OpenText(filePath5);
+        JsonTextReader jsonTextReader = new JsonTextReader(reader);
+        JObject jsonObject = (JObject)JToken.ReadFrom(jsonTextReader);
+        jsonObject["server"] = server; 
+        reader.Close();
+        string output = JsonConvert.SerializeObject(jsonObject, Newtonsoft.Json.Formatting.Indented);
+        File.WriteAllText(filePath5, output);
+    }
+    catch(Exception ex)
+    {
+        Console.WriteLine("写入错误"+ex);
+    }
+}
+
+//Set_server("1.1.1.2");
+//Get_server();
+```
+
+
+
+### （5）读写XML
+
+```xml
+创建两个.xml文件，内容如下：
+不带ID的文件:
+<?xml version="1.0" encoding="utf-8" ?>
+<studentList>
+	<student>
+		<name>张三</name>
+		<sex>男</sex>
+		<old>20</old>
+	</student>
+	<student>
+		<name>李四</name>
+		<sex>女</sex>
+		<old>21</old>
+	</student>
+</studentList>
+
+```
+
+```xml
+<?xml version="1.0" encoding="utf-8" ?>
+<studentList>
+	<student Type="Bad" ISBN="541801">
+		<name id="1">张三</name>
+		<sex id="11">男</sex>
+		<old id="111">20</old>
+	</student>
+	<student Type="Good" ISBN="541802">
+		<name id="2">李四</name>
+		<sex id="22">女</sex>
+		<old id="222">21</old>
+	</student>
+</studentList>
+```
+
+```C#
+void DataSet_ReadXml()
+{
+    //dataset读取简单xml文件
+    DataSet ds = new DataSet();
+    ds.ReadXml(filePath7);
+    //读取第一条数据的name节点
+    string name = ds.Tables[0].Rows[0]["name"].ToString();
+    //输出：张三
+    Console.WriteLine(name);
+}
+
+void DataSet_ReadXml_id()
+{
+    //dataset读取带属性的xml文件
+    DataSet ds = new DataSet();
+    ds.ReadXml(filePath8);
+    //读取的节点名称
+    string nodeName = "name";
+    string name = "";
+    name = ds.Tables[nodeName].Rows[0][nodeName + "_Text"].ToString();
+    //读取节点的id属性
+    string id = ds.Tables[nodeName].Rows[0]["id"].ToString();
+    //输出：id:1,name:张三
+    Console.WriteLine("id:{0},name:{1}", id, name);
+}
+//DataSet_ReadXml();
+//DataSet_ReadXml_id();
+```
+
+### （6）读写EXCEL
+
+```C#
+NPOI方式
+
+```
+
+```C#
+以ClosedXML的方式读写
+
+    
+//添加相应的NuGet包
+//using ClosedXML.Excel;
+void Excle_ClosedXml()
+{
+    var workbook = new XLWorkbook(filePath11);
+    IXLWorksheet sheet = workbook.Worksheet(1);//这个库也是从1开始
+    //设置第一行第一列值,更多方法请参考官方Demo
+    sheet.Cell(1, 5).Value = "Excle_ClosedXml";//该方法也是从1开始，非0
+    workbook.SaveAs(filePath12);
+}
+//Excle_ClosedXml();
+//导出不支持覆盖，如果路径12的文件存在则报错？
+```
+
+```C#
+以Spire.Xls的方式读写
+    
+    
+//如果需要在WinForm中展示，那么Spire.Office可能是唯一选择。
+//Nuget下载Free Spire.xls
+void Excle_spire()
+{
+    Spire.Xls.Workbook workbook = new Spire.Xls.Workbook();
+    workbook.LoadFromFile(filePath11);
+    //处理Excel数据，更多请参考官方Demo
+    Spire.Xls.Worksheet sheet = workbook.Worksheets[0];
+    sheet.Range[1, 6].Text = "Excle_spire";//该方法也是从1开始，非0
+    workbook.SaveToFile(filePath12);
+}
+//Excle_spire();
+//覆盖式导出
+```
+
+```C#
+以EPPlus的方式读写
+    
+    
+//如果只是需要读写Excel，那么EPPlus非常方便而且符合使用习惯。
+//using OfficeOpenXml;
+void TestEPPlus()
+{
+    ExcelPackage.LicenseContext = LicenseContext.NonCommercial;//指明非商业应用；EPPlus通过LicenseContext来区分商业应用（Commercial）和非商业应用（NonCommercial）
+    ExcelPackage package = new ExcelPackage(filePath12);//加载Excel工作簿
+    ExcelWorksheet sheet1 = package.Workbook.Worksheets["Sheet1"];//读取工作簿中名为"Sheet1"的工作表
+
+    sheet1.Cells[1, 1].Value = "A";//设置单元格内容
+    sheet1.Cells[2, 2].Value = "B";
+    sheet1.Cells[3, 3].Value = "C";
+    //package.Save();//将更改保存到原文件
+    package.SaveAs(filePath12);//将更改保存到新的文件，类似于另存为
+}
+//TestEPPlus();
+```
+
+
+
+### （7）读写CSV
+
+```C#
+DataTable CSV2DataTable(string fileName)
+{
+    try
+    {
+        DataTable dt = new DataTable();
+        FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+        StreamReader sr = new StreamReader(fs, Encoding.Default);
+        //记录每次读取的一行记录
+        string strLine = "";
+        //记录每行记录中的各字段内容
+        string[] aryLine;
+        //标示列数
+        int columnCount = 0;
+        //标示是否是读取的第一行
+        bool IsFirst = true;
+        //逐行读取CSV中的数据
+        while ((strLine = sr.ReadLine()) != null)
+        {
+            aryLine = strLine.Replace('"', ' ').Replace(" ", "").TrimEnd(',').Split(',');
+            if (IsFirst == true)
+            {
+                IsFirst = false;
+                columnCount = aryLine.Length;
+                //创建列
+                for (int i = 0; i < columnCount; i++)
+                {
+                    DataColumn dc = new DataColumn(aryLine[i]);
+                    try
+                    {
+                        dt.Columns.Add(dc);
+                    }
+                    catch (Exception ex)
+                    {
+                        return null;
+                    }
+                }
+            }
+            else
+            {
+                DataRow dr = dt.NewRow();
+                for (int j = 0; j < columnCount; j++)
+                {
+                    dr[j] = aryLine[j];
+                }
+                dt.Rows.Add(dr);
+            }
+        }
+        sr.Close();
+        fs.Close();
+        return dt;
+    }
+    catch (Exception)
+    {
+        return null;
+    }
+}
+//仅能读取简单的CSV
+//DataTable dt = CSV2DataTable(filePath9);
+//for (int i = 0; dt.Rows.Count<i; i++)
+//{
+//    Console.Write("");
+//}
+
+```
+
+
+
+
+
+
+
+
+
+```C#
+string path = @"";
+
+/*
+1.用FileStream关联文件，再依文件类型使用相应的文本流或二进制流封装文件流进行读写
+*/
+FileStream fs1 = new FileStream(filepathTarget, FileMode.OpenorCreate ,FileAccess.ReadWrite);
+BinaryWrite bw = new BinaryWrite(fs1);
+FileStream fs2 = File.Open(filepathSource, FileMode.OpenorCreate ,FileAccess.ReadWrite);
+BinaryReader br = new BinaryReader(fs2);
+byte[] fileBytes = br.ReadBytes((int)fs2.Length);	//从filepathSource中读取二进制数据
+bw.Write(fileBytes);	//将二进制数据写入filepathTarget
+
+//使用FileInfo/File，若是文本文件可直接使用CreateText或OpenText，返回StreamWriter或StreamReader进行读写
+string content="hello world!";
+FileInfo fi = new FileInfo(filepath, FileMode.Append ,FileAccess.ReadWrite);	//文件已存在
+//StreamReader sw = fi.OpenText();	//OpenText只能读取
+StreamWriter sw = fi.AppendText();
+sw.Write(content);
+
+//若是二进制文件就饶了一个远路，再返回FileStream，再用Binary流封装进行读写
+
+```
+
+## 
 
 
 

@@ -217,12 +217,12 @@ https://blog.csdn.net/u012719076/article/details/108235452
 
 而且由于在ASCII中字符 \ 是转义字符，所以要表示 \ 则要多加一个，所以是 \; 而 / 则不需多添加。
 
-对于路径加@
+对于路径加@，可取消字符转义。
 正斜杠/ 加@ 没有作用
 反斜杠\ 加@ 会使 一个\ 变成 两个\
 
 ```C#
-string strPath = @"D:\\OSA\\BK\\20200825-095420-bk.csv";
+string strPath = @"D:\OSA\BK\20200825-095420-bk.csv";
 ```
 
 
@@ -308,8 +308,12 @@ Console.WriteLine(c);
 
 * 窗体初始位置
 
-  https://www.cnblogs.com/xinjian/archive/2011/09/21/2184306.html
+  StartPosition 默认值是WindowsDefaultLocation ,我们只需要改成CenterScreen. 注意MSDN上的一句备注：       
 
+  显示窗体之前，应设置此属性。 可在调用 [Show](http://msdn.microsoft.com/zh-cn/library/system.windows.forms.form.show.aspx) 或 [ShowDialog](http://msdn.microsoft.com/zh-cn/library/system.windows.forms.form.showdialog.aspx) 方法之前或在窗体构造函数中设置此属性。 所以不要试图在Load事件中改变此属性，没用的。
+  
+  https://www.cnblogs.com/xinjian/archive/2011/09/21/2184306.html
+  
   https://www.cnblogs.com/roboot/p/7088070.html
 
 ### （1）*添加资源文件*
@@ -341,7 +345,8 @@ Console.WriteLine(c);
   this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
   
   ///由ComponentResourceManager进行管理
-  ComponentResourceManager resources = new ComponentResourceManager(typeof(Form1));this.pictureBox1.Image = ((Image)(resources.GetObject("Image")));
+  ComponentResourceManager resources = new ComponentResourceManager(typeof(Form1));
+  this.pictureBox1.Image = ((Image)(resources.GetObject("Image")));
   ```
 
   导入“本地资源”的图片，**会在form文件下面的form.resx文件里面，不可以在多个form界面引用**，不可以在里面修改图片的名称；而导入“项目资源文件”的图片，会保存在Properties文件夹下面的Resources.resx文件夹里面，可以在多个form界面引用，可以在里面修改图片的名称。
@@ -385,12 +390,12 @@ Application.Run(new Form1());
 
 > | void Show()               | 显示窗体                       |
 > | ------------------------- | ------------------------------ |
-> | **void Hide()**           | 隐藏窗体                       |
+> | **void Hide()**           | **隐藏窗体**                   |
 > | DialogResult ShowDialog() | 以对话框模式显示窗体，模态窗体 |
 > | void CenterToParent()     | 使窗体在父窗体边界内居中       |
 > | void CenterToScreen()     | 使窗体在当前屏幕上居中         |
 > | void Activate()           | 激活窗体并给予它焦点           |
-> | void Close()              | 关闭窗体                       |
+> | **void Close()**          | **关闭窗体**                   |
 
 ### （1）ShowDialog()和Show()的区别？
 
