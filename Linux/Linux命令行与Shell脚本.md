@@ -436,7 +436,7 @@ head -n 行数 文件名
 常用于跟踪日志文件（一些运行中的程序将会向日志中写入内容）
 
 ```bash
-tail -f 
+tail -f 文件名
 ```
 
 ---
@@ -493,35 +493,54 @@ ln -s 文件名 链接名
 ```
 
 ```bash
-#跨文件系统的啥例子
+#跨文件系统的例子
 sudo su
 ln -s /home/wk/workspace/1.sh /opt/2.sh
 ```
 
 ![image-20221128154008574](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221128154008574.png)
 
+### （3）硬链接和软链接的作用
+
+* 硬连接的作用是**允许一个文件拥有多个有效路径名，这样用户就可以建立硬连接到重要文件，以防止“误删”的功能。**只删除一个连接并不影响节点本身和其它的连接，只有当最后一个连接被删除后，文件的数据块及目录的连接才会被释放。也就是说，文件真正删除的条件是与之相关的所有硬连接文件均被删除。	
+* 软链接又称之为符号连接（Symbolic Link）。**软链接文件类似于Windows的快捷方式。**它实际上是一个特殊的文件。在符号连接中，文件实际上是一个文本文件，其中包含的有另一文件的位置信息。
+
 ---
 
 ## 9. secureCRT上传、下载文件
 
-* secureCRT标签页上右键选中**连接sftp**
+### （1）Windows和Linux之间发送文件
 
-  ```bash
-  pwd		#查看Linux当前目录
-  lpwd	#查看Windows本地当前目录
-  ls		#查看Linux当前目录内容
-  lls		#查看Windows本地当前目录内容
-  cd		#切换Linux目录
-  lcd		#切换Windows本地目录
-  
-  put 文件名		#Windows本地上传到Linux服务器
-  get	文件名		#Linux服务器下载文件到Windows本地
-  
-  put -r 目录名		#Windows本地上传文件夹到Linux服务器
-  get -r 目录名		#Linux服务器加载文件夹到Windows本地
-  
-  exit		#退出sftp
-  ```
+secureCRT标签页上右键选中**连接sftp**
+
+```bash
+pwd		#查看Linux当前目录
+lpwd	#查看Windows本地当前目录
+ls		#查看Linux当前目录内容
+lls		#查看Windows本地当前目录内容
+cd		#切换Linux目录
+lcd		#切换Windows本地目录
+
+put 文件名		#Windows本地上传到Linux服务器
+get	文件名		#Linux服务器下载文件到Windows本地
+
+put -r 目录名		#Windows本地上传文件夹到Linux服务器
+get -r 目录名		#Linux服务器加载文件夹到Windows本地
+
+exit		#退出sftp
+```
+
+### （2）scp-两个Linux服务器间传送文件
+
+通过secureCRT可以在Windows和Linux间传送文件。2台Linux服务器间可以通过Windows作为中介传送文件，但这种方法麻烦。scp可以在2台Linux服务器间传送文件。
+
+```bash
+#当前在主机192.168.42.10上
+scp -r 源 目的		#从源拷贝到目的。
+scp -r root@192.168.42.1:/tmp/aa /tmp		#将192.168.42.1的tmp下的aa及其子目录拷贝到192.168.42.10的tmp下
+```
+
+scp和cp的区别只在于文件前要加上`用户名@IP地址:文件路径`
 
 ---
 
@@ -597,7 +616,7 @@ ps -ef | grep 关键字		#查找指定进程
 ```bash
 kill PID
 killall 程序名
--9选项表示强行终止		#进程比较顽固终止不了加-9
+-9选项表示强行终止		#进程比较顽固终止不了加-9。	kill -9 PID
 ```
 
 ---
@@ -719,19 +738,7 @@ free -h		#以单位G查看
 free -m		#以单位M查看
 ```
 
-### （5）scp-两个Linux服务器间传送文件
-
-通过secureCRT可以在Windows和Linux间传送文件。2台Linux服务器间可以通过Windows作为中介传送文件，但这种方法麻烦。scp可以在2台Linux服务器间传送文件。
-
-```bash
-#当前在主机192.168.42.10上
-scp -r 源 目的		#从源拷贝到目的。
-scp -r root@192.168.42.1:/tmp/aa /tmp		#将192.168.42.1的tmp下的aa及其子目录拷贝到192.168.42.10的tmp下
-```
-
-scp和cp的区别只在于文件前要加上`用户名@IP地址:文件路径`
-
-### （6）tree-显示目录文件树
+### （5）tree-显示目录文件树
 
 ```bash
 apt install tree	#安装tree
@@ -868,7 +875,7 @@ telnet失败的原因：
 
 ---
 
-## 17. 系统服务管理
+## 17. 系统服务管理（开机自启程序）
 
 **服务：运行在后台的程序**
 
@@ -993,7 +1000,60 @@ systemctl status firewalld	#查看防火墙服务状态。
 
 ---
 
-## 18. 防火墙
+## 18. CentOS可配置/etc/rc.local脚本实现服务启动（开机程序自启）
+
+* /etc/rc.local脚本在开机时运行，其中的内容是按照顺序执行的，执行完一个程序才会执行下一个。**如果某个程序要写在rc.local中开机自启，但它不是后台程序，在它运行完之前rc.local会阻塞，导致开机阻塞。就要在脚本中运行该程序时加个&，让它在后台执行。**
+
+  ```bash
+  #在/etc/rc.local脚本中添加以下命令，开机自启
+  /usr/bin/date >> /tmp/date1.log		#开机将时间记录到日志文件
+  ```
+
+* 环境变量缺失问题
+
+  在rc.local中执行程序时无法使用环境变量，解决方法：
+
+  在脚本中通过`export`设置环境变量，要用什么环境变量就设置什么。
+
+---
+
+## 19. CentOS计划任务
+
+计划任务即周期性的自动执行程序或脚本，包括**用户计划任务**、**系统计划任务**。
+
+Linux用**crond服务**提供计划任务，crond每分钟都会检查是否有需要执行的任务，如果有就执行。
+
+查看crond服务状态：`systemctl status crond`
+
+### （1）用户计划任务
+
+每个用户都可以定义自己的计划任务，用于周期性的执行程序或脚本。
+
+计划任务的内容存放于**crontab**文件中，每个用户都有自己的crontab文件。
+
+* 查看crontab文件内容
+
+  ```bash
+  #普通用户只能查看自己的crontab
+  crontab -l
+  #root用户通过-u查看指定用户的crontab
+  crontab -l -u 用户
+  ```
+
+* 修改crontab文件内容
+
+  ```bash
+  crontab -e
+  # 该命令以nano编辑器打开，ctrl-x退出
+  ```
+  
+  ![image-20221201015328303](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221201015328303.png)
+
+​		内容由执行周期和执行的程序或脚本组成。若要执行多个程序或脚本，程序或脚本间以`;`分隔（shell中也可以，如：clear;pwd;ls -la）。
+
+---
+
+## 20. 防火墙
 
 防火墙是在内网和外网之间构建的一道保护屏障。
 
@@ -1022,7 +1082,7 @@ systemctl status firewalld	#查看防火墙服务状态。
 
 ---
 
-## 19. 环境变量
+## 21. 环境变量
 
 程序的执行需要参数，若多个程序需要一个共同的参数，则应该把该参数设置为环境变量。
 
@@ -1071,7 +1131,7 @@ echo $PATH
 
   ```bash
   #执行当前目录下的程序需要./demo，若输入demo想要执行程序怎么做？
-  #将当前目录添加到PATH中，每换一次目录都要添加一个目录到PATH中？
+  #ANS：将当前目录添加到PATH中，每换一次目录都要添加一个目录到PATH中？
   #只要将任意目录的当前目录添加到PATH中
   export PATH=$PATH:.
   ```
@@ -1100,58 +1160,6 @@ echo $PATH
   ```bash
   export aa='aa value'
   ```
-
----
-
-## 20. CentOS可配置/etc/rc.local脚本实现开机程序自启
-
-* /etc/rc.local脚本在开机时运行，其中的内容是按照顺序执行的，执行完一个程序才会执行下一个。**如果某个程序要写在rc.local中开机自启，但它不是后台程序，在它运行完之前rc.local会阻塞，导致开机阻塞。就要在脚本中运行该程序时加个&，让它在后台执行。**
-
-  ```bash
-  #在/etc/rc.local脚本中添加以下命令，开机自启
-  /usr/bin/date >> /tmp/date1.log		#开机将时间记录到日志文件
-  ```
-
-* 环境变量缺失问题
-
-  在rc.local中执行程序时无法使用环境变量，解决方法：
-
-  在脚本中通过`export`设置环境变量，要用什么环境变量就设置什么。
-
----
-
-## 21. CentOS计划任务
-
-计划任务即周期性的自动执行程序或脚本，包括**用户计划任务**、**系统计划任务**。
-
-Linux用**crond服务**提供计划任务，crond每分钟都会检查是否有需要执行的任务，如果有就执行。
-
-查看crond服务状态：`systemctl status crond`
-
-### （1）用户计划任务
-
-每个用户都可以定义自己的计划任务，用于周期性的执行程序或脚本。
-
-计划任务的内容存放于**crontab**文件中，每个用户都有自己的crontab文件。
-
-* 查看crontab文件内容
-
-  ```bash
-  #普通用户只能查看自己的crontab
-  crontab -l
-  #root用户通过-u查看指定用户的crontab
-  crontab -l -u 用户
-  ```
-
-* 修改crontab文件内容
-
-  ```bash
-  crontab -e
-  ```
-
-  ![image-20221201015328303](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221201015328303.png)
-
-​		内容由执行周期和执行的程序或脚本组成。若要执行多个程序或脚本，程序或脚本间以`;`分隔（shell中也可以，如：clear;pwd;ls -la）。
 
 ---
 
@@ -1184,7 +1192,7 @@ ssh root@私有IP
 
 ![image-20221201021240893](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221201021240893.png)
 
-在云服务器操作面，`创建安全组->设置访问规则（入方向）->添加端口5005`
+在云服务器操作页面，`创建安全组->设置访问规则（入方向）->添加端口5005`
 
 ---
 
@@ -1255,6 +1263,62 @@ ctrl-d 下翻半页
 Shell本身也是一门编程语言，学了不用会忘。
 
 **会写简单脚本、会读脚本即可，写复杂脚本更多采用Python。对程序员来说要实现功能逻辑用编程语言调用系统调用完成。**
+
+## 0. 关键字汇总
+
+```bash
+sleep 1s
+sleep 1m
+sleep 1h
+sleep 1d
+```
+
+```bash
+#命令执行结果赋值给变量
+a=`ls -al`
+```
+
+```bash
+#整数运算赋值给变量
+a=`expr 2 \* 3`		#将命令expr 2 \* 3的结果赋值给a
+a=$(( 2*3 ))
+```
+
+```bash
+#变量自增、自减
+let i++
+i=`expr i + 1`
+i=$(( i+1 ))
+```
+
+```bash
+if [ i -lt 10]
+if (( i<10 ))
+```
+
+```bash
+i=0
+while (( i<10 ))
+do
+	echo $i
+	let i++
+	i=`expr $i + 1`
+
+while :			#死循环
+```
+
+```bash
+for i in ${arr[*]}
+do
+	echo $i
+done
+
+for (( i=0;i<10;i++ ))
+
+for (( i=0;i<${#arr[*]};i++))
+```
+
+
 
 ## 1. 概念
 
@@ -1497,11 +1561,14 @@ shell中变量取值默认的是字符串。
 
 将命令执行的结果对变量进行赋值
 
-使用`$()`将要执行的命令括起来
+使用`$()`或***``***将要执行的命令括起来
 
 ```shell
 a=$(ls ./)
 echo $a
+
+b=`ls ./`
+echo $b
 ```
 
 ---
@@ -1524,30 +1591,16 @@ echo "hello world"
 
 ## 6. 流程控制
 
-### （1）if语句
+### （1）条件表达式
+
+`test expression`可简写成`[ expression ]`。**注意expression和两侧括号间有空格。if和括号之间也有空格**
 
 ```shell
-if cond1
+if [ -d "/home/wk/workspace" ]
 then
-	command1
-elif cond2
-then
-	command2
-else
-	command3
+	echo "dir exist.."
 fi
 ```
-
-* 条件表达式：
-
-  `test expression`可简写成`[ expression ]`。注意expression和两侧括号间有空格。
-
-  ```shell
-  if [ -d "/home/wk/workspace" ]
-  then
-  	echo "dir exist.."
-  fi
-  ```
 
 * 条件运算符
 
@@ -1563,7 +1616,7 @@ fi
   >
   > -w filename：判断文件是否存在，且是否具有可写权限
 
-  整数比较
+  **整数比较，在bash风格中必须使用这种。但是在(())中就可以不用**
 
   > -eq 等于
   >
@@ -1583,17 +1636,61 @@ fi
   >
   > str1!=str2 字符串不等
 
-### （2）循环语句
-
-* 基本形式（bash风格）
-
-```shell
-for var in list
+```bash
+if [ i eq 10 ]
 do 
-	commands
+	echo $i
 done
-#var在循环语句外也能使用，且保持最后一个var的值
+
+if (( i==10 ))
+do
+	echo $i
+done
 ```
+
+### （2）if语句
+
+```bash
+if cond1
+then
+	command1
+elif cond2
+then
+	command2
+else
+	command3
+fi
+```
+
+### （3）for循环和while循环
+
+* while的bash风格
+
+  ```bash
+  while [ condition ]
+  do 
+  	...
+  done
+  ```
+
+  ```bash
+  #死循环写法
+  i=1
+  while :
+  do 
+  	let i++		#等价于i=$($i + 1)或i=`expr $i + 1`
+  done
+  ```
+
+* for的bash风格
+
+  ```bash
+  for var in list
+  do 
+  	commands
+  done
+  #var在循环语句外也能使用，且保持最后一个var的值
+  ```
 
 * list可以是命令执行的结果
 
@@ -1609,14 +1706,28 @@ done
 
 * C风格
 
+  ```bash
+  for (( i=0;i<10;i++ ))
+  do
+  	...
+  done
+  ```
+
+  ```bash
+  while (( i<10 ))
+  do
+  	...
+  done
+  ```
+
 ---
 
 ## 7. 函数传参
 
 函数名后跟参数值。函数体内以$1/$2/$3...表示参数：
 
-- $0——文件名
-- $1/$2/$3——参数
+- **$0——文件名**
+- **$1/$2/$3——参数**
 - $#——传递给脚本的参数个数
 - $*——将所有参数以一个字符串的形式输出
 - $#——将所有参数各个以字符串的形式输出s
@@ -1625,7 +1736,11 @@ done
 
 ## 8. 整数数值计算
 
-将整数计算的数值赋值给变量。
+将整数计算的数值赋值给变量：
+
+* 方法1
+
+  使用(())，在括号内部可以直接进行整数计算。
 
 ```shell
 a=$((1+3)) 	
@@ -1633,10 +1748,11 @@ b=$((3*3))
 c=$(($a+$b))
 ```
 
-也可以写成下面两种形式：
+* 方法2
+
+**expr是一个命令，表示将后面的作为一个整数表达式进行计算。反引号赋值的方式，将expr命令的结果，也就是表达式的计算结果赋值给a。**
 
 ```shell
-a=$[1+3]	#数字和运算符之间不需要空格
 a=`expr 3 \* 3`	#这种方法写的时候表达式数字和运算符间要有空格，乘法要转义字符，否则会被识别为通配符
 ```
 
@@ -1673,6 +1789,19 @@ a=`expr 3 \* 3`	#这种方法写的时候表达式数字和运算符间要有空
 ```shell
 >		#输出重定向
 >>		#输出追加
+```
+
+---
+
+## 11. sleep命令
+
+shell中休眠时间
+
+```bash
+sleep 1s	#1秒
+sleep 1m	#1分
+sleep 1h	#1小时
+sleep 1d	#1天
 ```
 
 
