@@ -1,6 +1,6 @@
 lambda表达式和匿名方法、字段和属性、委托和事件、多线程、vs使用高级
 
-# 基础
+# 一、基础
 
 ## 0. .Net和C#
 
@@ -352,11 +352,86 @@ test("bb", 0, c);					//直接传入数组c
 
 ## 7. 值类型和引用类型
 
+引用类型存放于堆，值类型存放于栈。
+
+### （1）类型
+
+* 引用类型
+
+  string、自定义类
+
+* 值类型
+
+  int、double、float、decimal、enum、struct
+
+### （2）存储位置不同
+
+* 值类型：在栈上直接存变量值
+
+* 引用类型：变量值存在堆上，在栈上也会开辟空间，存的是堆上的地址
+
+  ```c#
+  string a = "1234";
+  // "1234"存在堆上，栈上存的地址
+  ```
+
+### （3）传递方式不同
 
 
 
+## 8. string
 
-## 8. 字段和属性
+### （1）string的不可变性和赋值
+
+string和自定义类对象不同，虽然两者都是引用类型。但后者赋值`Person p1=new Person(); Person p2=p1;`后，指向同一块堆内存，改变p2，p1的值也会改变。
+
+但string特殊在会重新开辟堆内存。
+
+```c#
+string s1 = "111";
+string s2= s1;		//s2和s1指向同一块堆内存
+s2="222";	
+//s1是"111"还是"222"？
+ANS:"111"
+因为string是不可变的，给s2赋值"222"会开辟一块新的堆内存。
+```
+
+![image-20230211215626194](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230211215626194.png)
+
+int型的n1重新赋值时，在栈中的值会被取代。
+
+而string类型的s1，在栈中存的是地址指向堆中存储字符串值的位置。当对s1的值发生改变时，原先堆中存值的堆内存不销毁，重新开辟一块堆内存存储新值，s1存储新地址。（因此，字符串值的频繁改变：赋值、拼接等，会产生大量的堆内存垃圾。GC在程序结束时，会扫描内存，引用计数为0的堆内存会立即销毁。）
+
+### （2）string一些API
+
+* string可以看成一个**只读**char数组，可通过索引get到对应字符。但不能通过索引set对应字符。
+
+  ```c#
+  string s = "1234";
+  char c = s[0];
+  ```
+
+  若想要改变某个字符：
+
+  ```c#
+  string s = "hello";
+  str = s.Remove(3,1);	//str.Remove(int startIndex, int count)
+  str = s.Insert(3,"L");	//str.Insert(int index, string str)
+  //helLo
+  ```
+
+  ```c#
+  string s = "hello";
+  char[] ss = s.ToCharArray();	//ToCharArray()将string转成char数组
+  ss[3]='L';
+  s = new string(ss);				//new string(char[] ss)可将字符数组转成string
+  ```
+
+  
+
+
+
+## 9. 字段和属性
 
 属性控制属性的读写权限。
 
@@ -388,7 +463,9 @@ class Person
 }
 ```
 
-## 9. static
+
+
+## 10. static
 
 ### （1）非静态类
 
@@ -422,9 +499,85 @@ public static class Global{
 
 * 只能有静态成员
 
-# OOP
 
-## 10. 
+
+
+
+# 二、OOP
+
+## 10. 构造函数
+
+创建对象时执行，初始化**属性**。
+
+不显式写时，会有一个默认的无参构造。显式写了以后，默认无参构造会消失，需要自己显式增加一个无参构造。
+
+可重载。
+
+```c#
+class Person
+{
+    private int age;
+    private string name;
+    private string sex;
+    
+    public int Age{get;set;}
+    public string Name{get=>this.name;set=>this.name=value;}
+    public string Sex{get;set;}
+    
+    public Person(int age, string name, string sex)
+    {
+    	    this.Age=age;
+        	this.Name=name;
+        	this.Sex=sex;
+    }
+    
+    public Person(int age, string name):this(age, name, "male"){}
+    
+    ~Person()
+    {
+        
+    }
+    
+}
+```
+
+## 11. this
+
+在类中代指当前类的对象。
+
+在类中显式调用**全参构造函数。**
+
+```c
+public Student(int age, string name):this(age, name, "male")	//this会显示调用全参构造，减少冗余代码
+```
+
+## 12. 析构函数
+
+C#中有gc（garbage collection）机制，自动回收垃圾。
+
+析构方法的调用时机和GC一样是完全不可预测的，也不应当依赖于它被调用。析构函数是确保已分配的非托管资源总能被释放的一个补救措施。如果可能就不应当被调用，譬如说手动释放了非托管资源，此时应当通知GC取消对对象的析构函数的调用。
+
+**最后，如果你一定要手动分配非托管资源，那么记住析构函数是保险丝，是最后的保障，不是常规的做法。**
+
+## 13. 命名空间
+
+用于解决类的重名问题，命名空间中有若干类。若不同命名空间中有同名的类，调用同名类时为了避免歧义，要加上命名空间。如：
+
+项目1中有类A，项目2中有类A。项目2想要调用项目1的类A，需要：
+
+> ①添加引用
+>
+> ![image-20230211213242222](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230211213242222.png)
+>
+> ②引入命名空间
+>
+> ```c#
+> using Project1
+> ```
+>
+> 
+
+
 
 
 

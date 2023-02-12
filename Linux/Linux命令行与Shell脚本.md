@@ -875,7 +875,7 @@ telnet失败的原因：
 
 ---
 
-## 17. 系统服务管理（开机自启程序）
+## 17. 系统服务管理（程序开机自启）
 
 **服务：运行在后台的程序**
 
@@ -1000,7 +1000,7 @@ systemctl status firewalld	#查看防火墙服务状态。
 
 ---
 
-## 18. CentOS可配置/etc/rc.local脚本实现服务启动（开机程序自启）
+## 18. CentOS可配置/etc/rc.local脚本实现服务启动（程序开机自启）
 
 * /etc/rc.local脚本在开机时运行，其中的内容是按照顺序执行的，执行完一个程序才会执行下一个。**如果某个程序要写在rc.local中开机自启，但它不是后台程序，在它运行完之前rc.local会阻塞，导致开机阻塞。就要在脚本中运行该程序时加个&，让它在后台执行。**
 
@@ -1292,7 +1292,10 @@ i=$(( i+1 ))
 ```
 
 ```bash
-if [ i -lt 10]
+if [ $? -eq 0 ]
+then 
+fi
+
 if (( i<10 ))
 ```
 
@@ -1719,6 +1722,10 @@ fi
   	...
   done
   ```
+  
+  ### （4）for和if嵌套
+  
+  
 
 ---
 
@@ -1731,6 +1738,9 @@ fi
 - $#——传递给脚本的参数个数
 - $*——将所有参数以一个字符串的形式输出
 - $#——将所有参数各个以字符串的形式输出s
+- $$ 这个脚本/程序的PID(脚本运行的当前进程PID)
+- $? 执行上一个指令的返回值 (显示最后命令的退出状态。0表示没有错误，其他任何值表明有错误)
+- 
 
 ---
 
@@ -1803,6 +1813,96 @@ sleep 1m	#1分
 sleep 1h	#1小时
 sleep 1d	#1天
 ```
+
+---
+
+## 12. timeout-超时终止
+
+用于限定命令或脚本的执行时间，超过设定时间若命令仍在执行则kill进程。
+
+具体使用见`man timeout`
+
+```bash
+timeout 时间 命令/脚本
+```
+
+> * timeout后接函数的话无效
+> * 
+
+```bash
+timeout 10s	ping www.baidu.com	#ping命令执行10s
+#开辟两个进程，父进程timeout 10s ping www.baidu.com，子进程ping www.baidu.com
+```
+
+```bash
+timeout 1m ./test.sh
+```
+
+---
+
+## 14. 计算shell脚本执行时间
+
+```bash
+shell脚本运行时间，下次用到可直接copy
+starttime=`date +'%Y-%m-%d %H:%M:%S'`
+ 需执行的程序
+ endtime=`date +'%Y-%m-%d %H:%M:%S'`
+start_seconds=$(date --date="$starttime" +%s);
+end_seconds=$(date --date="$endtime" +%s);
+echo "本次运行时间： "$((end_seconds-start_seconds))"s"
+```
+
+```bash
+计算脚本执行时间：
+
+ #!/bin/bash
+
+ UseTime () {
+
+     startTime=`date +%Y%m%d-%H:%M`
+
+     startTime_s=`date +%s`
+
+     $Command              #根据自己脚本路径，测试脚本文件执行时间（sh test.sh)
+
+     endTime=`date +%Y%m%d-%H:%M`
+
+     endTime_s=`date +%s`
+
+     sumTime=$[ $endTime_s - $startTime_s ]
+
+     useTime=$[ $sumTime / 60 ]
+
+     echo "$startTime ---> $endTime" "Totl:$useTime minutes"  >> /tmp/usertime.txt
+
+ }
+
+ 
+
+ hello () {
+
+     echo "hello !"
+
+     sleep 120
+
+ }
+
+ 
+
+ Command=hello
+
+ UseTime $Command
+
+
+
+计算脚本使用时间分钟
+
+cat /tmp/usertime.txt 
+
+20170510-14:54 ---> 20170510-14:56 Totl:2 minutes
+```
+
+
 
 
 
