@@ -1,5 +1,9 @@
 lambda表达式和匿名方法、字段和属性、委托和事件、多线程、vs使用高级
 
+ienumerable
+
+from/where/select
+
 # 一、基础
 
 ## 0. .Net和C#
@@ -329,6 +333,14 @@ State st = State.a;
 
 **因此，传入ref形参的变量在传入前必须被初始化过，否则没有开辟内存。**
 
+* readonly
+
+  ```c#
+  ref readonly int aConstant; // aConstant can't be value-reassigned.
+  readonly ref int Storage; // Storage can't be ref-reassigned.
+  readonly ref readonly int CantChange; // CantChange can't be value-reassigned or ref-reassigned.
+  ```
+
 ### （3）params——变长数组
 
 * 只能修饰一维数组
@@ -402,38 +414,167 @@ int型的n1重新赋值时，在栈中的值会被取代。
 
 而string类型的s1，在栈中存的是地址指向堆中存储字符串值的位置。当对s1的值发生改变时，原先堆中存值的堆内存不销毁，重新开辟一块堆内存存储新值，s1存储新地址。（因此，字符串值的频繁改变：赋值、拼接等，会产生大量的堆内存垃圾。GC在程序结束时，会扫描内存，引用计数为0的堆内存会立即销毁。）
 
-### （2）string一些API
+### （2）String.Format
 
-* string可以看成一个**只读**char数组，可通过索引get到对应字符。但不能通过索引set对应字符。
 
-  ```c#
-  string s = "1234";
-  char c = s[0];
-  ```
 
-  若想要改变某个字符：
+### （3）string一些API
 
-  ```c#
-  string s = "hello";
-  str = s.Remove(3,1);	//str.Remove(int startIndex, int count)
-  str = s.Insert(3,"L");	//str.Insert(int index, string str)
-  //helLo
-  ```
+#### —s.Remove、s.Insert、s.ToCharArray
 
-  ```c#
-  string s = "hello";
-  char[] ss = s.ToCharArray();	//ToCharArray()将string转成char数组
-  ss[3]='L';
-  s = new string(ss);				//new string(char[] ss)可将字符数组转成string
-  ```
+string可以看成一个**只读**char数组，可通过索引get到对应字符。但不能通过索引set对应字符。
 
-  
+```c#
+string s = "1234";
+char c = s[0];
+```
+
+若想要改变string中某个字符：
+
+```c#
+string s = "hello";
+str = s.Remove(3,1);	//str.Remove(int startIndex, int count)
+str = s.Insert(3,"L");	//str.Insert(int index, string str)
+//helLo
+```
+
+```c#
+string s = "hello";
+char[] ss = s.ToCharArray();	//ToCharArray()将string转成char数组
+ss[3]='L';
+s = new string(ss);				//new string(char[] ss)可将字符数组转成string
+```
+
+#### —StringBuilder-对字符串进行大量的拼接、赋值操作
+
+因为每次对string进行改变时会在内存产生垃圾，所以需要大量拼接和赋值时，使用StringBuilder类。
+
+```c#
+string s = null;
+StringBuilder sb = new StringBuilder();
+for(int i=0;i<10000;++i){
+    //s+=i;			//耗时很长。因为每拼接一次都要开辟新内存。
+    sb.Append(i);	//像sb对象里append字符串，不开辟新内存，一直操作同一块内存，速度快好几个数量级。
+}
+Console.WriteLine(sb.toString());
+```
+
+#### —s.Length
+
+#### —s.ToUpper、s.ToLower
+
+大小写转换
+
+#### —s.Equals
+
+```c#
+s.Equals(string value, StringComparision comparisonType)
+// StringComparision是枚举类型，指定比较方式。
+//StringComparision.OridinalIgnoreCase为忽略大小写比较
+```
+
+#### —Split
+
+返回值是string数组
+
+```c#
+string[] Split(params char[] chs, StringSplitOptions.RemoveEmptyEntries)
+//以ch字符数组中的字符为分割符
+//StringSplitOptions是枚举类型。RemoveEmptyEntries表示分割后返回的string数组中不包括空字符串""。
+//None表示不去除空字符串""。这样出现chs中字符的地方将会是""    
+```
+
+#### —Replace
+
+将字符串中的oldvalue替换为newvalue
+
+```c#
+string Replace(string oldValue, string newValue)
+```
+
+#### —Substring
+
+取子串
+
+```c#
+string Substring(int startIndex, int len)
+```
+
+#### ——Contains
+
+```c#
+bool Contains(string val);
+```
+
+#### ——IndexOf
+
+返回子串第一次出现的index
+
+```c#
+int IndexOf(string value, int startIndex)
+```
+
+#### ——LastIndexOf
+
+返回子串最后一次出现的index
+
+#### ——StartsWith
+
+判断是否以子串value开始
+
+```c#
+bool StartsWith(string value)
+```
+
+#### ——EndsWith
+
+判断是否以子串value结束
+
+```c#
+bool EndsWith(string value)
+```
+
+#### ——str.Trim
+
+去掉字符串左侧和右侧的空字符
+
+```c#
+str.Trim()
+str.TrimStart()
+str.TrimEnd()
+```
+
+#### ——string.IsNullOrEmpty()
+
+判断字符串是否为空
+
+```C#
+bool string.IsNullOrEmpty(string str)
+```
+
+#### ——Join
+
+将数组每个元素以指定的分割符分隔
+
+```c#
+string string.Join(string seperator, params object[] values)
+```
+
+```c#
+string[] str = {"111", "222", "333", "444"};
+string strNew = str.Join("|", str);
+Console.WriteLine(strNew);		// 111|222|333|444
+```
+
+
 
 
 
 ## 9. 字段和属性
 
 属性控制属性的读写权限。
+
+写好field后，**快捷键ctrl-r-e快速生成property**。
 
 ```c#
 class Person
@@ -499,13 +640,80 @@ public static class Global{
 
 * 只能有静态成员
 
+## 11.var
 
+类型推断，仅队函数内部的**局部变量**起作用。
+
+初始化时必须赋初值。
+
+```c#
+var v = "123";
+```
+
+初始化后不能再给它赋与初值不同的值。
+
+不会影响性能。
+
+* 获取变量类型：
+
+  ```c#
+  var a = "123";
+  Type type_a = a.GetType();
+  ```
+
+* 当变量的类型是已知时，var可选。当指定的变量类型是只供编译器本身访问时，必须用var。
+
+  ```c#
+  // Example #1: var is optional when
+  // the select clause specifies a string
+  string[] words = { "apple", "strawberry", "grape", "peach", "banana" };
+  var wordQuery = from word in words
+                  where word[0] == 'g'
+                  select word;
+  
+  // Because each element in the sequence is a string,
+  // not an anonymous type, var is optional here also.
+  foreach (string s in wordQuery)
+  {
+      Console.WriteLine(s);
+  }
+  
+  // Example #2: var is required because
+  // the select clause specifies an anonymous type
+  var custQuery = from cust in customers
+                  where cust.City == "Phoenix"
+                  select new { cust.Name, cust.Phone };
+  
+  // var must be used because each item
+  // in the sequence is an anonymous type
+  foreach (var item in custQuery)
+  {
+      Console.WriteLine("Name={0}, Phone={1}", item.Name, item.Phone);
+  }
+  ```
+
+
+
+
+## 12. final
+
+* try catch final
+
+  指捕获到异常后一定会执行的代码块。
+
+* 用于修饰变量、字段、函数、类
+
+  用于变量时，该变量只能赋值一次，不可修改；
+
+  用于方法时，该方法不能被重写（就是参数列表不变。重载是参数列表不同。）或隐藏；
+
+  用于类时，该类不能被继承。
 
 
 
 # 二、OOP
 
-## 10. 构造函数
+## 12. 构造函数
 
 创建对象时执行，初始化**属性**。
 
@@ -541,7 +749,7 @@ class Person
 }
 ```
 
-## 11. this
+## 13. this
 
 在类中代指当前类的对象。
 
@@ -551,7 +759,7 @@ class Person
 public Student(int age, string name):this(age, name, "male")	//this会显示调用全参构造，减少冗余代码
 ```
 
-## 12. 析构函数
+## 14. 析构函数
 
 C#中有gc（garbage collection）机制，自动回收垃圾。
 
@@ -559,7 +767,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 **最后，如果你一定要手动分配非托管资源，那么记住析构函数是保险丝，是最后的保障，不是常规的做法。**
 
-## 13. 命名空间
+## 15. 命名空间
 
 用于解决类的重名问题，命名空间中有若干类。若不同命名空间中有同名的类，调用同名类时为了避免歧义，要加上命名空间。如：
 
@@ -576,6 +784,139 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 > ```
 >
 > 
+
+## 16. 继承
+
+* 继承的优点：
+
+  子类拥有父类的所有方法和属性，从而可以减少创建类的工作量。提高了代码的重用性。
+
+  提高了代码的扩展性，子类不但拥有了父类的所有功能，还可以添加自己的功能。
+
+* 继承的缺点：
+
+  继承是侵入性的。只要继承，就必须拥有父类的***所有***属性和方法。
+
+  降低了代码的灵活性。因为继承时，父类会对子类有一种约束。
+
+  **增强了耦合性。当需要对父类的代码进行修改时，必须考虑到对子类产生的影响。**
+
+* object类是所有类的父类。
+
+* 避免类中代码冗余，将类中共有的部分提取成父类。
+
+* **构造子类对象时，会先调用父类的构造在子类对象内部创建一个父类对象，这样子类对象才能访问父类中的成员。**
+
+* 调用父类构造函数
+
+  
+
+  ```c#
+  class Person{
+      int _age;
+      string _name;
+      string _gender;
+      
+      public int Age{get;set;}
+      public string Name{get;set;}
+      public string Gender{get;set;}
+      
+      public Person(int age, string name, string gender){
+          this._age=age;
+          this._name=name;
+          this._gender=gender;
+      }
+      
+      public void sayHello(){
+          Console.WriteLine("Person");
+      }
+  }
+  
+  class Coder:Person{
+      string _language;
+      
+      public string Language{get;set;}
+      
+      //base调用父类Person的构造，将age/name/gender传入父类构造
+      public Coder(int age, string name, string gender, string language):base(age,name,gender){
+          this._language=language;	
+      }
+      
+      //与父类同名的函数sayHello，将覆盖父类Person的sayHello
+       public new void sayHello(){
+          Console.WriteLine("Coder");
+      }
+  }
+  ```
+
+* 当子类中有和父类**同名的成员**（函数、变量）时，**将覆盖父类的成员**，子类对象在调用时只能调用子类的调用不到父类的。但是不要这样写，违反LSP原则。正确的写法是：子类中可以对父类的非抽象方法进行重载，但不能重写（即参数列表相同，函数体不同，可用final修饰父类的非抽象方法从语法层面避免子类的重写。）
+
+  **需要用new关键字声明成员。**
+
+  LSP中规定不覆写
+
+  ```c#
+  Coder cc = new Coder();
+  cc.sayHello();	//Coder。而不是Person。
+  ```
+
+## 17. 里氏替换原则（LSP）
+
+易于理解的LSP说明：https://www.jianshu.com/p/dfcdcd5d9ece
+
+* 子类对象可以赋值给父类变量。
+
+  ```c#
+  Person p = new Student();
+  ```
+
+* 若父类变量中装的是子类对象，则可以将这个父类变量强转为子类对象。
+
+  ```c#
+  Student ss = (Student)p;
+  ss.sayHello();	//Student
+  ```
+
+  
+
+
+
+
+
+
+
+## 18. is和as
+
+都是用于强转
+
+* is转换成功则返回true，失败返回false
+
+  ```C#
+  if(p is Student)
+  {
+  	Student ss = (Student)p;
+  	ss.sayHello();	//student
+  }
+  else
+  {
+      Console.WriteLine("转换失败");
+  }
+  ```
+
+* as转换成功返回转换后对象，失败时返回null
+
+  ```c#
+  Student t = p as Student;
+  t.sayHello();	//student
+  ```
+
+  
+
+  
+
+
+
+
 
 
 
