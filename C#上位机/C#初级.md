@@ -1,8 +1,8 @@
 lambda表达式和匿名方法、字段和属性、委托和事件、多线程、vs使用高级
 
-ienumerable
+迭代器：ienumerable
 
-from/where/select
+Linq：from/where/select
 
 # 一、基础
 
@@ -45,7 +45,39 @@ vs快捷键：ctrl-k-c	ctrl-k-u
 
 ## 3. 变量
 
-### （1）double和decimal
+### （1）成员常量
+
+c/c++中都有全局常量变量，但C#中的常量变量都在类中。函数中的是局部常量，在类中的是成员常量。
+
+成员常量和静态变量一样，不能通过对象访问，可以通过类名访问。
+
+* const修饰的。初始化后值不能修改：
+
+```c#
+const int a = 2;	//值要确定于编译期
+```
+
+* readonly修饰的，初始化值可以修改：
+
+```c#
+ref readonly int aConstant; // aConstant can't be value-reassigned.
+readonly ref int Storage; // Storage can't be ref-reassigned.
+readonly ref readonly int CantChange; // CantChange can't be value-reassigned or ref-reassigned.
+```
+
+### （2）数组
+
+* 定义
+
+  ```c#
+  int[] arr = new int[]{1,2,3,4};		//定义时初始化
+  ```
+
+* 
+
+
+
+### （3）double和decimal
 
 double可表示的范围远远大于decimal，但decimal的精度远远高于double。
 
@@ -76,7 +108,7 @@ Console.WriteLine("name is {0:0.00}", a);	//3.33
 
 ### （4）类型转换
 
-#### ——自动转换（隐式转换）
+#### 自动转换（隐式转换）
 
 **没有精度丢失。**低精度转高精度。如：int转double。
 
@@ -85,7 +117,7 @@ int a = 1;
 double b = a;	//将低精度转高精度
 ```
 
-#### ——强制转换（显式转换）
+#### 强制转换（显式转换）
 
 **发生了精度丢失。**高精度转低精度，如：double转int。
 
@@ -94,7 +126,7 @@ double a = 1.1;
 int b = (int)a;
 ```
 
-#### ——int类型加减乘除还是int。表达式中只要有double结果就是double
+#### int类型加减乘除还是int。表达式中只要有double结果就是double
 
 ```c#
 int a =10;
@@ -103,7 +135,7 @@ double c = a / b;	//c=3
 double d = a*1.0 / b;	//d=3.0		将int提升为double类型方法：乘以1.0
 ```
 
-#### ——Convert类型转换
+#### Convert类型转换
 
 类型不兼容时，用Convert转换。
 
@@ -117,20 +149,88 @@ double a = Convert.toDouble(str);
 int b = Convert.toInt32(str);
 ```
 
-#### ——Parse()和TryParse()
+#### Parse()和TryParse()
 
 ```c#
 int int.Parse(string);
 bool int.TryParse(string, out int);
 ```
 
-#### ——所有类型都可以转成string
+#### 所有类型都可以转成string
 
 ```c#
 .ToString()
 ```
 
-## 4. 异常
+### （5）变量的隐式初始化
+
+根据变量类型不同，创建变量后自动初始化的值也不同。
+
+值类型默认是0（bool类型是false），引用类型为null。
+
+## 4. 数组
+
+* 定义
+
+  ```c#
+  int[] arr = new int[3];
+  int[,] arr = new int[3][4];		//定义二维数组
+  int[,,] arr = new int[3][4][5];
+  ```
+
+* 初始化
+
+  ```c#
+  int[] arr = new int[] {1,2,3};		//定义时就初始化
+  int[,] arr = new int[][] {{1,2}, {3,4}, {5,6}};
+  ```
+
+  可简写成：
+
+  ```c#
+  int[] arr = {1,2,3};		
+  int[,] arr = {{1,2}, {3,4}, {5,6}};
+  ```
+
+* 交错数组
+
+  元素是数组的数组，子数组长度不定，需要各个单独初始化。
+
+  ```c#
+  int[] arr = new int[3][];	
+  arr[0] = new int[] {1,2,3}
+  arr[1] = new int[] {2,3}
+  arr[2] = new int[] {4,5,6,7}
+  ```
+
+* foreach遍历
+
+  ```c#
+  foreach(var i in arr)
+  ```
+
+  当arr中存的元素是值类型时不能修改数组的值，当元素是引用类型时可以通过i修改元素。
+
+
+### Clone()和CloneTo()
+
+CopyTo()和Clone()都属于浅拷贝,这一点是毋庸置疑的.对于浅拷贝:如果数组中的成员为值类型(如:int,float,double,byte等),则完全复制数值到目标数组中,如果是引用类型(如用户自定义类型:class Student,class People,或者是类库中的类类型:ArrayList等),则指复制引用给目标数组.文字有时候不如代码来得容易理解.但是这里也许用图更容易理解,看下图:
+
+假定创建一个学生类数组Student[],然后浅拷贝到另一个学生类数组Student1[]中。
+
+那么CopyTo()和Clone()方法的区别是什么呢?其实他们的区别,也就是MSDN上说的最大的区别就是用法上的区别.我们可以在VS弹出智能提示的时候看看他们的返回值,CopyTo()的返回值是void,使用方法如下Array1.CopyTo(Array2,0);其中Array2必须是一个已经实例化的数组.而Clone()的返回值是object.使用方法如下Array2 = Array1.Clone();其中Array2不必实例化.这样,我相信理解这两个方法的区别就很容易了.本质上并没有什么区别.都属于浅拷贝.如果拷贝所有的数组,就是用Clone().但是如果只是拷贝一部分,就可以选择CopyTo()了,CopyTo()的参数提示是这样的CopyTo(Array array,int Index).第二个参数index(索引)是指明从数组中的第几个对象开始复制.
+
+相信到这里.应该很容易理解CopyTo()和Clone().下面说说浅拷贝和[深拷贝](https://so.csdn.net/so/search?q=深拷贝&spm=1001.2101.3001.7020)的区别.
+
+如上面所说的,浅拷贝对于值类型则复制值,对于引用类型则复制对象的引用(类似于指针).深拷贝则是完完全全的创建一个个新对象.对原来数组中的所有对象全部创建新对象.对新数组中的修改不会影响原来数组中的值或对象.但是如何实现深拷贝呢?.NET库中似乎没有深拷贝的方法.这和实现深拷贝的原理有关系.若用户希望实现深拷贝.希望出现两个完全一样但又互不影响的数组.则必须自己写方法,对原数组中的每个对象实现拷贝,层层深入,直到这个对象中的对象中的对象……中的对象为值类型为止,因为只有值类型才是完全拷贝,对一个值进行修改不会影响另一个相同的值.这么说又有点难理解了.实现深拷贝的方法,如下图:
+
+https://www.cnblogs.com/JamelAr/p/14156387.html
+
+
+
+
+
+## 5. 异常
 
 ### （1）try catch finally
 
@@ -138,7 +238,7 @@ https://blog.csdn.net/ananlele_/article/details/109056883
 
 * 异常
 
-  .NET框架内置了常见的异常，所有异常的父类是Exception。像DivideByZeroExcpetion等异常类是Exception的子类（派生类）。
+  所有异常的父类是System.Exception。.NET框架内置了常见的异常，。像DivideByZeroExcpetion等异常类是Exception的子类（派生类）。
 
   若没有进行try catch捕获异常，则.NET提供的默认机制将终止整个程序。
 
@@ -160,13 +260,13 @@ https://blog.csdn.net/ananlele_/article/details/109056883
   }
   ```
 
-  执行顺序：先try，若未发生异常，则执行finally；若发生了异常，则执行catch，再执行finally。
+  执行顺序：先try，若未发生异常，则跳过catch，执行finally；若发生了异常，则执行catch，再执行finally。
 
 * try中若有return，则会先执行return，后执行finally。
 
 * try后必须跟catch或finally中的至少一个。
 
-  可以跟多个catch，用来捕获不同的异常进行不同的处理。但是需要catch更专业的错误放在前面。
+  可以跟多个catch，用来捕获不同的异常进行不同的处理。但是需要将更加典型、直观的异常放在前面catch，将无参catch放在最后，一般不要只用无参catch。
 
   ```C#
   using System;
@@ -204,7 +304,7 @@ https://blog.csdn.net/ananlele_/article/details/109056883
 
   可以在try代码块中手动抛出异常。
 
-  可以在catch代码块中将异常向更高的上下文重新抛出，由更高的上下文进行处理。
+  可以在catch代码块中将异常向更高的上下文重新抛出，由更高的上下文进行处理。这里只写一个throw。
 
 * 用户自定义异常
 
@@ -224,11 +324,12 @@ https://blog.csdn.net/ananlele_/article/details/109056883
       {
           try
           {
-              throw new CustomException("RAJESH");
+              throw new CustomException("RAJESH");	//手动抛出异常
           }
           catch (Exception e)				//多态
           {
               Console.WriteLine("此处捕获异常" + e.ToString());
+              throw;	//有异常抛给上文
           }
           Console.WriteLine("LAST STATEMENT");
       }
@@ -269,6 +370,37 @@ State st = State.a;
   string str = "2";
   State st = Enum.Parse(Typeof(State), a);
   ```
+
+### （3）修改成员数值类型——枚举记录开关状态
+
+默认是int，修改成员可通过：
+
+```c#
+enum ee:ulong
+```
+
+这样成员的类型从int改为ulong。
+
+我们可以用变量的每个bit位作为开关量的标识，这样uint32可表示32个开关量。可根据需要的开关量位数，修改enum成员的类型。
+
+```c#
+enum enumType:ushort{state1=0x00, state2=0x01, state3=0x04, state4=0x08...}
+```
+
+* 设定一个enumType类型的flag变量，比如置state1、state2、state3：
+
+  ```c#
+  enumType ops = state1|state2|state3;
+  ```
+
+* 判断某个状态的开关：
+
+  ```c#
+  bool useState1 = ((ops&state1)==state1);
+  bool useState2 = ((ops&state2)==state2);
+  ```
+
+
 
 ## 6. out/ref/params关键字
 
@@ -333,13 +465,15 @@ State st = State.a;
 
 **因此，传入ref形参的变量在传入前必须被初始化过，否则没有开辟内存。**
 
-* readonly
+**实参传入时也要加ref。**
 
-  ```c#
-  ref readonly int aConstant; // aConstant can't be value-reassigned.
-  readonly ref int Storage; // Storage can't be ref-reassigned.
-  readonly ref readonly int CantChange; // CantChange can't be value-reassigned or ref-reassigned.
-  ```
+```c#
+public void ff(ref int a, ref string c){...}
+
+int m = 1;
+string str = "hello";
+ff(ref m, ref str);
+```
 
 ### （3）params——变长数组
 
@@ -370,15 +504,17 @@ test("bb", 0, c);					//直接传入数组c
 
 * 引用类型
 
-  string、自定义类
+  array、string、class、delegate、interface
 
 * 值类型
 
-  int、double、float、decimal、enum、struct
+  基本类型、enum、struct
 
 ### （2）存储位置不同
 
 * 值类型：在栈上直接存变量值
+
+  **但是作为类的成员变量时，还是存储在堆上，因为堆是引用类型。**
 
 * 引用类型：变量值存在堆上，在栈上也会开辟空间，存的是堆上的地址
 
@@ -389,7 +525,17 @@ test("bb", 0, c);					//直接传入数组c
 
 ### （3）传递方式不同
 
+体现在2个方面，一是实参传递给形参，而是变量赋值。
 
+#### 传参
+
+形参值类型：在栈中为形参开辟了内存，函数块中对形参进行操作不影响变量。
+
+形参引用类型：
+
+形参带ref：系统不在栈上开辟内存，而是形参和实参指向同一块内存，对形参的修改就会改变实参。
+
+传入ref的实参必须是变量不能是数值，且传入的实参必须要先初始化。
 
 ## 8. string
 
@@ -420,7 +566,7 @@ int型的n1重新赋值时，在栈中的值会被取代。
 
 ### （3）string一些API
 
-#### —s.Remove、s.Insert、s.ToCharArray
+#### s.Remove、s.Insert、s.ToCharArray
 
 string可以看成一个**只读**char数组，可通过索引get到对应字符。但不能通过索引set对应字符。
 
@@ -445,7 +591,7 @@ ss[3]='L';
 s = new string(ss);				//new string(char[] ss)可将字符数组转成string
 ```
 
-#### —StringBuilder-对字符串进行大量的拼接、赋值操作
+#### StringBuilder-对字符串进行大量的拼接、赋值操作
 
 因为每次对string进行改变时会在内存产生垃圾，所以需要大量拼接和赋值时，使用StringBuilder类。
 
@@ -459,13 +605,13 @@ for(int i=0;i<10000;++i){
 Console.WriteLine(sb.toString());
 ```
 
-#### —s.Length
+#### s.Length
 
-#### —s.ToUpper、s.ToLower
+#### s.ToUpper、s.ToLower
 
 大小写转换
 
-#### —s.Equals
+#### s.Equals
 
 ```c#
 s.Equals(string value, StringComparision comparisonType)
@@ -473,7 +619,7 @@ s.Equals(string value, StringComparision comparisonType)
 //StringComparision.OridinalIgnoreCase为忽略大小写比较
 ```
 
-#### —Split
+#### Split
 
 返回值是string数组
 
@@ -484,7 +630,7 @@ string[] Split(params char[] chs, StringSplitOptions.RemoveEmptyEntries)
 //None表示不去除空字符串""。这样出现chs中字符的地方将会是""    
 ```
 
-#### —Replace
+#### Replace
 
 将字符串中的oldvalue替换为newvalue
 
@@ -492,7 +638,7 @@ string[] Split(params char[] chs, StringSplitOptions.RemoveEmptyEntries)
 string Replace(string oldValue, string newValue)
 ```
 
-#### —Substring
+#### Substring
 
 取子串
 
@@ -500,13 +646,13 @@ string Replace(string oldValue, string newValue)
 string Substring(int startIndex, int len)
 ```
 
-#### ——Contains
+#### Contains
 
 ```c#
 bool Contains(string val);
 ```
 
-#### ——IndexOf
+#### IndexOf
 
 返回子串第一次出现的index
 
@@ -514,11 +660,11 @@ bool Contains(string val);
 int IndexOf(string value, int startIndex)
 ```
 
-#### ——LastIndexOf
+#### LastIndexOf
 
 返回子串最后一次出现的index
 
-#### ——StartsWith
+#### StartsWith
 
 判断是否以子串value开始
 
@@ -526,7 +672,7 @@ int IndexOf(string value, int startIndex)
 bool StartsWith(string value)
 ```
 
-#### ——EndsWith
+#### EndsWith
 
 判断是否以子串value结束
 
@@ -534,7 +680,7 @@ bool StartsWith(string value)
 bool EndsWith(string value)
 ```
 
-#### ——str.Trim
+#### str.Trim
 
 去掉字符串左侧和右侧的空字符
 
@@ -544,7 +690,7 @@ str.TrimStart()
 str.TrimEnd()
 ```
 
-#### ——string.IsNullOrEmpty()
+#### string.IsNullOrEmpty()
 
 判断字符串是否为空
 
@@ -552,7 +698,7 @@ str.TrimEnd()
 bool string.IsNullOrEmpty(string str)
 ```
 
-#### ——Join
+#### Join
 
 将数组每个元素以指定的分割符分隔
 
@@ -568,11 +714,11 @@ Console.WriteLine(strNew);		// 111|222|333|444
 
 
 
-
-
 ## 9. 字段和属性
 
-属性控制属性的读写权限。
+属性不是字段，是函数。
+
+属性控制属性的读写权限，也可在其中加入逻辑代码，进行计算或是对赋值进行限定。
 
 写好field后，**快捷键ctrl-r-e快速生成property**。
 
@@ -631,6 +777,10 @@ public class Person {
 
 一般用来封装一些全局使用的变量、方法。
 
+构造方法要是**静态构造方法**。
+
+静态类不能派生子类，静态类是密封类。（sealed class myClass）
+
 ```C#
 public static class Global{
     public static int a;
@@ -644,7 +794,7 @@ public static class Global{
 
 类型推断，仅队函数内部的**局部变量**起作用。
 
-初始化时必须赋初值。
+**初始化时必须赋初值。**
 
 ```c#
 var v = "123";
@@ -697,10 +847,6 @@ var v = "123";
 
 ## 12. final
 
-* try catch final
-
-  指捕获到异常后一定会执行的代码块。
-
 * 用于修饰变量、字段、函数、类
 
   用于变量时，该变量只能赋值一次，不可修改；
@@ -709,11 +855,46 @@ var v = "123";
 
   用于类时，该类不能被继承。
 
+## 13. new
 
+new关键字并不是创建类对象特有的，而仅仅只是表示在开辟内存。
+
+对值类型变量来说，new表示在栈上开辟内存。
+
+对引用类型来说，表示在堆上开辟内存，new表达式返回的是引用，这个引用赋值给变量，变量开辟在栈上。
+
+```c#
+Person p;	//在栈上开辟个内存
+p = new Person();	//在堆上开辟内存，将引用返回给变量p
+```
+
+还有个用法是子类屏蔽父类同名成员。
+
+## 14. 重载overload
+
+方法名相同，但函数签名不同。（方法名、形参个数、形参类型，返回值不是签名的一部分）
+
+## 15. virtual和abstract
+
+父类中声明为virtual的方法，可以被子类override。若不想父类的某个函数被override，将其修饰为final。
+
+LSP原则：不要override父类的非抽象方法。
+
+```c#
+class ff{
+    virtual public void func(){}
+}
+
+class ss:ff{
+    override public void func(){}
+}
+```
+
+父类的方法声明为abstract为抽象方法，父类即抽象类，抽象类不可被实例化，只能作为父类被继承，子类override实现抽象方法。
 
 # 二、OOP
 
-## 12. 构造函数
+## 16. 构造函数
 
 创建对象时执行，初始化**属性**。
 
@@ -749,7 +930,13 @@ class Person
 }
 ```
 
-## 13. this
+#### 静态构造函数
+
+构造函数可以为静态。静态构造函数只能有一个，不能有参数，不能有访问权限修饰符。主要用于初始化类的静态字段（因为只有静态方法可以访问静态字段）。
+
+
+
+## 17. this
 
 在类中代指当前类的对象。
 
@@ -759,15 +946,17 @@ class Person
 public Student(int age, string name):this(age, name, "male")	//this会显示调用全参构造，减少冗余代码
 ```
 
-## 14. 析构函数
+## 18. 析构函数
 
 C#中有gc（garbage collection）机制，自动回收垃圾。
 
-析构方法的调用时机和GC一样是完全不可预测的，也不应当依赖于它被调用。析构函数是确保已分配的非托管资源总能被释放的一个补救措施。如果可能就不应当被调用，譬如说手动释放了非托管资源，此时应当通知GC取消对对象的析构函数的调用。
+析构方法的调用时机和GC一样是不可预测什么时候调用的，因此也不应当依赖于它被调用。析构函数是确保已分配的非托管资源总能被释放的一个补救措施。如果可能就不应当被调用，譬如说手动释放了非托管资源，此时应当通知GC取消对对象的析构函数的调用。
 
 **最后，如果你一定要手动分配非托管资源，那么记住析构函数是保险丝，是最后的保障，不是常规的做法。**
 
-## 15. 命名空间
+若需要立刻释放资源，可通过IDisposable接口实现Dispose方法，写释放资源的代码。然后调用GC.depressfinalize关闭调用析构函数。
+
+## 19. 命名空间
 
 用于解决类的重名问题，命名空间中有若干类。若不同命名空间中有同名的类，调用同名类时为了避免歧义，要加上命名空间。如：
 
@@ -785,7 +974,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 >
 > 
 
-## 16. 继承
+## 20. 继承
 
 * 继承的优点：
 
@@ -849,18 +1038,36 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
   }
   ```
 
-* 当子类中有和父类**同名的成员**（函数、变量）时，**将覆盖父类的成员**，子类对象在调用时只能调用子类的调用不到父类的。但是不要这样写，违反LSP原则。正确的写法是：子类中可以对父类的非抽象方法进行重载，但不能重写（即参数列表相同，函数体不同，可用final修饰父类的非抽象方法从语法层面避免子类的重写。）
+* 当子类中有和父类**同名的成员**（函数、变量）时，**将覆盖父类的成员**，子类对象在调用时只能调用子类的调用不到父类的。**用new关键字声明子类中和父类同名的成员，可以这条语句中屏蔽父类成员。**子类中可以使用base访问父类成员。
 
-  **需要用new关键字声明成员。**
+  但是不要这样写，违反LSP原则，不要override非抽象方法，可以重载overload。正确的写法是：
+
+  子类中可以对父类的非抽象方法进行重载。
+
+* 重载：**函数签名**不同，函数名相同。
+
+* 函数签名：参数列表的个数、类型。不包括返回值。
+
+* 不可——如果不想父类的非抽象方法被子类override，可以用final修饰父类方法，不可被覆写。
+
+* 必须要——抽象父类`abstract public class Person`不可实例化，必须要被子类继承且override了其中的抽象方法`public void ff();`子类才可以实例化，否则子类也是抽象类。
+
+* 都行——父类的方法被virtual修饰时，子类可以override该方法，也可以不override。
+
+* 若不想父类方法被override，可用final修饰。
+
+  
 
   LSP中规定不覆写
 
   ```c#
   Coder cc = new Coder();
   cc.sayHello();	//Coder。而不是Person。
-  ```
+```
 
-## 17. 里氏替换原则（LSP）
+## 21. 里氏替换原则（LSP）
+
+设计模式6大原则其一
 
 易于理解的LSP说明：https://www.jianshu.com/p/dfcdcd5d9ece
 
@@ -868,7 +1075,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
   ```c#
   Person p = new Student();
-  ```
+```
 
 * 若父类变量中装的是子类对象，则可以将这个父类变量强转为子类对象。
 
@@ -877,15 +1084,15 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
   ss.sayHello();	//Student
   ```
 
-  
+* LSP原则内容
+
+> 
 
 
 
 
 
-
-
-## 18. is和as
+## 22. is和as强转
 
 都是用于强转
 
@@ -903,16 +1110,278 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
   }
   ```
 
-* as转换成功返回转换后对象，失败时返回null
+* as转换成功返回转换后对象，失败时返回null。
 
+  **必须用于引用类型或可赋值为null的变量。**
+  
   ```c#
   Student t = p as Student;
   t.sayHello();	//student
   ```
+  
+  
+
+## 23. 委托
+
+委托是具有相同签名、返回值的有序函数列表，是引用类型。
+
+方法列表：绑定到委托上的方法。委托会依次调用方法列表中的每个方法。
+
+判定方法列表是否为空：将委托变量和null比较。
+
+初始化委托时，会将第一个方法放入方法列表：MyDel md = func;
+
+通过等号赋值绑定到方法列表的方法只能是第一个方法，后面的绑定需要使用+=；若再次使用赋值给委托变量，就会产生新的委托变量，原来的委托变量将会被GC回收。
+
+给委托添加方法使用+=，移出方法使用-=。
+
+绑定匿名方法使用lambda表达式，可在委托里内联一小段函数。
+
+
+
+## 24. 内置泛型委托Action和Func
+
+
+
+
+
+## 25. 事件
+
+事件是成员，不是类型。要声明为public，外部程序才能向其注册handler方法。
+
+**事件的声明依靠委托，其内部含有一个私有的委托。**
+
+* 声明事件的步骤：
+
+  > * 定义委托类型。可以使用标准预定义委托类型`EventHandler`，使用`EventHandler(pbject sender, EventArgs)`事件为标准事件。
+  >
+  > * 定义事件。
+  >
+  >   ```c#
+  >   public event EventHandler myevent1, myevent2;
+  >   public static event EventHandler myevent;
+  >   ```
+  >
+  > * 订阅事件，绑定事件handler。
+  >
+  >   ```c#
+  >   myevent1 += (sender, args)=>{...}
+  >   myevent1 += new EventHandler(func);
+  >   ```
+  >
+  > * 触发事件。
+  >
+  >   ```c#
+  >   //在函数ff中手动触发事件myEvent1
+  >   public void ff(object sender, EventArgs e){
+  >       if(myEvent1!=null){
+  >           myEvent1(sender, e);
+  >       }
+  >   }
+  >   ```
 
   
 
+## 26. 自定义委托、事件传递参数
+
+类EventArgs对象e中无法存储数据。**将参数从事件触发处传递到事件handler处。**
+
+#### 方法1——通过自定义类MyEventArgs继承EventArgs，封装参数
+
+```c#
+//自定义MyEventArgs
+class MyEventArgs:EventArgs{
+    private string msg;
+    public MyEventArgs(string msg){
+        this.msg = msg;
+    }
+}
+```
+
+步骤：
+
+* 自定义委托。可使用自定义类MyEventArgs作为参数的委托。
+
+  ```c#
+  public void delegate myEventHandler(object sender, MyEventArgs e);	//使用自定义的MyEventArgs
+  ```
+
+* 使用自定义的委托定义事件。
+
+  ```c#
+  public event myEventHandler myEvent;	//定义事件myEvent
+  ```
+
+* 绑定事件处理函数。
+
+  ```c#
+  public void func(object sender, MyEventArgs e){
+      Console.WriteLine(e.msg);	//传出参数
+  }
   
+  myEvent+=func;		//将func添加到方法列表
+  ```
+
+* 触发事件
+
+  ```c#
+  public void trigger(object sender, EventArgs e){
+      MyEventArgs args = new MyEventArgs("hello");	//封装参数"hello"
+      myEvent(sender, args);		//触发事件，将参数传递到func定义处。
+  }
+  ```
+
+#### 方法2——使用内置的泛型EventHandler事件定义
+
+使用泛型事件定义，跳过自定义委托，自定义事件。
+
+步骤：
+
+* 自定义类myEventArgs继承自EventArgs类，封装信息，用于传递信息。
+
+* 声明泛型事件
+
+  ```c#
+  public event EventHandler<myEventArgs> myEvent;
+  ```
+
+* 事件handler
+
+  ```c#
+  public void func(object sender, MyEventArgs e){...}
+  ```
+
+* 触发事件
+
+  同上
+
+
+
+## 27. 观察者模式
+
+publisher、subscriber
+
+
+
+### （1）事件订阅流程
+
+
+
+### （2）通过事件传递参数
+
+
+
+## 28. 接口
+
+接口就是一组未实现的方法的集合。类实现接口后，就可以调用其中的方法。
+
+#### 声明
+
+不能包含变量，只能包含方法、属性、事件，且都不能实现。
+
+不能有任何访问权限修饰符，默认是public。
+
+名称惯例以I开头。
+
+#### 实现
+
+只有类、结构可以实现接口，实现时必须实现接口中的所有成员。
+
+当表示某个子类继承于父类的同时还要实现某些接口：
+
+```c#
+class Son:Father,Iinterface1,Iinterface2{
+    ...
+}
+```
+
+#### 使用
+
+可以通过类使用实现的方法。
+
+还有种用法：将实现了接口的类的对象强转为接口的引用变量，通过这个引用变量调用实现的方法。所有实现了该接口的类，都可以转换成这个接口的变量。
+
+#### 接口可继承
+
+# 三、其他
+
+## 29. 多线程、异步
+
+
+
+
+
+## 30. 外部方法
+
+当方法声明包含[extern]修饰符时，称该方法为外部方法。外部方法是在外部实现的，编程语言通常是使用C#以外的语言。外部方法不可以是泛型。
+
+```c#
+class program
+{
+     	[DllImport("User32.dll")]
+        //声明外部方法 使用关键字extern 由于配合DllImport属性使用，所以必须包含static关键字
+        public static extern int MessageBox(int h, string m, string c, int type);
+        static int Main(string[] args)
+        {
+            Console.WriteLine("请输入你的姓名");
+            string name = Console.ReadLine();
+            //利用return进行弹出对话框,所以需要将Main方法改为有返回值
+            return MessageBox(0,"您好："+name+"\n\n"+"欢迎来到这里","提示",0);
+            Console.ReadKey();
+        }
+}
+```
+
+## 31. typeof/GetType()
+
+```c#
+Type t = typeof(myClass);
+FieldsInfo[] fi =t.GetFields();
+MethodsInfo[] mi = t.GetMethods();
+```
+
+## 32. using语句
+
+using statement分配资源，using语句会将statement隐式的放入try catch语句中，并在finally中加一个Dispose释放资源。所以使用using语句可以自动释放使用的资源。
+
+## 33. 装箱拆箱
+
+装箱：将值类型转成引用类型。
+
+拆箱：将引用类型转成值类型。
+
+## 34. 泛型（generic）
+
+### （1）where约束
+
+让编译器知道那些类型的参数可被接受。
+
+where子句：
+
+![image-20230312180600596](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230312180600596.png)
+
+where T:nameofClass——表示T必须继承该类
+
+where T:nameofInterface——表示T必须实现了该接口
+
+```c#
+class MyClass <T1,T2,T3> 
+    where T2:struct
+    where T2:class
+{
+	...        
+}
+```
+
+### （2）泛型类
+
+
+
+### （3）泛型委托
+
+
+
+### （4）泛型方法
 
 
 
@@ -922,13 +1391,23 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 
 
+# 三、数据结构
 
 
-# 数据结构
 
 
 
-# Socket
+# 四、LinQ
+
+
+
+# 五、EntityFramework
+
+
+
+
+
+# 六、 Socket
 
 
 
