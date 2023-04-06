@@ -794,7 +794,7 @@ public static class Global{
 
 类型推断，仅队函数内部的**局部变量**起作用。
 
-**初始化时必须赋初值。**
+**定义时必须初始化。**
 
 ```c#
 var v = "123";
@@ -891,6 +891,32 @@ class ss:ff{
 ```
 
 父类的方法声明为abstract为抽象方法，父类即抽象类，抽象类不可被实例化，只能作为父类被继承，子类override实现抽象方法。
+
+## 16. ？与可空类型Nullable
+
+?.运算符：NULL检查运算符，若对象为NULL则不进行取对象操作直接返回NULL：
+
+```C#
+int? firstX = points?.FirstOrDefault()?.X;
+```
+
+通过?可将非空类型int、double等设为null：
+
+```c#
+int? a = null;
+int? b = 3;
+//等价于:
+Nullable<int> a = new Nullable<int>(3);
+```
+
+通过??可进行判断赋值：
+
+```c#
+int? a = null;
+int b = a??3.14;	//若a为null，则将3.14赋值给b
+```
+
+https://www.cnblogs.com/youmingkuang/p/11459615.html
 
 # 二、OOP
 
@@ -1063,19 +1089,20 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
   ```c#
   Coder cc = new Coder();
   cc.sayHello();	//Coder。而不是Person。
-```
-
-## 21. 里氏替换原则（LSP）
-
-设计模式6大原则其一
-
-易于理解的LSP说明：https://www.jianshu.com/p/dfcdcd5d9ece
-
-* 子类对象可以赋值给父类变量。
-
+  ```
+  
   ```c#
-  Person p = new Student();
-```
+  ## 21. 里氏替换原则（LSP）
+  
+  设计模式6大原则其一
+  
+  易于理解的LSP说明：https://www.jianshu.com/p/dfcdcd5d9ece
+  
+  * 子类对象可以赋值给父类变量。
+  
+    ```c#
+    Person p = new Student();
+  ```
 
 * 若父类变量中装的是子类对象，则可以将这个父类变量强转为子类对象。
 
@@ -1137,11 +1164,44 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 绑定匿名方法使用lambda表达式，可在委托里内联一小段函数。
 
+```c#
+public void delegate dlg(int a);
+dlg+=a=>return a++;
+```
+
+委托在编译的时候确实会编译成类。因为Delegate是一个类，所以在任何可以声明类的地方都可以声明委托。
+
+ **委托是一个类，它定义了方法的类型，使得可以将方法当作另一个方法的参数来进行传递，这种将方法动态地赋给参数的做法，可以避免在程序中大量使用If-Else(Switch)语句，同时使得程序具有更好的可扩展性。（https://www.cnblogs.com/neo98/articles/4916163.html）**
+
+为什么要引入委托：https://www.cnblogs.com/zhili/archive/2012/10/22/Delegate.html
+
 
 
 ## 24. 内置泛型委托Action和Func
 
+内置泛型委托类型。
 
+Action对应的函数签名没有返回值，Func对应的函数签名有返回值。
+
+```c#
+Action
+Action<T>
+Action<T1,T2>
+Action<T1,T2,T3>
+Action<T1,T2,T3,T4>
+```
+
+```c#
+Func<TResult>
+Func<T,TResult>
+Func<T1,T2,TResult>
+Func<T1,T2,T3,TResult>
+Func<T1,T2,T3,T4,TResult>
+```
+
+```c#
+Func<int a, double b, string str> dlg+=(int a, double b)=>return (a+b).toString();
+```
 
 
 
@@ -1153,7 +1213,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 * 声明事件的步骤：
 
-  > * 定义委托类型。可以使用标准预定义委托类型`EventHandler`，使用`EventHandler(pbject sender, EventArgs)`事件为标准事件。
+  > * 定义委托类型。**可以使用内置委托类型`EventHandler`**，使用`EventHandler(pbject sender, EventArgs)`事件为标准事件。
   >
   > * 定义事件。
   >
@@ -1257,17 +1317,40 @@ class MyEventArgs:EventArgs{
 
 
 
-## 27. 观察者模式
+## 27. 观察者模式(observer)
 
 publisher、subscriber
 
-
+https://www.cnblogs.com/zhili/p/ObserverPattern.html
 
 ### （1）事件订阅流程
 
+publisher定义事件：
 
+```c#
+public event EventHandler myevent;
+```
+
+subscriber定义事件handler并订阅publisher的事件myevent：
+
+```c#
+public void func(object sender, EventArgs e){...}
+myevent+=func;	//订阅
+```
+
+publisher状态发生改变触发事件，subscriber被广播通知调用handler：
+
+```c#
+public void trigger(object sender, EventArgs e){
+    myevent(sender, e);	//向所有订阅者发布广播
+}
+```
+
+https://blog.csdn.net/iteye_4195/article/details/82448068?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-82448068-blog-112131243.235%5Ev27%5Epc_relevant_default&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-82448068-blog-112131243.235%5Ev27%5Epc_relevant_default&utm_relevant_index=3
 
 ### （2）通过事件传递参数
+
+见26，将参数从publisher（触发事件，发生变化的一方）传递到subscriber（事件handler，接收变化做出反应的一方）。
 
 
 
@@ -1305,9 +1388,160 @@ class Son:Father,Iinterface1,Iinterface2{
 
 # 三、其他
 
-## 29. 多线程、异步
+## 29. 多线程、异步委托
+
+线程是轻量的进程，C#程序运行时第一个线程自动创建，称为**主线程**。
+
+线程生命周期开始于Thread对象创建时，状态有：未启动、就绪、休眠、死亡。
+
+何时使用多线程：
+1、提高CPU的利用率，从而提高了程序的效率；
+2、当程序运行会卡住软件界面，为了使人不用焦虑等待时，采取线程与委托来处理，从而使软件界面运行流畅；
+3、处理大量数据时间较长（显示一个进度条给界面）或不需要马上得到结果反馈给软件界面时；
+
+### （1）Thread.Start开辟线程
+
+https://blog.csdn.net/weixin_34364071/article/details/85998726?spm=1035.2023.3001.6557&utm_medium=distribute.pc_relevant_bbs_down_v2.none-task-blog-2~default~ESQUERY~Rate-2-85998726-bbs-392024152.pc_relevant_bbs_down_v2_default&depth_1-utm_source=distribute.pc_relevant_bbs_down_v2.none-task-blog-2~default~ESQUERY~Rate-2-85998726-bbs-392024152.pc_relevant_bbs_down_v2_default
+
+创建线程对象：
+
+```c#
+Thread th = new Thread(new ThreadStart(func));	//new Thread传入的参数类型是委托类型：void delegate()
+```
+
+启动线程：
+
+```c#
+th.Start();
+```
+
+暂停线程：
+
+```c#
+th.Sleep();
+```
+
+终止线程：
+
+```c#
+th.Abort();
+```
+
+#### —如何优雅的终止线程：
+
+Thread.Abort是在调用线程内抛出一个ThreadAbortException从而导致线程终止。但是只有目标线程在调用**托管代码**时Abort()才会立即返回终止线程，若正在调用非托管代码（如外部C++代码）则不会立即返回。通过Thread.ThreadState获取状态可知，调用Abort抛出异常后，状态为ThreadState.AbortRequested，真正终止后状态为ThreadState.Aborted。
+
+所以调用Abort()后需要循环判断ThreadState是否为Aborted，才能判断线程是否真正终止：
+
+```c#
+var thread = new Thread(
+    new ThreadStart(
+        () =>
+            {
+                while (true)
+                {
+                    //该线程会进行无限循环，自己不会结束
+                    Thread.Sleep(100);
+                }
+            }));
+ 
+thread.IsBackground = true;
+thread.Start();//启动线程
+ 
+thread.Abort();//调用Thread.Abort方法试图强制终止thread线程
+ 
+//上面调用Thread.Abort方法后线程thread不一定马上就被终止了，所以我们在这里写了个循环来做检查，看线程thread是否已经真正停止。其实也可以在这里使用Thread.Join方法来等待线程thread终止，Thread.Join方法做的事情和我们在这里写的循环效果是一样的，都是阻塞主线程直到thread线程终止为止
+while (thread.ThreadState!=ThreadState.Aborted)
+{
+    //当调用Abort方法后，如果thread线程的状态不为Aborted，主线程就一直在这里做循环，直到thread线程的状态变为Aborted为止
+    Thread.Sleep(100);
+}
+ 
+//当跳出上面的循环后就表示我们启动的线程thread已经完全终止了
+```
+
+**但用Abort终止线程不是好方法，它通过抛异常终止线程可能会造成一些意想不到的问题，所以更好的方法是：**
+
+定义终止标志位，当需要子线程终止时，改变标志位，在子线程的循环中判断标志位，若标志位改变则通过return终止子线程。适用于循环执行的子线程。
+
+```c#
+USBOP.ThreadStopFlg = true;         
+while ((USBReadThread.ThreadState != System.Threading.ThreadState.Stopped) && (USBReadThread.ThreadState != System.Threading.ThreadState.Aborted))
+{
+    Thread.Sleep(10);	//主线程休眠等待子线程终止
+}
+
+//子线程循环中添加：
+if (ThreadStopFlg == true) //判断是否该结束线程了  
+{  
+    ThreadStopFlg = false;  
+    return;  
+} 
+```
+
+阻塞调用线程，等待其他线程结束：
+
+```c#
+Join();
+```
+
+> 获取当前正在运行线程：CurrentThread
+>
+> 获取或设置某线程是否为后台线程：IsBackGround
+>
+> 获取线程状态：**ThreadState**（ThreadState.Running、ThreadState.Aborted等）
+
+### （2）异步委托开辟线程
+
+为了降低创建、销毁线程的成本，CLR为每一个进程维护了一个线程池。开始，线程池是空的，如果进程使用的线程被创建并执行完毕后，不会被销毁而会被放入线程池。之后，进程需要一个线程，就会从线程池中还原一个线程，节省很多时间。
+
+UI主线程要能及时相应用户操作，若程序后台需要执行很长时间就需要放到另一个线程。
+
+**异步执行的三种方式：阻塞主线程等待子线程、主线程轮询子线程执行状态、子线程执行完调用回调函数。**
+
+* AsyncResult对象和IAsyncResult接口对象
+
+  ![image-20230331123955719](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230331123955719.png)
+
+* BeginInvoke和EndInvoke
+
+  ```c#
+  void func_callback(IAsyncResult iar){...}
+  IAsyncResult BeginInvoke(1, 2, new AsyncCallback(func_callback), null)
+  ```
+
+  ```c#
+  T result = dlg.EndInvoke(out p, IAsyncResult iar);
+  ```
+
+* 轮询
+
+  ```c#
+  ```
+
+  
+
+https://www.cnblogs.com/zhili/archive/2013/05/15/Csharp5asyncandawait.html
+
+https://learn.microsoft.com/zh-cn/dotnet/standard/asynchronous-programming-patterns/calling-synchronous-methods-asynchronously
+
+https://learn.microsoft.com/zh-cn/dotnet/standard/asynchronous-programming-patterns/asynchronous-programming-using-delegates
 
 
+
+### （3）Thread.Start和BeginInvoke开辟的线程有什么区别？
+
+我们知道线程池有工作线程和IO线程，你写的多线程和并发只能操控到工作线程，而异步恰恰可以把线程池里的IO线程调动起来处理关于一切涉及IO方面的工作，取网络IO，文件IO
+
+
+
+thread开启的线程和begininvoke有什么区别？https://www.cnblogs.com/zjoch/archive/2012/04/12/2443714.html
+
+Control.Invoke 方法 (Delegate) :在拥有此控件的基础窗口句柄的线程上执行指定的委托。
+Control.BeginInvoke 方法 (Delegate) :在创建控件的基础句柄所在线程上异步执行指定委托。
+Control的Invoke和BeginInvoke的参数为delegate，委托的方法是在Control的线程上执行的，也就是我们平时所说的UI线程。
+
+### （4）锁
 
 
 
@@ -1326,7 +1560,7 @@ class program
             Console.WriteLine("请输入你的姓名");
             string name = Console.ReadLine();
             //利用return进行弹出对话框,所以需要将Main方法改为有返回值
-            return MessageBox(0,"您好："+name+"\n\n"+"欢迎来到这里","提示",0);
+            return MessageBox(0, "您好："+name+"\n\n"+"欢迎来到这里","提示", 0);
             Console.ReadKey();
         }
 }
@@ -1375,47 +1609,223 @@ class MyClass <T1,T2,T3>
 
 ### （2）泛型类
 
-
-
 ### （3）泛型委托
-
-
 
 ### （4）泛型方法
 
+```c#
+public void func(S, T)(S p):where S:Person
+{
+    ...
+}
+```
+
+## 35. 定时器
 
 
 
 
 
+## 36. 反射（reflection）与特性（attribute）
+
+https://blog.csdn.net/ananlele_/article/details/107979117
 
 
 
-# 三、数据结构
+## 37. 索引器（indexer）
+
+使可通过[]下标访问定义了索引器的类的成员。
+
+允许索引是其他类型，不一定非要是int。
+
+```c#
+element-type this[int index]
+{
+   // get 访问器
+   get
+   {
+      // 返回 index 指定的值
+   }
+
+   // set 访问器
+   set
+   {
+      // 设置 index 指定的值
+   }
+}
+```
+
+```c#
+using System;
+namespace IndexerApplication
+{
+   class IndexedNames
+   {
+      private string[] namelist = new string[size];
+      static public int size = 10;
+      public IndexedNames()
+      {
+         for (int i = 0; i < size; i++)
+         namelist[i] = "N. A.";
+      }
+      public string this[int index]
+      {
+         get
+         {
+            string tmp;
+
+            if( index >= 0 && index <= size-1 )
+            {
+               tmp = namelist[index];
+            }
+            else
+            {
+               tmp = "";
+            }
+
+            return ( tmp );
+         }
+         set
+         {
+            if( index >= 0 && index <= size-1 )
+            {
+               namelist[index] = value;
+            }
+         }
+      }
+
+       public int this[string name]
+      {
+         get
+         {
+            int index = 0;
+            while(index < size)
+            {
+               if (namelist[index] == name)
+               {
+                return index;
+               }
+               index++;
+            }
+            return index;
+         }
+
+      }
+       
+      static void Main(string[] args)
+      {
+         IndexedNames names = new IndexedNames();
+         names[0] = "Zara";
+         names[1] = "Riz";
+         names[2] = "Nuha";
+         names[3] = "Asif";
+         names[4] = "Davinder";
+         names[5] = "Sunil";
+         names[6] = "Rubic";
+         for ( int i = 0; i < IndexedNames.size; i++ )
+         {
+            Console.WriteLine(names[i]);
+         }
+         Console.ReadKey();
+      }
+   }
+}
+```
+
+# 四、数据结构
+
+集合分为泛型集合和非泛型集合。
+
+前者位于System.Collection.Generic命名空间，后者位于System.Collection。
+
+### （1）泛型集合和非泛型集合
+
+非泛型集合内部存储的是Object类型：ArrayList，Stack，Queue，HashTable
+
+泛型集合：`List<T>、Stack<T>、Queue<T>、Dictionary<TKey,TValue>`
+
+# 五、LinQ
 
 
 
+# 六、 设计模式
 
+**关注使用场景**
 
-# 四、LinQ
+### （1）单例模式
 
+单例模式(https://www.runoob.com/design-pattern/singleton-pattern.html)：某个类只创建一个对象。适用于某个全局使用的类，需要频繁的创建对象，为了防止对象的频繁创建、销毁浪费资源，令某个类只能产生一个对象。
 
+线程安全：https://blog.csdn.net/xiaochenXIHUA/article/details/108508258
 
-# 五、EntityFramework
+```c#
+private static readonly object _Synchronized = new object();
+//创建一个只读对象作为lock
+```
 
+```c#
+using System;
+using System.Collections.Generic;
+using System.Text;
+ 
+namespace SingleModel
+{
+    //懒汉式单例
+    public class Single3
+    {
+        //定义一个保存实例的静态变量
+        private static Single3 _Instance;
+        //定义一个保证线程同步标识
+        private static readonly object _Synchronized = new object();
+        private Single3() { }
+ 
+        public static Single3 GeInstance()
+        {
+            if (_Instance==null)
+            {
+                lock (_Synchronized)
+                {
+                    //双重锁定
+                    if (_Instance==null)
+                    {
+                        _Instance = new Single3();
+                    }
+                }
+            }
+            return _Instance;
+        }
+ 
+    }//Class_end
+}
+```
 
+### （2）工厂模式
 
+工厂模式：当若干子类实现了同一个接口，明确希望在不同条件下产生不同的子类对象，并用同一个接口对象去“接”。简化对象创建和去接的接口的选择。
 
+### （3）观察者模式
 
-# 六、 Socket
+观察者模式：当publisher状态发生改变时，所有的subscriber要能够被通知并做出反应。
 
+# 七、EntityFramework
 
+https://zhuanlan.zhihu.com/p/161107452
 
+# 八、三层架构
 
+https://www.jianshu.com/p/7f628015a243
 
+# 九、 Socket
 
+https://www.cnblogs.com/zhili/archive/2012/09/23/QQ_P2P.html
 
+向MES上传数据
 
+# 十、串口通信
+
+RS232
+
+RS485/422
 
 
 
