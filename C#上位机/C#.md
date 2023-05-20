@@ -1152,7 +1152,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 委托是具有相同签名、返回值的有序函数列表，是引用类型。
 
-方法列表：绑定到委托上的方法。委托会依次调用方法列表中的每个方法。
+方法列表：绑定到委托上的方法。委托会依次调用方法列表中的每个方法。**执行函数的顺序按照注册的顺序。**
 
 判定方法列表是否为空：将委托变量和null比较。
 
@@ -1599,7 +1599,7 @@ namespace IndexerApplication
 
 # 四、多线程
 
-## 1. 多线程、异步委托
+## 1. Thread
 
 线程是轻量的进程，C#程序运行时第一个线程自动创建，称为**主线程**。
 
@@ -1702,7 +1702,7 @@ Join();
 >
 > 获取线程状态：**ThreadState**（ThreadState.Running、ThreadState.Aborted等）
 
-### （2）异步委托BeginInvoke
+## 2. 异步委托BeginInvoke
 
 为了降低创建、销毁线程的成本，CLR为每一个进程维护了一个线程池。开始，线程池是空的，如果进程使用的线程被创建并执行完毕后，不会被销毁而会被放入线程池。之后，进程需要一个线程，就会从线程池中还原一个线程，节省很多时间。
 
@@ -1754,6 +1754,8 @@ Control.BeginInvoke 方法 (Delegate) :在创建控件的基础句柄所在线�
 Control的Invoke和BeginInvoke的参数为delegate，委托的方法是在Control的线程上执行的，也就是我们平时所说的UI线程。
 
 ### （4）Lock锁
+
+## 3. Task/async
 
 
 
@@ -1867,6 +1869,254 @@ namespace Singleton
 
 
 
+## 
+
+
+
+## 观察者模式
+
+https://blog.csdn.net/qq_40666028/article/details/80916020
+
+https://www.cnblogs.com/fengfuwanliu/p/10892940.html
+
+https://zhuanlan.zhihu.com/p/346509500
+
+### 前言
+
+### 耦合的情况
+```c#
+class Subject
+{
+	private string args;	//被观察者的某个会变化的状态
+	private List<Observer> observers;	//所有的观察者，与观察者耦合
+	
+	public void Attach(Observer ob)
+	{
+		observers.Add(ob);
+	}
+	
+	public void Detach(Observer ob)
+	{
+		observers.Remove(ob);
+	}
+	
+	public void notify()
+	{ 
+		foreach(var o in observers)
+		{
+			o.Update();
+		}
+	}	//args改变时，通知观察者
+}
+
+class Observer
+{
+	private Subject sub;	//需要访问被观察者的状态args，与被观察者耦合
+	public Observer(Subject sub)
+	{
+		this.sub = sub;
+	}
+	public void Update()
+	{
+		Console.WriteLine(sub.args);
+	}
+}
+```
+> Subject需要在状态发生改变时通知所有观察者，所以依赖Observer。
+> Observer需要对Subject的通知做出响应Update，需要访问Subject的参数，依赖Subject。
+> 两个具体类耦合，双向依赖。
+### 解耦合
+首先依据依赖倒转，具体类不要依赖具体类，依赖抽象。里氏原则。
+```c#
+class abstract Subject
+{
+	protected string args;
+	protected List<Observer> observers;
+	public abstract void Attach(Observer ob);
+	public abstract void Detach(Observer ob);
+	public abstract void notify();
+}
+
+class ConcreteSubject:Subject
+{
+	public override void Attach(Observer ob)
+	{
+		observers.Add(ob);
+	}
+	public override void Detach(Observer ob)
+	{
+		observers.Remove(ob);
+	}
+	public override void notify()
+	{
+		foreach(var ii in observers)
+		{
+			ii.update();
+		}
+	}
+}
+
+class abstract Observer
+{
+	private Subject sub;
+	public Observer(Subject sub)
+	{	
+		this.sub = sub;	
+	}
+	public abstract void Update();
+}
+
+class ConcreteObserver:Observer
+{
+	public override void Update()
+	{
+		Console.WriteLine(sub.args);
+	}
+}
+
+```
+
+![image](https://img2023.cnblogs.com/blog/2415825/202305/2415825-20230519003415800-1572595864.png)
+
+　　定义对象之间的一种一对多依赖关系，使得每当一个对象状态发生改变时，其相关依赖对象皆得到通知并被自动更新。观察者模式的别名包括发布-订阅（Publish/Subscribe）模式、模型-视图（Model/View）模式、源-监听器（Source/Listener）模式或从属者（Dependents）模式。观察者模式是一种对象行为型模式。
+
+Subject（抽象目标）：目标又称为主题，它是指被观察的对象。在目标中定义了一个观察者集合，一个观察目标可以接受任意数量的观察者来观察，它提供一系列方法来增加和删除观察者对象，同时它定义了通知方法notify()。目标类可以是接口，也可以是抽象类或具体类。
+
+ConcreteSubject（具体目标）：具体目标是目标类的子类，通常它包含有经常发生改变的数据，当它的状态发生改变时，向它的各个观察者发出通知；同时它还实现了在目标类中定义的抽象业务逻辑方法（如果有的话）。如果无须扩展目标类，则具体目标类可以省略。
+
+Observer（抽象观察者）：观察者将对观察目标的改变做出反应，观察者一般定义为接口，该接口声明了更新数据的方法update()，因此又称为抽象观察者。
+
+ConcreteObserver（具体观察者）：在具体观察者中维护一个指向具体目标对象的引用，它存储具体观察者的有关状态，这些状态需要和具体目标的状态保持一致；它实现了在抽象观察者Observer中定义的update()方法。通常在实现时，可以调用具体目标类的attach()方法将自己添加到目标类的集合中或通过detach()方法将自己从目标类的集合中删除。
+
+### EventHandler方式实现
+
+上面的ConcreteSubject依赖Observer，因此维护了所有的观察者，通过遍历手动执行各个observer的Update()。但若Publisher不知道有多少Subscriber，或者最好**不要依赖抽象Observer**。再者，observer往往是一些被封装好的控件或内部类，不存在一个公共的抽象类Observer，去实现相同的Update。而且Update()也不会是同样的方法名。
+
+C#的委托，可以通过多播方式自动执行所有在委托上注册过的函数。这样Publisher不必知道有多少Subscriber，Subscriber也不需要有一个抽象类。
+
+C#内置事件委托`EventHandler<EventArgs>`通过多播执行注册在事件上的函数。
+
+* 通过定义类继承EventArgs，封装参数，可将参数从publisher传递到observer。
+* publisher触发事件的函数命名为:On_func，在客户端处将On_func注册到publisher的事件上。
+
+```c#
+public class Subjcet
+{
+    private string args;
+    public event EventHandler<string> Update;
+    public string Args{get=>args;set=>args=value;}
+    
+    public Subject(string args)
+    {
+        args = args;
+    }
+    
+    public void notify();
+}
+
+public class Boss:Subject
+{
+    private string args;
+    public event EventHandler<string> Update;
+    public string Args{get=>args;set=>args=value;}
+    
+    public Subject(string args):base(args){}
+    
+    public void notify()
+    {
+        Update();
+    }
+}
+
+class StockObserver
+{
+    private string name;
+    private Subject sub;
+    public StockObserver(string name, Subject sub)
+    {
+        this.name=name;
+        this.sub=sub;
+    }
+    
+    public void CloserMarker()
+    {
+        Console.WriteLine($"args={sub.args}");
+    }
+}
+
+class NBAbserver
+{
+    private string name;
+    private Subject sub;
+    public StockObserver(string name, Subject sub)
+    {
+        this.name=name;
+        this.sub=sub;
+    }
+    
+    public void CloserWatchNBA()
+    {
+        Console.WriteLine($"args={sub.args}");
+    }
+}
+
+//Main:
+Boss boss = new Boss();
+StockObserver tongshi1 = new StockObserver("zhang", boss);
+StockObserver tongshi2 = new StockObserver("wang", boss);
+
+boss.Update += new EventHandler(tongshi1.CloserMarker);
+boss.Update += new EventHandler(tongshi2.CloserWatchNBA);
+
+boss.args = "回来了";	//boss的状态发生改变
+boss.notify();	//boss触发subscriber的响应
+
+
+```
+
+### 函数命名规则
+
+事件event EventHandler：XXXXEventHandler
+
+Publisher触发事件的函数：OnXXXXEventHandler()
+
+### 异步执行多播
+
+将多个方法分别绑定委托，以list存储。分别BeginInvoke异步执行。
+
+```c#
+using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace 观察者模式
+{
+    public delegate void SpeakDelegate(string speak);
+
+    class Child
+    {
+
+        public List<SpeakDelegate> SpeakHandleList = new List<SpeakDelegate>();
+
+        public void Speak(string speak)
+        {
+            foreach (SpeakDelegate SpeakHandle in this.SpeakHandleList)
+            {
+                if (SpeakHandle != null)
+                    SpeakHandle.BeginInvoke(speak, FinishListion, null);	//speak为参数，FinishListion为回调，null为传入回调的参数
+            }
+        }
+
+        private void FinishListion(IAsyncResult result)
+        {
+           
+        }
+
+    }
+}
+
+```
+
 ## 适配器模式Adapter
 
 
@@ -1877,31 +2127,27 @@ namespace Singleton
 
 ## 包装模式Decorator
 
-
-
-## 观察者模式
-
-观察者模式：当publisher状态发生改变时，所有的subscriber要能够被通知并做出反应。
-
 # 七、ORM-EntityFramework
 
 https://www.dbs724.com/146176.html
 
 .net core：https://blog.csdn.net/DREAM5555/article/details/115345172
 
-## 1. ORM-EF操作MySQL
+## 1. EF6操作SQLserver
 
 
+
+## 2. EF6操作MySQL
 
 # 八、MVVM
 
 https://www.jianshu.com/p/7f628015a243
 
-# 九、 Socket
+# 九、 TCP
 
 https://www.cnblogs.com/zhili/archive/2012/09/23/QQ_P2P.html
 
-向MES上传数据
+
 
 # 十、串口通信
 
