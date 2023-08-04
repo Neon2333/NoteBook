@@ -475,6 +475,23 @@ string str = "hello";
 ff(ref m, ref str);
 ```
 
+* 索引器不能以ref修饰
+
+  如：
+
+  ```c#
+  Dictionary dict = new Dictionary();
+  dict.Add(key, val);
+  
+  Myfunc(ref dict[key]);	//这会报错
+  
+  int vval;
+  dict.TryGetValue(key, out vval);
+  Myfunc(vval);
+  ```
+
+  
+
 ### （3）params——变长数组
 
 * 只能修饰一维数组
@@ -1150,6 +1167,8 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 ## 23. 委托
 
+### 概念
+
 委托是具有相同签名、返回值的有序函数列表，是引用类型。
 
 方法列表：绑定到委托上的方法。委托会依次调用方法列表中的每个方法。**执行函数的顺序按照注册的顺序。**
@@ -1158,15 +1177,18 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 初始化委托时，会将第一个方法放入方法列表：MyDel md = func;
 
-通过等号赋值绑定到方法列表的方法只能是第一个方法，后面的绑定需要使用+=；若再次使用赋值给委托变量，就会产生新的委托变量，原来的委托变量将会被GC回收。
+### 定义委托的几种语法
 
-给委托添加方法使用+=，移出方法使用-=。
+**通过等号赋值绑定到方法列表的方法只能是第一个方法，后面的绑定需要使用+=**；若再次使用赋值给委托变量，就会产生新的委托变量，原来的委托变量将会被GC回收。
+
+给委托添加方法使用+=，**移出方法使用-=**。
 
 绑定匿名方法使用lambda表达式，可在委托里内联一小段函数。
 
 ```c#
-public void delegate dlg(int a);
-dlg+=a=>return a++;
+public delegate void DLG(int a);	//定义委托类型DLG
+Dlg dlg = new DLG(a=>return a++);	//通过new DLG注册方法
+DLG dlg += a=>return a++;			//定义委托实例dlg并注册一个lambda方法
 ```
 
 委托在编译的时候确实会编译成类。因为Delegate是一个类，所以在任何可以声明类的地方都可以声明委托。
@@ -1175,13 +1197,22 @@ dlg+=a=>return a++;
 
 为什么要引入委托：https://www.cnblogs.com/zhili/archive/2012/10/22/Delegate.html
 
+### 多播
 
+可在委托上注册多个同签名的函数，调用委托时将按照注册顺序依次调用函数。
 
-## 24. 内置泛型委托Action和Func
+```c#
+DLG dlg = sum;
+dlg += sub;
+dlg += multip;
+dlg(1, 2);	//3,-1,2
+```
+
+## 24. 内置泛型委托Action、Func、Predicate
 
 内置泛型委托类型。
 
-Action对应的函数签名没有返回值，Func对应的函数签名有返回值。
+Action对应的函数签名没有返回值，Func对应的函数签名有返回值。**最多16个参数**。
 
 ```c#
 Action
@@ -1189,6 +1220,7 @@ Action<T>
 Action<T1,T2>
 Action<T1,T2,T3>
 Action<T1,T2,T3,T4>
+...
 ```
 
 ```c#
@@ -1197,7 +1229,18 @@ Func<T,TResult>
 Func<T1,T2,TResult>
 Func<T1,T2,T3,TResult>
 Func<T1,T2,T3,T4,TResult>
+...
 ```
+
+Predicate是返回值为bool的Func，且输入参数只能有1个。
+
+等价于 Func<T,bool>
+
+```c#
+var predicate = new Predicate<int>(x => x % 2 == 0)
+```
+
+
 
 ```c#
 Func<int a, double b, string str> dlg+=(int a, double b)=>return (a+b).toString();
@@ -1386,9 +1429,15 @@ class Son:Father,Iinterface1,Iinterface2{
 
 #### 接口可继承
 
+
+
+## 29. 多态
+
+父类引用指向子类对象。父类引用能否调用子类独有的成员？
+
 # 三、其他
 
-### 
+
 
 ## 30. 外部方法
 
@@ -1478,6 +1527,8 @@ public void func(S, T)(S p):where S:Person
 
 
 ## 37. 反射（reflection）与特性（attribute）
+
+https://liuhaowen.blog.csdn.net/article/details/118695042?spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-118695042-blog-4891368.235%5Ev36%5Epc_relevant_default_base3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-118695042-blog-4891368.235%5Ev36%5Epc_relevant_default_base3&utm_relevant_index=5
 
 https://blog.csdn.net/ananlele_/article/details/107979117
 
@@ -1591,15 +1642,60 @@ namespace IndexerApplication
 
 前者位于System.Collection.Generic命名空间，后者位于System.Collection。
 
-## 泛型集合和非泛型集合
+### 非泛型集合
 
 非泛型集合内部存储的是Object类型：ArrayList，Stack，Queue，HashTable
 
+
+
+### 泛型集合
+
 泛型集合：`List<T>、Stack<T>、Queue<T>、Dictionary<TKey,TValue>`
 
-# 四、多线程
+#### （1）Dictionary
 
-## 1. Thread
+* 取值
+
+  ```c#
+  if(dict.ContainsKey(key)){
+      var val = dict[key];
+  }
+  ```
+
+  ```c#
+  dict.TryGetValue(key, out val);
+  ```
+
+
+* key的唯一性和相等比较
+
+  一个key映射到唯一的一个value。通过key1==key2，从而可取值或是判断value1==value2。
+
+  当key类型是基本类型时很直观。若key的类型是类，这个类需要有GetHashCode()和Equal()函数。
+
+  https://www.cnblogs.com/wk2522466153/p/17584640.html
+
+
+
+
+
+
+
+## 
+
+
+
+## 40. 一些容易忽略的点
+
+* struct/class默认访问权限是internal。struct成员默认访问权限是private。
+
+* VS的应用程序和控制台程序的设置
+
+  ![image-20230725155415767](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230725155415767.png)
+
+
+
+# 四、多线程
 
 线程是轻量的进程，C#程序运行时第一个线程自动创建，称为**主线程**。
 
@@ -1610,9 +1706,7 @@ namespace IndexerApplication
 2、当程序运行会卡住软件界面，为了使人不用焦虑等待时，采取线程与委托来处理，从而使软件界面运行流畅；
 3、处理大量数据时间较长（显示一个进度条给界面）或不需要马上得到结果反馈给软件界面时；
 
-### （1）Thread.Start
-
-https://blog.csdn.net/weixin_34364071/article/details/85998726?spm=1035.2023.3001.6557&utm_medium=distribute.pc_relevant_bbs_down_v2.none-task-blog-2~default~ESQUERY~Rate-2-85998726-bbs-392024152.pc_relevant_bbs_down_v2_default&depth_1-utm_source=distribute.pc_relevant_bbs_down_v2.none-task-blog-2~default~ESQUERY~Rate-2-85998726-bbs-392024152.pc_relevant_bbs_down_v2_default
+## 1. Thread
 
 创建线程对象：
 
@@ -1640,7 +1734,7 @@ th.Abort();
 
 #### 如何优雅的终止线程
 
-Thread.Abort是在调用线程内抛出一个ThreadAbortException从而导致线程终止。但是只有目标线程在调用**托管代码**时Abort()才会立即返回终止线程，若正在调用非托管代码（如外部C++代码）则不会立即返回。通过Thread.ThreadState获取状态可知，调用Abort抛出异常后，状态为ThreadState.AbortRequested，真正终止后状态为ThreadState.Aborted。
+**Thread.Abort是在调用线程内抛出一个ThreadAbortException从而导致线程终止**。但是只有目标线程在调用**托管代码**时Abort()才会立即返回终止线程，若正在调用非托管代码（如外部C++代码）则不会立即返回。通过Thread.ThreadState获取状态可知，调用Abort抛出异常后，状态为ThreadState.AbortRequested，真正终止后状态为ThreadState.Aborted。
 
 所以调用Abort()后需要循环判断ThreadState是否为Aborted，才能判断线程是否真正终止：
 
@@ -1702,13 +1796,15 @@ Join();
 >
 > 获取线程状态：**ThreadState**（ThreadState.Running、ThreadState.Aborted等）
 
+
+
 ## 2. 异步委托BeginInvoke
 
 为了降低创建、销毁线程的成本，CLR为每一个进程维护了一个线程池。开始，线程池是空的，如果进程使用的线程被创建并执行完毕后，不会被销毁而会被放入线程池。之后，进程需要一个线程，就会从线程池中还原一个线程，节省很多时间。
 
 UI主线程要能及时相应用户操作，若程序后台需要执行很长时间就需要放到另一个线程。
 
-**异步执行的三种方式：阻塞主线程等待子线程、主线程轮询子线程执行状态、子线程执行完调用回调函数。**
+通过EndInvoke获取子线程返回值：
 
 * AsyncResult对象和IAsyncResult接口对象
 
@@ -1716,24 +1812,73 @@ UI主线程要能及时相应用户操作，若程序后台需要执行很长时
 
 * BeginInvoke和EndInvoke
 
+  当调用BeginInvoke时，系统创建了一个AsyncResult对象，但返回的是IAsyncResult对象。
+
+  > IAsyncResult.IsCompleted返回异步方法是否完成
+  >
+  > **IAsyncResult.AsyncState是BeginInvoke的最后一个参数，可在回调函数中通过IAsyncResult.AsyncState访问，起到了将BeginInvoke的最后一个参数传递到回调函数中的功能。**
+
+  EndInvoke调用时若异步方法没有执行完，则当前线程会阻塞在EndInvoke直到异步方法返回值。
+
   ```c#
-  void func_callback(IAsyncResult iar){...}
-  IAsyncResult BeginInvoke(1, 2, new AsyncCallback(func_callback), null)
+  delegate int dlg(int, int) = new delegate((a,b)=>return a+b);
+  void func_callback(IAsyncResult iar){}	//回调函数
+  IAsyncResult dlg.BeginInvoke(1, 2, new AsyncCallback(func_callback), null)	
+  //BeginInvoke第三个参数是委托，传入函数编译器自动创建委托
   ```
-
-  ```c#
-  T result = dlg.EndInvoke(out p, IAsyncResult iar);
-  ```
-
-* 轮询
-
-  ```c#
   
+  ```c#
+  T result = dlg.EndInvoke(out p, IAsyncResult iar);	//异步方法中若有out参数，放到EndInvoke中执行
+  ```
+  
+  **异步方法执行的三种方式：阻塞主线程等待子线程、主线程轮询子线程执行状态、子线程执行完调用回调函数。**
+
+  * 轮询
+
+  ```c#
+  delegate int DLG(int a, int b);
+  DLG dlg = new DLG((a, b) => return a + b);
+  IAsyncResult iar  = dlg.BeginInvoke(1, 2, null, null)
+  while(!iar.IsCompleted)
+  {
+      //异步方法未结束就继续执行某些操作
+  }
   ```
 
 
-* 回调
+  * 回调
 
+    当异步方法执行完毕时自动调用回调函数。在回调里通过里氏转换将IAsyncResult转为AsyncResult获得委托。然后通过委托调用EndInvoke，此时异步方法已经执行完毕。
+
+    ```c#
+    public static void funcCallback(IAsyncResult iar)
+    {
+        string hello = (string)iar.AsyncState;
+        Console.WriteLine(iar.IsCompleted);
+        AsyncResult ar = (AsyncResult)iar;
+        DLG ddlg = ar.AsyncDelegate;
+        int ret = ddlg.EndInvoke(iar);
+    }
+    
+    private void button1_Click(object sender, EventArgs e)
+    {
+        Dlg dlg = new DLG((a, b) => return a+b);
+        IAsyncResult iar = dlg.BeginInvoke(2, 3, funcCallBack, "hello");
+    }
+    ```
+
+
+**Thread.Start和BeginInvoke开辟的线程有什么区别：**
+
+> 我们知道线程池有工作线程和IO线程，你写的多线程和并发只能操控到工作线程，而异步恰恰可以把线程池里的IO线程调动起来处理关于一切涉及IO方面的工作，取网络IO，文件IO。
+>
+> thread开启的线程和begininvoke有什么区别？https://www.cnblogs.com/zjoch/archive/2012/04/12/2443714.html
+>
+> Control.Invoke 方法 (Delegate) :在拥有此控件的基础窗口句柄的线程上执行指定的委托。
+> Control.BeginInvoke 方法 (Delegate) :在创建控件的基础句柄所在线程上异步执行指定委托。
+> Control的Invoke和BeginInvoke的参数为delegate，委托的方法是在Control的线程上执行的，也就是我们平时所说的UI线程。
+
+## 3. Task/async
 
 https://www.cnblogs.com/zhili/archive/2013/05/15/Csharp5asyncandawait.html
 
@@ -1743,35 +1888,399 @@ https://learn.microsoft.com/zh-cn/dotnet/standard/asynchronous-programming-patte
 
 
 
-### （3）Thread.Start和BeginInvoke开辟的线程有什么区别？
 
-我们知道线程池有工作线程和IO线程，你写的多线程和并发只能操控到工作线程，而异步恰恰可以把线程池里的IO线程调动起来处理关于一切涉及IO方面的工作，取网络IO，文件IO。
 
-thread开启的线程和begininvoke有什么区别？https://www.cnblogs.com/zjoch/archive/2012/04/12/2443714.html
+## 4. Lock锁
 
-Control.Invoke 方法 (Delegate) :在拥有此控件的基础窗口句柄的线程上执行指定的委托。
-Control.BeginInvoke 方法 (Delegate) :在创建控件的基础句柄所在线程上异步执行指定委托。
-Control的Invoke和BeginInvoke的参数为delegate，委托的方法是在Control的线程上执行的，也就是我们平时所说的UI线程。
 
-### （4）Lock锁
 
-## 3. Task/async
+## 5. Interlocked锁
+
+https://blog.csdn.net/SmillCool/article/details/127118858
+
+Interlocked是为多个线程共同访问的变量提供原子操作，这个类是一个静态类 它提供了以线程安全的方式递增、递减、交换和读取值的方法。
+效率高于lock，但只能解决简单的同步问题：自增、自减、加、读取、赋值
+
+https://blog.51cto.com/13713878410/1530358
+这些方法都是线程安全的。
+![image](https://img2023.cnblogs.com/blog/2415825/202305/2415825-20230515141606689-1126969250.png)
+
+```c#
+public static uint Exchange (ref uint location1, uint value);
+//将value赋值给location1
+//返回值：location1的原始值
+
+public static float CompareExchange (ref float location1, float value, float comparand);
+//location1与comparand比较，若相等，则将location1置value
+//返回值location1的原始值
+```
+
+```c#
+private int value1 = 0;
+        public void TestIncrementUnSafe()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Thread t = new Thread(IncrementValue1);
+                t.Name = "t1 " + i;
+                t.Start();
+            }
+            Thread.Sleep(2000);
+            //value maybe 500000
+            Console.WriteLine("value1 = " + value1);
+        }
+        private int value2 = 0;
+        public void TestIncrementSafe()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Thread t = new Thread(IncrementValue2);
+                t.Name = "t2 " + i;
+                t.Start();
+            }
+            Thread.Sleep(2000);
+            //value should be 500000
+            Console.WriteLine("value2 = " + value2);
+        }
+        private void IncrementValue1()
+        {
+            for (int i = 0; i < 1000000; i++)
+            {
+                value1++;
+                //Console.WriteLine(Thread.CurrentThread.Name);
+            }
+        }
+        private void IncrementValue2()
+        {
+            for (int i = 0; i < 1000000; i++)
+            {
+                Interlocked.Increment(ref value2);
+            }
+        }
+/*
+控制台输出：
+
+运行结果1
+
+value1 = 4612592
+value2 = 5000000
+
+运行结果2
+
+value1 = 4697979
+value2 = 5000000
+*/
+
+private int value3 = 0;
+        public void TestExchangeSafe()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Thread t = new Thread(ExchangeValue3);
+                t.Name = "t2 " + i;
+                t.Start();
+            }
+            Thread.Sleep(2000);
+            //value should be 83
+            Console.WriteLine("value3 = " + value3);
+        }
+        private void ExchangeValue3()
+        {
+            Interlocked.Exchange(ref value3, 83);
+        }
+        private int value4 = 0;
+        public void TestCompareExchangeSafe()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                Thread t = new Thread(ExchangeValue3);
+                t.Name = "t2 " + i;
+                t.Start();
+            }
+            Thread.Sleep(2000);
+            //value should be 99 or 0
+            Console.WriteLine("value4 = " + value4);
+        }
+        private void ExchangeValue4()
+        {
+            //if value4=0, set value4=99
+            Interlocked.CompareExchange(ref value4, 99,0);
+        }
+/*
+控制台输出:
+
+value4 = 0
+value3 = 83
+*/
+```
+
+
 
 
 
 # 五、LinQ
 
-LINQ是.NET Framework 3.5的新特性
+LINQ是.NET Framework 3.5的新特性。
+
+https://www.cnblogs.com/lifepoem/archive/2011/10/25/2223765.html
+
+## 1.前言
+**sequence是实现了IEnumerable<T>的对象**
+查询语法：类似SQL语句。
+方法语法：System.Linq.Enumerable中定义了40个查询运算符。链式查询运算符。（https://www.cnblogs.com/lifepoem/archive/2011/10/27/2226556.html）
+两种语法互补使用，方法语法使用的更多。
+LINQ中最基本的数据单元是sequences和elements。
+## 2.方法语法
+### （1）查询运算符签名
+Func<TSource, bool>委托匹配 TSource => bool表达式，接受TSource输入参数，返回一个bool值。当结果为true时，表示该元素会包含在输出sequence中。
+```C#
+ public static IEnumerable<TSource> Where<TSource>
+            (this IEnumerable<TSource> source, Func<TSource, bool> predicate)
+
+//静态方法写法：
+IEnumerable<string> query = System.Linq.Enumerable.Where(names, n=>n.Contains('a'));
+//Where第一个参数为实现了IEnumerable的集合，第二个参数为返回值为bool的委托。
+
+//扩展方法写法：
+IEnumerable<string> query=name.Where(n=>n.Contains('a'));	//扩展方法的写法可以方便的写成链式操作
+//使用var简写
+var query = name.Where(n=>n.Contains('a'));
+```
+大部分查询运算符都接受一个lambda表达式作为参数，Lambda表达式格式为：(parameters) => expression-or-statement-block。
+正是扩展方法让LINQ查询运算符的链接成为了可能。
+### （2）常用查询运算符
+而对Where查询运算符来讲，它并不需要对输出element进行类型推断，因为它只是对输入elements进行过滤而不作转换，因此输出element和输入element具有相同的数据类型。
+where 从句表示一种筛选过程，当条件满足的时候，这样的对象才可能被迭代返回出来。**如果多次条件筛选的话，那就相当于是 && 处理一样的效果。**
+```c#
+var student =
+    from student in students
+    where student.Age >= 18
+    where student.Chinese + student.English + student.Math >= 180	//多次的Where相当于查询条件的&&
+    select student.Name;
+```
+对于OrderBy查询运算符来讲，Func<TSource, TKey>把输入元素映射至一个排序键值。TKey由Lambda表达式的结果推断出来，比如我们可以按长度或按字母顺序对names数组进行排序。
+
+First()——返回sequence中的第一个element
+Last()——返回最后一个element
+ElementAt()——返回某个index的element
+OrderBy(lambda)——按照lambda指定的属性排序
+Count()——对sequence计数
+Min()——返回sequence的min
+Max()
+Contains(T ele)——返回是否包含某个ele
+Any()——判断sequence中是否存在满足条件的ele
+```c#
+int[] intArray = new int[] { 0, 1, 2, 3 };
+var items = intArray.Any(i => ((i % 2) == 0));
+foreach (int item in items)
+             Console.WriteLine(item);
+          Console.ReadLine();
+```
+All()——判断sequence中是否所有ele都满足条件
+Concat()——两个sequence连接在一起
+Union()——两个sequence取并集
+
+
+## 3.查询语法
+### (1)查询语法及使用
+查询表达式要求要以Select或Group结束。
+### (2)方法语法和查询语法结合
+方法语法有查询运算符，有的查询运算符没有对应的查询语法，如：Count()、First()、Last()。这种需要先以查询语法来写，最后结合查询运算符。适用于较为复杂的查询需求。
+```C#
+string[] names = { "Tom", "Dick", "Harry", "Mary", "Jay" };
+ 
+            // 计算包含字母”a”的姓名总数
+            int matches = (from n in names where n.Contains("a") select n).Count();     // 3
+            // 按字母顺序排序的第一个名字
+            string first = (from n in names orderby n select n).First();     // Dick
+```
+
+## 4.Linq的延迟执行
+https://www.cnblogs.com/lifepoem/archive/2011/10/29/2228589.html
+他们不是在查询创建的时候执行，而是在遍历的时候执行（换句话说，当enumerator的MoveNext方法被调用时）。
+
+### （1）重复查询
+延迟执行带来的一个影响是，当我们重复遍历查询结果时，查询会被重复执行。
+调用ToArray、ToList可令Linq立刻执行，将查询结果保存到Array和List<>中。
+
+### （2）局部变量捕获
+如果查询的lambda表达式引用了程序的局部变量时，如果在查询定义之后改变了该变量的值，那么查询结果也会随之改变。
+```c#
+    int[] numbers = { 1, 2 };
+
+            int factor = 10;
+            IEnumerable<int> query = numbers.Select(n => n * factor);
+            factor = 20;
+            foreach (int n in query)
+                Console.Write(n + "|");     // 20|40|
+```
+
+这个特性在我们通过foreach循环创建查询时会变成一个真正的陷阱。假如我们想要去掉一个字符串里的所有元音字母，我们可能会写出如下的query：
+
+复制代码
+              IEnumerable<char> query = "How are you, friend.";
+
+            query = query.Where(c => c != 'a');
+            query = query.Where(c => c != 'e');
+            query = query.Where(c => c != 'i');
+            query = query.Where(c => c != 'o');
+            query = query.Where(c => c != 'u');
+    
+            foreach (char c in query) Console.Write(c); //Hw r y, frnd.
+复制代码
+尽管程序结果正确，但我们都能看出，如此写出来的程序不够优雅。所以我们会自然而然的想到使用foreach循环来重构上面这段程序：
+
+复制代码
+            IEnumerable<char> query = "How are you, friend.";
+
+            foreach(char vowel in "aeiou")
+                query = query.Where(c => c != vowel);
+     
+            foreach (char c in query) Console.Write(c); //How are yo, friend.
+复制代码
+结果中只有字母u被过滤了，咋一看，有没有吃一惊呢！但只要仔细一想就能知道原因：因为vowel定义在循环之外，所以每个lambda表达式都捕获了同一变量。当我们的query执行时，vowel的值是什么呢？不正是被过滤的字母u嘛。要解决这个问题，我们只需把循环变量赋值给一个内部变量即可，如下面的temp变量作用域只是当前的lambda表达式。
+
+复制代码
+            IEnumerable<char> query = "How are you, friend.";
+
+            foreach (char vowel in "aeiou")
+            {
+                char temp = vowel;
+                query = query.Where(c => c != temp);
+            }
+     
+            foreach (char c in query) Console.Write(c); //Hw r y, frnd.
+复制代码
+
+### (3)查询运算符的模型和延迟执行
+和传统的集合类型如array，linked list不同，一个装饰者sequence并没有自己用来存放元素的底层结构，而是包装了我们在运行时提供的另外一个sequence。此后当我们从装饰者sequence中请求数据时，它就会转而从包装的sequence中请求数据。
+
+比如调用Where会创建一个装饰者sequence，其中保存了输入sequence的引用、lambda表达式还有其他提供的参数。下面的查询对应的装饰者sequence如图所示：
+
+        IEnumerable<int> lessThanTen = new int[] { 5, 12, 3 }.Where(n => n < 10);
+
+
+ 当我们遍历lessThanTen时，实际上我们是在通过Where装饰者从Array中查找数据。
+
+而查询运算符链接创建了一个多层的装饰者，每个查询运算符都会实例化一个装饰者来包装前一个sequence，比如下面的query和对应的多层装饰者sequence:
+
+            IEnumerable<int> query = new int[] { 5, 12, 3 }
+                .Where(n => n < 10)
+                .OrderBy(n => n)
+                .Select(n => n * 10);
+
+
+在我们遍历query时，我们其实是在通过一个装饰者链来查询最初的array。
+需要注意的是，如果在上面的查询后面加上一个转换运算符如ToList，那么query会被立即执行，这样，单个list就会取代上面的整个对象模型。
+
+## 5.过滤运算符
+https://www.cnblogs.com/lifepoem/archive/2011/11/16/2250676.html
+![image](https://img2023.cnblogs.com/blog/2415825/202305/2415825-20230506105634025-934090996.png)
+
+## 6.排序、分组
+* OrderBy, ThenBy——升序排序
+	ThenBy只会对那些在前一次排序中拥有相同键值的elements进行重新排序，我们可以连接任意数量的ThenBy运算符。
+	```c#
+	 // 先按长度排序，然后按第二个字符排序，再按第一个字符排序
+            IEnumerable<string> query =
+                names.OrderBy (s => s.Length).ThenBy (s => s[1]).ThenBy (s => s[0]);
+	```
+* OrderByDescending, ThenByDescending——对一个sequence按降序排序
+* Reverse——按倒序返回一个sequence
+
+### 自定义排序规则
+要排序先要定义比较规则。
+基本型别都提供了默认的比较算法，如string提供了按字母进行比较，int提供了按整数大小进行比较。
+* 当我们创建了自己的实体类，如Student，默认想要对其按照年龄进行排序，则需要为**实体类继承IComparable接口，实现CompareTo方法。**
+```c#
+ class Student:IComparable
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+
+        #region IComparable Members
+
+        public int CompareTo(object obj)
+        {
+            Student student = obj as Student;
+            if (Age > student.Age)
+            {
+                return 1;
+            }
+            else if (Age == student.Age)
+            {
+                return 0;
+            }
+            else
+            {
+                return -1;
+            }
+            //return Age.CompareTo(student.Age);
+        }
+        #endregion
+    }
+```
+* 如果不想使用年龄作为比较器了，那怎么办。这个时候IComparer的作用就来了，可使用IComparer来实现一个自定义的比较器。
+```c#
+class SortName: IComparer
+    {
+        #region IComparer Members
+
+        public int Compare(object x, object y)
+        {
+            Student s1 = x as Student;
+            Student s2 = y as Student;
+            return s1.Name.CompareTo(s2.Name);
+        }
+
+        #endregion
+    }
+```
+在排序的使用为Sort方法提供此比较器：
+```c#
+studentList.Sort(new SortName());
+```
+* 上面的代码我们使用了一个已经不建议使用的集合类ArrayList。当泛型出来后，所有非泛型集合类已经建议不尽量使用了。进行了装箱和拆箱。而这是会影响性能的。如果我们的集合中有成千上万个复杂的实体对象，则在排序的时候所耗费掉的性能就是客观的。而泛型的出现，就可以避免掉拆箱和装箱。故上文代码中的ArrayList，应该换成List<T>，对应的，我们就该实现IComparable<T>和IComparer<T>。
+```c#
+class Student:IComparable<Student>
+    {
+        public string Name { get; set; }
+        public int Age { get; set; }
+
+        #region IComparable<Student> Members
+
+        public int CompareTo(Student other)
+        {
+            return Age.CompareTo(other.Age);
+        }
+
+        #endregion
+    }
+
+    class SortName: IComparer<Student>
+    {
+        #region IComparer<Student> Members
+
+        public int Compare(Student x, Student y)
+        {
+            return x.Name.CompareTo(y.Name);
+        }
+	}
+
+
+```
 
 # 六、 设计模式
 
 **关注使用场景**
 
-## UML
+## 1. UML
 
 泛化：最终代码中，泛化关系表现为**继承非抽象类**。用一条带空心箭头的直接表示
 
 实现：最终代码中，实现关系表现为**继承抽象类**。用一条带空心箭头的虚线表示
+
+依赖：用一套**带箭头的虚线**表示的。在最终代码中，依赖关系体现为类构造方法及类方法的传入参数，箭头的指向为调用关系。（A类是B类的函数形参、函数返回值、函数局部变量、静态成员函数）
 
 聚合：用一条带空心菱形箭头的直线表示。A聚合到B上，或者说B由A组成。
 
@@ -1779,11 +2288,11 @@ LINQ是.NET Framework 3.5的新特性
 
 关联：关联关系是用一条直线表示的。在最终代码中，关联对象通常是以成员变量的形式实现的。
 
-依赖：用一套带箭头的虚线表示的。在最终代码中，依赖关系体现为类构造方法及类方法的传入参数，箭头的指向为调用关系。
+![image-20230525105644759](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230525105644759.png)
 
 ![image-20230422113402097](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230422113402097.png)
 
-## 单例模式Singleton
+## 2. 单例模式Singleton
 
 单例模式(https://www.runoob.com/design-pattern/singleton-pattern.html)：某个类只创建一个对象。适用于某个全局使用的类，需要频繁的创建对象，为了防止对象的频繁创建、销毁浪费资源，令某个类只能产生一个对象。
 
@@ -1847,33 +2356,23 @@ namespace Singleton
 }
 ```
 
-## 工厂模式
+## 3. 简单工厂SimpleFactory
 
-### （1）简单工厂SimpleFactory
-
-简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例通常都具有共同的父类。1
+简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例通常都具有共同的父类。
 
 ![image-20230422114006051](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230422114006051.png)
 
+## 4. 工厂方法模式FactoryMethod
 
 
 
 
 
-
-### （2）工厂方法模式FactoryMethod
-
-
-
-### （3）抽象工厂模式
+## 5. 抽象工厂模式
 
 
 
-## 
-
-
-
-## 观察者模式
+## 6. 观察者模式
 
 https://blog.csdn.net/qq_40666028/article/details/80916020
 
@@ -2070,8 +2569,6 @@ boss.Update += new EventHandler(tongshi2.CloserWatchNBA);
 
 boss.args = "回来了";	//boss的状态发生改变
 boss.notify();	//boss触发subscriber的响应
-
-
 ```
 
 ### 函数命名规则
@@ -2119,45 +2616,246 @@ namespace 观察者模式
 
 ## 适配器模式Adapter
 
-
-
 ## 外观模式Facade
-
-
 
 ## 包装模式Decorator
 
-# 七、ORM-EntityFramework
+
+
+# 七、三层架构
+
+UIL、BLL、DAL、Model
+
+https://www.jianshu.com/p/7f628015a243
+
+# 八、数据库
+
+## 1. ORM-EntityFramework
 
 https://www.dbs724.com/146176.html
 
 .net core：https://blog.csdn.net/DREAM5555/article/details/115345172
 
-## 1. EF6操作SQLserver
+### EF6操作SQLserver
 
 
 
-## 2. EF6操作MySQL
+### EF6操作MySQL
 
-# 八、MVVM
 
-https://www.jianshu.com/p/7f628015a243
 
-# 九、 TCP
+## 2. 简单工厂+反射+配置文件
+
+# 九、 Socket
 
 https://www.cnblogs.com/zhili/archive/2012/09/23/QQ_P2P.html
 
+## 1. 基本TCP流程
+
+### （1）Server
+
+* 创建一个监听服务器端口的Socket对象，指明协议，IP，端口：
+
+  ```c#
+  Socket ss = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+  //AddressFamily.InterNetwork——IPv4
+  //SocketType.Stream——可靠双向字节流
+  //ProtocolType.Tcp——TCP
+  serverSocket.Bind(new IPEndPoint(this.bindIP, bindPort));   //IPEndPoint是IP:port
+  ```
 
 
-# 十、串口通信
+* 监听本机端口：
+
+  ```c#
+  serverSocket.Listen(listenRequests);	
+  //listenRequests——最多允许同时连接的Client数
+  ```
+
+* 创建一个与客户端建立连接后，用于收发消息的socket
+
+  ```c#
+  clientConnectSocket = serverSocket.Accept();    //Accept()建立连接并返回用于通信的socket
+  ```
+
+* 向client发送消息
+
+  ```c#
+  clientConnectSocket.send(byte[] buffer)
+  ```
+
+* 接收消息
+
+  ```c#
+  byte[] receiveBuff;
+  int bytes = clientConnectSocket.Receive(receiveBuff, receiveBuff.Length, 0);
+  ```
+
+* 断开
+
+  ```c#
+  serverSocket.Close();
+  clientConnectSocket.Close();
+  ```
+
+### （2）Client
+
+* 创建用于和服务器进行传递数据的Socket，其中IP是本机IP，port是系统自动分配。
+* 向server发送消息
+* 从server接收消息
+
+## 2. 常用API
+
+### （1）头文件——System.Net.Sockets
+
+
+
+
+
+
+
+## 3. 异步Accept、Receive
+
+
+
+
+
+
+
+## 4. 序列化和反序列化
+
+https://www.cnblogs.com/amylis_chen/p/11578598.html
+https://www.cnblogs.com/1549983239yifeng/p/14789106.html
+https://www.cnblogs.com/xueyubao/p/11262320.html
+https://blog.csdn.net/qq_37179591/article/details/105736690
+https://www.cnblogs.com/guogangj/p/7489218.html
+![](https://img2023.cnblogs.com/blog/2415825/202306/2415825-20230629003317582-1631410764.png)
+
+### （1）二进制序列化
+
+#### 设置某些字段、属性不二进制序列化
+
+添加Attribute：[System.NonSerialized]
+
+#### 无法找到程序集“Client, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null”
+
+![image](https://img2023.cnblogs.com/blog/2415825/202306/2415825-20230629124228334-1113851261.png)
+类分处于服务器命名空间下和客户端命名空间下，命名空间的不一致也就是类的不一致导致了对象在反序列化时出现错误。
+
+##### 解决1——SerializationBinder
+
+[SerializationBinder类](https://learn.microsoft.com/zh-cn/dotnet/api/system.runtime.serialization.serializationbinder?view=net-7.0&redirectedfrom=MSDN)
+
+```c#
+public class UBinder : SerializationBinder
+    {
+        public override Type BindToType(string assemblyName, string typeName)
+        {
+            // 从E:\TibetGlobal.dll读取
+            var path = Path.Combine("E:\\", "TibetGlobal.dll");
+            var assembly = Assembly.LoadFrom(globalPath);
+            return assembly.GetType(typeName);
+            }
+        }
+    }
+
+ public class UBinder : SerializationBinder
+        {
+                public override Type BindToType(string assemblyName, string typeName)
+                {
+                        Assembly ass = Assembly.GetExecutingAssembly();
+                        return ass.GetType(typeName);
+                }
+       }
+————————————————
+版权声明：本文为CSDN博主「yunzhonghefei1」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
+原文链接：https://blog.csdn.net/yunzhonghefei1/article/details/106528366
+
+
+var formatter = new BinaryFormatter
+{
+    Binder = new UBinder()
+};
+var obj = formatter.Deserialize(pipeServer);
+```
+
+##### 解决2——DLL
+
+
+
+### （2）XML序列化
+
+#### 无法XML序列化的情况
+
+常见的两种模式，Binary和XML序列化，Binary二进制序列化没有什么限制，但是XML序列化有限制：
+
+
+    （1）需序列化的字段必须是公共的(public)
+    （2）需要序列化的类都必须有一个无参的构造函数
+    （3）枚举变量可序列化为字符串，无需用[XmlInclude]
+    （4）**序列化非基本类型对象，必须在对象前用[XmlInclude]将可能需要序列化的自定义复杂类型进行事先声明。**该规则递归作用到子元素。
+        如导出ArrayList对象，若其成员是自定义的，需预包含处理：
+        ```c#
+          using System.Xml.Serialization;
+          [XmlInclude(typeof(自定义类))]
+          [Serilizable]
+        ```
+    （5）Attribute中的IsNullable参数若等于false，表示若元素为null则不显示该元素。
+        也就是说：针对值类型（如结构体）该功能是实效的
+        若数组包含了100个空间，填充了10个类对象，则序列化后只显示10个节点
+        若数组包含了100个空间，填充了10个结构体对象，则序列化后会显示100个节点
+    （6）真正无法XML序列化的情况
+        某些类就是无法XML序列化的（即使使用了[XmlInclude]）
+            IDictionary（如HashTable）
+            System.Drawing.Color
+            System.Drawing.Font
+            SecurityAttribute声明
+        父类对象赋予子类对象值的情况
+        对象间循环引用
+    （7）对于无法XML序列化的对象，可考虑
+        使用自定义xml序列化（实现IXmlSerializable接口）
+        实现IDictionary的类，可考虑（1）用其它集合类替代；（2）用类封装之，并提供Add和this函数
+        某些类型需要先经过转换，然后才能序列化为 XML。如XML序列化System.Drawing.Color，可先用ToArgb()将其转换为整数 
+        过于复杂的对象用xml序列化不便的话，可考虑用二进制序列化
+
+
+在很多情况下，二进制序列化对对象的序列化信息更加完整、准确。
+
+#### xml设置某些字段、属性不序列化
+
+对public属性进行设置：
+[System.Xml.Serialization.XmlIgnore]
+
+#### XML序列化常用注解Attribute
+
+
+
+### （3）DataTable的序列化
+
+
+
+## 5. XML
+
+
+
+## 6. JSON
+
+# 十、日志
+
+
+
+# 十一、串口通信
 
 RS232
 
 RS485/422
 
+# 十二、VS调试
 
+F12跳转到函数定义，Ctrl+-返回。
 
+alt+F12快捷浏览函数定义。
 
+# 
 
-# 十一、VS高级
-
+ 

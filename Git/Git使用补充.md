@@ -847,6 +847,9 @@ git reflog常用于恢复本地的错误操作
 
 https://blog.csdn.net/weixin_37557729/article/details/107012028
 
-## 11.VS中使用Git
+## 11. 解决不跟踪空目录
 
+在空folder中创建.gitkeep文件：`touch .gitkeep`
+
+## 12..gitignore文件
 
