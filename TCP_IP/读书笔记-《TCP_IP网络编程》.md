@@ -20,732 +20,7 @@ https://www.yht7.com/news/127552
 
 ---
 
-# Part 01——C#  Socket
-
-## 1. DNS解析
-
-### 头文件——System.Net
-
-### （1）主机类——IPHostEntry
-
-#### 属性
-
-> * 
->
-
-
-
-> * 
-
-### （3）Dns类
-
-该类提供简单的DNS解析功能。
-
-#### 方法
-
-> * 
->
-> * 
->
-> * 
->
->   ```c#
->   
->   ```
->
-> * 
->
->   ```C#
->   
->   ```
-
-```c#
-
-```
-
-
-
-## 2. TCP
-
-### （1）头文件——System.Net.Sockets
-
-### （2）
-
-#### 构造
-
-```C#
-public NetworkStream (Socket socket);
-```
-
-```C#
-public NetworkStream (Socket socket, bool ownsSocket);
-/*
-Socket
-Socket，NetworkStream 使用它来发送和接收数据。
-ownsSocket
-Boolean
-设置为 true 可指示 NetworkStream 将拥有 Socket；否则为 false。
-*/
-```
-
-```C#
-// Examples for constructors that do not specify file permission.
-
-// Create the NetworkStream for communicating with the remote host.
-NetworkStream myNetworkStream;
-
-if (networkStreamOwnsSocket){
-     myNetworkStream = new NetworkStream(mySocket, true);
-}
-else{
-     myNetworkStream = new NetworkStream(mySocket);
-}
-```
-
-> * 
-
-#### 
-
-> * > 
->
->   ```C#
->   
-> 
->=======
-> 
-> >>>>>> Stashed changes
->=======
-> 
-> >>>>>> Stashed changes
->   tcpClient.Connect (ipAddress, 11003);
->
->   ```
-> 
->
-> 
-> * GetStream——返回用于发送/接收数据的NetworkStream
-> 
->   ```C#
-  public System.Net.Sockets.NetworkStream GetStream ();
->   ```
->
->   ```C#
->
-> <<<<<<< Updated upstream
-  <<<<<<< Updated upstream
->                                       
->
-> 
->   =======
-> 
->  // Uses the GetStream public method to return the NetworkStream.
->   NetworkStream netStream = tcpClient.GetStream ();
->
-> >>>>>> Stashed changes
->=======
-> 
->   // Uses the GetStream public method to return the NetworkStream.
->   NetworkStream netStream = tcpClient.GetStream ();
->
-> >>>>>> Stashed changes
->  
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->   
-> =======
-> 
->>>>>>> Stashed changes
-> =======
->
-> >>>>>> Stashed changes
->       
->  }
-> <<<<<<< Updated upstream
-<<<<<<< Updated upstream
->                                       
-> =======
-> 
->                                       >>>>>> Stashed changes
->=======
-> 
-> >>>>>> Stashed changes
->   
-> <<<<<<< Updated upstream
-> <<<<<<< Updated upstream
-> 
->      
-> 
-> =======
-
->       // Read can return anything from 0 to numBytesToRead.
->      // This method blocks until at least one byte is read.
->       netStream.Read (bytes, 0, (int)tcpClient.ReceiveBufferSize);
->
->       // Returns the data received from the host to the console.
-      string returndata = Encoding.UTF8.GetString (bytes);
->                                       
->>>>>>> Stashed changes
-> =======
-> 
->       // Read can return anything from 0 to numBytesToRead.
->       // This method blocks until at least one byte is read.
-      netStream.Read (bytes, 0, (int)tcpClient.ReceiveBufferSize);
-> 
->      // Returns the data received from the host to the console.
->       string returndata = Encoding.UTF8.GetString (bytes);
->
-> >>>>>> Stashed changes
-      
->                                       
-> 
-> <<<<<<< Updated upstream
-> <<<<<<< Updated upstream
-> 
-> =======
-
-> >>>>>> Stashed changes
->=======
-> 
-> >>>>>> Stashed changes
->      
->       }
-> 
-> 
->  ```
-> 
->
-> 
-> * 
-> 
->       ```c#
->   
->   ```
-
-```C#
-
-```
-
-
-
-### （4）
-
-
-
-#### 构造
-
-```C#
-
-```
-
-> 
-
-```C#
-
-```
-
-
-
-> * > 
->
->   ```C#
->   
->   <<<<<<< Updated upstream
-><<<<<<< Updated upstream
->   
->
-> 
-> =======
-> 
->  public class TcpListenerSample
->   {
->
-> >>>>>> Stashed changes
->=======
-> 
->   public class TcpListenerSample
->   {
->
-> >>>>>> Stashed changes
->       static void Main(string[] args)
->       {
->           try
->          {
->               // set the TcpListener on port 13000
->              int port = 13000;
->               TcpListener server = new TcpListener(IPAddress.Any, port);
-> <<<<<<< Updated upstream
-> <<<<<<< Updated upstream
-> 
->     
->
-> =======
->
->               // Start listening for client requests
->               server.Start();
->     
->              // Buffer for reading data
->               byte[] bytes = new byte[1024];
->              string data;
-> 
-> >>>>>> Stashed changes
-> =======
-> 
->               // Start listening for client requests
->               server.Start();
->     
->               // Buffer for reading data
->               byte[] bytes = new byte[1024];
->               string data;
-> 
-> >>>>>> Stashed changes
->               //Enter the listening loop
->               while (true)
->               {
->                   Console.Write("Waiting for a connection... ");
-> <<<<<<< Updated upstream
-> <<<<<<< Updated upstream
-  
-> =======
->                                     
-> >>>>>> Stashed changes
-> =======
->
-> >>>>>> Stashed changes
->                  // Perform a blocking call to accept requests.
->                   // You could also use server.AcceptSocket() here.
->                   TcpClient client = server.AcceptTcpClient();
->                  Console.WriteLine("Connected!");
-> <<<<<<< Updated upstream
-<<<<<<< Updated upstream
->                                     
->                   // Get a stream object for reading and writing
->                   NetworkStream stream = client.GetStream();
->                                         
->                  int i;
->     
->                   // Loop to receive all the data sent by the client.
->                   i = stream.Read(bytes, 0, bytes.Length);
-> 
-> =======
-> 
->                   // Get a stream object for reading and writing
-                  NetworkStream stream = client.GetStream();
->     
->                  int i;
->     
->                   // Loop to receive all the data sent by the client.
->                                                                                           i = stream.Read(bytes, 0, bytes.Length);
-> 
-> >>>>>> Stashed changes
-> =======
->
->                   // Get a stream object for reading and writing
->                  NetworkStream stream = client.GetStream();
->     
->                   int i;
->                                                                             
->                   // Loop to receive all the data sent by the client.
->                   i = stream.Read(bytes, 0, bytes.Length);
-> 
->>>>>>> Stashed changes
->                   while (i != 0)
-                  {
->                                                           // Translate data bytes to a ASCII string.
->                       data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
->                       Console.WriteLine(String.Format("Received: {0}", data));
->                                                                             <<<<<<< Updated upstream
-> <<<<<<< Updated upstream
-> 
->                       // Process the data sent by the client.
->                                                           data = data.ToUpper();
->    
->                       byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
->     
->                       // Send back a response.
->                       stream.Write(msg, 0, msg.Length);
-                      Console.WriteLine(String.Format("Sent: {0}", data));
->     
->                      i = stream.Read(bytes, 0, bytes.Length);
->                   }
->
-> =======
-
->                                                           // Process the data sent by the client.
->                      data = data.ToUpper();
->     
->                       byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
->     
->                       // Send back a response.
-                      stream.Write(msg, 0, msg.Length);
->                       Console.WriteLine(String.Format("Sent: {0}", data));
->    
->                       i = stream.Read(bytes, 0, bytes.Length);
->                   }
->                                                                         
-> >>>>>> Stashed changes
->                                                                         =======
-> 
->                       // Process the data sent by the client.
->                      data = data.ToUpper();
->     
->                      byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
->     
->                       // Send back a response.
->                                                                                               stream.Write(msg, 0, msg.Length);
->                       Console.WriteLine(String.Format("Sent: {0}", data));
->                                                                             
->                       i = stream.Read(bytes, 0, bytes.Length);
->                   }
->
-> >>>>>> Stashed changes
-                  // Shutdown and end connection
->                                                       client.Close();
->               }
->           }
->                                                                                       catch (SocketException e)
->           {
->                                                                                           Console.WriteLine("SocketException: {0}", e);
->           }
-> <<<<<<< Updated upstream
->                                     <<<<<<< Updated upstream
->
-> =======
-> 
-> >>>>>> Stashed changes
-> =======
-> 
->>>>>> Stashed changes
->           Console.WriteLine("Hit enter to continue...");
->          Console.Read();
->       }
->   }
->                                                                         
->   ```
->                                                                         
-> 
-
-```C#
-
-```
-
-
-
-### （5）
-
-### 构造
-
-```C#
-
-```
-
-> * addressFamily——地址族
->
->   > AddressFamily——enum
->   >
->   > * InterNetwork——IPv4
->   > * InterNetworkV6——IPv6
->
->   ```C#
->   using System;
->   using System.Text;
->   using System.IO;
->   using System.Net;
->   using System.Net.Sockets;
-    <<<<<<< Updated upstream
->   <<<<<<< Updated upstream
->                                       
->   public class Sample
->   {
->
-> =======
->
->   public class Sample
->   {
->
-> >>>>>> Stashed changes
-=======
->                                   
->   public class Sample
->   {
->                                   
->>>>>>> Stashed changes
->     public static string DoSocketGet(string server)
->     {
->       //Set up variables and String to write to the server.
->       Encoding ASCII = Encoding.ASCII;
->       string Get = "GET / HTTP/1.1\r\nHost: " + server +
->                    "\r\nConnection: Close\r\n\r\n";
->       Byte[] ByteGet = ASCII.GetBytes(Get);
->       Byte[] RecvBytes = new Byte[256];
->       String strRetPage = null;
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
-=======
->                                   
->>>>>>> Stashed changes
->       // IPAddress and IPEndPoint represent the endpoint that will
->       //   receive the request.
->       // Get first IPAddress in list return by DNS.
->                                   
->       try
->       {
-<<<<<<< Updated upstream
->
-> =======
->
->       // IPAddress and IPEndPoint represent the endpoint that will
->       //   receive the request.
->       // Get first IPAddress in list return by DNS.
->                                                                             
->       try
->       {
->
-> >>>>>> Stashed changes
-=======
->                                   
->>>>>>> Stashed changes
->         // Define those variables to be evaluated in the next for loop and
->         // then used to connect to the server. These variables are defined
->         // outside the for loop to make them accessible there after.
->         Socket s = null;
->         IPEndPoint hostEndPoint;
->         IPAddress hostAddress = null;
->         int conPort = 80;
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
-> =======
->
-> >>>>>> Stashed changes
-=======
->                                   
->>>>>>> Stashed changes
->         // Get DNS host information.
->         IPHostEntry hostInfo = Dns.GetHostEntry(server);
->         // Get the DNS IP addresses associated with the host.
->         IPAddress[] IPaddresses = hostInfo.AddressList;
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
-> =======
->
-> >>>>>> Stashed changes
-=======
->                                   
->>>>>>> Stashed changes
->         // Evaluate the socket and receiving host IPAddress and IPEndPoint.
->         for (int index=0; index<IPaddresses.Length; index++)
->         {
->           hostAddress = IPaddresses[index];
->           hostEndPoint = new IPEndPoint(hostAddress, conPort);	//构造IPEndPoint
->
->
->           // Creates the Socket to send data over a TCP connection.
->           s = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp );
->
->
->           // Connect to the host using its IPEndPoint.
->           s.Connect(hostEndPoint);
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
-> =======
->
-> >>>>>> Stashed changes
-=======
->                                                                   
->>>>>>> Stashed changes
->           if (!s.Connected)
->           {
->             // Connection failed, try next IPaddress.
->             strRetPage = "Unable to connect to host";
->             s = null;
->             continue;
->           }
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
->           // Sent the GET request to the host.
->           s.Send(ByteGet, ByteGet.Length, 0);
->
-> =======
->
->           // Sent the GET request to the host.
->           s.Send(ByteGet, ByteGet.Length, 0);
->
-> >>>>>> Stashed changes
-=======
->                                                                   
->           // Sent the GET request to the host.
->           s.Send(ByteGet, ByteGet.Length, 0);
->                                                                   
->>>>>>> Stashed changes
->         } // End of the for loop.
->
->
->         // Receive the host home page content and loop until all the data is received.
->         Int32 bytes = s.Receive(RecvBytes, RecvBytes.Length, 0);
->         strRetPage = "Default HTML page on " + server + ":\r\n";
->         strRetPage = strRetPage + ASCII.GetString(RecvBytes, 0, bytes);
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
-> =======
->
-> >>>>>> Stashed changes
-=======
->                                                                   
->>>>>>> Stashed changes
->         while (bytes > 0)
->         {
->           bytes = s.Receive(RecvBytes, RecvBytes.Length, 0);
->           strRetPage = strRetPage + ASCII.GetString(RecvBytes, 0, bytes);
->         }
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
->       } // End of the try block.
->
-> =======
->
->       } // End of the try block.
->
-> >>>>>> Stashed changes
-=======
->                                                                   
->       } // End of the try block.
->                                                                   
->>>>>>> Stashed changes
->       catch(SocketException e)
->       {
->         Console.WriteLine("SocketException caught!!!");
->         Console.WriteLine("Source : " + e.Source);
->         Console.WriteLine("Message : " + e.Message);
->       }
->       catch(ArgumentNullException e)
->       {
->         Console.WriteLine("ArgumentNullException caught!!!");
->         Console.WriteLine("Source : " + e.Source);
->         Console.WriteLine("Message : " + e.Message);
->       }
->       catch(NullReferenceException e)
->       {
->         Console.WriteLine("NullReferenceException caught!!!");
->         Console.WriteLine("Source : " + e.Source);
->         Console.WriteLine("Message : " + e.Message);
->       }
->       catch(Exception e)
->       {
->         Console.WriteLine("Exception caught!!!");
->         Console.WriteLine("Source : " + e.Source);
->         Console.WriteLine("Message : " + e.Message);
->       }
-<<<<<<< Updated upstream
-> <<<<<<< Updated upstream
->
-> =======
->
-> >>>>>> Stashed changes
-=======
->                                                                   
->>>>>>> Stashed changes
->       return strRetPage;
->   }
->      public static void Main()
->      {
->         Console.WriteLine(DoSocketGet("localhost"));
->      }
->    }
->   
->   ```
->
->   * socketType——socket类型
->
->     > * SocketType——enum
->     > * Dgram——数据报socket
->     > * Stream——流socket
->
->   ```C#
->   //Creates the Socket for sending data over TCP.
->   Socket s = new Socket(AddressFamily.InterNetwork, SocketType.Stream,
->      ProtocolType.Tcp );
-> 
->   // Connects to host using IPEndPoint.
->   s.Connect(EPhost);
->   if (!s.Connected)
->   {
->      strRetPage = "Unable to connect to host";
->   }
->   // Use the SelectWrite enumeration to obtain Socket status.
->    if(s.Poll(-1, SelectMode.SelectWrite)){
->         Console.WriteLine("This Socket is writable.");
->    }
->    else if (s.Poll(-1, SelectMode.SelectRead)){
->          Console.WriteLine("This Socket is readable." );
->    }
->    else if (s.Poll(-1, SelectMode.SelectError)){
->         Console.WriteLine("This Socket has an error.");
->    }
->   ```
->
-> 
->
-> * [protocolType](https://docs.microsoft.com/zh-cn/dotnet/api/system.net.sockets.protocoltype?view=net-5.0)——协议
->
->   > * ProtocolType——enum
->   > * IPv4
->   > * IPv6
->   > * Tcp
->   > * Udp
->   > * Icmp
->   > * Igmp
-
-#### 方法
-
-> * 
-
-
-
-## 3. HTTP
-
-### （1）WebClient
-
-提供将数据发送到指定Uri和从指定Uri获取数据的方法
-
-```C#
-WebClient client = new WebClient();
-Stream data = client.OpenRead(textBoxUri.Text);
-StreamReader reader = new StreamReader(data);
-textBox_content.Text = reader.ReadtoEnd();
-reader.close();
-data.close();
-```
-
-### （2）WebRequest
-
-
-
-### （3）WebResponse
-
-
-
-### （4）浏览器控件
-
-![image-20210913223432788](https://i.loli.net/2021/09/13/5X7Ioh4H9jmTbzP.png)
-
-```c#
- private void button1_Click(object sender, EventArgs e)
- {
- 	webBrowser1.Navigate(textBox_searchUri.Text, false);
- }
-```
-
-![image-20210914195241060](https://i.loli.net/2021/09/14/nCKRIspNy159MJr.png)
-
----
-
-# Part 02——系统编程C/C++ Socket
+# Part 01——系统编程C/C++ Socket
 
 [Socket技术详解](https://www.jianshu.com/p/066d99da7cbd)
 
@@ -855,7 +130,7 @@ unsigned char sin_zero[8];
 > serv_addr.sin_addr.s_addr=htonl(INADDR_ANY);	//绑定IP地址，INADDR_ANY表示所有网卡的IP
 > serv_addr.sin_port=htons(atoi(argv[1]));	//命令行第2个参数为server监听的端口
 > if(bind(sock,(struct sockaddr*)&serv_addr, sizeof(serv_addr))==-1){
-> serv_bindHandling();
+> 	serv_bindHandling();
 > }
 > ```
 >
@@ -881,7 +156,7 @@ unsigned char sin_zero[8];
 > uint16_t htonl(uint16_t hostshort);
 > ```
 >
-> * **atoi——把字符串转成整型数，跳过空字符。字符不能转成int或空字符时，无法转换时返回0。**
+> * **atoi——把字符串转成整型数，跳过空字符。字符不能转成int或空字符时，无法转换时返回0**
 >
 > ```c
 > int atoi(const char *nptr); 
@@ -931,16 +206,9 @@ unsigned char sin_zero[8];
 >   }
 >   ```
 >
-> <<<<<<< Updated upstream
->
-> =======
->   ```c++
->   //message_server.cpp
-> 
->   ```
-> >>>>>> Stashed changes
 
 ```c
+  //message_server.cpp
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1090,14 +358,6 @@ void error_handling(char *message)
 >   }
 >   ```
 >
-<<<<<<< Updated upstream
-=======
->   ```c++
->   //message_client.cpp
->                                                           
->   ```
->
->>>>>>> Stashed changes
 
 ### Windows
 
@@ -1363,8 +623,6 @@ int inet_pton(int af_family, const char *str, void *addr);	//成功返回1，出
 
 > * family——AF_INET、AF_INET6（IPv6）
 
-
-
 #### inet_ntop——二进制网络字节序IP转成点分十进制字符串IP
 
 ```c
@@ -1443,15 +701,7 @@ https://blog.csdn.net/p312011150/article/details/81273888
 >   char buff[]={'2','4','5','+'};
 >   int num = atoi(buff);
 >   p num	//245
-> <<<<<<< Updated upstream
 >
-> =======
->
-> >>>>>> Stashed changes
->   int num_ = (int)(buff[0] - '0');
->   p num_   //2
->   
->   ```
 
 自己实现atoi函数：
 
@@ -1712,7 +962,7 @@ sizeof (data type)
 >
 > * sizeof不能计算动态分配空间的大小
 >
->   ![image-20210927140833164](D:/WorkSpace/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/TCP_IP/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.assets/image-20210927140833164-16327229387291.png)
+>   ![image-20210927140833164-16327229387291](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20210927140833164-16327229387291.png)
 
 ### （3）cin
 
@@ -1949,25 +1199,23 @@ buff[len];
 >
 > 所以CPU在这里面，还是需要做一些微小的工作。
 >
-> ======================
->
 > 补充运行时类型的问题：
 >
 > C这种语言，要的就是运行时不带类型记号的裸奔快感。比如对于类似这样的源代码：
 >
 > ```text
-> int a = some_procedure();
+>int a = some_procedure();
 > int b = some_other_procedure();
 > int c = a + b;
 > ```
->
+> 
 > 最后的那个相加，在不优化的情况下，通常会产生类似这样的几个指令：
 >
 > - 从地址a取32位数据到寄存器1；
-> - 从地址b取32位数据到寄存器2；
+>- 从地址b取32位数据到寄存器2；
 > - 执行32位整形加法；
 > - 将32位数据写到地址c；
->
+> 
 > 可以看到，**这里面没有类型。对数据的操作方式就是类型。（取数据的位数）**
 
 ### （8）send
@@ -1999,13 +1247,13 @@ https://www.cnblogs.com/ellisonzhang/p/10412021.html
 
 ## 8. socket缓冲区
 
-![图片](https://mmbiz.qpic.cn/mmbiz_png/FmVWPHrDdnlQB0CrBiboEZGfE8keHGEsjXicIIHoCtx2KrEJLHASA3CRkD5t7X0mYlOm3XSXpnibbjiaqAD7ZRMmew/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)目录
+![图片](https://mmbiz.qpic.cn/mmbiz_png/FmVWPHrDdnlQB0CrBiboEZGfE8keHGEsjXicIIHoCtx2KrEJLHASA3CRkD5t7X0mYlOm3XSXpnibbjiaqAD7ZRMmew/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)
 
 代码执行send成功后，数据就发出去了吗？
 
 回答这个问题之前，需要了解什么是**Socket 缓冲区**。
 
-### 什么是 socket 缓冲区
+### （1）什么是 socket 缓冲区
 
 编程的时候，如果要跟某个IP建立连接，我们需要调用操作系统提供的 `socket API`。
 
@@ -2037,7 +1285,7 @@ https://www.cnblogs.com/ellisonzhang/p/10412021.html
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/FmVWPHrDdnlQB0CrBiboEZGfE8keHGEsjicVh0e15ib4rx1N0V9ic5eWtXKp8GZAefOYONT4KKfUhcAkqJvph7CNfQ/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)一个socket有两个缓冲区
 
-#### 怎么观察 socket 缓冲区
+### （2）怎么观察 socket 缓冲区
 
 如果想要查看 socket 缓冲区，可以在linux环境下执行 `netstat -nt` 命令。
 
@@ -2079,7 +1327,7 @@ int main(int argc, char *argv[])
 
 上面是一段伪代码，仅用于展示大概逻辑，我们在建立好连接后，一般会在代码中执行 `send` 方法。那么此时，消息就会被立刻发到对端机器吗？
 
-### 执行 send 发送的字节，会立马发送吗？
+### （4）执行 send 发送的字节，会立马发送吗？
 
 答案是不确定！执行 send 之后，数据只是拷贝到了socket 缓冲区。至 什么时候会发数据，发多少数据，全听操作系统安排。
 
@@ -2103,7 +1351,7 @@ int tcp_sendmsg()
 
 在 tcp_sendmsg 中， 核心工作就是将待发送的数据组织按照先后顺序放入到发送缓冲区中， 然后根据实际情况（比如拥塞窗口等）判断是否要发数据。如果不发送数据，那么此时直接返回。
 
-### 如果缓冲区满了会怎么办
+### （5）如果缓冲区满了会怎么办
 
 前面提到的情况里是，发送缓冲区有足够的空间，可以用于拷贝待发送数据。
 
@@ -2179,7 +1427,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
 
 ![图片](https://mmbiz.qpic.cn/mmbiz_png/FmVWPHrDdnlQB0CrBiboEZGfE8keHGEsj9hSlrmT2jGibWZW7blcOgJxZQX7BznAAGxU6AX6nn6vDto9rsDvLpEA/640?wx_fmt=png&tp=webp&wxfrom=5&wx_lazy=1&wx_co=1)socket读写缓冲区满了的情况汇总
 
-### 如果socket缓冲区还有数据，执行close了，会怎么样？
+### （6）如果socket缓冲区还有数据，执行close了，会怎么样？
 
 首先我们要知道，**一般正常情况下，发送缓冲区和接收缓冲区 都应该是空的。**
 
@@ -2263,7 +1511,7 @@ void tcp_send_fin(struct sock *sk)
 
 ## UDP部分
 
-### UDP也有缓冲区吗
+### （7）UDP也有缓冲区吗
 
 说完TCP了，我们聊聊UDP。这对好基友，同时都是传输层里的重要协议。既然前面提到TCP有发送、接收缓冲区，那UDP有吗？
 
@@ -2277,7 +1525,7 @@ UDP socket 也是 socket，一个socket 就是会有收和发两个缓冲区。�
 
 有没有是一回事，用不用又是一回事。
 
-### UDP不用发送缓冲区？
+### （8）UDP不用发送缓冲区？
 
 事实上，UDP不仅有发送缓冲区，也用发送缓冲区。
 
@@ -2515,7 +1763,7 @@ UDP有数据边界，一次发送的数据不论长短都封装为一个数据�
 
 ### （3）connected UDP
 
-![image-20211008115732011](D:/WorkSpace/%E5%B7%A5%E4%BD%9C%E7%AC%94%E8%AE%B0/TCP_IP/%E7%BD%91%E7%BB%9C%E7%BC%96%E7%A8%8B.assets/ZCfSsAit4LGrz56.png)
+![ZCfSsAit4LGrz56](https://raw.githubusercontent.com/WangKun233/ImageHost/main/ZCfSsAit4LGrz56.png)
 
 client在sendto数据之前，用connect将目标地址固定为addr_serv，提高效率。随后每次send时不需要指定地址，可以不用sendto，改用write
 
@@ -2905,8 +2153,6 @@ int main(int argc, char** argv){
 
 https://www.cnblogs.com/wunaozai/p/3753731.html
 
-
-
 ```c++
 #include<netdb.h>
 struct hostent* gethostbyaddr(const char* addr, socklen_t len, int family);
@@ -3102,11 +2348,10 @@ TCP断开连接发起者不仅仅限于client，server也可以发出断开连�
 
 为什么在客户端程序Ctrl-c后，立即运行客户端程序不会出现错误呢？因为客户端中只有服务端地址addr_serv需要赋值用于sock_clnt的connect，sock_clnt自身的端口是connect时动态分配的，不需要在程序中设置。
 
-<<<<<<< Updated upstream
-#### 可以将SO_REUSEADDR设置为1，处于Time-wait状态下的套接字的端口号就可以立即重新被使用，在server端Ctrl-c后就可以立即重新使用绑定的端口。SO_REUSEADDR的默认值是0。
-=======
+**可以将SO_REUSEADDR设置为1，处于Time-wait状态下的套接字的端口号就可以立即重新被使用，在server端Ctrl-c后就可以立即重新使用绑定的端口。SO_REUSEADDR的默认值是0。**
+
+
 所以，可以将SO_REUSEADDR设置为1，处于Time-wait状态下的套接字的端口号就可以立即重新被使用，在server端Ctrl-c后就可以立即重新使用绑定的端口。SO_REUSEADDR的默认值是0。
->>>>>>> Stashed changes
 
 ```c++
 //server.cpp
@@ -3118,7 +2363,7 @@ setsock(sock_serv, SOL_SOCKET, SO_REUSEADDR, (void*)&option, optlen);
 
 
 
-### （5）TCP_NODELAY——使用/禁用Nagle算法
+### （5）禁用Nagle算法——TCP_NODELAY
 
 TCP默认是使用Nagle算法的，则TCP_NODELAY默认为0。将TCP_NODELAY设为1时，禁用Nagle算法。
 
@@ -4049,29 +3294,29 @@ int main(int argc, char** argv)
 
 ```
 
-![image-20211021232729184](https://i.loli.net/2021/10/21/HOiUyc3hskvF6qZ.png)
+![image-20230805145112637](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805145112637.png)
 
-![image-20211021232742761](https://i.loli.net/2021/10/21/oMUD4P7QTfatB8l.png)
+![image-20230805145052997](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805145052997.png)
 
-![image-20211021232823016](https://i.loli.net/2021/10/21/9KeR5sGAZpFtClm.png)
+![image-20230805145028857](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805145028857.png)
 
-![image-20211021232835887](https://i.loli.net/2021/10/21/1IqdB38HtXpMJWu.png)
+![image-20230805145011298](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805145011298.png)
 
-![image-20211021232856318](https://i.loli.net/2021/10/21/4XtEmiHC7f8Abcx.png)
+![image-20230805144942599](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144942599.png)
 
-![image-20211021232941117](https://i.loli.net/2021/10/21/WqvRezf278OGyNx.png)
+![image-20230805144923422](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144923422.png)
 
 因为主进程`sleep(600)`，当子进程return时，OS将主进程唤醒执行了`child_proc`。
 
 #### 将`mpserv.cpp`中最后的`sleep(600)`注释掉时：
 
-![image-20211021231744449](https://i.loli.net/2021/10/21/MCb6ayupsUlPhDB.png)
+![image-20230805144907184](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144907184.png)
 
-![image-20211021233209423](https://i.loli.net/2021/10/21/xzY1u29wEqP84hv.png)
+![image-20230805144848739](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144848739.png)
 
-![image-20211021233249852](https://i.loli.net/2021/10/21/gmcsu1y5f28DZ4N.png)
+![image-20230805144823227](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144823227.png)
 
-![image-20211021233309426](https://i.loli.net/2021/10/21/Fx5RI2S8NipZWtr.png)
+![image-20230805144806677](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144806677.png)
 
 因为主进程没有`sleep`，主进程fork子进程后就return了。`ps au`也显示主进程销毁了，但子进程3095还存在。
 
@@ -4081,22 +3326,12 @@ int main(int argc, char** argv)
 
 #### A：父进程结束时子进程并不会跟随着结束？
 
-![image-20211023191747379](https://i.loli.net/2021/10/23/BOT2jADHiZm43CL.png)
+![image-20230805144731117](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144731117.png)
 
-![image-20211023191816741](https://i.loli.net/2021/10/23/eRg85wUFt1B2srk.png)
+![image-20230805144712023](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144712023.png)
 
 父进程终止时子进程并不会中止而是仍在工作，只是中断会弹出命令提示符。所以`sleep(3)`只是防止子进程结束之前，终端就弹出命令提示符，无法继续后续命令。
 
 #### Q：为什么没有执行child_proc，子进程也没有变成僵尸进程呢？
 
-![image-20211021233348491](https://i.loli.net/2021/10/21/tdyYA8UiPoamefI.png)
-=======
-```
-
-
-
----
-
-## 13. 多进程服务器端
-
->>>>>>> Stashed changes
+![image-20230805144653914](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230805144653914.png)
