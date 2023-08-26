@@ -4,6 +4,199 @@ lambda表达式和匿名方法、字段和属性、委托和事件、多线程�
 
 Linq：from/where/select
 
+# 知识点收集
+
+## 1. C#取整
+
+```c#
+向下取整：
+    Math.Floor()	//3.1->3
+向上取整：
+    Math.Ceiling()	//3.1->4
+```
+
+## 2. Enumerable集合最大、最小、均值
+
+* 最值
+
+  实现了IEnumrable的集合可调用Max()/Min()/Average()方法
+
+  https://learn.microsoft.com/zh-cn/dotnet/api/system.linq.enumerable.max?view=net-7.0
+
+  ```c#
+  Max<TSource>(IEnumerable<TSource>, Func<TSource,Int32>)
+  Max<TSource>(IEnumerable<TSource>, Func<TSource,Double>)
+  Max<TSource, TResult>(IEnumerable<TSource>, Func<TSource,TResult>) 
+  ```
+
+  ```c#
+  yMaxLine = points.Max<PointF>(p => p.Y);
+  ```
+
+  
+
+* 均值
+
+  https://learn.microsoft.com/zh-cn/dotnet/api/system.linq.enumerable.average?view=net-7.0
+
+  ```c#
+   yAvgLine = points.Average<PointF>(p => p.Y);
+  ```
+
+## 3. 控件的Owner和Parent属性
+
+Parent属性：访问父容器
+
+Owner属性：访问拥有窗体的窗体。当一个窗体归另一个窗体所有，则Owner关闭或最小化时，该窗体也会关闭或最小化。
+
+## 4. 设置字段默认值、属性访问器默认值
+
+* 字段是类内部使用，设置默认值：
+
+  ```c#
+  public class Tree{
+      public int Height{get;set;}=10;
+      
+      private string color="green";
+      public string Color{
+          get{
+              return color;
+          }
+          set{
+              color=value;
+          }
+      }
+  }
+  ```
+
+* 属性是提供给类外访问的。
+
+  对于简单类型的属性，比如Int32，Boolean等等这些Primitive类型，你可以在属性的声明前设置一个**DefaultValueAttribute**，在**Attribute的构造函数[DefaultValue()]里传入设置默认值**。但是这个只是用来设置可视化设计器的。
+
+  字段的默认值不会因此而被初始化，**必须要在代码中手动初始化和DefaultValue相同的值**，如上初始化字段所示。
+
+  ```c#
+  //X范围
+  private int xmin = 0;	//手动初始化和DefaultValue相同的值
+  [
+      Browsable(true),
+      CateGory("布局"),
+      Description(" X轴数值最小值 "),
+      DefaultValue(0)
+  ]
+  public int Xmin
+  {
+      get => this.xmin;
+      set
+      {
+          this.xmin = value;
+          pictureBox_plot.Invalidate();	//修改属性后，重绘
+      }
+  }
+  ```
+
+* 复杂属性设置默认值
+
+  自己定义Reset()函数负责重置，ShouldSerialize()。
+
+  VS能够根据方法的名称来识别这种方法，比如Reset<PropertyName>方法把**重置为默认值**，ShouldSerialize<PropertyName>方法**检查属性是否是默认值**。过去我们把它称之为魔术命名法，应该说是一种不好的编程习惯，可是现在微软依然使用这种机制。
+
+  ```c#
+  private Color yMaxLineColor = Color.Red;
+  public Color YMaxLineColor { get => yMaxLineColor; set => yMaxLineColor = value; }
+  [
+      Browsable(true),
+      CateGory("外观"),
+      Description( " 数据最大值标线 " ),
+  ]
+  public void ResetYMaxLineColor()
+  {
+      YMaxLineColor= Color.Red;
+  }
+  public bool ShouldSerializeYMaxLineColor()
+  {
+      return YMaxLineColor != Color.Red;
+  ```
+
+
+## 5. double取3位小数
+
+```c#
+小数点后的位数固定string.Format("{0:F2}", 4384.5) //4384.50
+```
+
+## 6. String.Format()
+
+```c#
+String.Format("{0} is {1}, val1, val2");	//"val1 is val2"
+```
+
+## 7. 控件重绘
+
+Invidate()
+
+OnPaint()
+
+```c#
+protected override void OnPaint(PaintEventArgs e)
+
+　　　　　　　 {
+
+　　　　　　　　　　　 base.OnPaint(e);
+
+　　　　　　　　　　　 StringFormat style = new StringFormat();
+
+　　　　　　　　　　　 style.Alignment = StringAlignment.Near;
+
+　　　　　　　　　　　 switch (alignmentValue)
+
+　　　　　　　　　　　 {
+
+　　　　　　　　　　　　　　　 case ContentAlignment.MiddleLeft:
+
+　　　　　　　　　　　　　　　　　　　 style.Alignment = StringAlignment.Near;
+
+　　　　　　　　　　　　　　　　　　　 break;
+
+　　　　　　　　　　　　　　　 case ContentAlignment.MiddleRight:
+
+　　　　　　　　　　　　　　　　　　　 style.Alignment = StringAlignment.Far;
+
+　　　　　　　　　　　　　　　　　　　 break;
+
+　　　　　　　　　　　　　　　 case ContentAlignment.MiddleCenter:
+
+　　　　　　　　　　　　　　　　　　　 style.Alignment = StringAlignment.Center;
+
+　　　　　　　　　　　　　　　　　　　 break;
+
+　　　　　　　　　　　 }
+
+　　　　　　　　　　　 // Call the DrawString method of the System.Drawing class to write　　 
+
+　　　　　　　　　　　 // text. Text and ClientRectangle are properties inherited from
+
+　　　　　　　　　　　 // Control.
+
+　　　　　　　　　　　 e.Graphics.DrawString(
+
+　　　　　　　　　　　　　　　 DisplayText,
+
+　　　　　　　　　　　　　　　 Font,
+
+　　　　　　　　　　　　　　　 new SolidBrush(TextColor),
+
+　　　　　　　　　　　　　　　 ClientRectangle, style);
+
+　　　　　　　 }
+
+　　　 }
+```
+
+## 8. 用户控件DataSource属性写法
+
+https://blog.csdn.net/softart/article/details/1935242
+
 # 一、基础
 
 ## 0. .Net和C#
@@ -226,7 +419,9 @@ CopyTo()和Clone()都属于浅拷贝,这一点是毋庸置疑的.对于浅拷贝
 
 https://www.cnblogs.com/JamelAr/p/14156387.html
 
+## 结构体
 
+C#中结构体成员默认的访问权限是private。类成员（字段、方法）默认是private，构造函数默认是public。
 
 
 
@@ -885,7 +1080,55 @@ Person p;	//在栈上开辟个内存
 p = new Person();	//在堆上开辟内存，将引用返回给变量p
 ```
 
-还有个用法是子类屏蔽父类同名成员。
+**还有个用法是子类屏蔽父类同名成员。**
+
+在派生类中使用new声明此方法的隐藏。隐藏时，访问父类则调用父类的方法，访问子类则调用子类的方法。
+
+```c#
+namespace 隐藏
+{
+    class Program
+    {
+ 
+        static voidMain(string[] args)
+        {
+            ClassNew CN =new ClassNew();
+           CN.SetName("new");
+ 
+            BaseClass BC =CN;
+           BC.SetName("基类");
+        }
+                 //基类
+        public class BaseClass
+        {
+            public void SetName(string name)
+            {
+               Console.WriteLine("基类：我的名字是" + name);
+            }
+        }
+//派生类
+        public class ClassNew : BaseClass
+        {
+            //这里如果不使用new，将生成警告！
+            //屏蔽了父类的SetName方法。哪怕是父类引用指向子类对象，调用SetName也是调用子类的。
+            new public void SetName(string name)
+            {
+               Console.WriteLine("new：我的名字是" + name);
+            }
+        }
+    }
+}
+
+/*运行结果：new：我的名字是new
+
+ 基类：我的名字是基类*/
+```
+
+## 14. 重写override
+
+继承时发生，在子类中重新定义父类中的方法，子类中的方法和父类的方法是一样的，即方法名，参数，返回值都相同。
+
+基类方法声明为virtual(虚方法)，派生类中使用override申明此方法的重写。
 
 ## 14. 重载overload
 
@@ -895,7 +1138,7 @@ p = new Person();	//在堆上开辟内存，将引用返回给变量p
 
 父类中声明为virtual的方法，可以被子类override。若不想父类的某个函数被override，将其修饰为final。
 
-LSP原则：不要override父类的非抽象方法。
+**LSP原则：不要override父类的非抽象方法。不要这么用！只override抽象类。**
 
 ```c#
 class ff{
@@ -907,7 +1150,7 @@ class ss:ff{
 }
 ```
 
-父类的方法声明为abstract为抽象方法，父类即抽象类，抽象类不可被实例化，只能作为父类被继承，子类override实现抽象方法。
+父类的**方法声明为abstract为抽象方法，父类即抽象类**，抽象类不可被实例化，只能作为父类被继承，子类override实现抽象方法。
 
 ## 16. ？与可空类型Nullable
 
