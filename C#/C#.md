@@ -1089,7 +1089,6 @@ namespace 隐藏
 {
     class Program
     {
- 
         static voidMain(string[] args)
         {
             ClassNew CN =new ClassNew();
@@ -1448,8 +1447,20 @@ DLG dlg += a=>return a++;			//定义委托实例dlg并注册一个lambda方法
 DLG dlg = sum;
 dlg += sub;
 dlg += multip;
-dlg(1, 2);	//3,-1,2
+dlg?.Invoke(1,2);	//3,-1,2
 ```
+
+### 委托调用函数
+
+委托变量可以直接当做函数传入参数使用。
+
+**但是建议这么使用委托，可增加健壮性：**
+
+```c#
+dlg?.Invoke()	//防止dlg为null
+```
+
+
 
 ## 24. 内置泛型委托Action、Func、Predicate
 
@@ -1482,8 +1493,6 @@ Predicate是返回值为bool的Func，且输入参数只能有1个。
 ```c#
 var predicate = new Predicate<int>(x => x % 2 == 0)
 ```
-
-
 
 ```c#
 Func<int a, double b, string str> dlg+=(int a, double b)=>return (a+b).toString();
