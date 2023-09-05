@@ -1776,9 +1776,11 @@ public void func(S, T)(S p):where S:Person
 
 
 
+## 37. DateTime
 
 
-## 37. 反射（reflection）与特性（attribute）
+
+## 38. 反射（reflection）与特性（attribute）
 
 https://liuhaowen.blog.csdn.net/article/details/118695042?spm=1001.2101.3001.6650.4&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-118695042-blog-4891368.235%5Ev36%5Epc_relevant_default_base3&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-4-118695042-blog-4891368.235%5Ev36%5Epc_relevant_default_base3&utm_relevant_index=5
 
@@ -1786,7 +1788,7 @@ https://blog.csdn.net/ananlele_/article/details/107979117
 
 
 
-## 38. 索引器（indexer）
+## 39. 索引器（indexer）
 
 使可通过[]下标访问定义了索引器的类的成员。
 
@@ -1888,11 +1890,13 @@ namespace IndexerApplication
 
 
 
-## 39. 数据结构
+## 30. 容器
 
 集合分为泛型集合和非泛型集合。
 
 前者位于System.Collection.Generic命名空间，后者位于System.Collection。
+
+**C# 将数据存于容器中是将原始数据直接存于容器中。而C++则是将原始数据拷贝了一份存于容器中，所以数据要能拷贝。**
 
 ### 非泛型集合
 
@@ -1937,7 +1941,7 @@ namespace IndexerApplication
 
 
 
-## 40. 一些容易忽略的点
+## 41. 一些容易忽略的点
 
 * struct/class默认访问权限是internal。struct成员默认访问权限是private。
 
@@ -3593,12 +3597,10 @@ RS232
 
 RS485/422
 
-# 十二、VS调试
+# 十二、C#新特性
 
-F12跳转到函数定义，Ctrl+-返回。
+## 1. dynamic
 
-alt+F12快捷浏览函数定义。
 
-# 
 
  

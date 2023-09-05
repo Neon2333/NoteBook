@@ -1,6 +1,6 @@
-https://blog.csdn.net/zhizhengguan/article/details/107567449
-
 # 软件下载与安装
+
+https://blog.csdn.net/zhizhengguan/article/details/107567449
 
 ## 在线版
 
@@ -27,3 +27,6 @@ Debuggers：与编译器一致即可，g++则用GDB，msvc则找到CDB。
 Cmake：与上面的方法一致，找到Cmake编译器，添加就行了。
 
 配置完之后可以在Kit标签页给配置命名。
+
+
+

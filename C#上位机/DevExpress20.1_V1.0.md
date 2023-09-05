@@ -475,6 +475,8 @@ private void argsShowing(object sender, XtraMessageShowingArgs e)
 
   * UseSystemPasswordChar——是否使用密码形式
 
+  * ReadOnly——设置不可编辑文本
+
 * 不在Options中，直接使用代码指定
 
   * [TextEdit.SelectionStart](https://docs.devexpress.com/WindowsForms/DevExpress.XtraEditors.TextEdit.SelectionStart)——设置或获取被选择的字符的信息
