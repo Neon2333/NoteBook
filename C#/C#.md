@@ -4,7 +4,44 @@ lambda表达式和匿名方法、字段和属性、委托和事件、多线程�
 
 Linq：from/where/select
 
+# 代码规范
+
+变量应该是程序中使用最多的标识符了，变量的命名规范可能是一套C++命名准则中最重要的部分：变量的命名变量名由作用域前缀＋类型前缀＋一个或多个单词组成。为便于界定，每个单词的首字母要大写。对于某些用途简单明了的局部变量，也可以使用简化的方式，如：i, j, k, x, y, z ....　作用域前缀作用域前缀标明一个变量的可见范围。作用域可以有如下几种：前缀说明无局部变量m_类的成员变量（member）sm_类的静态成员变量（static member）s_静态变量（static）g_外部全局变量（global）sg_静态全局变量（static global）gg_进程间共享的共享数据段全局变量（global global）除非不得已，否则应该尽可能少使用全局变量。类型前缀类型前缀标明一个变量的类型，可以有如下几种：前缀说明n整型和位域变量（number）e枚举型变量（enumeration）c字符型变量（char）b布尔型变量（bool）f浮点型变量（float）p指针型变量和迭代子（pointer）pfn特别针对指向函数的指针变量和函数对象指针（pointer of function）g数组（grid）i类的实例（instance）对于经常用到的类，也可以定义一些专门的前缀，如：std::string和std::wstring类的前缀可以定义为"st"，std::vector类的前缀可以定义为"v"等等。类型前缀可以组合使用，例如"gc"表示字符数组，"ppn"表示指向整型的指针的指针等等。　推荐的组成形式变量的名字应当使用"名词"或者"形容词＋名词"。例如："nCode", "m_nState"，"nMaxWidth" ....
+
+| 类型               | 写法   |
+| ------------------ | ------ |
+| private成员        | m_val  |
+| private static成员 | ms_val |
+| static变量         | s_val  |
+| 全局变量           | g_val  |
+| 全局静态变量       | gs_val |
+| 枚举类型           | et_val |
+| 枚举变量           | e_val  |
+| int                | iVal   |
+| float              | fVal   |
+| double             | dVal   |
+| string             | sVal   |
+| bool               | bVal   |
+| 数组               | aVal   |
+| 指针               | pVal   |
+| char               | cVal   |
+| DateTime           | dtVal  |
+| delegate           | dlgVal |
+| event              | evVal  |
+
+
+
 # 知识点收集
+
+## 0. VS快捷键
+
+|           |              |
+| --------- | ------------ |
+| F12       | 跳转定义     |
+| shift+F12 | 查找所有引用 |
+|           |              |
+
+
 
 ## 1. C#取整
 
@@ -1423,7 +1460,38 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 **通过等号赋值绑定到方法列表的方法只能是第一个方法，后面的绑定需要使用+=**；若再次使用赋值给委托变量，就会产生新的委托变量，原来的委托变量将会被GC回收。
 
-给委托添加方法使用+=，**移出方法使用-=**。
+### 委托添加、移出方法
+
+* 通过+=添加方法，通过-=移出方法
+
+* 通过Delegate的静态方法
+
+  ```c#
+  delegate void MyDelegate(int num);
+  
+  //创建3 个MyDelegate 委托类的实例
+  MyDelegate myDelegatel = new MyDelegate(this.PrintNum);
+  MyDelegate myDelegate2 = new MyDelegate(this.PrintDoubleNum);
+  MyDelegate myDelegate3 = new MyDelegate(this.PrintTripleNum);
+  
+   MyDelegate myDelegates = null;
+  //使用Delegate 类的静态方法Combine
+   myDelegates = (MyDelegate)Delegate.Combine(myDelegates, myDelegatel);
+   myDelegates = (MyDelegate)Delegate.Combine(myDelegates, myDelegate2);
+   myDelegates = (MyDelegate)Delegate.Combine(myDelegates, myDelegate3);
+   //将myDelegates 传入Print 方法
+   this.Print(10, myDelegates);
+  
+  ///移除方法 
+  myDelegates = (MyDelegate)Delegate.Remove(myDelegates, myDelegatel);
+  ///移除所有
+  myDelegates = (MyDelegate)Delegate.RemoveAll(myDelegates, myDelegatel);
+  
+  private void Print(int v, MyDelegate myDelegates)
+  {
+          
+  }
+  ```
 
 绑定匿名方法使用lambda表达式，可在委托里内联一小段函数。
 
@@ -1501,6 +1569,26 @@ Func<int a, double b, string str> dlg+=(int a, double b)=>return (a+b).toString(
 
 
 ## 25. 事件
+
+### 移出事件绑定的所有方法
+
+```C#
+/// <summary>
+        /// 移除所有的事件绑定
+        /// </summary>
+        /// <param name="clearEvent"></param>
+        public static void clear_event<T>(ref T clearEvent) where T : Delegate
+        {
+            Delegate[] dels = (clearEvent as Delegate).GetInvocationList(); //event是特殊的delegate，所以类型还是delegate
+            foreach (Delegate d in dels)
+            {
+                Delegate.RemoveAll(clearEvent, d);
+                //得到方法名
+                //object delObj = d.GetType().GetProperty("Method").GetValue(d, null);
+                //string funcName = (string)delObj.GetType().GetProperty("Name").GetValue(delObj, null);
+            }
+        }
+```
 
 事件是成员，不是类型。要声明为public，外部程序才能向其注册handler方法。
 
@@ -1778,7 +1866,7 @@ public void func(S, T)(S p):where S:Person
 
 ## 37. DateTime
 
-
+https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-date-and-time-format-strings
 
 ## 38. 反射（reflection）与特性（attribute）
 

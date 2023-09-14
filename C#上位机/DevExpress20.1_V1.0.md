@@ -2908,6 +2908,8 @@ https://docs.devexpress.com/WindowsForms/118337/controls-and-libraries/form-layo
 
 ## 1. GridControl——GridView
 
+https://blog.csdn.net/c___novice/article/details/109516942
+
 ![image-20220314143937029](https://s2.loli.net/2022/03/14/mZXRcPUtbkOfrpo.png)
 
 ![image-20220314144014386](https://s2.loli.net/2022/03/14/5k8zN9oKiuRXOIb.png)
@@ -3027,7 +3029,36 @@ https://www.cnblogs.com/wuhuacong/p/8796898.html
 > 版权声明：本文为CSDN博主「Dummy-0394」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
 > 原文链接：https://blog.csdn.net/wk0394/article/details/41575489
 
+### （5）增删行
 
+```c#
+private void simpleButton_addTask_Click(object sender, EventArgs e)
+        {
+            LearningTask learningTask = new LearningTask();
+            learningTask.TaskId = learningTaskList.Count;
+            learningTask.CreateTime = DateTime.Now;
+            learningTask.CurTaskStatus = (int)LearningTask.TaskStatus.Pause;
+            learningTask.CurTaskMode = (int)LearningTask.TaskMode.modeClock;
+            learningTask.TaskDescription = this.textEdit_inputTaskDescription.Text;
+            learningTask.CountDownInitVal = 3600 * Convert.ToInt32(this.labelControl_setTime.Text.Substring(3, 1));
+            learningTask.RemainingTime = learningTask.CountDownInitVal;
+            learningTask.TotalLearningTime = 0;
+            learningTaskList.Add(learningTask);
+            this.gridControl_taskList.RefreshDataSource();  //将DataSource的变化刷新到显示上
+
+            this.textEdit_inputTaskDescription.Text = "";
+        }
+```
+
+```c#
+//删除选中任务
+        private void simpleButton_delTask_Click(object sender, EventArgs e)
+        {
+            int rowHandle = this.tileView_taskList.FocusedRowHandle;
+            int delTaskId = Convert.ToInt32(this.tileView_taskList.GetRowCellValue(rowHandle, "TaskId"));
+            learningTaskList.RemoveAll(item => item.TaskId == delTaskId);
+        }
+```
 
 ## 2. GridControl——WinExplorerView
 
