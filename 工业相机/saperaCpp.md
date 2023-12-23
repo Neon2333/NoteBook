@@ -83,8 +83,41 @@ SapFormatType GetType();	//获取类型
 | BOOL GetFeatureInfo(const char* featureName, SapFeature* feature); | 请注意，**在调用此方法之前，必须为SapFeature对象调用Create方法**<br/>Feature——SapFeature对象，存储feature信息 |
 | BOOL GetFeatureInfo(int featureIndex, SapFeature* feature);  | featureIndex——从0到featureCount-1                            |
 | BOOL GetFeatureNameByIndex(int featureIndex, char* featureName, int featureNameSize); | 根据feature的index显示feature名称。                          |
-| bool GetFeatureValue(const char* featureName, INT32* featureValue); |                                                              |
+| bool GetFeatureValue(const char* featureName, INT32* featureValue); | 获取feature值                                                |
 | bool GetFeatureValue(int featureIndex, INT32* featureValue); |                                                              |
+| BOOL GetFileCount(int* fileCount);                           | 返回采集设备支持的文件数                                     |
+| BOOL GetFileNameByIndex(int fileIndex, char* fileName, int fileNameSize); | 返回与指定索引关联的设备文件的名称                           |
+| BOOL GetFileIndexByName(const char* fileName, int* fileIndex); | 返回与指定名称关联的设备文件的索引                           |
+| BOOL GetFileProperty(int fileIndex, SapAcqDevice::FileProperty propertyType, UINT64* filePropertyValue); | ***获取文件属性值***<br/>propertyType—SapAcqDevice::FilePropertyAccessMode或SapAcqDevice::FilePropertySize |
+| BOOL GetFileProperty(const char* fileName, SapAcqDevice::FileProperty propertyType, UINT64* filePropertyValue); | FilePropertyAccessMode的可能取值：<br/>SapAcqDevice::FileAccessModeNone <br/>SapAcqDevice::FileAccessModeReadOnly <br/>SapAcqDevice::FileAccessModeWriteOnly <br/>SapAcqDevice::FileAccessModeReadWrite |
+| const char* GetLabel();                                      | 获取采集设备资源的文本描述。资源的名称为：ServerName[ResourceName]。 |
+| const char* GetModeName();<br/>BOOL SetModeName(const char* modeName); | 获取/设置使用SaveFeatures方法保存设备功能时要使用的模式名称。<br/>公司名称+模式<br/>通过LoadFeatures加载CCF文件时，modeName参数自动装载 |
+| BOOL GetReadOnly(); <br/>BOOL SetReadOnly(BOOL readOnly);    | 获取/设置类是否对设备具有只读访问权限。                      |
+| UpdateFeatureMode GetUpdateFeatureMode();                    | 获取/设置feature写入设备的模式<br/>mode可能取值：<br/>SapAcqDevice::UpdateFeatureAuto或SapAcqDevice::UpdateFeatureManual<br/>前者使用SetFeatureValue修改feature时，会立即发送到设备。<br/>后者将每个feature都临时缓存，需要调用UpdateFeaturesToDevice将一次性全部发送到设备 |
+| BOOL SetUpdateFeatureMode(UpdateFeatureMode mode);           |                                                              |
+| BOOL IsCallbackRegistered(const char* eventName, BOOL* isRegistered);<br/> | 判断event上是否注册了回调函数。<br/>eventIndex范围0到GetEventCount()<br/>可在循环里使用，判断某个事件是否有需要解除注册的回调函数 |
+| BOOL IsCallbackRegistered(int eventIndex, BOOL* isRegistered); |                                                              |
+| BOOL IsEventAvailable(const char* eventName, BOOL* isAvailable); | 判断该event是否被当前采集设备支持                            |
+| BOOL IsFeatureAvailable(const char *featureName, BOOL *isAvailable); | 判断feature是否被当前采集设备支持。<br/>当程序支持多种采集设备，每种都有不同的feature集合时，该函数很有用 |
+| BOOL IsFeatureRecordingStarted();                            | 返回featureRecording是否开启。<br/>                          |
+| SapAcqDevice::StartFeatureRecording                          |                                                              |
+| SapAcqDevice::PauseFeatureRecording                          |                                                              |
+| SapAcqDevice::StopFeatureRecording                           |                                                              |
+| SapAcqDevice::ResumeFeatureRecording                         | 恢复feature recording                                        |
+| BOOL IsFeatureRecordingStarted();                            | 判断feature recording是否已开始                              |
+| BOOL IsFileAccessAvailable();                                | 采集设备的file是否可访问。<br/>若为false，则不可使用GetFileCount、GetFileNameByIndex、GetFileIndexByName、GetFileProperty、WriteFile，ReadFile和DeleteDeviceFile函数。 |
+| BOOL LoadFeatures(const char* configFile);                   | 加载CCF文件（CamExpert或调用SaveFeatures生成）<br/>若当前object是read-only access不可调用。 |
+| BOOL LoadFeatureRecording(const char *recordFileName);       | 从文本文件加载设备功能设置更改并应用功能设置更改。           |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
+|                                                              |                                                              |
 |                                                              |                                                              |
 |                                                              |                                                              |
 |                                                              |                                                              |

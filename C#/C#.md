@@ -27,7 +27,7 @@ Linq：from/where/select
 | char               | cVal   |
 | DateTime           | dtVal  |
 | delegate           | dlgVal |
-| event              | evVal  |
+| event              | etVal  |
 
 
 
@@ -35,7 +35,7 @@ Linq：from/where/select
 
 ## 0. VS快捷键
 
-|           |              |
+| 按键      | 功能         |
 | --------- | ------------ |
 | F12       | 跳转定义     |
 | shift+F12 | 查找所有引用 |
@@ -108,7 +108,7 @@ Owner属性：访问拥有窗体的窗体。当一个窗体归另一个窗体所
 
 * 属性是提供给类外访问的。
 
-  对于简单类型的属性，比如Int32，Boolean等等这些Primitive类型，你可以在属性的声明前设置一个**DefaultValueAttribute**，在**Attribute的构造函数[DefaultValue()]里传入设置默认值**。但是这个只是用来设置可视化设计器的。
+  对于简单类型的属性，比如Int32，Boolean等等这些Primitive类型，你可以在属性的声明前设置一个**DefaultValueAttribute**，在**Attribute的构造函数[DefaultValue()]里传入设置默认值**。但是这个**只是用来设置可视化设计器的。**
 
   字段的默认值不会因此而被初始化，**必须要在代码中手动初始化和DefaultValue相同的值**，如上初始化字段所示。
 
@@ -136,7 +136,7 @@ Owner属性：访问拥有窗体的窗体。当一个窗体归另一个窗体所
 
   自己定义Reset()函数负责重置，ShouldSerialize()。
 
-  VS能够根据方法的名称来识别这种方法，比如Reset<PropertyName>方法把**重置为默认值**，ShouldSerialize<PropertyName>方法**检查属性是否是默认值**。过去我们把它称之为魔术命名法，应该说是一种不好的编程习惯，可是现在微软依然使用这种机制。
+  VS能够根据方法的名称来识别这种方法，比如Reset\<PropertyName>方法把**重置为默认值**，ShouldSerialize\<PropertyName>方法**检查属性是否是默认值**。过去我们把它称之为魔术命名法，应该说是一种不好的编程习惯，可是现在微软依然使用这种机制。
 
   ```c#
   private Color yMaxLineColor = Color.Red;
@@ -148,11 +148,12 @@ Owner属性：访问拥有窗体的窗体。当一个窗体归另一个窗体所
   ]
   public void ResetYMaxLineColor()
   {
-      YMaxLineColor= Color.Red;
+      YMaxLineColor = Color.Red;
   }
   public bool ShouldSerializeYMaxLineColor()
   {
       return YMaxLineColor != Color.Red;
+  }
   ```
 
 
@@ -166,6 +167,7 @@ Owner属性：访问拥有窗体的窗体。当一个窗体归另一个窗体所
 
 ```c#
 String.Format("{0} is {1}, val1, val2");	//"val1 is val2"
+string str = $"{val0} is {val1}";
 ```
 
 ## 7. 控件重绘
@@ -452,7 +454,7 @@ CopyTo()和Clone()都属于浅拷贝,这一点是毋庸置疑的.对于浅拷贝
 
 相信到这里.应该很容易理解CopyTo()和Clone().下面说说浅拷贝和[深拷贝](https://so.csdn.net/so/search?q=深拷贝&spm=1001.2101.3001.7020)的区别.
 
-如上面所说的,浅拷贝对于值类型则复制值,对于引用类型则复制对象的引用(类似于指针).深拷贝则是完完全全的创建一个个新对象.对原来数组中的所有对象全部创建新对象.对新数组中的修改不会影响原来数组中的值或对象.但是如何实现深拷贝呢?.NET库中似乎没有深拷贝的方法.这和实现深拷贝的原理有关系.若用户希望实现深拷贝.希望出现两个完全一样但又互不影响的数组.则必须自己写方法,对原数组中的每个对象实现拷贝,层层深入,直到这个对象中的对象中的对象……中的对象为值类型为止,因为只有值类型才是完全拷贝,对一个值进行修改不会影响另一个相同的值.这么说又有点难理解了.实现深拷贝的方法,如下图:
+如上面所说的,浅拷贝对于值类型则复制值,对于引用类型则**复制对象的引用**(类似于指针).深拷贝则是完完全全的创建一个个新对象.对原来数组中的所有对象全部创建新对象.对新数组中的修改不会影响原来数组中的值或对象.但是如何实现深拷贝呢?.NET库中似乎没有深拷贝的方法.这和实现深拷贝的原理有关系.若用户希望实现深拷贝.希望出现两个完全一样但又互不影响的数组.则必须自己写方法,对原数组中的每个对象实现拷贝,层层深入,直到这个对象中的对象中的对象……中的对象为值类型为止,因为只有值类型才是完全拷贝,对一个值进行修改不会影响另一个相同的值.这么说又有点难理解了.实现深拷贝的方法,如下图:
 
 https://www.cnblogs.com/JamelAr/p/14156387.html
 
@@ -470,7 +472,7 @@ https://blog.csdn.net/ananlele_/article/details/109056883
 
 * 异常
 
-  所有异常的父类是System.Exception。.NET框架内置了常见的异常，。像DivideByZeroExcpetion等异常类是Exception的子类（派生类）。
+  所有异常的父类是System.Exception。.NET框架内置了常见的异常。像DivideByZeroExcpetion等异常类是Exception的子类（派生类）。
 
   若没有进行try catch捕获异常，则.NET提供的默认机制将终止整个程序。
 
@@ -574,7 +576,7 @@ https://blog.csdn.net/ananlele_/article/details/109056883
 ```c#
 public enum State
 {
-	a=2;
+    a=2;
     b=4;
     c;
     d;
@@ -600,7 +602,7 @@ State st = State.a;
 
   ```c#
   string str = "2";
-  State st = Enum.Parse(Typeof(State), a);
+  State st = Enum.Parse(Typeof(State), str);
   ```
 
 ### （3）修改成员数值类型——枚举记录开关状态
@@ -678,7 +680,7 @@ enum enumType:ushort{state1=0x00, state2=0x01, state3=0x04, state4=0x08...}
 
   ```c#
   //写自己的Int.TryParse(string,out int)
-  public static MyTryParse(string str, out int res){
+  public static bool MyTryParse(string str, out int res){
       try
       {
       	res=Convert.toInt(str);
@@ -724,7 +726,7 @@ ff(ref m, ref str);
 
   
 
-### （3）params——变长数组
+### （3）params——一维变长数组
 
 * 只能修饰一维数组
 * 参数列表只能有一个params参数
@@ -1041,7 +1043,7 @@ public static class Global{
 
 ## 11.var
 
-类型推断，仅队函数内部的**局部变量**起作用。
+类型推断，仅对函数内部的**局部变量**起作用。
 
 **定义时必须初始化。**
 
@@ -1272,7 +1274,7 @@ public Student(int age, string name):this(age, name, "male")	//this会显示调�
 
 C#中有gc（garbage collection）机制，自动回收垃圾。
 
-析构方法的调用时机和GC一样是不可预测什么时候调用的，因此也不应当依赖于它被调用。析构函数是确保已分配的非托管资源总能被释放的一个补救措施。如果可能就不应当被调用，譬如说手动释放了非托管资源，此时应当通知GC取消对对象的析构函数的调用。
+析构方法的调用时机和GC一样是不可预测什么时候调用的，因此也不应当依赖于它被调用。析构函数是确保已分配的非托管资源总能被释放的一个补救措施。如果可能就不应当被调用，**譬如说手动释放了非托管资源，此时应当通知GC取消对对象的析构函数的调用。**
 
 **最后，如果你一定要手动分配非托管资源，那么记住析构函数是保险丝，是最后的保障，不是常规的做法。**
 
@@ -1306,7 +1308,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 * 继承的缺点：
 
-  继承是侵入性的。只要继承，就必须拥有父类的***所有***属性和方法。
+  继承是侵入性的。只要继承，就必须拥有父类的***所有属性和方法***。
 
   降低了代码的灵活性。因为继承时，父类会对子类有一种约束。
 
@@ -1384,9 +1386,9 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
   ```c#
   Coder cc = new Coder();
-  cc.sayHello();	//Coder。而不是Person。
+  cc.sayHello();	//Coder。而不是Person
   ```
-  
+
   ```c#
   ## 21. 里氏替换原则（LSP）
   
@@ -1397,7 +1399,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
   * 子类对象可以赋值给父类变量。
   
     ```c#
-    Person p = new Student();
+     Person p = new Student();
   ```
 
 * 若父类变量中装的是子类对象，则可以将这个父类变量强转为子类对象。
@@ -1410,8 +1412,6 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 * LSP原则内容
 
 > 
-
-
 
 
 
@@ -1448,7 +1448,7 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 ### 概念
 
-委托是具有相同签名、返回值的有序函数列表，是引用类型。
+**委托是具有相同签名、返回值的有序函数列表**，是引用类型。
 
 方法列表：绑定到委托上的方法。委托会依次调用方法列表中的每个方法。**执行函数的顺序按照注册的顺序。**
 
@@ -1458,7 +1458,9 @@ C#中有gc（garbage collection）机制，自动回收垃圾。
 
 ### 定义委托的几种语法
 
-**通过等号赋值绑定到方法列表的方法只能是第一个方法，后面的绑定需要使用+=**；若再次使用赋值给委托变量，就会产生新的委托变量，原来的委托变量将会被GC回收。
+通过等号赋值绑定到方法列表的方法只能是第一个方法，后面的绑定需要使用+=；
+
+**若再次使用赋值给委托变量，就会产生新的委托变量，原来的委托变量将会被GC回收。**
 
 ### 委托添加、移出方法
 
