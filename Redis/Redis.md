@@ -7,7 +7,6 @@ https://blog.csdn.net/weixin_44893902/article/details/123087435
 ```redis
 redis-server.exe redis.windows.conf	//启动服务
 redis-cli.exe -h 127.0.0.1 -p 6379	//连接Redis客户端
-
 ```
 
 ## 2. 工具-RedisInsight
@@ -102,6 +101,34 @@ OK
 ```
 
 ## 4. 列表List
+
+使用LPUSH或者RPUSH向列表的左侧或右侧添加一个元素。
+
+LRANGE或RRANGE从列表左侧或右侧获取一个元素。
+
+```sql
+> LPUSH letter a
+(integer) 1
+> LRANGE letter 0 -1
+1) "a"
+> LPUSH letter b
+(integer) 2
+
+```
+
+
+
+
+
+
+
+
+
+## 5.Hash表
+
+
+
+## 
 
 
 

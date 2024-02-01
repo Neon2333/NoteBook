@@ -56,7 +56,7 @@ Linq：from/where/select
 
 * 最值
 
-  实现了IEnumrable的集合可调用Max()/Min()/Average()方法
+  实现了IEnumerable的集合可调用Max()/Min()/Average()方法
 
   https://learn.microsoft.com/zh-cn/dotnet/api/system.linq.enumerable.max?view=net-7.0
 
@@ -108,7 +108,7 @@ Owner属性：访问拥有窗体的窗体。当一个窗体归另一个窗体所
 
 * 属性是提供给类外访问的。
 
-  对于简单类型的属性，比如Int32，Boolean等等这些Primitive类型，你可以在属性的声明前设置一个**DefaultValueAttribute**，在**Attribute的构造函数[DefaultValue()]里传入设置默认值**。但是这个**只是用来设置可视化设计器的。**
+  对于简单类型的属性，比如Int32，Boolean等等这些Primitive类型，你可以在属性的声明前设置一个**DefaultValue**的Attribute，在**Attribute的构造函数[DefaultValue()]里传入设置默认值**。但是这个**只是用来设置可视化设计器的。**
 
   字段的默认值不会因此而被初始化，**必须要在代码中手动初始化和DefaultValue相同的值**，如上初始化字段所示。
 
@@ -136,7 +136,7 @@ Owner属性：访问拥有窗体的窗体。当一个窗体归另一个窗体所
 
   自己定义Reset()函数负责重置，ShouldSerialize()。
 
-  VS能够根据方法的名称来识别这种方法，比如Reset\<PropertyName>方法把**重置为默认值**，ShouldSerialize\<PropertyName>方法**检查属性是否是默认值**。过去我们把它称之为魔术命名法，应该说是一种不好的编程习惯，可是现在微软依然使用这种机制。
+  VS能够根据方法的名称来识别这种方法，比如ResetPropertyName方法把**重置为默认值**，ShouldSerializePropertyName方法**检查属性是否是默认值**。过去我们把它称之为魔术命名法，应该说是一种不好的编程习惯，可是现在微软依然使用这种机制。
 
   ```c#
   private Color yMaxLineColor = Color.Red;
@@ -236,11 +236,38 @@ protected override void OnPaint(PaintEventArgs e)
 
 https://blog.csdn.net/softart/article/details/1935242
 
+
+
+## 9. 跨线程访问控件
+
+C#中是禁止跨线程直接访问控件的，可以**使用控件的InvokeRequired属性检查是否，为true说明有一个创建它以外的线程想访问它，则需要通过Invoke方法对控件进行调用。**
+
+如果从线程外操作windows窗体控件，那么就需要使用Invoke或者BeginInvoke方法，通过一个委托把调用封送到控件所属的线程上执行。
+```c#
+ private void WriteInfo(string str)
+        {
+            if (txt_Info.InvokeRequired)
+            {
+                this.Invoke(new Action(() => { txt_Info.AppendText(str + "\r\n"); }));
+            }
+            else
+            {
+                txt_Info.AppendText(str + "\r\n");
+            }
+        }
+```
+
 # 一、基础
 
 ## 0. .Net和C#
 
 .Net是一个平台，一般指.Net Framework框架，类似JVM，除了C#还有VB等语言。C#是编程语言，可以在.Net平台下开发。
+
+编译过程：
+
+C#代码编译为dll，dll包括MSIL+metadata，其中MSIL是中间语言，metadata是代码一些信息，反射就是从metadata中获取信息的。MSIL经过JIT/CLR翻译为机器码运行在不同的平台上。JIT/CLR屏蔽了不同的平台的字长等差异性，使得在从C#代码到dll的过程中都是相同的。
+
+
 
 ## 1. 注释
 
@@ -776,7 +803,7 @@ test("bb", 0, c);					//直接传入数组c
 
 ### （3）传递方式不同
 
-体现在2个方面，一是实参传递给形参，而是变量赋值。
+体现在2个方面，一是实参传递给形参，二是变量赋值。
 
 #### 传参
 
@@ -794,7 +821,7 @@ test("bb", 0, c);					//直接传入数组c
 
 string和自定义类对象不同，虽然两者都是引用类型。但后者赋值`Person p1=new Person(); Person p2=p1;`后，指向同一块堆内存，改变p2，p1的值也会改变。
 
-但string特殊在会重新开辟堆内存。
+但string特殊在会重新开辟堆内存。可通过StringBuilder设置最大容量：可指定此对象的最大容量为 25。 修改StringBuilder时，除非达到容量，否则对象不会为自己重新分配空间。 当达到容量时，将自动分配新的空间且容量翻倍。 
 
 ```c#
 string s1 = "111";
@@ -848,13 +875,15 @@ s = new string(ss);				//new string(char[] ss)可将字符数组转成string
 
 ```c#
 string s = null;
-StringBuilder sb = new StringBuilder();
+StringBuilder sb = new StringBuilder(s);
 for(int i=0;i<10000;++i){
     //s+=i;			//耗时很长。因为每拼接一次都要开辟新内存。
     sb.Append(i);	//像sb对象里append字符串，不开辟新内存，一直操作同一块内存，速度快好几个数量级。
 }
 Console.WriteLine(sb.toString());
 ```
+
+
 
 #### s.Length
 
@@ -1783,9 +1812,10 @@ class Son:Father,Iinterface1,Iinterface2{
 
 ## 30. 外部方法
 
-当方法声明包含[extern]修饰符时，称该方法为外部方法。外部方法是在外部实现的，编程语言通常是使用C#以外的语言。外部方法不可以是泛型。
+当方法声明包含[extern]修饰符时，称该方法为外部方法。外部方法是在外部实现的，编程语言通常是使用C#以外的非托管语言。外部方法不可以是泛型。
 
 ```c#
+using System.Runtime.InteropServices;
 class program
 {
      	[DllImport("User32.dll")]
@@ -1803,6 +1833,154 @@ class program
 ```
 
 ## 31. 扩展方法
+
+给类型增加方法。
+
+https://learn.microsoft.com/zh-cn/dotnet/csharp/programming-guide/classes-and-structs/extension-methods
+
+在非嵌套的、非泛型**静态类内部定义**，**方法也必须是静态的。**
+
+**在参数列表中的需要扩展的类型前加上this。**
+
+```c#
+/*想给string 类型增加一个Add方法，该方法的作用是给字符串增加一个字母a.*/
+
+//必须是静态类才可以添加扩展方法
+Static class Program
+{
+static void Main(string[] args)
+{
+string str = "quzijing";
+//注意调用扩展方法,必须用对象来调用
+string Newstr = str.Add();
+Console.WriteLine(Newstr);
+Console.ReadKey();
+}
+//声明扩展方法
+//扩展方法必须是静态的，Add有三个参数
+//this 必须有，string表示我要扩展的类型，stringName表示对象名
+//三个参数this和扩展的类型必不可少，对象名可以自己随意取如果需要传递参数，//再增加一个变量即可
+public static string Add(this string stringName)
+{
+return stringName+ "a";
+}
+}
+```
+
+```c#
+//给我们自定义的类型增加一个扩展方法，并增加一个传递的参数。
+
+public class Student
+{
+public string StuInfo()
+{
+return "学生基本信息";
+}
+public string getStuInfo(string stuName, string stuNum)
+{
+return string.Format( "学生信息：\n" + "姓名：{0} \n" + "学号：{1}", stuName, stuNum);
+}
+}
+
+//再声明一个名为ExtensionStudentInfo的静态类，注意必须为静态
+//这个类的作用就是包含一些我们想要扩展的方法，在此我们声明两个Student类型的扩展方法，Student类型为我们自定义的类型。示例代码如下：
+
+public static class ExtensionStudentInfo
+{
+//声明扩展方法
+//要扩展的方法必须是静态的方法，Add有三个参数
+//this 必须有，string表示我要扩展的类型，stringName表示对象名
+//三个参数this和扩展的类型必不可少，对象名可以自己随意取如果需要传递参数，再增加一个变量即可
+public static string ExtensionStuInfo(this Student stuName)
+{
+return stuName.StuInfo();
+}
+//声明扩展方法
+//要扩展的方法必须是静态的方法，Add有三个参数
+//this 必须有，string表示我要扩展的类型，stringName表示对象名
+//三个参数this和扩展的类型必不可少，对象名可以自己随意取如果需要传递参数，在此我们增加了两个string类型的参数
+public static string ExtensionGetStuInfo(this Student student, string stuname, string stunum)
+{
+return student.getStuInfo(stuname, stunum)+ "\n读取完毕";
+}
+}
+
+static void Main(string[] args)
+{
+Student newstudent = new Student();
+//要使用对象调用我们的扩展方法
+string stuinfo = newstudent.ExtensionStuInfo();
+Console.WriteLine(stuinfo);
+//要使用对象调用我们的扩展方法
+string stuinformation = newstudent.ExtensionGetStuInfo( "quzijing", "20081766");
+Console.WriteLine(stuinformation);
+Console.ReadKey();
+
+```
+
+扩展阅读：
+
+https://blog.csdn.net/u011966339/article/details/80936675
+
+很多人看到扩展方法也许眼里冒出金光，以后在设计的时候不管三七二十一，反正可以扩展。还有一些人会对类任意扩展，将以前一些作为”Helper”的方法统统使用扩展方法代替，注意的是扩展方法有“污染性”，所以我觉得在扩展的时候还是想想，是不是值得这样扩展。
+
+在扩展的时候也不要对比较高层的类进行扩展，像我上面对object的扩展我觉得就是不可取的，object是所有类的基类，一经扩展，所有的类都被“污染”了。
+
+> 在我们的编程生涯中我们要使用很多很多类库，这些类库有的是我们自己开发的，我们有她的代码，有的是第三方发布的，我们不仅没有他们的代码，连看的机会都没有。
+>
+> 作为.net程序员，我们每天都要和BCL(Base Class Linbrary)打交道。无疑，BCL做为一个年轻的框架类库，她是成功的，但是还有一些时候我们还是得写一些”Helper”方法来扩展类库，由于我们不能修改类库的源代码，我们只有写一个个的静态类。虽然在使用上也算方便，但作为追求完美的程序员来说总有些不雅。 现在我就碰到这样的事情，前两天奉命写一个从XML文件加载Chart图的设置的方法，从XML加载数据绑定到对象上，这肯定是反射的用武之地了。我经常需要写一些根据对象属性名字来判断这个对象是否有这个属性或者根据属性名获取该属性的值。还是按照平常一样，我很快写了一个PropertyHelper，里面有两个静态方法：HasProperty,GetValueByName。
+>
+> PropertyHelper.HasProperty(point, "X")，如此的调用也还过得去，不过在C# 3.0微软为我们提供了扩展方法。现在我们可以直接这样调用了point.HasProperty(“X”);看看我是如何实现这个扩展方法的？
+> ```c#
+> public static class PropertyExtension
+> {
+> public static object GetValueByName(this object self, string propertyName)
+> {
+> if (self == null)
+> {
+> return self ;
+> }
+> Type t = self.GetType();
+> PropertyInfo p = t.GetProperty(propertyName);
+> return p.GetValue(self, null);
+> }
+> }
+> 
+> ```
+>
+> 我给object类型添加了一个扩展方法，在.net里所有的类都继承自object，那所有的类都默认的拥有这个方法了，真方便，呵呵。
+>
+> 注意到和普通的静态方法有何差别？在这个方法的第一个参数前面多了一个this关键字。
+>
+> 扩展方法：
+>
+> 1 方法所在的类必须是静态的
+>
+> 2 方法也必须是静态的
+>
+> 3 方法的第一个参数必须是你要扩展的那个类型，比如你要给int扩展一个方法，那么第一个参数就必须是int。
+>
+> 4 在第一个参数前面还需要有一个this关键字。
+>
+> 按照上面的步骤写你就得到了一个“扩展方法”，你可以像调用这个类的原生方法那样去调用它：
+>
+> string str = "abc";
+> object len = str.GetValueByName("Length");
+> 好像string类型现在有了GetValueByName这个方法一样，但实际上string并没有这样一个方法。那这又是为什么呢？是我们可爱的编译器在其中做了手脚。为了避开编译器的干扰，我们来直接欣赏MSIL代码：
+>
+> L_0008: ldstr "Length"
+> L_000d: call object TestLambda.PropertyExtension::GetValueByName(object, string)
+> 从MSIL中我们可以看出，这段代码编译后和调用静态方法没有任何的差别(从call指令来看，这是在调用一个静态方法)。
+>
+> 从这里可以知道扩展方法即可以使用实例调用的方式也可以直接使用静态类调用的方式：
+>
+> ```c#
+> str.GetValueByName("Length");
+> 
+> PropertyExtension.GetValueByName(str,"Length");
+> ```
+>
+> 
 
 
 
@@ -1864,11 +2042,112 @@ public void func(S, T)(S p):where S:Person
 
 ## 36. 定时器
 
+.NET Framework里面提供了三种Timer：
+
+### （1）System.Windows.Forms.Timer
+
+运行在主线程上，通过Tick事件触发。基于窗体程序，直接拖拽到窗体上。
+
+Interval：间隔触发的时间。
+Enabled：true表示启用，false表示禁止
+
+单线程执行、会卡UI、Form下的Timer用于对时间精度要求不高的地方。
+
+### （2）**System.Timers.Timer**
+
+用于对时间精度有要求的地方。
+
+AutoReset：true表示事件关联的方法只执行一次，再次计时结束也不会再次执行。false表示一直执行。
+SynchronizingObject：此timer默认是运行在线程池的，**也就是说CPU自动分配线程执行事件**，但是我们可以使用SynchronizingObject属性指定唯一线程。
+
+```c#
+		private System.Timers.Timer tmr = new System.Timers.Timer();
+        private object obj = new object();
+
+        public Timer_timer()
+        {
+            InitializeComponent();
+         
+            tmr.Elapsed += new System.Timers.ElapsedEventHandler(OnTmrTrg);
+            tmr.Interval = 100;
+            tmr.AutoReset = true; //true-一直循环 ，false-循环一次   
+            // tmr.SynchronizingObject = this; //运行在主线程上
+            tmr.Enabled = false;
+        }
+        private void OnTmrTrg(object sender, System.Timers.ElapsedEventArgs e)
+        {
+            WriteInfo("tmr loop:  " + Thread.CurrentThread.ManagedThreadId);
+            lock (obj)
+            {
+                WriteInfo("tmr is running :" + Thread.CurrentThread.ManagedThreadId);
+                for (int i = 0; i < 10; i++)
+                {
+                    Thread.Sleep(1000);
+                    WriteInfo("Count: " + i + ": " + Thread.CurrentThread.ManagedThreadId);
+                }
+            }
+        }
+        private void WriteInfo(string str)
+        {
+            if (txt_Info.InvokeRequired)
+            {
+                this.Invoke(new Action(() => { txt_Info.AppendText(str + "\r\n"); }));
+            }
+            else
+            {
+                txt_Info.AppendText(str + "\r\n");
+            }
+        }
+        private void btn_Enter_Click(object sender, EventArgs e)
+        {
+            if (btn_Enter.Text == "确定")
+            {
+                btn_Enter.Text = "取消";
+                Application.DoEvents();
+         
+                tmr.Start();
+            }
+            else
+            {
+                btn_Enter.Text = "确定";
+                tmr.Stop();
+            }
+        }
+
+```
+
+* Timer.timer是通过主线程创建，执行在线程池上的，所以默认在不指定SynchronizingObject属性的情况下，不卡主界面。
+
+* 由于可以多线程执行，所以需要考虑线程安全（假设一种情况，A线程正在计算余额（总金额-消费金额），这个时候然后B线程将总金额改了，那A线程所返回的会发生错误）。解决方案有两种：1. 金额的计算工作全部由A线程执行（单线程）。2. 使用Lock () 确保每次A线程执行计算任务的时候B线程等待A完成在进行。
+
+* Timer.timer可以通过AutoReset = false 设置，只执行一次事件方法。
+
+* Start ()&Stop () 和 Enabled = true/false等效。
 
 
-## 37. DateTime
+
+## 37. DateTime格式
 
 https://learn.microsoft.com/zh-cn/dotnet/standard/base-types/standard-date-and-time-format-strings
+
+### （1）DateTime
+
+```C#
+.toString("yyyy-MM-dd HH:mm:ss.fff");	//mm-dd才显示08-01，否则显示8-1
+//fff个数表示小数点后显示的位数，这里精确到小数点后3位
+```
+
+**注意：一定要注意大小写！！！M是月份，写成了m就是分钟数了！！**
+
+### （2）DateTime转String各种格式
+
+DateTime转string：https://www.cnblogs.com/JiYF/p/7831547.html
+
+### （3）String转DateTime
+
+string转DateTime：https://www.cnblogs.com/Pickuper/articles/2058880.html
+
+
 
 ## 38. 反射（reflection）与特性（attribute）
 
@@ -1980,25 +2259,41 @@ namespace IndexerApplication
 
 
 
-## 30. 容器
+## 40. 容器
 
 集合分为泛型集合和非泛型集合。
 
-前者位于System.Collection.Generic命名空间，后者位于System.Collection。
+前者位于**System.Collection.Generic**命名空间，后者位于System.Collection。
 
 **C# 将数据存于容器中是将原始数据直接存于容器中。而C++则是将原始数据拷贝了一份存于容器中，所以数据要能拷贝。**
 
-### 非泛型集合
+### （1）非泛型集合
 
-非泛型集合内部存储的是Object类型：ArrayList，Stack，Queue，HashTable
+非泛型集合内部存储的是Object类型：`ArrayList、Stack、Queue、HashTable`
 
+#### HashTable
 
+Hashtable 类代表了一系列基于键的哈希代码组织起来的**键/值**对。它使用**键**来访问集合中的元素
 
-### 泛型集合
+Hashtable的Key和Value都是object类型，所以在使用值类型的时候，必然会出现装箱和拆箱的操作，因此性能肯定是不如Dictionary的
+
+```C#
+int a = 1;
+string b = "222";
+HashTable ht = new HashTable();
+ht.Add(a, b);	
+
+foreach(DictionaryEntry de in ht){
+    int c = (int)de.Key;	//取出时是object类型
+    string d = (string)de.Value;
+}
+```
+
+### （2）泛型集合
 
 泛型集合：`List<T>、Stack<T>、Queue<T>、Dictionary<TKey,TValue>`
 
-#### （1）Dictionary
+#### Dictionary
 
 * 取值
 
@@ -2021,25 +2316,96 @@ namespace IndexerApplication
 
   https://www.cnblogs.com/wk2522466153/p/17584640.html
 
+* 通过一个键读取一个值的时间是接近O(1)
 
+## 41. 位操作
 
+C#中可用Int32和Int64直接指定32位或64位整型，Int64相当于long。
 
+可用Int32记录32个bool状态：
 
+```C#
+public static Int32 SetBitValueInt32(Int32 value, ushort index, bool bitValue)
+        {
+            if (index > 31) throw new ArgumentOutOfRangeException("index"); //索引超出范围
+            var val = 1 << index;
+            return bitValue ? (value | val) : (value & ~val);   //置1：与1或，置0：与0与
+        }
 
+        public static Int64 SetBitValueInt64(Int64 value, ushort index, bool bitValue)
+        {
+            if (index > 60) throw new ArgumentOutOfRangeException("index"); //索引超出范围
+            var val = 1 << index;
+            return bitValue ? (value | val) : (value & ~val);   //1和0/1位或都是1,0和0/1位与都是0
+        }
 
-## 
+        //位为1返回true
+        public static bool GetBitValueInt32(Int32 value, ushort index)
+        {
+            if (index > 31) throw new ArgumentOutOfRangeException("index"); //索引出错
+            var val = 1 << index;
+            return (value & val) == val;        //某bit和1与，若改变则为0，若不变则为1
+        }
 
+        public static bool GetBitValueInt64(Int64 value, ushort index)
+        {
+            if (index > 60) throw new ArgumentOutOfRangeException("index"); //索引出错
+            var val = 1 << index;
+            return (value & val) == val;
+        }
 
+        public static void SetInt32AllBit1(ref Int32 value)
+        {
+            //for(ushort i = 0; i < 32; i++)
+            //{
+            //    value = SetBitValueInt32(value, i, true);
+            //}
+            value = -1;
+        }
 
-## 41. 一些容易忽略的点
+        public static void SetInt32AllBit0(ref Int32 value)
+        {
+            //for (ushort i = 0; i < 32; i++)
+            //{
+            //    value = SetBitValueInt32(value, i, false);
+            //}
+            value = 0;
+        }
 
-* struct/class默认访问权限是internal。struct成员默认访问权限是private。
+        public static void SetInt64AllBit1(ref Int64 value)
+        {
+            //for (ushort i = 0; i < 64; i++)
+            //{
+            //    value = SetBitValueInt64(value, i, true);
+            //}
+            value = -1;
+        }
 
-* VS的应用程序和控制台程序的设置
+        public static void SetInt64AllBit0(ref Int64 value)
+        {
+            //for (ushort i = 0; i < 64; i++)
+            //{
+            //    value = SetBitValueInt64(value, i, false);
+            //}
+            value = 0;
+        }
+```
 
-  ![image-20230725155415767](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230725155415767.png)
+## 42. 调用外部dll或exe
 
+### （1）调用外部dll的非托管函数
 
+```c#
+using System.Runtime.InteropServices;
+
+public class Win32 {
+
+    [DllImport("user32.dll", EntryPoint="MessageBoxA")]	//EntryPoint将dll中的全局函数MessageBoxA更改名称为MsgBox
+
+    public static extern int MsgBox(int hWnd, String text, String caption, uint type);	//外部函数MsgBox
+
+}    
+```
 
 # 四、多线程
 
@@ -2213,7 +2579,6 @@ UI主线程要能及时相应用户操作，若程序后台需要执行很长时
     }
     ```
 
-
 **Thread.Start和BeginInvoke开辟的线程有什么区别：**
 
 > 我们知道线程池有工作线程和IO线程，你写的多线程和并发只能操控到工作线程，而异步恰恰可以把线程池里的IO线程调动起来处理关于一切涉及IO方面的工作，取网络IO，文件IO。
@@ -2224,7 +2589,15 @@ UI主线程要能及时相应用户操作，若程序后台需要执行很长时
 > Control.BeginInvoke 方法 (Delegate) :在创建控件的基础句柄所在线程上异步执行指定委托。
 > Control的Invoke和BeginInvoke的参数为delegate，委托的方法是在Control的线程上执行的，也就是我们平时所说的UI线程。
 
-## 3. Task/async
+## 3.await和async
+
+深入理解 await 编程范式：https://github.com/lightjiao/lightjiao.github.io/blob/master/Blogs/073.Await-in-deep.md
+
+自从C# 5.0时代引入async和await关键字后，异步编程就变得流行起来。尤其在现在的.NET Core时代，如果你的代码中没有出现async或者await关键字，都会让人感觉到很奇怪。
+
+**只是异步实现中多了async和await关键字和调用的方法都多了async后缀而已。正是因为他们的实现很像，所以我在第四部分才命名为使用async和await使异步编程更简单，就像我们在写同步代码一样，并且代码的coding思路也是和同步代码一样，这样就避免考虑在APM中委托的回调等复杂的问题**
+
+
 
 https://www.cnblogs.com/zhili/archive/2013/05/15/Csharp5asyncandawait.html
 
@@ -2234,13 +2607,19 @@ https://learn.microsoft.com/zh-cn/dotnet/standard/asynchronous-programming-patte
 
 
 
+## 4.Task
+
+任务Task和线程Thread的区别：
+任务是架构在线程之上的，也就是说任务最终还是要抛给线程去执行。
+**任务跟线程不是一对一的关系，比如开10个任务并不是说会开10个线程，**这一点任务有点类似线程池，但是任务相比线程池有很小的开销和精确的控制。
 
 
-## 4. Lock锁
+
+## 5. Lock锁
 
 
 
-## 5. Interlocked锁
+## 6. Interlocked锁
 
 https://blog.csdn.net/SmillCool/article/details/127118858
 
@@ -2376,6 +2755,7 @@ https://www.cnblogs.com/lifepoem/archive/2011/10/25/2223765.html
 方法语法：System.Linq.Enumerable中定义了40个查询运算符。链式查询运算符。（https://www.cnblogs.com/lifepoem/archive/2011/10/27/2226556.html）
 两种语法互补使用，方法语法使用的更多。
 LINQ中最基本的数据单元是sequences和elements。
+
 ## 2.方法语法
 ### （1）查询运算符签名
 Func<TSource, bool>委托匹配 TSource => bool表达式，接受TSource输入参数，返回一个bool值。当结果为true时，表示该元素会包含在输出sequence中。
@@ -2704,7 +3084,7 @@ namespace Singleton
 
 ## 3. 简单工厂SimpleFactory
 
-简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例通常都具有共同的父类。
+简单工厂模式专门定义一个类来负责创建其他类的实例，被创建的实例的类都继承同一个接口/抽象类。
 
 ![image-20230422114006051](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230422114006051.png)
 
@@ -2960,14 +3340,6 @@ namespace 观察者模式
 
 ```
 
-## 适配器模式Adapter
-
-## 外观模式Facade
-
-## 包装模式Decorator
-
-
-
 # 七、三层架构
 
 UIL、BLL、DAL、Model
@@ -2976,7 +3348,13 @@ https://www.jianshu.com/p/7f628015a243
 
 # 八、数据库
 
-## 1. ORM-EntityFramework
+## 1. ADO.NET
+
+
+
+
+
+## 2. ORM-EntityFramework
 
 https://www.dbs724.com/146176.html
 
@@ -2989,8 +3367,6 @@ https://www.dbs724.com/146176.html
 ### EF6操作MySQL
 
 
-
-## 2. 简单工厂+反射+配置文件
 
 # 九、 Socket
 
@@ -3549,17 +3925,15 @@ private void button1_Click(object sender, EventArgs e)
  }
 ```
 
-
-
-## 3. 异步Accept、Receive
-
+## 3. XML
 
 
 
+## 4. JSON
 
 
 
-## 4. 序列化和反序列化
+## 5. 序列化和反序列化
 
 https://www.cnblogs.com/amylis_chen/p/11578598.html
 https://www.cnblogs.com/1549983239yifeng/p/14789106.html
@@ -3604,9 +3978,6 @@ public class UBinder : SerializationBinder
                         return ass.GetType(typeName);
                 }
        }
-————————————————
-版权声明：本文为CSDN博主「yunzhonghefei1」的原创文章，遵循CC 4.0 BY-SA版权协议，转载请附上原文出处链接及本声明。
-原文链接：https://blog.csdn.net/yunzhonghefei1/article/details/106528366
 
 
 var formatter = new BinaryFormatter
@@ -3671,23 +4042,17 @@ var obj = formatter.Deserialize(pipeServer);
 
 
 
-## 5. XML
 
 
-
-## 6. JSON
+## 6. 异步Accept、Receive
 
 # 十、日志
 
+log4net
 
 
-# 十一、串口通信
 
-RS232
-
-RS485/422
-
-# 十二、C#新特性
+# 十一、C#新特性
 
 ## 1. dynamic
 
