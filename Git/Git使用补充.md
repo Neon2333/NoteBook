@@ -1,10 +1,56 @@
-# 重点
-
 ## 1. *版本回滚——git reset*
 
 **reset和revert的区别：reset会删除某commit-id之后所有的commit**
 
 https://blog.csdn.net/weixin_44802825/article/details/104814984
+
+### 日常使用情景
+
+> * 未commit，未生成新的版本号
+>
+>   用暂存区还原工作区
+>
+>   ```git
+>   git checkout <filename>
+>   ```
+>  
+>     ```git
+>  git checkout .
+>     ```
+> 
+> * 未commit
+>
+>   用本地仓库**回滚暂存区**，将暂存区和HEAD保持一致
+>
+>   ```
+>  git reset HEAD
+>   ```
+> 
+> * 未commit
+>
+>   用本地仓库回滚**暂存区和WorkSpace**，将工作区、暂存区和HEAD保持一致
+>
+>   ```
+>  git reset --hard HEAD
+>   ```
+> 
+> * 已commit，生成了新的版本号
+>
+>   回滚本地仓库到上一版本号
+>
+>   ```
+>  git reset HEAD~1        //HEAD指向上个commit，
+>   git reset 版本号
+>   ```
+> 
+> * 已commit
+>
+>   回滚本地仓库到上一版本的同时，将工作区和暂存区也于新的HEAD保持一致
+>
+>   ```
+>    git reset --hard HEAD~1
+>   git reset --hard 版本号
+>   ```
 
 ### 原理
 
@@ -22,7 +68,7 @@ reset --hard    //将HEAD指向新版本号，且暂存区和工作区一起更�
 
 > https://blog.csdn.net/albertsh/article/details/106448035
 > 
-> HEAD——指向当前分支的最新的commit
+> **HEAD——指向当前分支的最新的commit**
 > 
 > HEAD^和HEAD~
 > 
@@ -58,55 +104,18 @@ reset --hard    //将HEAD指向新版本号，且暂存区和工作区一起更�
 > 
 > 该指令和git reset HEAD+ it checkout --<file> to discard changes in working directory两步相同，一步到位直接将暂存区和Workspace都回退到本地仓库中的当前版本。
 
-### 日常使用情景
-
-> * 未commit，未生成新的版本号
->   
->   用暂存区回滚working tree
->   
->   ```
->   git checkout .
->   ```
-> 
-> * 未commit
->   
->   用本地仓库**回滚暂存区**，将暂存区和HEAD保持一致
->   
->   ```
->   git reset HEAD
->   ```
-> 
-> * 未commit
->   
->   用本地仓库回滚**暂存区和WorkSpace**，将工作区、暂存区和HEAD保持一致
->   
->   ```
->   git reset --hard HEAD
->   ```
-> 
-> * 已commit，生成了新的版本号
->   
->   回滚本地仓库到上一版本号
->   
->   ```
->   git reset HEAD~1        //HEAD指向上个commit，
->   git reset 版本号
->   ```
-> 
-> * 已commit
->   
->   回滚本地仓库到上一版本的同时，将工作区和暂存区也于新的HEAD保持一致
->   
->   ```
->   git reset --hard HEAD~1
->   git reset --hard 版本号
->   ```
-
 ---
 
 ## 2 远程仓库回滚
 
 当代码已经Push到远程仓库后，发现push的代码有问题，怎么回滚到之前的版本呢？
+
+在开发项目中如果把错误的版本提交到了远程仓库，别人克隆了你的错误版本，然后一看信息后发现是你提交的，那你少不了一顿骂。。。所以如果发生了这种错误，在别人没发现前，有下面的方法可以补救。
+
+把自己工作区的代码改正，然后一步一步重新提交到远程仓库。
+把自己本地仓库回退到以前版本，然后强制提交到远程仓库。
+使用命令
+git push -f origin main
 
 ---
 
@@ -316,7 +325,7 @@ https://www.jianshu.com/p/d07f5a8f604d
   git fetch origin master
   ```
 
-* 取回的代码在本地主机上会建立指针`远程主机名/分支名`指向拉取的分支的最新commit。如：fetch master分之后更新：origin/master
+* 取回的代码在本地主机上会建立指针`远程主机名/分支名`指向拉取的分支的最新commit。如：fetch master之后更新：origin/master
 
 * git fetch命令通常用来查看其他人的分支的开发进程，因为它**取回的代码对你本地的开发代码没有影响**
   
@@ -376,7 +385,7 @@ git reset --hard HEAD~
 
 #### fast-forward模式
 
-在当前分支相比于我们要合并的分支没有额外的提交（commit）时，可以执行 fast-forward 合并。Git 很懒，首先会尝试执行最简单的选项：fast-forward！这类合并不会创建新的提交，而是会将我们正在合并的分支上的提交直接合并到当前分支。
+适用于在当前分支相比于我们要合并的分支没有额外的提交（commit）时，可以执行 fast-forward 合并。是git默认的merge模式。这类合并不会创建新的提交，而是会将我们正在合并的分支上的提交直接合并到当前分支。
 
 ```
 git merge --ff
@@ -388,6 +397,10 @@ git merge --ff
 
 如果我们在当前分支上提交我们想要合并的分支不具备的改变，那么 git 将会执行 no-fast-forward 合并。
 
+**使用 `--no-ff` 参数后，会执行正常合并，在 `Master` 分支上生成一个新节点merge commit，保证版本演进更清晰。**
+
+![image-20240204200242130](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20240204200242130.png)
+
 使用 no-fast-forward 合并时，Git 会在当前活动分支上创建新的 merging commit。这个提交的父提交（parent commit）即指向这个活动分支（HEAD^1），也指向我们想要合并的分支（HEAD^2）。
 
 ```
@@ -396,7 +409,190 @@ git merge --no-ff
 
 ![merge--no-ff](https://s2.loli.net/2022/03/23/j5xEtVru6cqiMPn.gif)
 
-### （4）rebase
+### （4）使用 git mergetool 解决合并两个分支时出现的冲突：
+
+在解决合并冲突之前，我们应该设置 Git 使用的 diff 工具，如下所示。
+
+```text
+$ git config merge.tool meld
+$ git config merge.conflictstyle diff3
+$ git config mergetool.prompt false
+```
+
+上面的命令将 meld 设置为默认的 diff 工具。此外，我们已将 conflictstyle 设置为 diff3；这将 diff 工具设置为显示两个文件的共同祖先（当前分支一和分支中要合并的分支）。
+
+要查看支持的不同差异工具，请运行以下命令。
+
+```text
+$ git mergetool --tool-help
+```
+
+现在，我们从示例开始演示如何解决冲突。假设我们有两个分支，如下所示。
+
+```text
+$ git branch
+* main
+  feature1
+```
+
+第一个分支是 main 分支，第二个是名为 feature1 的功能开发分支。
+
+我们在 main 分支中有一个 README.md 文件，其内容如下。
+
+```text
+$ cat README.md
+# Upwork
+Upwork projects
+```
+
+如上所示，我们目前在 main 分支。然后，我们切换到 feature1 分支。
+
+**将main的内容merge到自己的分支feature1上。**
+
+```text
+$ git checkout feature1
+Switched to branch 'feature1'
+
+$ git branch
+  main
+* feature1
+```
+
+我们更新 README.md 并打印其内容如下。
+
+```text
+$ cat README.md
+This is conflicting branch line.
+```
+
+现在，我们将 main 分支与 feature1 分支合并以获取该分支中的最新更改。
+
+合并时，Git 显示合并冲突如下。
+
+
+
+```text
+$ git merge main
+Auto-merging README.md
+CONFLICT (add/add): Merge conflict in README.md
+Automatic merge failed; fix conflicts and then commit the result.
+```
+
+我们可以通过以下方式获得有关冲突的更多信息。
+
+
+
+```text
+$ git status
+On branch feature1
+You have unmerged paths.
+  (fix conflicts and run "git commit")
+
+Unmerged paths:
+  (use "git add <file>..." to mark resolution)
+
+	both added:      README.md
+
+no changes added to commit (use "git add" and/or "git commit -a")
+```
+
+我们现在将打印文件 README.md 的内容，该文件存在冲突。
+
+```text
+$ cat README.md 
+<<<<<<< HEAD
+This is conflicting branch line.
+
+||||||| merged common ancestors
+=======
+# Upwork
+Upwork projects
+>>>>>>> main
+```
+
+该文件现在显示了各种符号。
+
+符号 <<<<<<< 后跟 HEAD 是当前分支的别名。这表示此部分中编辑的开始。
+
+======== 符号表示当前分支中修订的结束和新分支中编辑的开始。
+
+符号 >>>>>>>> 后跟远程分支名称，即main`，显示尝试合并的位置。
+
+现在，我们将使用 mergetool 来解决冲突。
+
+
+
+```text
+$ git mergetool
+Merging:
+README.md
+
+Normal merge conflict for 'README.md':
+  {local}: created file
+  {remote}: created file
+```
+
+这将启动 meld（因为我们已将其设置为默认差异工具）。请看下图。
+
+
+左窗格显示在本地分支中对文件 README.md 所做的编辑。中间窗格包含为解决冲突所做的更改结果。右窗格显示在远程分支（即我们要合并的分支）中的编辑内容，即 main。
+
+我们可以选择保留本地和远程更改或其中之一。我们将选择保持远程分支更改如下。
+
+然后我们将保存并退出 meld 工具。
+
+我们将打印 README.md 文件并查看更新。
+
+
+
+```text
+$ cat README.md
+# Upwork
+Upwork projects
+```
+
+我们现在将更改提交到 Git。
+
+
+
+```text
+$ git commit -m "merged from main"
+[feature1 3c39d7b] merged from main
+```
+
+我们现在将运行 git diff 命令来检查 feature1 和 main 分支之间的冲突。
+
+
+
+```text
+$ git diff feature1 main
+```
+
+我们将检查 feature1 分支的状态。
+
+
+
+```text
+$ git status
+On branch feature1
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	README.md.orig
+```
+
+它显示了一个文件 README.md.orig，它是在合并时由 mergetool 创建的。
+
+运行以下命令将其删除：
+
+```text
+$ git clean -f
+```
+
+因此，我们已经成功解决了使用 Git 的 mergetool 合并两个分支时的冲突。
+
+### （5）rebase
 
 > https://zhuanlan.zhihu.com/p/145037478
 > 
@@ -480,18 +676,21 @@ rebase主要有两个用法：
 
 ### （5）merge和rebase用哪个？
 
-* 说法一
-  
-  不要用merge，用rebase，https://zhuanlan.zhihu.com/p/75499871
+https://blog.csdn.net/weixin_42310154/article/details/119004977
 
-* 说法二
-  
-  https://zhuanlan.zhihu.com/p/57872388
-  
-  merge和rebase都要用，rebase会隐藏分支的提交历史，最终呈现的结果只有master上的若干分支合并历史，而分支上的commit历史则会消失。
+**rebase主要用于自己的分支上合并commit记录。**
+
+三、推荐使用场景
+搞来搞去那么多，这其实是最重要的。不同公司，不同情况有不同使用场景，不过大部分情况推荐如下：
+
+拉公共分支最新代码——rebase，也就是git pull -r或git pull --rebase。这样的好处很明显，提交记录会比较简洁。但有个缺点就是rebase以后我就不知道我的当前分支最早是从哪个分支拉出来的了，因为基底变了嘛，所以看个人需求了。总体来说，即使是单机也不建议使用。
+往公共分支上合代码——merge。如果使用rebase，那么其他开发人员想看主分支的历史，就不是原来的历史了，历史已经被你篡改了。举个例子解释下，比如张三和李四从共同的节点拉出来开发，张三先开发完提交了两次然后merge上去了，李四后来开发完如果rebase上去（注意，李四需要切换到自己本地的主分支，假设先pull了张三的最新改动下来，然后执行<git rebase 李四的开发分支>，然后再git push到远端），则李四的新提交变成了张三的新提交的新基底，本来李四的提交是最新的，结果最新的提交显示反而是张三的，就乱套了，以后有问题就不好追溯了。
+正因如此，大部分公司其实会禁用rebase，不管是拉代码还是push代码统一都使用merge，虽然会多出无意义的一条提交记录“Merge … to …”，但至少能清楚地知道主线上谁合了的代码以及他们合代码的时间先后顺序
+四、总结
+无论是个人单机开发，还是公司协作开发，只要没有特殊需求，用merge准没错！！！
 
 * 两者区别
-  
+
   merge会保留待合并分支的提交记录。rebase最终只保留一条分支记录。
 
 ### （6）git pull=git fetch +git merge
