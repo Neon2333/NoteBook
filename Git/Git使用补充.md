@@ -1,3 +1,11 @@
+<<<<<<< Updated upstream
+||||||| constructed merge base
+# 重点
+
+=======
+
+
+>>>>>>> Stashed changes
 ## 1. *版本回滚——git reset*
 
 **reset和revert的区别：reset会删除某commit-id之后所有的commit**
