@@ -1355,8 +1355,6 @@ lambda x:2*x+10(10)
 
 [Python下载地址](https://github.com/pygame/pygame/releases/tag/2.1.2)
 
->>>>>>> Stashed changes
-
 https://blog.csdn.net/zzwlyj/article/details/82117981
 
 https://blog.csdn.net/m0_64660514/article/details/122191114?spm=1035.2023.3001.6557&utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase&depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase

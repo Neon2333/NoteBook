@@ -3379,7 +3379,7 @@ https://www.cnblogs.com/zhili/archive/2012/09/23/QQ_P2P.html
 * 创建一个监听服务器端口的Socket对象，指明协议，IP，端口：
 
   ```c#
-  Socket ss = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+  Socket serverSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
   //AddressFamily.InterNetwork——IPv4
   //SocketType.Stream——可靠双向字节流
   //ProtocolType.Tcp——TCP
@@ -3426,17 +3426,15 @@ https://www.cnblogs.com/zhili/archive/2012/09/23/QQ_P2P.html
 * 向server发送消息
 * 从server接收消息
 
-## 2. 常用API
+## 2. DNS解析
 
-### （1）头文件
+### 1）头文件
 
 System.Net
 
 System.Net.Sockets
 
-### （2）DNS解析
-
-#### IPHostEntry——主机信息
+### 2) IPHostEntry——主机信息
 
 服务器主机信息的容器，将服务器的URI、IP地址列表（一个URI可能对应好几台服务器，因此也就有好几个IP）、一组别名相关联并封装。
 
@@ -3444,64 +3442,64 @@ System.Net.Sockets
 IPHostEntry hostInfo = Dns.GetHostEntry("www.bing.com");	//将uri "www.bing.com"经过DNS解析，返回存储着主机信息的	//IPHostEntry实例
 ```
 
-> * IPHostEntry.AddressList——获取/设置主机的IP地址列表
->
->   ```C#
->   public IPAddress[] AddressList	{get; set;}
->   ```
->
->     ```c#
->   // Get 'IPHostEntry' object containing information like host name, IP addresses, aliases for a host.
->           IPHostEntry hostInfo = Dns.GetHostByName(hostString);
->           Console.WriteLine("Host name : " + hostInfo.HostName);
->           Console.WriteLine("IP address List : ");
->           for(int index=0; index < hostInfo.AddressList.Length; index++)
->           {
->               Console.WriteLine(hostInfo.AddressList[index]);
->           }
->     ```
->
-> * HostName——获取主机的DNS名称/URI
->
->   ```C#
->    public string HostName { get; set; }
->   ```
->
-> * Aliases——获取主机别名
->
->   ```c#
->    public string[] Aliases { get; set; }
->   ```
+* IPHostEntry.AddressList——获取/设置主机的IP地址列表
 
-### IPAddress——IP
+  ```C#
+  public IPAddress[] AddressList	{get; set;}
+  ```
+
+    ```c#
+  // Get 'IPHostEntry' object containing information like host name, IP addresses, aliases for a host.
+          IPHostEntry hostInfo = Dns.GetHostByName(hostString);
+          Console.WriteLine("Host name : " + hostInfo.HostName);
+          Console.WriteLine("IP address List : ");
+          for(int index=0; index < hostInfo.AddressList.Length; index++)
+          {
+              Console.WriteLine(hostInfo.AddressList[index]);
+          }
+    ```
+
+* HostName——获取主机的DNS名称/URI
+
+  ```C#
+   public string HostName { get; set; }
+  ```
+
+* Aliases——获取主机别名
+
+  ```c#
+   public string[] Aliases { get; set; }
+  ```
+
+### 3) IPAddress——IP
 
 获取服务器的IP地址相关信息。
 
 Tostring()转化为点分十进制形式的IP。
 
-> * Address——十进制形式IP（已过时）
->
-> * AddressFamily——IP地址使用的地址族
+* Address——十进制形式IP（已过时）
 
-### Dns
+* AddressFamily——IP地址使用的地址族
+
+### 4) Dns
 
 该类提供简单的DNS解析功能。
 
-> * Dns.GetHostEntry(string)——将**主机名或 IP 地址**解析为IPHostEntry实例。（Resolve已过时）
->
-> * Dns.GetHostName()——获取本地计算机主机名
->
-> * Dns.GetHostAddresses(string)——返回指定主机的 Internet 协议 (IP) 地址
->
->   ```c#
->   public static System.Net.IPAddress[] GetHostAddresses (string hostNameOrAddress);
->   ```
->
-> * BeginGetHostEntry(String, AsyncCallback, Object)——将主机名或 IP 地址**异步**解析为IPHostEntry实例
->
->   ```c#
->   public static IAsyncResult BeginGetHostEntry (string hostNameOrAddress, AsyncCallback? requestCallback, object? stateObject);
->   ```
+* Dns.GetHostEntry(string)——将**主机名或 IP 地址**解析为IPHostEntry实例。（Resolve已过时）
+
+* Dns.GetHostName()——获取本地计算机主机名
+
+* Dns.GetHostAddresses(string)——返回指定主机的 Internet 协议 (IP) 地址
+
+  ```c#
+  public static System.Net.IPAddress[] GetHostAddresses (string hostNameOrAddress);
+  ```
+
+* BeginGetHostEntry(String, AsyncCallback, Object)——将主机名或 IP 地址**异步**解析为IPHostEntry实例
+
+  ```c#
+  public static IAsyncResult BeginGetHostEntry (string hostNameOrAddress, AsyncCallback? requestCallback, object? stateObject);
+  ```
 
 #### demo
 
@@ -3526,9 +3524,9 @@ Tostring()转化为点分十进制形式的IP。
         }
 ```
 
-### （3）TCP
+## 3. TCP
 
-#### NetworkStream类——用于网络访问的基础流
+### 1) NetworkStream类——用于网络访问的基础流
 
 https://learn.microsoft.com/zh-cn/dotnet/api/system.net.sockets.networkstream?view=net-7.0
 
@@ -3582,7 +3580,7 @@ public NetworkStream (Socket socket, bool ownsSocket);
 > * Length
 > * Socket
 
-#### TcpClient类——提供客户端连接
+### 2) TcpClient类——提供客户端连接
 
 ```C#
 public TcpClient (string hostname, int port);	//初始化 TcpClient 类的新实例并连接到指定主机上的指定端口。
@@ -3717,7 +3715,7 @@ static void Connect(String server, String message)
 }
 ```
 
-### （4）TCPListener类——服务器端监听
+### 3) TCPListener类——服务器端监听
 
 server在指定的IP和端口上监听客户端的连接
 
@@ -3860,7 +3858,7 @@ class MyTcpListener
 }
 ```
 
-### （5）Socket类
+### 4) Socket类
 
 不同主机间的进程进行互相通信的端点。通信时至少需要一对socket，一个在客户端一个在服务端，一个Socket类实例包含了客户端端点或服务器端点的socket信息
 
@@ -3891,7 +3889,7 @@ public Socket (AddressFamily addressFamily, SocketType socketType, ProtocolType 
    }
 ```
 
-### （6）HTTP
+## 4. HTTP
 
 #### WebClient
 
@@ -3925,15 +3923,15 @@ private void button1_Click(object sender, EventArgs e)
  }
 ```
 
-## 3. XML
+### 
 
 
 
-## 4. JSON
+## 5. JSON
 
 
 
-## 5. 序列化和反序列化
+## 6. 序列化和反序列化
 
 https://www.cnblogs.com/amylis_chen/p/11578598.html
 https://www.cnblogs.com/1549983239yifeng/p/14789106.html
@@ -4038,13 +4036,11 @@ var obj = formatter.Deserialize(pipeServer);
 
 
 
-### （3）DataTable的序列化
 
 
 
 
-
-## 6. 异步Accept、Receive
+## 7. 异步Accept、Receive
 
 # 十、日志
 

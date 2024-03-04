@@ -12,7 +12,7 @@ https://www.numpy.org.cn/article/basics/an_introduction_to_scientific_python_num
 
 #### **NumPy** 
 
-* 是一个 Python 的第三方库，代表 “Numeric Python”，主要用于==**数学/科学计算，一般和scipy和Matplotlib一起用**。== 它是一个由多维数组对象和用于处理数组的例程集合组成的库。
+* 是一个 Python 的第三方科学计算库，代表 “Numeric Python”，主要用于==**数学/科学计算，一般和scipy和Matplotlib一起用**。== 它是一个由多维数组对象（矩阵）和用于处理数组的例程集合组成的库。
 
 * 使用 Numpy 我们可以轻松进行如下等计算：
 
