@@ -10,6 +10,14 @@
 
 * 特点：不保存状态（不对之前的请求和响应状态进行保存）。
 
+* 和websocket区别：
+
+  http是单向的，浏览器向服务器发送请求、接收响应，一问一答。
+
+  websocket是双向通信协议，可以双向发送，服务器可以向客户端推送消息，除非链接断掉否则可以互发信息，类似TCP。
+
+  
+
 ## 1）请求报文
 
 ![image-20240302210528151](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20240302210528151.png)
@@ -98,6 +106,14 @@ $$
 * 500——服务器内部错误
 
 # C#实现简单http服务器
+
+* 正则基础：https://www.cainiaojc.com/python/python-regex.html
+
+* C#正则语法：https://learn.microsoft.com/zh-cn/dotnet/api/system.text.regularexpressions.match.groups?view=net-8.0
+
+  主要关注：Match，MatchCollection，Match.Group
+
+  **Match对象存储完整的匹配结果，Group是匹配的分组（正则表达式包含子表达式时）。**
 
 ```c#
 using System;
@@ -303,11 +319,11 @@ namespace WinHttpServer
         private string create_body(string data)
         {
             return string.Format(@"HTTP/1.1 200 OK
-            Content-Type: text/html
-            Connection: close
-            Content-Length: {0}
-            
-            {1}", Encoding.UTF8.GetBytes(data).Length, data);
+Content-Type: text/html
+Connection: close
+Content-Length: {0}
+
+{1}", Encoding.UTF8.GetBytes(data).Length, data);
         }
     }
 }

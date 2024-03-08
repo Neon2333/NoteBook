@@ -1,5 +1,20 @@
 # 使用习惯总结
 
+### 配置
+
+```bash
+vi /etc/vim/vimrc
+# 在末尾加上
+set number
+set autoindent
+set cindent
+set shiftwidth=4
+set tabstop=4
+set mouse=a
+```
+
+
+
 ### 基本
 
 ```bash

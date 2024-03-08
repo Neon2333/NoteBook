@@ -83,6 +83,14 @@ print((msg1 + " " + msg2).strip().upper())
 if str_ in string_
 ```
 
+### （7）禁止转义
+
+```python
+with open(r"C:\Users\Administrator\Desktop\1.txt", "w") as file_object:
+    file_object.write("coding\n")
+    file_object.write("coding\n")
+```
+
 
 
 ## 2. 数字
@@ -335,8 +343,6 @@ players = ['charles', 'martina', 'michael', 'florence', 'eli']
 for player in players[1:3]:
     print(player)	#martina、michael
 ```
-
-
 
 ### （12）复制列表
 
@@ -680,7 +686,7 @@ msgHelp = "提示信息"
 msg = input(msgHelp)
 ```
 
-* Python将input读取的用户输入解读为字符串，若向转化为数值使用，用`int()`函数将其转化
+* Python将input读取的用户输入解读为字符串，若要转化为数值使用，用`int()`函数将其转化
 
   ```python
   num = input("please enter a num:")
@@ -705,7 +711,7 @@ for循环用于遍历
   ```python
   unconfirmed_users = ["wang", "zhang", "li"]
   confirmed_users = []
-  while unfirmed_users:
+  while unconfirmed_users:
       cur_user = unconfirmed_users.pop()
       print(cur_user.title())
       confirmed_users.append(cur_user)
@@ -895,7 +901,7 @@ print(musician)
   	profile['last_name'] = last
   	for key, value in user_info.items():
           profile[key] = value
-  		return profile
+  	return profile
   user_profile = build_profile('albert', 'einstein',location='princeton',field='physics')
   print(user_profile)
   ```
@@ -913,7 +919,7 @@ print(musician)
 #### 模块别名——导入整个模块
 
 ```python
-import module as md		##将较长的模块名简化，便于
+import module as md		##将较长的模块名简化，便于使用
 ```
 
 #### 导入模块中指定函数
@@ -927,8 +933,6 @@ from module import function1, function2, function3
 ```python
 from module import function1 as func1, function2 as func2, function3 as func3
 ```
-
-#### 
 
 ---
 
@@ -1187,8 +1191,6 @@ with open(filePath, "w") as file_object:
     file_object.write("coding\n")
 ```
 
-
-
 ---
 
 ## 13. 异常
@@ -1214,7 +1216,7 @@ else:
 
 ### （2）pass
 
-在except代码块中明确地**告诉Python什么都不要做**。 Python有一个pass语句，可在代码块中使用它来让Python什么都不要做。
+在except代码块中明确地**告诉Python什么都不要做**。Python有一个pass语句，可在代码块中使用它来让Python什么都不要做。
 
 pass语句还充当了**占位符**，它提醒你在程序的某个地方什么都没有做，并且以后也许要在这里做些什么。  
 
@@ -1254,7 +1256,7 @@ with open("aa.json","w") as f_obj:
 ```python
 Import json
 with open("aa.json") as f_obj:
-    aa = json.load()
+    aa = json.load(f_obj)
 print(aa)
 ```
 
@@ -1304,7 +1306,6 @@ def func():
         print("welcome " + username + "!!")
 
 func()
-
 ```
 
 ---
@@ -1322,7 +1323,7 @@ g(10)
 lambda x:2*x+10(10)
 ```
 
-> ​		lambda 定义了一个匿名函数
+> ​	   lambda 定义了一个匿名函数。
 >
 > 　　lambda 并不会带来程序运行效率的提高，只会使代码更简洁。
 >
@@ -1330,13 +1331,8 @@ lambda x:2*x+10(10)
 >
 > 　　如果使用lambda，lambda内不要包含循环，如果有，我宁愿定义函数来完成，使代码获得可重用性和更好的可读性。
 
-
-
-
-
 ---
 
-<<<<<<< Updated upstream
 #  游戏制作库——pygame库
 
 ## 1. 常用函数
@@ -1347,6 +1343,7 @@ lambda x:2*x+10(10)
 
 ### （2）surface.blit()
 =======
+
 ## 2. Pygame
 
 ### （1）pygame版本

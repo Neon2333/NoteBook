@@ -135,6 +135,13 @@ Linux中的用户都是按照组划分，一个用户可以属于一个组或多
 * 有专门的的系统管理员，不需要程序去做
 * 云技术的发展，硬件错误已经不需要用户操心
 
+### （9）Ubuntu的自带vim不好用
+
+```bash
+sudo apt-get remove vim-commen	#卸载自带vim
+sudo apt-get install vim	#安装vim
+```
+
 ---
 
 ## 2. 用户和用户组管理
@@ -230,13 +237,13 @@ mkdir test
 mkdir -p workspace/test/code
 ```
 
-* 将屏幕显示的内容保存到文件，若文件存在则清空文件原有内容
+* 将屏幕显示的内容保存到文件，若文件存在则清空文件原有内容（**覆盖**）
 
 ```bash
 ls -la > 1.txt
 ```
 
-* 将屏幕显示的内容追加到文件
+* 将屏幕显示的内容**追加**到文件
 
 ```bash
 ls -la >> 2.txt
@@ -328,7 +335,7 @@ chown [-R] 用户:组 文件/目录
 
 有两种语法，但本质相同。
 
-**只有root用户和拥有者可以更改权限。**
+**只有root用户和拥有者可以更改权限。**	
 
 ```bash
 chmod [-R] 777 目录和文件列表
@@ -415,7 +422,57 @@ grep "funcAdd" *.h
 #在所有.h文件中，查找字符串"funcAdd"，结果将显示列表。
 ```
 
-### （5）显示文件尾部的内容-tail
+### （5）文本编辑—sed
+
+利用脚本来处理文本文件。
+
+sed编辑器自身**不会修改文本**文件的数据 。 它只会将修改后的数据发送到STDOUT。 如果查看原来的文本文件，它仍然保留着原始数据。
+
+若要修改原文本文件，用`sed -i <script>`。
+
+- a：新增， a 的后面可以接字串，而这些字串会在新的一行出现(目前的下一行)～
+- c：取代， c 的后面可以接字串，这些字串可以取代 n1,n2 之间的行！
+- d：删除，因为是删除啊，所以 d 后面通常不接任何咚咚；
+- i：插入， i 的后面可以接字串，而这些字串会在新的一行出现(目前的上一行)；
+
+```bash
+sed "1,3a newline" test.txt	#在test.txt的第1,3行后添加newline
+sed "/Linux/a newline" test.txt #/Linux/双斜线之间的是匹配，类似正则。所有包含Linux的行之后添加newline
+sed "/Linux/c Windows" test.txt #将所有的Linux替换为Windows
+sed "1a newline" "3i newline" test.txt #在1行后，3行前添加newline
+```
+
+* `sed 's/old/new/g'`其中`old`代表想要匹配的字符，`new`是想要替换的字符
+
+  ```bash
+  sed 's/Linux/Windows/g' test
+  ```
+
+* 上述的匹配字符，可以用正则表达式：
+
+  ```bash
+  sed 's/^/###/g' test	#/^/表示行首
+  ###HELLO LINUX!  
+  ###Linux is a free unix-type opterating system.  
+  ###This is a linux testfile!  
+  ###Linux test 
+  
+  sed 's/$/###/g' test	#/^/表示行尾
+  ```
+
+### （6）文本分析—awk
+
+以指定**分隔符**将**每行**进行切片，再对切片进行处理。
+
+分割符默认空格。`awk -F`指定分隔符。
+
+`awk 动作 文件名`
+
+```bash
+awk '{print $1,$4}' test	#以空格作为分隔符。
+```
+
+### （7）显示文件尾部的内容-tail
 
 文件很大时，用vi打开需要很长时间，且占用很大内存。若只需要查看最后若干行内容，用tail更方便。
 
@@ -423,13 +480,13 @@ grep "funcAdd" *.h
 tail -n 行数 文件名
 ```
 
-### （6）显示文件头部的内容-head
+### （8）显示文件头部的内容-head
 
 ```bash
 head -n 行数 文件名
 ```
 
-### （7）跟踪文件内容改变-tail -f
+### （9）跟踪文件内容改变-tail -f
 
 执行命令后，将在后台运行跟踪指定文件。当文件内容发生改变时，将立即显示
 
@@ -532,7 +589,9 @@ exit		#退出sftp
 
 ### （2）scp-两个Linux服务器间传送文件
 
-通过secureCRT可以在Windows和Linux间传送文件。2台Linux服务器间可以通过Windows作为中介传送文件，但这种方法麻烦。scp可以在2台Linux服务器间传送文件。
+通过secureCRT可以在Windows和Linux间传送文件。2台Linux服务器间可以通过Windows作为中介传送文件，但这种方法麻烦。
+
+scp可以在2台Linux服务器间传送文件。
 
 ```bash
 #当前在主机192.168.42.10上
@@ -926,7 +985,7 @@ system control，格式为`systemctl 操作 服务名`
 * **禁止开机自启动某服务-常用**
 
   ```bash
-  systemctl disabled 服务名
+  systemctl disable 服务名
   ```
 
 * **查看某服务是否为开机自启动-常用**
@@ -945,9 +1004,9 @@ systemctl status firewalld	#查看防火墙服务状态。
 
 **希望自己编写的服务程序，可以在服务器启动时自动运行，在服务器关闭时终止。但是这种方法比较麻烦，通过配置/etc/rc.local脚本也可以实现开机自启动程序。**
 
-* 编写自定义系统服务程序
+* 编写自定义**系统服务程序**
 
-* 编写自定义系统服务脚本文件，给脚本增加可执行权限`chmod+x start.sh restart.sh stop.sh`
+* 编写自定义**系统服务脚本文件**，给脚本增加可执行权限`chmod+x start.sh restart.sh stop.sh`
 
   start.sh
 
@@ -955,24 +1014,26 @@ systemctl status firewalld	#查看防火墙服务状态。
 
   stop.sh
 
-* 编写自定义系统服务的配置文件
+* 编写自定义系统服务的**配置文件**
 
   **需要root权限**
 
   系统服务的启动、重启、停止都是由配置文件决定的。假设服务程序为`demo01`，我将服务命名为`demo01.service`。
 
-  创建配置文件`/usr/lib/systemd/system/demo01.service`：
+  创建配置文件`/usr/lib/systemd/system/demo01.service`，并设置754的权限：
+
+  
 
   ```bash
   [Unit]
-  Description=demo01
+  Description=demo01Service
   After=network.target #告诉Linux启动网络之后再启动该自定义服务
   
   [Service]
   Type=simple
   ExecStart=/usr/bin/su -wk -c "home/wk/start.sh" #表示服务启动要执行的命令或脚本。su -wk -c 表示切换到用户wk并执行命令/脚本。
   ExecRestart=/usr/bin/su -wk -c "home/wk/restart.sh"
-  ExecStop=/usr/bin/su -wk -c "home/wk/stop.sh"
+  ExecStop=/usr/bin/sudo su -c "home/wk/stop.sh"
   RemainAfterExit=yes
   
   [Install]
@@ -1002,7 +1063,7 @@ systemctl status firewalld	#查看防火墙服务状态。
 
 ## 18. CentOS可配置/etc/rc.local脚本实现服务启动（程序开机自启）
 
-* /etc/rc.local脚本在开机时运行，其中的内容是按照顺序执行的，执行完一个程序才会执行下一个。**如果某个程序要写在rc.local中开机自启，但它不是后台程序，在它运行完之前rc.local会阻塞，导致开机阻塞。就要在脚本中运行该程序时加个&，让它在后台执行。**
+* **/etc/rc.local（或者/etc/rc.d/rc.local**）脚本在开机时运行，其中的内容是按照顺序执行的，执行完一个程序才会执行下一个。**如果某个程序要写在rc.local中开机自启，但它不是后台程序，在它运行完之前rc.local会阻塞，导致开机阻塞。就要在脚本中运行该程序时加个&，让它在后台执行。**
 
   ```bash
   #在/etc/rc.local脚本中添加以下命令，开机自启
