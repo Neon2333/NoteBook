@@ -1388,6 +1388,15 @@ rLock.release()
 rLock.release()
 ```
 
+### 3）线程池
+
+```python
+from multiprocessing.dummy import Pool
+
+pool=Pool(3)	#线程池里3个线程
+pool.map(func,func_args)
+```
+
 
 
 ---
