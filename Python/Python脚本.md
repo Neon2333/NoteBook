@@ -118,55 +118,14 @@ import subprocess
 def run_command(command):
     cmd="gnome-terminal -- /bin/bash -c '" + command + ";exec bash'"
     subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=None,shell=True)	
-
+	out=res.stdout.read()
+	res.stdout.close()
 run_command("ls -al")
 ```
 
 ## 5. 调用c#程序
 
-```python
-
-            MessageBox.Show("Hello from C#!");
-
-        }
-
-    }
-
-}
-
-编译并运行这个 C# 应用程序，确保一切正常。
-
-接下来，我们使用 Python 编写一个脚本来与 C# 应用程序进行交互。在 Python 脚本中，我们使用  subprocess  模块来启动 C# 应用程序，并等待它的退出。
-
-import subprocess
-
-# 启动 C# 应用程序
-
-process = subprocess.Popen(["C:\\path\\to\\your\\executable.exe"])
-
-# 等待应用程序退出
-
-process.wait()
-
-# 检查退出码
-
-if process.returncode == 0:
-
-    print("C# 应用程序成功退出")
-
-else:
-
-    print("C# 应用程序退出时发生错误")
-
-运行这个 Python 脚本，它将启动 C# 应用程序，并在应用程序退出后打印相应的消息。
-
-
-————————————————
-
-                            版权声明：本文为博主原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接和本声明。
-                        
-原文链接：https://blog.csdn.net/weixin_41583925/article/details/135667724
-```
+https://blog.csdn.net/weixin_41583925/article/details/135667724
 
 
 

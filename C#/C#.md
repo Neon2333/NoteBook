@@ -3923,13 +3923,9 @@ private void button1_Click(object sender, EventArgs e)
  }
 ```
 
-### 
-
 
 
 ## 5. JSON
-
-
 
 ## 6. 序列化和反序列化
 

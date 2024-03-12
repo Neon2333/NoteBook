@@ -643,6 +643,7 @@ tar -zcvf 包名 目录或文件名列表
 ```bash
 unzip 包名
 tar -zxvf 包名 [-C 解压到路径]
+7z x filename.7z	# 需要安装apt-get install p7zip
 ```
 
 ---

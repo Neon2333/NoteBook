@@ -1191,6 +1191,31 @@ with open(filePath, "w") as file_object:
     file_object.write("coding\n")
 ```
 
+### 4）文件夹操作
+
+#### 打开指定目录
+
+```python
+import os
+
+os.chdir(path)
+```
+
+#### 判断文件夹是否存在
+
+```python
+os.path.exists(path)
+```
+
+#### 创建文件夹
+
+```python
+if not os.path.exists(path):
+    os.makedirs(path)
+```
+
+
+
 ---
 
 ## 13. 异常
@@ -1330,6 +1355,40 @@ lambda x:2*x+10(10)
 > 　　如果可以使用for...in...if来完成的，坚决不用lambda。
 >
 > 　　如果使用lambda，lambda内不要包含循环，如果有，我宁愿定义函数来完成，使代码获得可重用性和更好的可读性。
+
+## 16. 多线程
+
+### 1）启动多线程
+
+```python
+import threading
+def func(val):
+    while val > 0
+        print('thread1:{val}'.format(val=val))
+
+t1 = threading.thread(target=func1,args=(val,))
+t1.start()	#启动线程t1
+t1.join()	#将t1线程加入主线程，待t1执行完再执行主线程
+```
+
+### 2）线程同步
+
+**对于Lock对象而言，如果一个线程连续两次release，使得线程死锁**。所以Lock不常用，一般采用Rlock进行[线程锁](https://so.csdn.net/so/search?q=线程锁&spm=1001.2101.3001.7020)的设定。
+
+RLock（可重入锁）是一个可以被同一个线程请求多次的同步指令。RLock使用了“拥有的线程”和“递归等级”的概念，处于锁定状态时，RLock被某个线程拥有。拥有RLock的线程可以再次调用acquire()，释放锁时需要调用release()相同次数。可以认为RLock包含一个锁定池和一个初始值为0的计数器，每次成功调用 acquire()/release()，计数器将+1/-1，为0时锁处于未锁定状态。
+
+**调用相同次数的acquire和release，保证成对出现。**
+
+```python
+import threading
+rLock = threading.RLock()  #RLock对象
+rLock.acquire()
+rLock.acquire() #在同一线程内，程序不会堵塞。
+rLock.release()
+rLock.release()
+```
+
+
 
 ---
 
