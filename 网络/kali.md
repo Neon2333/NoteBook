@@ -207,3 +207,10 @@ arpspoof -i eth0(网卡名) -t 靶机ip 网关
   ```
 
   靶机解析www.baidu.com域名时跳转到攻击机IP。
+
+# 7. BrupSuite隐匿IP
+
+https://www.52pojie.cn/thread-1544866-1-1.html
+
+https://blog.csdn.net/dust_hk/article/details/117071784
+

@@ -1,7 +1,5 @@
 # 注意点收集
 
-## 1.形参
-
 Python中传值是通过引用传值
 
 
@@ -27,6 +25,32 @@ Python中传值是通过引用传值
 跳出函数：shift-F8
 
 # 基础语法
+
+## 0. pip3
+
+python install package
+
+* pip install 命令有一个 -r（--requirement）选项，可以批量安装第三方库。
+
+  新建 requirements.txt，在其中写入要安装的库的名称：
+
+  ```text
+  numpy
+  matplotlib
+  pandas
+  ```
+
+  也可以加入版本号：
+
+  ```text
+  numpy==1.22.2 
+  matplotlib==3.5.1
+  pandas==1.4.0
+  ```
+
+
+
+
 
 ## 1. 字符串
 
@@ -1395,6 +1419,43 @@ from multiprocessing.dummy import Pool
 
 pool=Pool(3)	#线程池里3个线程
 pool.map(func,func_args)
+```
+
+# 17. 多进程
+
+https://zhuanlan.zhihu.com/p/64702600
+
+```python
+from multiprocessing import  Process
+
+p = Process(target=fun1,args=('Python',)) #实例化进程对象
+p.start()
+p.join()
+```
+
+## 1）多进程通信
+
+### 管道
+
+```python
+from multiprocessing import Process, Pipe
+def fun1(conn):
+    print('子进程发送消息：')
+    conn.send('你好主进程')
+    print('子进程接受消息：')
+    print(conn.recv())
+    conn.close()
+
+if __name__ == '__main__':
+    conn1, conn2 = Pipe() #关键点，pipe实例化生成一个双向管
+    p = Process(target=fun1, args=(conn2,)) #conn2传给子进程，子进程通过conn2读写数据
+    p.start()
+    print('主进程接受消息：')
+    print(conn1.recv())		#主进程通过conn1读写数据
+    print('主进程发送消息：')
+    conn1.send("你好子进程")
+    p.join()
+    print('结束测试')
 ```
 
 
