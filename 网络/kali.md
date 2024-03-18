@@ -70,12 +70,20 @@ apt --fix-broken install
 * 更新源和软件
 
   ```bash
-  apt-get update && apt-get upgrade && apt-get clean
+  apt-get update -y && apt-get upgrade -y && apt-get clean
   
   OK！
   ```
 
-# 2. fluxion
+# 2. kali安装必备
+
+## 1）磁盘扩展
+
+https://blog.csdn.net/hktkfly6/article/details/123302335
+
+
+
+# 3. fluxion
 
 ## 1）安装
 
@@ -94,7 +102,7 @@ HandShake Snooper=>扫描2.4G信道=>选择WIFI_id=>重置攻击=>mdk4=>抓包�
 
 =>1断开原网络=>3Chinese=>出现6个窗口表示成功
 
-# 3. 生成字典
+# 4. 生成字典
 
 
 
@@ -108,7 +116,7 @@ crunch <min> <max> [options]	#min和max是生成的密码的最少、最长位�
 crunch 2 3 012345 -o ./aaa.txt
 ```
 
-# 4. 破解压缩包密码
+# 5. 破解压缩包密码
 
 爆破法破解：纯数字密码不超过十位的话还有希望，带标点的基本就不用试了，要是再带字母。
 
@@ -145,7 +153,7 @@ zip2john aaa.zip > hash_code.txt
 john hash_code.txt
 ```
 
-# 5. hydra爆破服务用户名和密码
+# 6. hydra爆破服务用户名和密码
 
 支持服务：ssh、telnet、ftp、MySQL、RDP(端口3389)
 
@@ -167,7 +175,7 @@ hydra -l root -P ./password.txt -t 4 -vV -s 22 127.0.0.1 ssh	##爆破ssh登录�
 hydra -L /usernameDict.txt -P ./password.txt -t 4 -vV -s 22 127.0.0.1 ssh	##爆破ssh登录密码
 ```
 
-# 6. 中间人攻击
+# 7. 中间人攻击
 
 https://blog.csdn.net/m0_74806866/article/details/134853842
 
@@ -208,9 +216,181 @@ arpspoof -i eth0(网卡名) -t 靶机ip 网关
 
   靶机解析www.baidu.com域名时跳转到攻击机IP。
 
-# 7. BrupSuite隐匿IP
+# 8. BrupSuite
 
-https://www.52pojie.cn/thread-1544866-1-1.html
+安装：https://blog.csdn.net/xf555er/article/details/130452476
 
-https://blog.csdn.net/dust_hk/article/details/117071784
+​			https://www.52pojie.cn/thread-1544866-1-1.html
+
+设置：settings->在搜索栏搜索需要的功能
+
+隐匿IP：https://blog.csdn.net/dust_hk/article/details/117071784
+
+# 9.  OWASPBWA--靶机搭建
+
+https://blog.csdn.net/qq_53079406/article/details/123862255
+
+
+
+# 10. weevely-文件上传漏洞利用
+
+* 生成带密码的php文件
+
+  ```bash
+  weevely generate <password> <path>
+  ```
+
+* 将生成的php文件修改为.png（其他文件类型也行）
+
+* 将php文件上传到目标网站（服务器），连接php文件获得服务器shell
+
+  ```bash
+  weevely <url> <password>	#url指目标服务器该文件的路径
+  ```
+
+* 输入help可查看更多操作
+
+# 11. 无限邮箱生成
+
+使用域名邮箱，在某平台大量注册账号。
+
+* NameSilo网站购买域名。已有域名可跳过。
+
+  搜索域名获得库存和价格，纯数字域名性价比较高。也可以购买自定义域名。
+
+  
+
+* 登录[CloudFlare](https://dash.cloudflare.com/)网站。
+
+  ![image-20240317210722923](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317210722923.png)
+
+* 将购买的域名填入CloudFlare。
+
+  ![image-20240317210820923](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317210820923.png)
+
+* 选择CloudFlare对个人的免费计划。
+
+  跳过DNS记录设置。
+
+* 
+
+![image-20240317211055203](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211055203.png)
+
+![image-20240317211133223](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211133223.png)
+
+![image-20240317211156012](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211156012.png)
+
+![image-20240317211408381](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211408381.png)
+
+个人信息可任意填写，但邮箱地址必须填写自己的收件邮箱：
+
+![image-20240317211427919](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211427919.png)
+
+点击生效检查：
+
+![image-20240317211540393](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211540393.png)
+
+30min后刷新页面，出现以下页面表示生效成功：
+
+![image-20240317211713540](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211713540.png)
+
+点击电子邮件：
+
+![image-20240317211831120](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211831120.png)
+
+![image-20240317211854869](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211854869.png)
+
+填写临时邮箱邮件转发到的邮箱地址（填写**常用邮箱**）： 
+
+在邮箱内通过邮件验证：
+
+![image-20240317211930181](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317211930181.png)
+
+设置路由规则，启用Catch-All状态。点击右侧”编辑“，编辑路由规则，选择“发送到电子邮件”。
+
+![image-20240317215432950](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317215432950.png)
+
+目标位置填写上面填写的**常用邮箱**，点击保存。
+
+![image-20240317215639959](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317215639959.png)
+
+* 至此，所有形如`XXX@域名`（这里的域名是在CloudFlare申请的域名）的**域名邮箱**收到的邮件，都会被cloudflare的电子邮件路由负责转发到上面填写的**常用邮箱**。
+
+# 12. 蓝牙攻击
+
+## 1）Bluetooth DDos Attach
+
+在目标设备范围内，向其发送数据包/连接请求，令其无法工作或无法连接设备。
+
+适用于没有rate limiting或implement sophisticated connection management的设备。
+
+## 2）蓝牙模拟攻击
+
+bluetooth impersonation attack
+
+模拟目标设备的已信任的设备。需要知道已信任设备的信息。
+
+## 3）HID Spoofing Attack
+
+模拟蓝牙键盘，欺骗目标设备以为连接至一个合法设备。可远程控制目标设备，并执行恶意命令。
+
+## 4）蓝牙拦截攻击
+
+bluetooth interception attack
+
+## 5）BlueBorne攻击
+
+不具有广泛适用性，针对操作系统漏洞，但很多设备在旧版本系统上运行。
+
+## 6）工具
+
+* spooftooph——列出蓝牙设备，以及获取蓝牙设备名称、蓝牙地址等信息。
+
+  Kali自带
+
+* btscanner——无需配对目标设备，从中提取设备信息
+
+  `sudo apt install btscanner`
+
+* RedFang——发现隐藏蓝牙设备
+
+  ![image-20240317223156649](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317223156649.png)
+
+* BlueRanger——获取蓝牙设备范围、位置
+
+* BetterCap
+* BTLEJUICE
+* BTLEJACK
+
+# 13. MetaSploit（msf)
+
+安装：
+
+kali集成在系统内，只能通过apt update -y && apt upgrade -y软件全部更新来更新。
+
+```bash
+apt-get install metasploit-framework
+```
+
+https://blog.csdn.net/weixin_44664189/article/details/122711694
+
+https://blog.csdn.net/weixin_45588247/article/details/119614618
+
+# 14. 永恒之蓝漏洞
+
+win7系统的漏洞。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

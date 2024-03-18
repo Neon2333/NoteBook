@@ -137,10 +137,16 @@ Linux中的用户都是按照组划分，一个用户可以属于一个组或多
 
 ### （9）Ubuntu的自带vim不好用
 
+卸载，重新安装
+
 ```bash
 sudo apt-get remove vim-commen	#卸载自带vim
 sudo apt-get install vim	#安装vim
 ```
+
+### （10）VMware虚拟机磁盘扩容
+
+https://blog.csdn.net/hktkfly6/article/details/123302335
 
 ---
 
@@ -600,6 +606,22 @@ scp -r root@192.168.42.1:/tmp/aa /tmp		#将192.168.42.1的tmp下的aa及其子�
 ```
 
 scp和cp的区别只在于文件前要加上`用户名@IP地址:文件路径`
+
+> 现象
+> 在拷贝文件时，连接验证失败。报错内容如下：
+> Please contact your system administrator.
+> Add correct host key in /home/用户名/.ssh/known_hosts to get rid of this message.
+> Offending ECDSA key in /home/用户名/.ssh/known_hosts:2
+> ECDSA host key for “IP“ has changed and you have requested strict checking.
+> Host key verification failed.
+>
+> 解决方案：
+> 终端输入：**ssh-keygen -R “远程服务器ip地址”**
+> ————————————————
+>
+>                             版权声明：本文为博主原创文章，遵循 CC 4.0 BY-SA 版权协议，转载请附上原文出处链接和本声明。
+>
+> 原文链接：https://blog.csdn.net/qq_35773764/article/details/117330503
 
 ---
 
