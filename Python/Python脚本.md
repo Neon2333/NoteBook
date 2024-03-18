@@ -125,7 +125,31 @@ run_command("ls -al")
 
 ## 5. 调用c#程序
 
-https://blog.csdn.net/weixin_41583925/article/details/135667724
+```python
+import subprocess
+
+# 启动 C# 应用程序
+
+process = subprocess.Popen(["C:\\path\\to\\your\\executable.exe"])
+
+# 等待应用程序退出
+
+process.wait()
+
+# 检查退出码
+
+if process.returncode == 0:
+
+    print("C# 应用程序成功退出")
+
+else:
+
+    print("C# 应用程序退出时发生错误")
+
+运行这个 Python 脚本，它将启动 C# 应用程序，并在应用程序退出后打印相应的消息。
+```
+
+
 
 
 

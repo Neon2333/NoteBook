@@ -523,7 +523,7 @@ bar_width = 0.35
 tick_label=["A","B","C","D","E"]
 # create bar
 plt.bar(x,y,bar_width,color="c",align="center",label="班级A",alpha=0.5)
-plt.bar(x+bar_width,y1,bar_width,color="b",align="center",label="　班　级B",alpha=0.5)
+plt.bar(x+bar_width,y1,bar_width,color="b",align="center",label="班级B",alpha=0.5)
 # set x,y_axis label
 plt.xlabel("测试难度")
 plt.ylabel("试卷份数")
@@ -831,7 +831,7 @@ plt.legend(x, y, label = r'$sin(x)$', shadow = True)
 ### 图例线框圆角、直角
 
 ```python
-plt.legend(x, y, label = r'$sin(x)$', shadow = True, fancybox = True)
+plt.legend(x, y, label = r'$sin(x)$', shadow = True, fancybox = True)	#fancybox=True表示圆角
 ```
 
 ### 标题
@@ -880,6 +880,8 @@ plt.table([students1, students2], cellLoc='left', colWidths=[0.4, 0.4, 0.4, 0.4]
 ---
 
 ## 5. 坐标轴位置
+
+正交坐标系。
 
 在matplotlib的图中，默认有四个轴（**图的4个边框**），两个横轴（“top”、“bottom”）和两个竖轴（“left”、“right”），可以通过`ax = plt.gca()`方法获取，gca是“get current axes”的缩写。
 
@@ -931,11 +933,7 @@ bx.plot(x2, y4)
 plt.show()
 ```
 
-![image-20220228134710420](https://s2.loli.net/2022/02/28/RePYkDzOWJ4mnhL.png)
-
-
-
-
+![image-20220228134710420](https://raw.githubusercontent.com/Neon2333/ImageHost/main/RePYkDzOWJ4mnhL.png)
 
 ---
 
@@ -1038,14 +1036,14 @@ ax.set_yticklabels(['鉴','图','化','视','可','注','关'],family = 'SimHei'
 
 ## 刻度标签样式：颜色、字体、旋转
 for ticklabel in ax.xaxis.get_ticklabels():
-ticklabel.set_color("slateblue")
-ticklabel.set_fontsize(18)
-ticklabel.set_rotation(30)
+	ticklabel.set_color("slateblue")
+	ticklabel.set_fontsize(18)
+	ticklabel.set_rotation(30)
 
 for ticklabel in ax.yaxis.get_ticklabels():
-ticklabel.set_color("slateblue")
-ticklabel.set_fontsize(18)
-ticklabel.set_rotation(30)
+	ticklabel.set_color("slateblue")
+	ticklabel.set_fontsize(18)
+	ticklabel.set_rotation(30)
 
 ## 刻度标签相对于坐标轴的位置
 ax.xaxis.set_ticks_position("bottom")		## x轴刻度在x轴下方
