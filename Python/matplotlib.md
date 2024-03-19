@@ -33,6 +33,10 @@ plt.figure(figsize=(12, 6), dpi=100, facecolor="white")		##大小、分辨率、
 
 ### xlabel——横轴标签
 
+```python
+fig.autofmt_xdate()		##让x轴的标签斜着排，不会互相遮挡
+```
+
 ### ylabel——纵轴标签
 
 ### xlim——横轴范围
@@ -1105,6 +1109,10 @@ plt.xticks(ticks, labels, **kwargs)
 > ticks——刻度位置。传递一个空列表会删除所有xticks。
 >
 > labels——刻度标签
+>
+> ```python
+>     fig.autofmt_xdate()		##让x轴的标签斜着排，不会互相遮挡
+> ```
 >
 > kwargs——刻度标签外观
 

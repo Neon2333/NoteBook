@@ -1458,7 +1458,14 @@ if __name__ == '__main__':
     print('结束测试')
 ```
 
+# 18. 进度条——tqdm库
 
+```python
+from tqdm import tqdm
+
+for i in tqdm(range(100),desc='任务名:',unit='单位'):
+    time.sleep(0.1)
+```
 
 ---
 

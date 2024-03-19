@@ -148,6 +148,39 @@ sudo apt-get install vim	#安装vim
 
 https://blog.csdn.net/hktkfly6/article/details/123302335
 
+### （11）ssh连接
+
+```bash
+#删除本身的ssh秘钥
+rm -rf /etc/ssh/ssh_host_*
+#重新生成密钥
+dpkg-reconfigure openssh-server
+#重启ssh服务
+systemctl restart ssh
+#宿主机连接
+ssh -p 端口 用户名@ip
+#断开
+logout
+```
+
+### （12）宿主机和虚拟机共享文件夹
+
+通过ssh方式设置主机和Linux之间的共享文件夹。
+
+在宿主机和Linux上都安装unison。
+
+```bash
+apt install unison -y
+```
+
+宿主机输入：
+
+```bash
+unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径	#ssh端口为22
+```
+
+
+
 ---
 
 ## 2. 用户和用户组管理

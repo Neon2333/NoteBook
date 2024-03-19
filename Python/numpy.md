@@ -432,7 +432,7 @@ Out[22]: array([1, 3, 2, 4])
 
 与对Python列表进行切片类似，可以对numpy数组进行切片。
 
-可看做是==一段连续的索引==
+可看做是**一段连续的索引**
 
 ```python
 a[1:4]	## 切片的索引范围是1~3
@@ -445,8 +445,6 @@ A = np.array([[1,-1,2],[3,2,0]])
 col = A[:,1:2]
 ## 第一个切片选择A中的所有行，而第二个切片仅选择每行中的中间条目
 ```
-
-
 
 #### 数组切片步长
 
@@ -589,10 +587,6 @@ x = np.linalg.solve(A,b)
 
 https://www.numpy.org.cn/article/other/py_basic_ops.html#%E7%9B%AE%E6%A0%87
 
-
-
-
-
 ---
 
 ## 5. 常用函数
@@ -610,8 +604,6 @@ https://www.numpy.org.cn/article/other/py_basic_ops.html#%E7%9B%AE%E6%A0%87
   ```python
   np.random.randn(100)	##生成100个
   ```
-
-  
 
 * random.randint()——生成范围内服从正态分布的随机数
 

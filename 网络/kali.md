@@ -70,16 +70,66 @@ apt --fix-broken install
 * 更新源和软件
 
   ```bash
-  apt-get update -y && apt-get upgrade -y && apt-get clean
+  apt update -y && apt upgrade -y && apt clean
   
   OK！
   ```
 
-# 2. kali安装必备
+# 2. kali必备安装
 
-## 1）磁盘扩展
+## 更新软件
 
-https://blog.csdn.net/hktkfly6/article/details/123302335
+apt是新版本，apt-get是旧版本的包管理器。
+
+```bash
+apt update	#查看有新版本的包、依赖
+apt list --upgradeable	#查看可升级软件、包、依赖
+apt upgrade -y	#升级
+apt-get clean	#清除下载的已安装过的软件包
+```
+
+## 安装vscode
+
+```bash
+#安装vscode
+官网下载deb
+apt install ./deb安装
+#终端下打开vscode
+code	#打开vscode
+code .	#在当前目录打开vscode
+code ./demo.py	#vscode打开demo.py文件
+```
+
+## ssh连接
+
+```bash
+#删除本身的ssh秘钥
+rm -rf /etc/ssh/ssh_host_*
+#重新生成密钥
+dpkg-reconfigure openssh-server
+#重启ssh服务
+systemctl restart ssh
+#宿主机连接。ssh的端口为22
+ssh -p 端口 用户名@ip
+#断开
+logout
+```
+
+## 设置共享文件夹
+
+通过ssh方式设置主机和Linux之间的共享文件夹。
+
+在宿主机和Linux上都安装unison。
+
+```bash
+apt install unison -y
+```
+
+宿主机输入：
+
+```bash
+unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径
+```
 
 
 
@@ -380,7 +430,9 @@ https://blog.csdn.net/weixin_45588247/article/details/119614618
 
 win7系统的漏洞。
 
+# 15. VM虚拟机磁盘扩展
 
+https://blog.csdn.net/hktkfly6/article/details/123302335
 
 
 
