@@ -40,7 +40,7 @@ subprocess.run(args, *, stdin=None, input=None, stdout=None, stderr=None, shell=
 
   **stdin、stdout 和 stderr**：子进程的标准输入、输出和错误。其值可以是`subprocess.PIPE`、`subprocess.DEVNULL`、一个已经存在的文件描述符、已经打开的文件对象或者 None。
 
-  **shell：Linux 中，当 args 是个字符串是，请设置 shell=True，当 args 是个列表的时候，shell 保持默认的 False。**
+  **shell：Linux 中，当 args 是个字符串时（不要用变量赋值字符串，直接把字符串写到Popen中），请设置 shell=True，当 args 是个列表的时候，shell 保持默认的 False。**
 
   **timeout**：设置命令超时时间。如果命令执行时间超时，子进程将被杀死，并弹出`TimeoutExpired`异常。
 
@@ -61,10 +61,10 @@ subprocess.run(args, *, stdin=None, input=None, stdout=None, stderr=None, shell=
   	print(res.stdout)
   except subprocess.CalledProcessError as e:
       print("错误信息:\n")
-      print(e.output)
+      print(e.output.decode('utf-8').strip())
   ```
 
-### 2）subprocess.Popen()
+### 2）subprocess.Popen()（推荐使用）
 
 用法和参数与run()方法、参数列表基本类同，但是它的返回值是一个Popen对象，而不是`CompletedProcess`对象。
 
@@ -78,11 +78,15 @@ Popen对象的stdin、stdout和stderr是三个文件句柄，可以像文件那�
 #! /usr/bin/python3
 
 import subprocess
+##使用列表形式的命令
 mycmd=["ls", "-la"]
-res=subprocess.Popen(args=mycmd,shell=False,stdout=subprocess.PIPE);
+res=subprocess.Popen(args=mycmd,shell=False,stdout=subprocess.PIPE)
+##直接把命令字符串卸载Popen中（推荐使用）
+res=subprocess.Popen('ls -al',stdout=subprocess.PIPE,shell=False)
+
 out=res.stdout.read()
 res.stdout.close()
-print(out)
+print(out.decode('utf-8').strip())
 ```
 
 ```python
@@ -90,7 +94,38 @@ print(out)
 s.stdin.write(b"import os\n")
 ```
 
-## 3. 打开新终端
+# 3.获取Popen输出
+
+```python
+#stdout=subprocess.PIPE参数表示将命令的输出重定向到一个管道中。然后使用communicate()方法获取进程的输出结果。
+import subprocess
+
+# 执行命令，获取输出结果
+proc = subprocess.Popen(['ls', '-l'], stdout=subprocess.PIPE)
+output = proc.communicate()[0]
+
+# 输出结果
+print(output.strip())#去掉换行符
+```
+
+```python
+import subprocess
+
+proc = subprocess.Popen(['ls', '-l'], stdout=subprocess.PIPE)
+
+# 非阻塞方式获取输出结果
+while proc.stdout.readable():
+    output = proc.stdout.read(1)
+    if not output:
+        break
+    print(output.decode('utf-8').strip(), end='')
+```
+
+
+
+
+
+## 4. 打开新终端
 
 ```python
 #! /usr/bin/python3
@@ -100,7 +135,7 @@ cmd=["gnome-terminal"]
 res=subprocess.Popen(cmd)
 ```
 
-## 4. 打开新终端并在新终端下执行命令
+## 5. 打开新终端并在新终端下执行命令
 
 https://blog.csdn.net/fengqianlang/article/details/131190515
 
@@ -123,7 +158,7 @@ def run_command(command):
 run_command("ls -al")
 ```
 
-## 5. 调用c#程序
+## 6. 调用c#程序
 
 ```python
 import subprocess

@@ -25,7 +25,7 @@ https://www.numpy.org.cn/article/basics/an_introduction_to_scientific_python_num
 
 * **概念**
 
-  ==numpy中的ndarray(n-dimensional-array)为多维数组==，是numpy中最为重要也是python进行科学计算非常重要和基本的数据类型。numpy中基本的运算符进行了重载，算数运算符和逻辑运算符都是逐元素操作的，还有==广播机制(broadcasting)==，使得一个标量与多维数组相互运算的时候也是逐元素运算。==ndarray 的一个特点是同构：即其中所有元素的类型必须相同。==
+  numpy中的ndarray(n-dimensional-array)为多维数组，是numpy中最为重要也是python进行科学计算非常重要和基本的数据类型。numpy中基本的运算符进行了重载，算数运算符和逻辑运算符都是逐元素操作的，还有广播机制(broadcasting)，使得一个标量与多维数组相互运算的时候也是逐元素运算。ndarray 的一个特点是同构：即其中所有元素的类型必须相同。
 
   ndarray和Python库类不同`array.array`，后者只处理一维数组并提供较少的功能。
 
@@ -33,8 +33,16 @@ https://www.numpy.org.cn/article/basics/an_introduction_to_scientific_python_num
 
   可以把axis看成是存放下标的一个框框（虽然不准确，但是这么理解用起来没有问题），第一个框就是第0个axis, 第二个框就是第1个axis……
 
-  对于矩阵$T_{ijk}(i=0,1,2;j=0,1,2,3;k=0,1,2,3,4)$，==sum(axis=0)==即$T_{jk}=\sum_{i=0}^{2}{T_{jk}}$
-
+  对于矩阵
+  $$
+  T_{ijk}(i=0,1,2;j=0,1,2,3;k=0,1,2,3,4)
+  $$
+  
+  $$
+  sum(axis=0)即T_{jk}=\sum_{i=0}^{2}{T_{jk}}
+  $$
+  
+  
   ```python
   np.ones((3,4,5)) = 
   [[[1. 1. 1. 1. 1.]
@@ -130,7 +138,7 @@ a = numpy.eye(2)	# 生成2*2单位矩阵
 ```
 
 ```python
-z = np.ones([3], dtype = int)  
+z = np.ones((1,3), dtype = int)  
 print(z)	# [1 1 1]
 
 a = np.ones((2,3,2))
@@ -138,16 +146,16 @@ a = np.ones((2,3,2))
 
 #### 其他Python的结构进行转换——array()
 
-==注意：传入的是列表、元组，而不是单个数值==
+**注意：传入的是列表、元组，而不是单个数值**
 
 ```python
 numpy.asarray(a, dtype) # 类似于numpy.array(a)
 numpy.fromiter(a, dtype) # 此函数从任何可迭代对象构建一个ndarray对象，返回一个新的一维数组。
 ```
 
-> **asarry和array区别点：
+> **asarray和array区别点：
 > （1）当他们的参数是列表型数据(list)时，二者没有区别；
-> （2）当他们的参数是数组类型(array)时，==np.array()会返回参数数组的一个副本==(copy，两者值一样但指向不同的内存),==np.asarray()会返回参数数组的一个引用==(两者指向同一块内存).**
+> （2）当他们的参数是数组类型(array)时，np.array()会返回参数数组的一个副本(copy，两者值一样但指向不同的内存),np.asarray()会返回参数数组的一个引用(两者指向同一块内存).**
 
 > **list和array的区别：**
 >
@@ -201,7 +209,7 @@ print(a) #[0. 1. 2. 3. 4.]
 
 ### （3）数组属性
 
-**shape——数组尺寸，元组。若矩阵是$n*m$阶，则shape=(n,m)**
+**shape——数组尺寸，元组。若矩阵是n*m阶，则shape=(n,m)**
 
 **size——数组元素总数，等于shape的元素乘积**
 
@@ -283,7 +291,7 @@ print(a) #[0. 1. 2. 3. 4.]
   (2, 3, 2)
   ```
   
-  **a被扩展为（2,3,2)shape的数组，$a[1][i][j]=a[0][i][j]$。b也同理被扩展为(2,3,2)shape的数组，$b[i][j][1]=b[i][j][0]$。**
+  **a被扩展为（2,3,2)shape的数组，a[1][i][j]=a[0][i][j]。b也同理被扩展为(2,3,2)shape的数组，b[i][j][1]=b[i][j][0]。**
   
 * **demo**
 
@@ -387,13 +395,38 @@ print(np.sqrt(x))
 
 #### **矩阵扁平化**
 
-将多维矩阵展开成一维
+将[多维数组](https://so.csdn.net/so/search?q=多维数组&spm=1001.2101.3001.7020)降为一维
 
 > flatten和ravel区别
 >
 > Numpy中经常使用到的操作由扁平化操作,Numpy提供了两个函数进行此操作,他们的功能相同,但在内存上有很大的不同。
 >
-> 我们在平时使用的时候flatten()更为合适.在使用过程中==flatten()分配了新的内存,但ravel()返回的是一个数组的视图==.视图是数组的引用(说引用不太恰当,因为原数组和ravel()返回后的数组的地址并不一样),在使用过程中应该注意避免在修改视图时影响原本的数组。==在实际应用中应尽量使用flatten()函数==,这样避免意外的错误。
+> 我们在平时使用的时候flatten()更为合适.在使用过程中==flatten()分配了新的内存,但ravel()返回的是一个数组的视图==.视图是数组的引用(说引用不太恰当,因为原数组和ravel()返回后的数组的地址并不一样),在使用过程中应该注意避免在修改视图时影响原本的数组。在实际应用中应尽量使用flatten()函数,这样避免意外的错误。
+
+```python
+In [14]: x=np.array([[1,2],[3,4]])
+
+# flattenh函数和ravel函数在降维时默认是行序优先
+In [15]: x.flatten()
+Out[15]: array([1, 2, 3, 4])
+
+In [17]: x.ravel()
+Out[17]: array([1, 2, 3, 4])
+
+# 传入'F'参数表示列序优先
+In [18]: x.flatten('F')
+Out[18]: array([1, 3, 2, 4])
+
+In [19]: x.ravel('F')
+Out[19]: array([1, 3, 2, 4])
+
+#reshape函数当参数只有一个-1时表示将数组降为一维
+In [21]: x.reshape(-1)
+Out[21]: array([1, 2, 3, 4])
+#x.T表示x的转置
+In [22]: x.T.reshape(-1)
+Out[22]: array([1, 3, 2, 4])
+```
 
 #### 数组切片
 
