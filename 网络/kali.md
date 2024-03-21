@@ -268,7 +268,11 @@ arpspoof -i eth0(网卡名) -t 靶机ip 网关
 
 # 8. BrupSuite
 
-安装：https://blog.csdn.net/xf555er/article/details/130452476
+安装：
+
+​			[burp_suite_pro_v2023.10.zip](https://zhuanlan.zhihu.com/p/671358251)
+
+​			https://blog.csdn.net/xf555er/article/details/130452476
 
 ​			https://www.52pojie.cn/thread-1544866-1-1.html
 
@@ -434,9 +438,11 @@ win7系统的漏洞。
 
 https://blog.csdn.net/hktkfly6/article/details/123302335
 
+# 16. 设置代理IP
 
+[Windows设置代理](https://zhuanlan.zhihu.com/p/486039122#:~:text=%E9%A6%96%E5%85%88%E7%82%B9%E5%87%BB%E6%A1%8C%E9%9D%A2%E5%8F%B3%E4%B8%8B%E8%A7%92%E7%9A%84%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E5%9B%BE%E6%A0%87%EF%BC%8C%E5%A6%82%E5%9B%BE%E6%89%80%E7%A4%BA%EF%BC%9A%20%E7%84%B6%E5%90%8E%E7%82%B9%E5%87%BB%E2%80%9C%E7%BD%91%E7%BB%9C%E5%92%8CInternet%E8%AE%BE%E7%BD%AE%E9%80%89%E9%A1%B9%E2%80%9D%EF%BC%8C%E6%A0%B9%E6%8D%AE%E6%8F%90%E7%A4%BA%E9%80%90%E6%AD%A5%E6%93%8D%E4%BD%9C%EF%BC%8C%E4%B8%8B%E5%9B%BE%E5%B7%B2%E7%BB%8F%E6%A0%87%E6%B3%A8%E5%87%BA%E6%AD%A5%E9%AA%A4%EF%BC%9A%201%E3%80%81%E7%82%B9%E5%87%BB%E4%BB%A3%E7%90%86%3B,2%E3%80%81%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%89%E6%8B%A9%E4%B8%BA%E5%BC%80%3B%203%E3%80%81%E8%BE%93%E5%85%A5ip%E5%92%8C%E7%AB%AF%E5%8F%A3%3B%204%E3%80%81%E7%82%B9%E5%87%BB%E4%BF%9D%E5%AD%98%E3%80%82)
 
-
+国内免费代理IP：https://zhuanlan.zhihu.com/p/395461277
 
 
 
