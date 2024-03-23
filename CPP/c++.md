@@ -14,10 +14,6 @@ https://blog.csdn.net/mjy520123/article/details/120297021
 
 ![image-20230828172251820](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230828172251820.png)
 
-
-
-
-
 ## 2. 编译
 
 每个.cpp文件都编译成1个.o目标文件（二进制代码），经过链接器链接形成可执行文件。

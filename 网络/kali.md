@@ -170,9 +170,9 @@ crunch 2 3 012345 -o ./aaa.txt
 
 爆破法破解：纯数字密码不超过十位的话还有希望，带标点的基本就不用试了，要是再带字母。
 
-### 1）**解压缩全能王这样的云解密软件，只要服务器上存储有压缩包密码就可以获取。这种方法成功率最高。**
+## 1）**解压缩全能王这样的云解密软件，只要服务器上存储有压缩包密码就可以获取。这种方法成功率最高。**
 
-### 2）hashcat破解
+## 2）hashcat破解
 
 * 获得压缩包hash-code
 
@@ -196,7 +196,7 @@ crunch 2 3 012345 -o ./aaa.txt
 
 ![image-20240310195523847](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240310195523847.png?token=ANG32YGJ5VAV3XVRDUBLS2LF5WQDO)
 
-### 3）john破解
+## 3）john破解
 
 ```bash
 zip2john aaa.zip > hash_code.txt

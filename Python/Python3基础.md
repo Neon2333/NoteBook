@@ -1511,6 +1511,90 @@ surface.blit(source，dest=None，special_flags=0)
 
 ---
 
+# OCR识别库
+
+https://blog.csdn.net/qq_38017966/article/details/118724459
+
+## （1）muggle_ocr
+
+muggle_ocr是一款轻量级的ocr识别库，从名字也可以看出来，专为麻瓜设计！使用也非常简单，但其强项主要是用于识别各类验证码，一般文字提取效果就稍差了。
+
+python库安装命令如下：
+
+```python
+pip install muggle_ocr
+```
+
+```python
+import muggle_ocr
+
+# 初始化sdk；model_type 包含了 ModelType.OCR/ModelType.Captcha 两种模式,分别对应常规图片与验证码
+sdk = muggle_ocr.SDK(model_type=muggle_ocr.ModelType.Captcha)
+
+with open(r"d:\Desktop\四位验证码.png", "rb") as f:
+    img = f.read()
+
+text = sdk.predict(image_bytes=img)
+print(text)
+
+```
+
+## （2）easyocr
+
+github上一万多个star的开源ocr项目（github地址：[EasyOCR](https://github.com/JaidedAI/EasyOCR)），支持80多种语言的识别，识别精度超高。
+
+python库安装命令如下：
+
+```python
+pip install easyocr
+```
+
+```python
+import easyocr
+
+#设置识别中英文两种语言
+reader = easyocr.Reader(['ch_sim','en'], gpu = False) # need to run only once to load model into memory
+result = reader.readtext(r"d:\Desktop\4A34A16F-6B12-4ffc-88C6-FC86E4DF6912.png", detail = 0)
+print(result)
+
+```
+
+初次运行需要在线下载检测模型和识别模型，建议在网速好点的环境运行：
+
+> Using CPU. Note: This module is much faster with a GPU.
+> Downloading detection model, please wait. This may take several minutes depending upon your network connection.
+> Downloading recognition model, please wait. This may take several minutes depending upon your network connection.
+
+识别结果输出如下，没有遗漏任何一个文字，精度甚至要优于前面的PaddleOCR。
+
+## （3）paddleOCR
+
+```python
+from paddleocr import paddleOCR
+#实例化OCR模型
+ocr=PaddleOCR()
+#识别图片中文字
+ret=ocr.ocr('img.png')
+print("识别结果：{ret}".format(ret))
+#将识别出的文字保存到txt文件中
+with open('文字.txt','a',encoding='utf-8') as file:
+    #遍历出文字识别结果
+    for line in ret:
+        #遍历出识别的每一行数据
+            #提取出识别数据中的文字元祖
+            text_line=word[-1]
+            #从文字元祖中提取文字内容
+            text=text_line[0]
+            print('text:',text)
+            #将文字内容写入到文件中
+            file.write(text+'\n')
+print("识别结果已保存到文本")
+```
+
+
+
+---
+
 # 数据可视化库——MatPlotLib库
 
 ## 1. 安装

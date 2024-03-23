@@ -1,12 +1,13 @@
-<<<<<<< Updated upstream
-||||||| constructed merge base
-# 重点
+## 0. 在线操作
 
-=======
+* 在线编辑器：在github.com后加1s变为github1s.com
+* 查找文件：按下t键搜索文件名
+* 通过sourcegraph查看
+* 代码块生成链接：shift+点击代码行号
 
 
->>>>>>> Stashed changes
-## 1. *版本回滚——git reset*
+
+## 1. 版本回滚——git reset
 
 **reset和revert的区别：reset会删除某commit-id之后所有的commit**
 
