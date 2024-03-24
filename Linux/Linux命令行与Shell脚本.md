@@ -179,6 +179,28 @@ apt install unison -y
 unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径	#ssh端口为22
 ```
 
+### （13）安装c++编译器
+
+安装g++编译器的命令：
+
+```bash
+sudo apt-get install build-essential
+```
+
+执行完后，就完成了gcc,g++,make的安装。build-essential是一整套工具，gcc，libc等等。
+
+通过“g++ -v”可以查看g++是否安装成功。
+
+注：`sudo apt-get install build-essential –fix-missing`，这个命令是修补安装build-essential，即已安装了部分build-essential，但没有安装完全，此时可以使用该命令继续安装build-essential。
+
+### （14）定时关机
+
+```bash
+shutdown -h now 
+shutdown -h 30	#30min后
+shutdown -h 23:00	#23:00关机
+```
+
 
 
 ---

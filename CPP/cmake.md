@@ -21,6 +21,8 @@ aaa1:aaa1.cc表示aaa1依赖aaa1.cc。
 
 make clean指令将执行clean标签下的命令。
 
+命令需要以[TAB]键开始。
+
 ```bash
 all:aaa1 aaa2 aaa3 aaa4 aaa5	#1行写不下可以在一行末尾加上\
 
@@ -45,6 +47,8 @@ clean:
 类似宏定义。
 
 定义变量，都是字符串格式。以`$()`使用。
+
+**.PHONY**修饰的目标就是只有规则没有依赖。
 
 * 使用变量替代在编译指令中**多次重复出现**的、**很长一串**的或是**需要修改**的参数。
 
@@ -110,6 +114,7 @@ target2=client        //客户端目标文件client
 src=$(wildcard *.c)   //用wildcard函数找到所有.c文件，server.c、client.c、wrap.c
 deps=$(wildcard *.h)   //用wildcard函数找到所有的.h文件，wrap.h
 obj=$(patsubst %.c,%.o,$(src))    //用patsubst函数将所有.c文件替换成.o文件
+#obj = $(src:%.c=%.o)
 
 all:$(target1) $(target2)    //目标文件server和client，多个目标文件一定形成此依赖关系
 
@@ -125,6 +130,31 @@ $(target2):client.o wrap.o  //client的依赖为client.o和wrap.o
 .PHONY:clean  //伪文件，需要在终端输入make clean才会调用
 clean:
   -rm -rf $(target1) $(target2) $(obj)   //删除所有的目标文件以及中间目标文件，用于重新编译。
+```
+
+```bash
+target1=server        
+target2=client        
+src=$(wildcard *.c)   
+deps=$(wildcard *.h)   
+obj=$(patsubst %.c,%.o,$(src))
+#obj = $(src:%.c=%.o)
+CC=g++
+
+all:$(target1) $(target2)    
+
+$(target1):server.o wrap.o  
+	$(CC) $^ -o $@ -Wall   
+  
+$(target2):client.o wrap.o  
+	$(CC) $^ -o $@ -Wall  
+
+%.o:%.c $(deps)  
+	$(CC) -c $< -o $@ -Wall   
+
+.PHONY:clean 
+clean:
+	rm -rf $(target1) $(target2) *.o   
 ```
 
 

