@@ -16,6 +16,8 @@ python3 test.py
 
 ## 2. subprocess模块
 
+***可执行bash命令或bash脚本。***
+
 subprocess 模块替代了一些老的模块和函数，**比如：`os.system`**
 
 subprocess 过去版本中的`call()`，`check_call()`和`check_output()`已经被`run()`方法取代了。`run()`方法为 3.5 版本新增。
