@@ -1,6 +1,6 @@
 # 1. 更换国内源
 
-### 1）更新源
+### （1）更新源
 
 `vim /etc/apt/sources.list`**  
 
@@ -32,7 +32,7 @@ sudo apt-get clean #删除缓存包
 sudo apt-get autoclean #删除未安装的deb包
 ```
 
-### 缺少pyrit，并且E :pyrit无法定位的问题：
+### （2）缺少pyrit，并且E :pyrit无法定位的问题：
 
 手动安装pyrit
 
@@ -44,7 +44,7 @@ git clone https://github.com/hacker3983/pyrit-installer.git
  bash install.sh
 ```
 
-### 出现存在软件包未满足依赖时：
+### （3）出现存在软件包未满足依赖时：
 
 有的比较老的博客提供镜像源的版本是bonic，你的系统版本可能比较新可能是focal， 直接复制别人的镜像源，版本代码对不上， 就会出错。
 
@@ -55,7 +55,7 @@ apt --fix-broken install
 
 ![image-20240309000436276](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240309000436276.png?token=ANG32YAYUCDRH27QRDYTFQTF5M32A)
 
-### 当出现更新源签名无效问题时：
+### （4）当出现更新源签名无效问题时：
 
 ![image-20240308222536760](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240308222536760.png?token=ANG32YFQKKYRTQEWKTWJSMDF5MXYE)
 
@@ -142,6 +142,24 @@ sudo apt-get install build-essential
 通过“g++ -v”可以查看g++是否安装成功。
 
 注：“sudo apt-get install build-essential –fix-missing”，这个命令是修补安装build-essential，即已安装了部分build-essential，但没有安装完全，此时可以使用该命令继续安装build-essential。
+
+## 终端美化
+
+* 安装[wezterm](https://wezfurlong.org/wezterm/install/linux.html)
+
+* [配置](https://zhuanlan.zhihu.com/p/588576407)
+
+  ```bash
+  mkdir -p  ~/.config/wezterm/	
+  ```
+
+  下载文件wezterm.lua，并且将之放到wezterm文件夹里，再用命令行赋予可执行权限：
+
+  ```bash
+  chmod 777 ~/.config/wezterm/wezterm.lua
+  ```
+
+  
 
 # 3. fluxion
 

@@ -481,11 +481,272 @@ MyFunc(${FirstArg} "bbb")
 
 ## （6）作用域
 
+变量都是传值使用，函数内修改变量不会改变函数外部同名变量。
+
+## （7）宏
+
+会读就行。自己不要写。
+
+调用宏相当于将宏定义中的代码段先直接替换。随后再执行代码。
+
+```cmake
+macro(Test Var)
+	set(Var "new value")
+	message("var=${Var}")
+endmacro()
+
+set(Var "first value")
+message("var=${Var}")
+Test("value")
+message("var=${Var}")
+#var=first value
+#var=
+```
+
+# 4. 构建项目
+
+## （1）直接写入源码路径
+
+简单的小项目用这个。
+
+* add_executable()中直接写入相对路径
+* 在源码中引入头文件时要写相对路径
+
+```c++
+//在项目project下新建animal文件夹：animal/dog.h
+#pragma once
+#include<string>
+class Dog{
+	public:
+    	std::string barking();
+}
+
+///dog.cpp
+std:string Dog::barking()
+{
+    std::cout<<"wow"<<std::endl;
+    return 0;
+}
+
+//main.cpp
+#include<iostream>
+#include"animal/dog.h"
+int main()
+{
+    Dog dog;
+    dog.barking();
+    return 0;
+}
+```
+
+```cmake
+#CmakeLists.txt
+cmake_minimum_required(VERSION 3.20)
+project(Animal CXX)	#CXX表示C++
+set(CMAKE_CXX_STANDARD 11)	#设定c++版本
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+add_exectuable(Animal main.cpp animal/dog.cpp)
+```
+
+```bash
+cmake -B build
+cmake --build build
+
+./build/Animal
+```
 
 
 
+## （2）调用子目录cmake脚本
 
+* 在project/animal目录下创建`animal.cmake`脚本文件
 
+  ```cmake
+  set(animal_sources animal/dog.cpp animal/cat.cpp animal/cow.cpp)
+  ```
 
+* 编写CmakeLists.txt时把`animal.cmake`脚本文件包含进
 
+  ```cmake
+  cmake_minimum_required(VERSION 3.20)
+  project(Animal CXX)
+  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD_REQUIRED True)
+  
+  include(animal/animal.cmake)
+  add_exectuable(Animal main.cpp ${animal_sources})
+  ```
+
+## （3）常用—Cmakelists嵌套
+
+* 在project/animal目录下创建CmakeLists.txt（子CmakeLists.txt）文件：
+
+  ```cmake
+  #生成库文件（默认生成静态库）
+  add_library(AnimalLib dog.cpp cat.cpp cow.cpp)
+  ```
+
+* 在project下创建CmakeLists.txt（父CmakeLists.txt）：
+
+  ```cmake
+  cmake_minimum_required(VERSION 3.20)
+  project(Animal CXX)
+  set(CMAKE_CXX_STANDARD 11)
+  set(CMAKE_CXX_STANDARD_REQUIRED True)
+  
+  add_subdirectory(animal)	#添加子目录/animal
+  target_include_directories(Animal PUBLIC "${PROJECT_SOURCE_DIR}/animal")	#指定头文件目录
+  target_link_libraries(Animal PUBLIC AnimalLib)	#链接库文件AnimalLib
+  add_exectuable(Animal main.cpp)
+  ```
+
+# 5. 调用库文件
+
+## （1）调用静态库
+
+### 步骤：
+
+* 指定头文件目录`include_directories`
+* 指定静态库目录`link_directories`
+* 指定要链接的静态库`link_libraries`
+* 生成可执行文件
+
+project
+
+> a
+>
+> > libanimal.a
+>
+> include
+>
+> > dog.h
+> >
+> > cat.h
+> >
+> > cow.h
+>
+> so
+>
+> > libanimal.so
+>
+> CmakeLists.txt
+>
+> main.cpp
+
+```cmake
+#CmakeLists.txt
+cmake_minimum_required(VERSION 3.20)
+project(Animal CXX)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+include_directories(${PROJECT_SOURCE_DIR}/include)	#指定头文件目录
+link_directories(${PROJECT_SOURCE_DIR}/a)	#指定静态库目录
+link_libraries(animal)	#指定要链接的静态库名称
+add_exectuable(app main.cpp)	#生成可执行文件
+```
+
+## （2）调用动态库
+
+动态库先调用`add_exectuable`生成可执行文件命令。
+
+再通过`target_link_libraries`链接动态库。
+
+```cmake
+#CmakeLists.txt
+cmake_minimum_required(VERSION 3.20)
+project(Animal CXX)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+include_directories(${PROJECT_SOURCE_DIR}/include)	#指定头文件目录
+link_directories(${PROJECT_SOURCE_DIR}/so)	#指定动态库目录
+add_exectuable(app main.cpp)	#生成可执行文件
+target_link_libraries(app PUBLIC animal)	#指定要链接的动态库名称
+```
+
+　　在`cmake`语法中，`link_libraries`和`target_link_libraries`是很重要的两个链接库的方式，虽然写法上很相似，但是功能上有很大区别：
+
+- `link_libraries`用来链接静态库，`target_link_libraries`用来链接导入库，即按照`头文件 + .lib(动态库导入库) + .dll(动态库)`方式隐式调用动态库的`.lib`导入库
+- `link_libraries`用在`add_executable`之前，`target_link_libraries`用在`add_executable`之后
+
+# 6. Cmake条件编译
+
+通过对宏赋不同的值，编译不同的文件。
+
+使用`-D`参数指定宏的不同值：
+
+```bash
+`cmake -B build -D USE_CAT=ON`
+```
+
+project
+
+> animal
+>
+> > dog.h
+> >
+> > dog.cpp
+> >
+> > cat.h
+> >
+> > cat.cpp
+> >
+> > cat2.h
+> >
+> > cat2.cpp
+> >
+> > CmakeLists.txt（子CmakeLists.txt）
+>
+> CmakeLists.txt（父CmakeLists.txt）
+>
+> main.cpp
+
+```cmake
+#子CmakeLists.txt
+option(USE_CAT2 "compile cat" OFF)	#宏USE_CAT默认值设为ON
+
+if(USE_CAT2)
+	set(SRC cat.cpp)
+else()
+	set(SRC dog.cpp)
+endif()
+
+add_library(Animal ${SRC})	#生成静态库
+
+#若使用USE_CAT，则向AnimalLib相关代码中声明要使用宏USE_CAT
+if(USE_CAT2)
+	target_compile_definitions(AnimalLib PRIVATE "USE_CAT2")
+endif()
+```
+
+* `target_compile_definitions()` 函数用于为指定的 CMake 目标添加编译定义。编译定义是传递给编译器的宏定义，它们可以影响代码的编译方式。
+
+```c++
+//cat.h
+#include "cat.h"
+#ifdef USE_CAT2
+    #include "cat2.h"
+#endif
+
+std:string barking()
+{
+    #ifdef USE_CAT2
+    	return cat2::barking();	//cat2 bark..
+    #else
+    	return "cat bark.."
+    #endif
+}
+```
+
+```bash
+cmake -B build	#默认USE_CAT2=OFF
+# cat bark..
+
+rm -rf build
+
+cmake -B build -DUSE_CAT2=ON
+#cat2 bark..
+```
 
