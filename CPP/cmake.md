@@ -7,7 +7,7 @@
 ```bash
 g++ -E aaa.cc -o aaa.i	#预编译
 g++ -S aaa.i -o aaa.s	#编译
-g++ -c aaa.o -o aaa.s	#汇编
+g++ -c aaa.s -o aaa.o	#汇编
 g++ aaa.o -o aaa		#链接
 ```
 
@@ -27,7 +27,7 @@ g++ aaa.o -o aaa		#链接
 
 ```bash
 # 生成静态库
-ar rsvc math_functions.o libmath_functions.a 
+ar rsvc libmath_functions.a math_functions.o
 
 # 生成动态链接库
 g++ math_functions.o -shared -fPIC -o libmath_functions.so 	#-shared表示生成动态库，-fPIC生成位置无关代码
@@ -540,7 +540,7 @@ int main()
 ```
 
 ```cmake
-#CmakeLists.txt
+#CMakeLists.txt
 cmake_minimum_required(VERSION 3.20)
 project(Animal CXX)	#CXX表示C++
 set(CMAKE_CXX_STANDARD 11)	#设定c++版本
@@ -566,7 +566,7 @@ cmake --build build
   set(animal_sources animal/dog.cpp animal/cat.cpp animal/cow.cpp)
   ```
 
-* 编写CmakeLists.txt时把`animal.cmake`脚本文件包含进
+* 编写CMakeLists.txt时把`animal.cmake`脚本文件包含进
 
   ```cmake
   cmake_minimum_required(VERSION 3.20)
@@ -574,38 +574,99 @@ cmake --build build
   set(CMAKE_CXX_STANDARD 11)
   set(CMAKE_CXX_STANDARD_REQUIRED True)
   
-  include(animal/animal.cmake)
+  include(animal/animal.cmake)	#引入脚本文件
   add_exectuable(Animal main.cpp ${animal_sources})
   ```
 
-## （3）常用—Cmakelists嵌套
+## （3）常用—CMakeLists嵌套
 
-* 在project/animal目录下创建CmakeLists.txt（子CmakeLists.txt）文件：
+project
+
+> a
+>
+> > libcat.a
+>
+> animal
+>
+> > dog.cpp
+> >
+> > cow.cpp
+> >
+> > CMakeLists.txt
+>
+> include
+>
+> > cat.h
+> >
+> > dog.h
+> >
+> > cow.h
+>
+> CMakeLists.txt
+>
+> main.cpp
+
+* main.cpp
+
+  ```cpp
+  #include<iostream>
+  #include"include/dog.h"
+  #include "include/cat.h"
+  
+  
+  int main(int argc, char** argv)
+  {
+      cat c;
+      std::cout<<c.bark()<<std::endl;  
+      dog d;
+      std::cout<<d.bark()<<std::endl;
+      return 0;
+  
+  }
+  ```
+
+  
+
+* 在project/animal目录下创建CMakeLists.txt（子CMakeLists.txt）文件：
+
+  生成静态库：
 
   ```cmake
   #生成库文件（默认生成静态库）
   add_library(AnimalLib dog.cpp cat.cpp cow.cpp)
+  #生成静态库
+  add_library(AninmalLib STATIC dog.cpp)
+  #生成动态库
+  add_library(AninmalLib SHARED dog.cpp)
   ```
 
-* 在project下创建CmakeLists.txt（父CmakeLists.txt）：
+* 在project下创建CMakeLists.txt（父CMakeLists.txt）：
 
+  `${PROJECT_SOURCE_DIR}表示项目路径`
+  
   ```cmake
-  cmake_minimum_required(VERSION 3.20)
-  project(Animal CXX)
+  cmake_minimum_required(VERSION 3.28.3)
+  project(App CXX)
   set(CMAKE_CXX_STANDARD 11)
   set(CMAKE_CXX_STANDARD_REQUIRED True)
   
   add_subdirectory(animal)	#添加子目录/animal
-  target_include_directories(Animal PUBLIC "${PROJECT_SOURCE_DIR}/animal")	#指定头文件目录
-  target_link_libraries(Animal PUBLIC AnimalLib)	#链接库文件AnimalLib
-  add_exectuable(Animal main.cpp)
+  link_directories(${PROJECT_SOURCE_DIR}/a)
+  link_libraries(cat)
+  add_executable(App main.cpp)
+  target_include_directories(App PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include") 
+  target_link_libraries(App PUBLIC AnimalLib)	#链接库文件AnimalLib
   ```
 
 # 5. 调用库文件
 
+**.h头文件是编译时必须的，lib是链接时需要的，dll是运行时需要的**。
+
 ## （1）调用静态库
 
-### 步骤：
+**先指定静态库，再生成可执行文件。**
+
+步骤：
 
 * 指定头文件目录`include_directories`
 * 指定静态库目录`link_directories`
@@ -625,45 +686,47 @@ project
 > > cat.h
 > >
 > > cow.h
+> >
+> > animal.h
 >
 > so
 >
 > > libanimal.so
 >
-> CmakeLists.txt
+> CMakeLists.txt
 >
 > main.cpp
 
 ```cmake
-#CmakeLists.txt
+#CMakeLists.txt
 cmake_minimum_required(VERSION 3.20)
-project(Animal CXX)
+project(App CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)	#指定头文件目录
 link_directories(${PROJECT_SOURCE_DIR}/a)	#指定静态库目录
 link_libraries(animal)	#指定要链接的静态库名称
-add_exectuable(app main.cpp)	#生成可执行文件
+add_exectuable(App main.cpp)	#生成可执行文件
 ```
 
 ## （2）调用动态库
 
-动态库先调用`add_exectuable`生成可执行文件命令。
+**和调用静态库最后的顺序不同。调用动态库必须先调用`add_exectuable`生成可执行文件命令。再通过`target_link_libraries`链接动态库。**
 
-再通过`target_link_libraries`链接动态库。
+因为动态库作用于运行时。要先生成可执行文件。
 
 ```cmake
-#CmakeLists.txt
+#CMakeLists.txt
 cmake_minimum_required(VERSION 3.20)
-project(Animal CXX)
+project(App CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 include_directories(${PROJECT_SOURCE_DIR}/include)	#指定头文件目录
 link_directories(${PROJECT_SOURCE_DIR}/so)	#指定动态库目录
-add_exectuable(app main.cpp)	#生成可执行文件
-target_link_libraries(app PUBLIC animal)	#指定要链接的动态库名称
+add_exectuable(App main.cpp)	#生成可执行文件
+target_link_libraries(App PUBLIC animal)	#指定要链接的动态库名称
 ```
 
 　　在`cmake`语法中，`link_libraries`和`target_link_libraries`是很重要的两个链接库的方式，虽然写法上很相似，但是功能上有很大区别：
@@ -671,7 +734,43 @@ target_link_libraries(app PUBLIC animal)	#指定要链接的动态库名称
 - `link_libraries`用来链接静态库，`target_link_libraries`用来链接导入库，即按照`头文件 + .lib(动态库导入库) + .dll(动态库)`方式隐式调用动态库的`.lib`导入库
 - `link_libraries`用在`add_executable`之前，`target_link_libraries`用在`add_executable`之后
 
-# 6. Cmake条件编译
+# 6.重点— 命令总结
+
+| -命令                                                        | -功能                                                        |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| cmake_minimun_required(VERSION )                             | 设置cmake最低版本                                            |
+| project(App CXX)                                             | 项目名、使用C++                                              |
+| add_subdirectory()                                           | 添加子目录                                                   |
+| include_directories(${PROJECT_SOURCE_DIR}/include)           | **添加头文件路径。**影响范围最大，一般放在最外层CmakeLists.txt影响全局。 |
+| target_include_directories(App PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include") | **添加头文件路径。**影响范围自定义，关键字PUBLIC/PRIVATE。**一般引用库路径使用这个命令**，作为外部依赖项引入进来。**建议使用这个。** |
+| link_directories(${PROJECT_SOURCE_DIR}/so)                   | 指定库路径。link_libraries就不用写库的全路径了。             |
+| link_libraries(animal)                                       | **指定要链接的静态库的名称。放在add_exectuable之前。**如：LINK_LIBRARIES("/opt/MATLAB/R2012a/bin/glnxa64/libeng.so") |
+| add_exectuable(App main.cpp)                                 | 可执行文件名。源文件。                                       |
+| target_link_libraries(App PUBLIC animal)                     | **指定链接的动态库名称。放在add_exectuable之后。**如：                                                TARGET_LINK_LIBRARIES(myProject hello)。                  TARGET_LINK_LIBRARIES(myProject libhello.a) |
+
+* target_include_directories()` 的功能完全可以使用 `include_directories()` 实现。但是我还是**建议使用 `target_include_directories()。**
+
+  **`include_directories(header-dir)` 是一个全局包含，向下传递。什么意思呢？就是说如果某个目录的 CMakeLists.txt 中使用了该指令，其下所有的子目录默认也包含了`header-dir` 目录。**
+
+  上述例子中，如果在顶层的 cmake-test/CMakeLists.txt 中加入：
+
+  ```cmake
+  include_directories(hello-world)
+  include_directories(hello-world/hello)
+  include_directories(hello-world/world)
+  ```
+
+  那么整个工程的源文件在编译时**都**会增加：
+
+  ```bash
+  -I hello-world -I hello-world/hello -I hello-world/world ...
+  ```
+
+  各级子目录中无需使用 `target_include_directories()` 或者 `include_directories()`了。如果此时查看详细的编译过程（`make VERBOSE=1`）就会发现编译过程是一大坨，很不舒服。
+
+  当然了，在**最终子目录**的 CMakeLists.txt 文件中，使用 `include_directories()` 和 `target_include_directories()` 的效果是相同的。
+
+# 7. Cmake条件编译
 
 通过对宏赋不同的值，编译不同的文件。
 
@@ -697,14 +796,14 @@ project
 > >
 > > cat2.cpp
 > >
-> > CmakeLists.txt（子CmakeLists.txt）
+> > CMakeLists.txt（子CMakeLists.txt）
 >
-> CmakeLists.txt（父CmakeLists.txt）
+> CMakeLists.txt（父CMakeLists.txt）
 >
 > main.cpp
 
 ```cmake
-#子CmakeLists.txt
+#子CMakeLists.txt
 option(USE_CAT2 "compile cat" OFF)	#宏USE_CAT默认值设为ON
 
 if(USE_CAT2)

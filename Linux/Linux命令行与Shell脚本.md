@@ -207,6 +207,10 @@ https://www.sysgeek.cn/ubuntu-flatpak/
 
 Linux 世界有三种通用的打包格式，可以在任何 [Linux 发行版](https://www.sysgeek.cn/tag/linux-distro/)中运行 Snap、Flatpak 和 AppImage。虽然 Ubuntu 默认预装了 Snap，但由于其源代码不开放，大多数发行版和开发者偏向「避免」使用它。更多人倾向于使用 Fedora 的 Flatpak 打包系统。
 
+### （16）AppImage
+
+无需安装，运行APPImage就是打开软件，终止就是关闭，删除就是卸载。
+
 ---
 
 ## 2. 用户和用户组管理
@@ -269,6 +273,14 @@ usermod -g 属组名 -d 用户主目录 -s /bin/bash
 # -s表示修改用户的登录shell
 ```
 
+#### 查看用户属组
+
+```bash
+groups 用户名
+```
+
+
+
 ## 3. 目录和文件操作
 
 ### （1）ls
@@ -297,6 +309,8 @@ mkdir test
 ```
 
 * mkdir -p递归创建文件夹
+
+  若 workspace/test目录不存在，会先创建这两层目录，再在test下创建/code
 
 ```bash
 mkdir -p workspace/test/code
@@ -694,10 +708,10 @@ scp和cp的区别只在于文件前要加上`用户名@IP地址:文件路径`
 
 ```bash
 #apt包管理器
-apt install 软件包名		#安装
+apt install 软件包名 -y		#安装
 apt remove 软件包名			#卸载
-apt upgrade				   #升级软件包
-apt update				   #列出所有可更新的软件
+apt upgrade	-y			   #升级软件包
+apt update	-y			   #列出所有可更新的软件
 apt update 软件包名			#更新某个软件
 ```
 
@@ -722,8 +736,8 @@ tar -zcvf 包名 目录或文件名列表
 ### （2）解压
 
 ```bash
-unzip 包名
-tar -zxvf 包名 [-C 解压到路径]
+unzip 包名 -d [解压路径]
+tar -zxvf 包名 -C [解压到路径]
 7z x filename.7z	# 需要安装apt-get install p7zip
 ```
 

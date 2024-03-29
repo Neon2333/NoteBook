@@ -77,6 +77,21 @@ apt --fix-broken install
 
 # 2. kali必备安装
 
+## 用户增加sudo权限
+
+```bash
+adduser kali	#增加kali用户
+passwd kali		#修改kali用户密码
+usermod --append --groups sudo kali	#将kali用户添加到sudo组（给kali sudo权限）
+#可写为：
+usermod -aG sudo kali
+groups kali		#查看kali用户所在组
+su kali			#切换到kali用户
+sudo -l			#查看kali用户是否权限提高
+```
+
+
+
 ## 更新软件
 
 apt是新版本，apt-get是旧版本的包管理器。
@@ -159,7 +174,6 @@ sudo apt-get install build-essential
   chmod 777 ~/.config/wezterm/wezterm.lua
   ```
 
-  
 
 # 3. fluxion
 
@@ -181,8 +195,6 @@ HandShake Snooper=>扫描2.4G信道=>选择WIFI_id=>重置攻击=>mdk4=>抓包�
 =>1断开原网络=>3Chinese=>出现6个窗口表示成功
 
 # 4. 生成字典
-
-
 
 ```bash
 crunch <min> <max> [options]	#min和max是生成的密码的最少、最长位数
@@ -233,7 +245,7 @@ john hash_code.txt
 
 # 6. hydra爆破服务用户名和密码
 
-支持服务：ssh、telnet、ftp、MySQL、RDP(端口3389)
+**支持服务：ssh、telnet、ftp、MySQL、RDP(端口3389)**
 
 `hydra 参数 IP 服务名`
 
@@ -436,13 +448,37 @@ bluetooth interception attack
 
 * RedFang——发现隐藏蓝牙设备
 
+  ```bash
+  sudo apt install redfang
+  ```
+
   ![image-20240317223156649](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317223156649.png)
 
 * BlueRanger——获取蓝牙设备范围、位置
 
 * BetterCap
+
 * BTLEJUICE
+
 * BTLEJACK
+
+
+
+## 7）蓝牙DDoS攻击
+
+https://www.mzbky.com/1376.html#:~:text=%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Kali%20Linux%E4%BE%A6%E5%90%AC%E8%93%9D%E7%89%99%E8%AE%BE%E5%A4%87%201%20%E6%AD%A5%E9%AA%A41%20%E4%BD%BF%E7%94%A8hciconfig%E5%90%AF%E7%94%A8%E8%93%9D%E7%89%99%E9%80%82%E9%85%8D%E5%99%A8%20%E5%A6%82%E6%9E%9C%E6%82%A8%E7%86%9F%E6%82%89%E7%94%A8%E4%BA%8EWi-Fi%E5%8D%A1%E5%92%8C%E9%80%82%E9%85%8D%E5%99%A8%E7%9A%84%20ifconfig%20%EF%BC%8C%E9%82%A3%E4%B9%88%E8%BF%98%E6%9C%89%E5%8F%A6%E4%B8%80%E4%B8%AA%E4%B8%8E%E8%93%9D%E7%89%99%E8%AE%BE%E5%A4%87%E7%9B%B8%E4%BC%BC%E7%9A%84%E5%B7%A5%E5%85%B7%E3%80%82,%20%20%20%20%20%20HCITOOL%281%29%20
+
+https://blog.csdn.net/u010764600/article/details/119684001
+
+https://hackmag.com/security/bluetooth-ddos/
+
+https://blog.csdn.net/qq_42378173/article/details/129013781
+
+## 8）配合msf蓝牙渗透手机
+
+
+
+https://www.cnblogs.com/webapplee/p/4060322.html
 
 # 13. MetaSploit（msf)
 
@@ -453,6 +489,8 @@ kali集成在系统内，只能通过apt update -y && apt upgrade -y软件全部
 ```bash
 apt-get install metasploit-framework
 ```
+
+手机渗透：
 
 https://blog.csdn.net/weixin_44664189/article/details/122711694
 
@@ -520,6 +558,8 @@ ENTER
 ```
 
 # 19. MAC地址隐藏
+
+**macchanger工具**
 
 给网络设备（网络端口wlan0）修改临时MAC。
 
