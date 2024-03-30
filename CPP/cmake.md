@@ -9,6 +9,9 @@ g++ -E aaa.cc -o aaa.i	#预编译
 g++ -S aaa.i -o aaa.s	#编译
 g++ -c aaa.s -o aaa.o	#汇编
 g++ aaa.o -o aaa		#链接
+
+#可写成：
+g++ -o aaa.o -c aaa.cpp
 ```
 
 ```bash
@@ -26,11 +29,13 @@ g++ aaa.o -o aaa		#链接
 ```
 
 ```bash
+#库名都要以lib开头
+
 # 生成静态库
 ar rsvc libmath_functions.a math_functions.o
 
 # 生成动态链接库
-g++ math_functions.o -shared -fPIC -o libmath_functions.so 	#-shared表示生成动态库，-fPIC生成位置无关代码
+g++ -shared -fPIC -o libmath_functions.so math_functions.o  	#-shared表示生成动态库，-fPIC生成位置无关代码
 
 # 链接静态库
 g++ main.cpp -o main -L. -l math_functions -static
@@ -734,7 +739,7 @@ target_link_libraries(App PUBLIC animal)	#指定要链接的动态库名称
 - `link_libraries`用来链接静态库，`target_link_libraries`用来链接导入库，即按照`头文件 + .lib(动态库导入库) + .dll(动态库)`方式隐式调用动态库的`.lib`导入库
 - `link_libraries`用在`add_executable`之前，`target_link_libraries`用在`add_executable`之后
 
-# 6.重点— 命令总结
+# 6.命令总结
 
 | -命令                                                        | -功能                                                        |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -744,9 +749,9 @@ target_link_libraries(App PUBLIC animal)	#指定要链接的动态库名称
 | include_directories(${PROJECT_SOURCE_DIR}/include)           | **添加头文件路径。**影响范围最大，一般放在最外层CmakeLists.txt影响全局。 |
 | target_include_directories(App PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include") | **添加头文件路径。**影响范围自定义，关键字PUBLIC/PRIVATE。**一般引用库路径使用这个命令**，作为外部依赖项引入进来。**建议使用这个。** |
 | link_directories(${PROJECT_SOURCE_DIR}/so)                   | 指定库路径。link_libraries就不用写库的全路径了。             |
-| link_libraries(animal)                                       | **指定要链接的静态库的名称。放在add_exectuable之前。**如：LINK_LIBRARIES("/opt/MATLAB/R2012a/bin/glnxa64/libeng.so") |
+| link_libraries(animal)                                       | **指定要链接的静态库的名称。放在add_exectuable之前。**如：LINK_LIBRARIES("/opt/MATLAB/R2012a/bin/glnxa64/libeng.a") |
 | add_exectuable(App main.cpp)                                 | 可执行文件名。源文件。                                       |
-| target_link_libraries(App PUBLIC animal)                     | **指定链接的动态库名称。放在add_exectuable之后。**如：                                                TARGET_LINK_LIBRARIES(myProject hello)。                  TARGET_LINK_LIBRARIES(myProject libhello.a) |
+| target_link_libraries(App PUBLIC animal)                     | **指定链接的动态库名称。放在add_exectuable之后。**如：                                                TARGET_LINK_LIBRARIES(myProject hello)。                  TARGET_LINK_LIBRARIES(myProject libhello.so) |
 
 * target_include_directories()` 的功能完全可以使用 `include_directories()` 实现。但是我还是**建议使用 `target_include_directories()。**
 
@@ -770,7 +775,103 @@ target_link_libraries(App PUBLIC animal)	#指定要链接的动态库名称
 
   当然了，在**最终子目录**的 CMakeLists.txt 文件中，使用 `include_directories()` 和 `target_include_directories()` 的效果是相同的。
 
-# 7. Cmake条件编译
+# 7. 实例
+
+demo01
+
+> a
+>
+> > libcat.a
+>
+> so
+>
+> > libcat.so
+>
+> include
+>
+> > cat.h
+> >
+> > dog.h
+>
+> animal
+>
+> > dog.cpp
+> >
+> > CMakeLists.txt
+>
+> CMakeLists.txt
+>
+> main.cpp
+
+```cpp
+//cat.h
+# pragma once
+#include<string>
+
+class cat
+{
+    public:
+        std::string bark();
+};
+```
+
+```cpp
+//cat.cpp
+#include"cat.h"
+
+std::string cat::bark()
+{
+    return "meow";
+}
+```
+
+```cpp
+//dog.h
+//dog.cpp
+//代码相同
+```
+
+```cpp
+//main.cpp
+#include<iostream>
+#include"include/dog.h"
+#include "include/cat.h"
+
+
+int main(int argc, char** argv)
+{
+    cat c;
+    std::cout<<c.bark()<<std::endl;  
+    dog d;
+    std::cout<<d.bark()<<std::endl;
+    return 0;
+
+}
+```
+
+```cmake
+#animal/CMakeLists.txt
+add_library(AnimalLib STATIC dog.cpp)
+```
+
+```cmake
+#demo01/CMakeLists.txt
+cmake_minimum_required(VERSION 3.28.3)
+project(App CXX)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+add_subdirectory(animal)	#添加子目录/animal
+link_directories(${PROJECT_SOURCE_DIR}/so)
+#link_libraries(cat)		#链接静态库libcat.a
+add_executable(App main.cpp)
+target_include_directories(App PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include") 
+target_link_libraries(App PUBLIC AnimalLib cat)	#链接库文件AnimalLib、动态库libcat.so
+```
+
+---
+
+# 8. Cmake条件编译
 
 通过对宏赋不同的值，编译不同的文件。
 

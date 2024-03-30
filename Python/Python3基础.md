@@ -1297,6 +1297,10 @@ def count_words(filename):
 count_words(filename)
 ```
 
+### （3）raise
+
+
+
 
 
 ---
@@ -1517,47 +1521,27 @@ while True:
     time.sleep(1)
 ```
 
+# 20. 单元测试
+
+
+
+
+
+# 21. 代码规范
+
+
+
+
+
 
 
 ---
 
-#  游戏制作库——pygame库
+# Python调用C++代码
 
-## 1. 常用函数
+## （1）cppyy库
 
-### （1）get_rect()
 
-![image-20220110151653929](https://s2.loli.net/2022/01/10/jrQscyVk81G7SUB.png)
-
-### （2）surface.blit()
-=======
-
-## 2. Pygame
-
-### （1）pygame版本
-
-[下载符合自己Python版本的pygame](https://blog.csdn.net/shizheng_Li/article/details/114731202)
-
-[Python下载地址](https://github.com/pygame/pygame/releases/tag/2.1.2)
-
-https://blog.csdn.net/zzwlyj/article/details/82117981
-
-https://blog.csdn.net/m0_64660514/article/details/122191114?spm=1035.2023.3001.6557&utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase&depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase
-
-```python
-# 方法旨在将一个图像绘制到另一个图像的上方
-surface.blit(source，dest=None，special_flags=0)
-```
-
-> 现在主要讲解blit的各个参数使用，主要就是两个，
->
-> 一个source，很好理解，就是图片。图片用load方法加载
->
-> ```python
-> image = pygame.image.load('不知名女友.gif')
-> ```
->
-> 一个是dest我们可以理解为rect，我们可以直接使用rect参数进去
 
 
 
@@ -1642,6 +1626,48 @@ with open('文字.txt','a',encoding='utf-8') as file:
             file.write(text+'\n')
 print("识别结果已保存到文本")
 ```
+
+
+
+---
+
+#  游戏制作库——pygame库
+
+## 1. 常用函数
+
+### （1）get_rect()
+
+![image-20220110151653929](https://s2.loli.net/2022/01/10/jrQscyVk81G7SUB.png)
+
+### （2）surface.blit()
+=======
+
+## 2. Pygame
+
+### （1）pygame版本
+
+[下载符合自己Python版本的pygame](https://blog.csdn.net/shizheng_Li/article/details/114731202)
+
+[Python下载地址](https://github.com/pygame/pygame/releases/tag/2.1.2)
+
+https://blog.csdn.net/zzwlyj/article/details/82117981
+
+https://blog.csdn.net/m0_64660514/article/details/122191114?spm=1035.2023.3001.6557&utm_medium=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase&depth_1-utm_source=distribute.pc_relevant_bbs_down.none-task-blog-2~default~OPENSEARCH~default-4.nonecase
+
+```python
+# 方法旨在将一个图像绘制到另一个图像的上方
+surface.blit(source，dest=None，special_flags=0)
+```
+
+> 现在主要讲解blit的各个参数使用，主要就是两个，
+>
+> 一个source，很好理解，就是图片。图片用load方法加载
+>
+> ```python
+> image = pygame.image.load('不知名女友.gif')
+> ```
+>
+> 一个是dest我们可以理解为rect，我们可以直接使用rect参数进去
 
 
 

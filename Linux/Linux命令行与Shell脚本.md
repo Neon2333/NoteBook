@@ -163,7 +163,14 @@ ssh -p 端口 用户名@ip
 logout
 ```
 
-### （12）宿主机和虚拟机共享文件夹
+### （12）vscode ssh连接
+
+* 安装remote-ssh扩展
+* 点击扩展按钮，按照要求输入配置
+
+* 打开folder添加远程主机的工作目录就可以像编辑本地文件一样
+
+### （13）宿主机和虚拟机共享文件夹
 
 通过ssh方式设置主机和Linux之间的共享文件夹。
 
@@ -179,7 +186,7 @@ apt install unison -y
 unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径	#ssh端口为22
 ```
 
-### （13）安装c++编译器
+### （14）安装c++编译器
 
 安装g++编译器的命令：
 
@@ -193,7 +200,7 @@ sudo apt-get install build-essential
 
 注：`sudo apt-get install build-essential –fix-missing`，这个命令是修补安装build-essential，即已安装了部分build-essential，但没有安装完全，此时可以使用该命令继续安装build-essential。
 
-### （14）定时关机
+### （15）定时关机
 
 ```bash
 shutdown -h now 
@@ -201,13 +208,13 @@ shutdown -h 30	#30min后
 shutdown -h 23:00	#23:00关机
 ```
 
-### （15）flagpak安装
+### （16）flagpak安装
 
 https://www.sysgeek.cn/ubuntu-flatpak/
 
 Linux 世界有三种通用的打包格式，可以在任何 [Linux 发行版](https://www.sysgeek.cn/tag/linux-distro/)中运行 Snap、Flatpak 和 AppImage。虽然 Ubuntu 默认预装了 Snap，但由于其源代码不开放，大多数发行版和开发者偏向「避免」使用它。更多人倾向于使用 Fedora 的 Flatpak 打包系统。
 
-### （16）AppImage
+### （17）AppImage
 
 无需安装，运行APPImage就是打开软件，终止就是关闭，删除就是卸载。
 
