@@ -423,12 +423,34 @@ p = runoobAarray;
 
 
 
-### （3）数组作为形参
+### （3）数组作为形参	
 
-**指针形式：**
+**概念：**
+
+**了解就行！！！！**
+
+* 数组名：值是数组首元素的地址，类型是指向首元素的指针类型。
+
+  ```cpp
+  对于arr[2][3]来说，可以看成有2个元素，元素为int[3]
+  arr表示首元素（元素是行）地址，也就是第一行的地址，值为：&arr[0]，类型是int(*)[3]。
+     	因此arr+i或arr[i]表示第i行的地址。
+      但使用sizeof计算的，却是元素个数：sizeof(arr)/sizeof(int)=数组元素总个数。
+  arr[1]或者*(arr+1)表示第2行的首元素的地址，也就是第2行第1个数字的地址，值为：&arr[1][0]，类型是int*。
+      因此arr[i]+j或   *(arr+i)+j表示第i行j列元素的地址。*(*(arr+i)+j)表示a[i][j]  
+      sizeof(arr[0])/sizeof(int)=行元素个数
+      sizeof(arr[0][0])/sizeof(int)=1
+  ```
+
+**指针形式1：**
+
+**不要用这个用法。**只是辨析数组名和指针的概念。
+
+`&arr是整个数组的地址，值同&arr[0]，但类型是int(*arr)[8]，&arr[0]的类型是int*`
 
 ```cpp
 void printArray(int(*arr)[8]) {
+    //*arr是取整个数组。所以参数中要指定数组长度
     for (auto i : *arr){
         std::cout << i << std::endl;
     }
@@ -445,11 +467,85 @@ int main(int argc, const char *argv[])
 {
     int a[8] = {1,2,3,4,5,6,7,8};
     int b[2][3] = {{11,22,33}, {44,55,66}};
-    printArray(&a);
+    printArray(a);
     printArray(&b);
     return 0;
 }
 ```
+
+#### 指针形式2：用这种别折腾！！！
+
+**二维数组的列数必须要指定，行数无所谓。**
+
+**二维数组列数不定的时候，转成一维数组。printarr5**
+
+```cpp
+void printarr1(int arr[], int len)
+{
+    for(int i=0;i<len;i++)
+    {
+        std::cout<<arr[i]<<std::endl;
+    }
+}
+
+void printarr2(int* arr, int len)
+{
+    for(int i=0;i<len;i++)
+    {
+        std::cout<<arr[i]<<std::endl;
+    }
+}
+
+void printarr3(int arr[][3], int rowLen)
+{
+    for(int i=0;i<rowLen;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+			std::cout<<arr[i][j]<<std::endl;            
+        }
+
+    }
+}
+
+void printarr4(int(*arr)[3], int rowLen)
+{
+    for(int i=0;i<rowLen;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+			std::cout<<arr[i][j]<<std::endl;            
+        }
+
+    }
+}
+
+void printarr5(int* arr, int rowLen, int colLen)
+{
+    for(int i=0;i<rowLen;i++)
+    {
+        for(int j=0;j<3;j++)
+        {
+			std::cout<<*(arr+i*colLen+j)<<std::endl;	//i是0从开始，所以不用(i-1)*colLen    
+        }
+
+    }
+}
+
+int main(int argc, const char *argv[])
+{
+    int a[8] = {1,2,3,4,5,6,7,8};
+    int b[2][3] = {{11,22,33}, {44,55,66}};
+    printarr2(a);
+    //b的值为&b[0]，类型是int(*)[3]。sizeof(b)是3*sizeof(int)
+    printarr4(b);
+    //b[0]值是&b[0][0]，类型是int*。sizeof(b[0])是sizeof(int)
+    printarr5(b[0]);	//printarr5(&b[0][0])也行
+    return 0;
+}
+```
+
+
 
 **引用形式：**
 
@@ -477,7 +573,7 @@ int main(int argc, const char *argv[])
 }
 ```
 
-传统的：
+C风格：
 
 ```cpp
 void func(int arr[], int len)
@@ -489,7 +585,7 @@ void func(int arr[], int len)
 void func(int* arr, int len){}
 ```
 
-**用数组指针或数组引用**作为函数参数，有如下优点：
+#### 用数组指针或数组引用作为函数参数的优点：
 
 1. 参数仍然保留着数组的信息，包括长度，所以我们可以使用基于范围的for循环。
 2. 防止参数误传。如果参数是长度为8的数组指针或引用，传递长度为10的数组作为参数，编译是无法通过的。
@@ -590,7 +686,7 @@ int main()
 
    new数组或者将局部变量的数组声明为静态static。
 
-3. 返回值除了包含指针，还应该包含数组长度。（sizeof(指向首地址的指针)=4而不是数组大小）。
+3. 返回值除了包含指针，还应该包含数组长度。（因为sizeof(指向首地址的指针)==4，而不是数组的长度）。
 
 ### （5）遍历数组
 
@@ -604,8 +700,6 @@ for(auto var : arr)
 ### （6）数组名与指针
 
 数组名是指向数组首元素的**常量指针**`typename* const`
-
-## 11. noexcept	
 
 
 
@@ -653,7 +747,7 @@ if(find != NULL)
 
 - 不存在空引用。引用必须连接到一块合法的内存。
 - 一旦引用被初始化为一个对象，就不能被指向到另一个对象。指针可以在任何时候指向到另一个对象。
-- 引用必须在创建时被初始化。指针可以在任何时间被初始化。
+- 引用必须在声明时被定义。指针可以先声明但不定义，在后面再定义。
 
 当函数返回一个引用时，则返回一个指向返回值的隐式指针。这样，函数就可以放在赋值语句的左边
 

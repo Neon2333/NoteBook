@@ -163,12 +163,16 @@ ssh -p 端口 用户名@ip
 logout
 ```
 
-### （12）vscode ssh连接
+### （12）vscode ssh连接远程开发
 
 * 安装remote-ssh扩展
 * 点击扩展按钮，按照要求输入配置
 
 * 打开folder添加远程主机的工作目录就可以像编辑本地文件一样
+
+* 打开终端：ctrl+`
+
+* 断开连接：点击左下角ssh。选择close remote ssh。
 
 ### （13）宿主机和虚拟机共享文件夹
 

