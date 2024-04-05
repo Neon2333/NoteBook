@@ -183,7 +183,7 @@ cpp为了提供多态，编译函数时会根据函数签名给函数名进行�
   } 
   ```
 
-## static
+## 5. static
 
 * 修饰类成员，表示属于非实例成员
 * 修饰全局变量：将全局变量的作用域仅为当前文件或函数，不可被其他文件或函数访问。
@@ -220,7 +220,7 @@ char const * p;	//同char* const
 
 
 
-## auto
+## 7. auto
 
 * 自动类型推断
 
@@ -831,7 +831,7 @@ Line::Line( double len)
       int m_y;
   };
   
-  CMyClass::CMyClass(int x, int y) : m_y(y), m_x(m_y)
+  CMyClass::CMyClass(int x, int y) : m_y(y), m_x(x)
   {
   };
   //初始化的顺序是先m_x再m_y。
@@ -949,9 +949,9 @@ class ClassName
 {
     template<typename T> ClassName (const ClassName<T>& another) 
     {
-   		this.m_a = another.m_a;	//ClassName的普通成员
+   	    this.m_a = another.m_a;	//ClassName的普通成员
         this.p_addr_size = another.p_addr_size;	//容器大小
-        this.p_addr = new T[this.p_addr->size];	//指针深拷贝
+        this.p_addr = new T[this.p_addr_size];	//指针深拷贝
         for(int i=0;i<this.p_addr_size;++i)
         {
             this.p_addr[i] = another.p_addr[i];	//T是基本类型的话可以直接赋值。若T是复杂类型，需要重载=
@@ -1223,8 +1223,6 @@ int main()
 
 
 
-
-
 ## 19. 虚函数和纯虚函数
 
 **虚函数：** 是在基类中使用关键字 **virtual** 声明的函数。哪怕是父类引用指向子类对象，也会根据所调用的对象类型来选择调用的函数。类似C#中的父类virtual函数、子类override。
@@ -1347,6 +1345,8 @@ class Box
 | 内置 | 指针         |
 | 数组 | 指针         |
 | 类   | 引用         |
+
+
 
 ## 22. const
 
@@ -1543,11 +1543,7 @@ private:
 
   
 
-
-
-
-
-## 27. 智能指针
+## 
 
 
 
@@ -1567,7 +1563,7 @@ private:
 
 ## 29. 函数指针
 
-### 定义
+### （1）定义
 
 using定义模板时较typedef好用很多！！
 
@@ -1588,31 +1584,33 @@ p_t pp = &func;
 pp(1, 2);
 ```
 
-### 回调函数
+### （2）回调函数
 
 函数指针是C/C++实现回调函数的途径。
 
 将一段代码A像参数一样传递/“注册”给其他代码B，当B中某个信号/行为发生时，会通知回调函数，A代码将会被执行。（如：信号机制、事件机制）
 
-将函数的调用转换为一个指针变量（函数入口地址）。这样，一个文件可通过获取这个变量调用另一个文件内的函数。 （C#中的委托也类似，在委托上注册函数，可通过委托在整个程序范围调用函数或是触发事件调用事件handler）
+将函数的调用转换为一个**指针变量（函数入口地址）**。这样，一个文件可通过获取这个变量调用另一个文件内的函数。 （C#中的委托也类似，在委托上注册函数，可通过委托在整个程序范围调用函数或是触发事件调用事件handler）
 
 ## 30. using关键字
 
-### 使用命名空间
+### （1）使用命名空间
 
 ```cpp
 using namespace std;
 ```
 
-### 指代别名，比typedef更加直观
+### （2）指代别名，比typedef更加直观
 
 ```cpp
 using INT = int;
 //等同于
 typedef int INT;
+//函数指针
+using int(*)(int, string) = pt;	//定义了一个函数指针类型p
 ```
 
-### 在派生类中引用基类成员
+### （3）在派生类中引用基类成员
 
 ## 31. IO
 
@@ -1758,7 +1756,7 @@ int main()
         cout << *b << endl;
 
         using p_t = int(*)(int, double);
-        p_t pp = func;
+        p_t pp = &func;
         cout << pp(1, 2.4) << endl;
     }
     catch (exception& ex) {
@@ -1767,13 +1765,9 @@ int main()
 }
 ```
 
-
-
 **不推荐直接使用系统内置异常类**
 
-C++是个偏底层语言，不会帮开发者做额外的事情，但是C++也提供了带堆栈信息的异常——自建异常。你只需要继承异常类，然后带个堆栈信息量就行，还可以自定义堆栈信息详细度。而且官方也不推荐直接使用系统内置异常类，都是建议使用自己的异常类
-
-## 33. 右值引用
+C++是个偏底层语言，不会帮开发者做额外的事情，但是C++也提供了带堆栈信息的异常——自建异常。你只需要继承异常类，然后带个堆栈信息量就行，还可以自定义堆栈信息详细度。**而且官方也不推荐直接使用系统内置异常类，都是建议使用自己的异常类。**
 
 
 
@@ -1781,23 +1775,157 @@ C++是个偏底层语言，不会帮开发者做额外的事情，但是C++也�
 
 ### static_cast
 
+```cpp
+static_cast<type>()
+```
+
+### dynamic_cast
+
 ### reinterpret_cast
 
 ### const_cast
 
+## 35. 多态
+
+多态概念：统一的写法，但是产生不同的行为。
+
+### （1）静态多态
+
+也就是编译期多态，包括：函数重载、操作符重载。
+
+```cpp
+void func(int a){}
+void func(int a,string str){}
+
+int main()
+{
+    func(1);
+    func(2,"aaa");
+}
+```
+
+### （2）动态多态
+
+* 父类对象指向子类对象。调用虚函数时，会调用子类的虚函数而不是父类的。
+
+  在父类中通过`virtual`声明虚函数，子类可`override`虚函数。
+
+  ```cpp
+  class Base
+  {
+  public:
+      virtual func()
+      {
+          std::cout<<"func...Base"<<std::endl;
+      }
+  }
+  
+  class Son
+  {
+  public:
+  	virtual func() override
+      {
+          std::cout<<"func...Son"<<std::endl;
+      }
+  }
+  
+  int main()
+  {
+      Base* b;
+      b = new Son();
+      b->func();	//func...Son
+  }
+  ```
+
+  
+
+* 函数指针，签名相同的函数都可以使用同类型的函数指针形参接收，然后在函数内调用。
+
+```cpp
+int func1(int a)
+{
+    return a++;
+}
+int func2(int a)
+{
+    return a--;
+}
+
+void func(int(*p)(int), int c)
+{
+    p(c);	//在这里调用形式都一样，但是可通过传入的函数不同实现不同的行为
+}
+
+int main()
+{
+    func(&func1, 2);	//3
+    func(&func2, 2);	//1
+}
+```
+
+### （3）实现原理
+
+虚函数表VFtable，存有该类中所有虚函数的入口地址。
+
+虚表指针vptr，指向该类的虚函数表，32为系统下4字节。
+
+在类中一旦声明了virtual函数，编译器会在**常量区**添加该类的虚函数表。在编译时会给对象实例的内存中添加一个隐藏的4B的指针，这会使得对象的内存占用增加4B。
+
+过程：对于`b->func()`，子类实例son的虚表指针就会首先指向自己的虚函数表，运行时查找该表，若找到func则调用；找不到的话，则会指向父类Base的虚函数表，再次查找，调用父类的func。从而实现多态。
+
+对象调用普通函数时，在编译期就可以决定，而调用虚函数是在运行时决定。通过虚表指针指向虚函数表，然后在表中查找（寻址）要调用的函数。因为存在查找的过程，所以速度较慢，不需要多态的函数不要声明为virtual。
+
+### （4）对象的内存布局
+
+* 类实例化为对象时函数不占有内存，数据成员占有内存。
+
+* 没有数据成员或虚函数表的类，其实例占1B，表示对象的存在。
+
+  有数据成员或虚函数表，就是占用实际大小。
+
+* vptr在实例对象内存的起始位置。
+
+* **多继承时，子类对象继承了几个父类，子类对象中就有几个VPTR指针，分别指向几张虚函数表。**
+
+  **其中子类自身定义的新的虚函数会排在第一张虚函数表的后面，顺序同声明的顺序一致。**
+
+* **子类override的父类的虚函数，将会覆盖相应的父类的虚函数表中的同名函数。且覆写后的函数的顺序，同父类中声明的顺序一致，同子类覆写的顺序无关。**
+
+* 一个基类不论有多少虚函数，都只有一个vptr。
+
+* 子类继承基类时，会把基类所有数据成员都继承过来，还可以调用父类的所有函数，包括虚函数。
+
+* 一个子类实例的内存占用是：**自身数据成员+父类实例对象大小+虚表指针个数*4**
+
+  
+
+* 对类使用ZeroMemory时，会将vptr置空，这会导致调用虚函数时程序崩溃。所以不要用ZeroMemory初始化类。
 
 
-### 
+
+## 37. RAII
 
 
+
+## 38. RTII
+
+
+
+## 
+
+
+
+
+
+---
 
 # 二、STL
 
-容器存入元素，都是将元素的拷贝存入容器中，不是将元素本身存入容器。所以把类对象放到容器中，一定要写类的拷贝构造和=重载。 
+容器存入元素，都是将元素的**拷贝存入**容器中，不是将元素本身存入容器。所以把类对象放到容器中，一定要写类的拷贝构造和=重载。 
 
 使用算法需要引入`<algorithm>`头文件
 
-## 迭代器
+## 1. 迭代器
 
 ```cpp
 #include<vector>
@@ -1819,9 +1947,9 @@ for(vector<int>::iterator it = v.begin();it!=v.end();++it)
 }
 ```
 
-## string
+## 2. string
 
-## vector
+## 3. vector
 
 动态数组。压入、弹出都在尾部。
 
@@ -1872,16 +2000,25 @@ v.assign(d.begin(), d.end());
 
 可以用`[index]`也可以用`at(index)`
 
-C++11增加了data()的用法，它返回内置vecotr所指的数组内存的第一个元素的指针：
+C++11增加了data()的用法，它返回内置vector所指的数组内存的第一个元素的指针：
+
+**访问数据时，先获取指针数据vector::data()，然后用指针方式访问，会大大提高效率。**
 
 ```cpp
-int main()  
-{  
-vector<int> v{10,20,30,40,50};  
-int *k=v.data();  	//获取v指向首元素的指针
-for(int i=0;i<v.size();i++)  
-cout<<*k++<<" ";  
-return 0;  
+#include<iostream>
+#include<vector>
+using namespace std;
+
+int main(){
+	vector<int> v;
+	v.reserve(5);
+	for(int i=0;i<5;i++){
+		v.push_back(i);
+	}
+	int* p=v.data();
+	for(int i=0;i<v.size();i++){
+		cout<<p[i]<<endl;
+	}
 }
 ```
 
@@ -1912,7 +2049,7 @@ vector的capacity不够时，会以原来的2倍capacity申请内存，同时将
 
 **reserve是只开辟内存空间，而resize是开辟了空间置了默认值。**
 
-## deque
+## 4. deque
 
 双向动态数组。方便访问首尾元素`front()`和`back()`。
 
@@ -1922,7 +2059,7 @@ vector的capacity不够时，会以原来的2倍capacity申请内存，同时将
 
 ![image-20230829172614322](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230829172614322.png)
 
-## stack
+## 5. stack
 
 不可随机访问。
 
@@ -1936,7 +2073,7 @@ FILO
 | empty()——是否为空 |      |
 | size()——尺寸      |      |
 
-## queue
+## 6. queue
 
 不可随机访问。无迭代器。
 
@@ -1951,7 +2088,7 @@ FIFO，队尾入，队头出。
 | push()——入队  |      |
 | pop()——出队   |      |
 
-## list
+## 7. list
 
 链表。节点有数据域、指针域。
 
@@ -1972,7 +2109,7 @@ FIFO，队尾入，队头出。
 | reverse()——翻转链表                                 |      |
 | sort()——排序，从小到大。list自带排序，不是algorithm |      |
 
-## set
+## 8. set
 
 set的适用情形/作用：**快速检索、去重、排序**。 
 
@@ -1980,9 +2117,7 @@ set的适用情形/作用：**快速检索、去重、排序**。
 
 set和multiset不能直接修改值，因为直接修改会使二叉树混乱，所以需要修改时应该先删除该元素，再insert()元素。 
 
-### 排序
-
-默认从小到大，若想从大到小，定义仿函数functor指定排序规则：
+默认从小到大，若想从大到小，定义仿函数functor或lambda表达式指定排序规则：
 
 ```cpp
 class myCompare 
@@ -2000,6 +2135,8 @@ s1.insert(2);
 s1.insert(3); 
 s1.insert(4); 
 s1.insert(5); 
+
+set<typename,[](typename val1, typename val2)->bool{return val1>val2}> s1;
 ```
 
 | 常用API                                 |      |
@@ -2008,9 +2145,9 @@ s1.insert(5);
 | erase(pos)/erase(ele)/erase(pos1, pos2) |      |
 | clear()                                 |      |
 
-## pair
+## 9. pair
 
-两个数据对
+数据对
 
 ```cpp
 pair<T1, T2> p = std::make_pair(val1, val2);
@@ -2020,11 +2157,11 @@ cout<<p.first<<p.second<<endl;
 auto p = std::make_pair(val1, val2);
 ```
 
-## map
+## 10. map
 
-存储的元素是pair对，一个是key，一个是value。
+存储的元素是pair，一个是key，一个是value。
 
-对key自动排序，可指定排序规则。
+**会对key自动排序，可指定排序规则。**
 
 内部是红黑树。
 
@@ -2046,19 +2183,17 @@ m.insert(new Person(), 2);
 m.insert(new Person(), 3);
 ```
 
-## 哈希表unordered_map
+## 11. unordered_map
 
-**不排序，查找比map快很多。**
+**哈希表，只完成key到value的映射，不对key进行排序，查找比map快很多。**
 
-头文件`#include<unordered_map`
+头文件`#include<unordered_map>`
 
+## 12. sort
 
+头文件为`#include<algorithm>`和`using namespace std`。 
 
-## sort
-
-头文件为#include<algorithm>和using namespace std。 
-
-时间复杂度为n*log(n)
+时间复杂度为`n*log(n)`
 
 ```cpp
 //默认从小到大
@@ -2075,7 +2210,7 @@ bool comp(typename a,typename b)
 } 
 ```
 
-## fill
+## 13. fill
 
 把数组或容器it1~it2填充val
 
@@ -2083,7 +2218,7 @@ bool comp(typename a,typename b)
 fill(it1, it2, val)
 ```
 
-## reverse
+## 14. reverse
 
 把数组或容器it1~it2中间的值翻转
 
@@ -2091,7 +2226,7 @@ fill(it1, it2, val)
 reverse(it1, it2)
 ```
 
-## accumulate
+## 15. accumulate
 
 在指定初值的基础上累加：
 
@@ -2099,11 +2234,33 @@ reverse(it1, it2)
 int sum = accumulate(it1, it2, val0)	//sum=val0+it1~it2范围内的求和
 ```
 
+## 16. 可调用对象包装器
 
+
+
+---
 
 # 三、现代C++
 
-# 四、泛型
+智能指针
+
+右值引用
+
+## 1. 
+
+
+
+---
+
+# 四、并发
+
+协程、线程池
+
+
+
+---
+
+# 五、泛型
 
 ## 模板的二次编译
 

@@ -123,6 +123,15 @@ code ./demo.py	#vscode打开demo.py文件
 
 ## ssh连接
 
+ssh报错：ECDSA host key "ip地址" for  has changed and you have requested strict checking.
+
+解决：
+
+```bash
+#删除当前主机内关于远程服务器的缓存和公钥
+ssh-keygen -R "你的远程服务器ip地址"
+```
+
 ```bash
 #删除本身的ssh秘钥
 rm -rf /etc/ssh/ssh_host_*
@@ -180,6 +189,17 @@ unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径
   chmod 777 ~/.config/wezterm/wezterm.lua
   ```
 
+## VM装win10
+
+### 常见报错
+
+* 引导方式选BIOS，不要默认UEFI。
+
+* operating system not found
+
+  其实根本原因在于通常我们在网上下载的iso镜像都是经过处理，不是原生纯净版本，里边是带exe的，所以VMware使用虚拟机安装虚拟机无法识别，只要我们使用微软提供的原生的iso镜像就可直接安装。
+
+  
 
 # 3. fluxion
 
@@ -420,6 +440,11 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 
 # 12. 蓝牙攻击
 
+概念：
+
+* le设备，小功率设备
+* device：可以接受其他设备连接的那种。连上需要配对，所以才需要强连。或者通过克隆，让其他设备连上伪造的克隆。
+
 ## （0）蓝牙相关命令
 
 | -命令                                  | -功能                      |
@@ -432,7 +457,6 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 | hcitool -i hci0 dev                    | 查看本地蓝牙设备           |
 | hciconfig hci0 up                      | 启动本地设备hci0           |
 | lsusb                                  | 查看所有连接的USB设备信息  |
-| =============连接蓝牙设备============= | =========================  |
 | bluetoothctl                           | **进入交互模式**。退出exit |
 | list                                   | List available controllers |
 | paired-devices                         | 查看当前配对设备           |
@@ -443,7 +467,6 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 | block FC:69:47:7C:9D:A3                | 阻止指定mac设备连接到系统  |
 | trust FC:69:47:7C:9D:A3                | 信任指定mac设备            |
 | untrust FC:69:47:7C:9D:A3              | 不信任指定mac设备          |
-| ==============                         |                            |
 | l2ping -i hci0 -s size -f addr         | 同网络协议栈中的ping       |
 |                                        |                            |
 |                                        |                            |
@@ -491,14 +514,14 @@ hcitool -i hci0 scan --class #远程扫描设备。若对方隐藏设备，使�
 hcitool -i hci0 info 88:A9:B7:E6:F1:8F	#查询设备信息
 hcitool -i hci0 inq		#扫描获取远程设备详细信息的命令
 
-hcitool lescan	#扫描小功率设备
+hcitool lescan	#扫描小功率设备（耳机那些接收设备）
 ```
 
 ### 2）spooftooph
 
 列出蓝牙设备，以及获取蓝牙设备名称、蓝牙地址等信息。
 
-### 3）RedFang——发现隐藏蓝牙设备
+### 3）RedFang——遍历扫描隐藏蓝牙设备
 
 通过指定地址范围，遍历扫描。
 

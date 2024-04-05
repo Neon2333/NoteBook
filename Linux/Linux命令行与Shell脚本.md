@@ -277,11 +277,23 @@ userdel -r 用户名
 passwd 用户名
 ```
 
+### 修改所属、所属组
+
+```bash
+#改所属、属组
+chown [-R] ownname:groupname filename
+
+#只改属组
+sudo chgrp [-R] groupname filename	#-R修改filename下的所有文件的属组为groupname
+```
+
 #### 修改用户的属组、home目录、shell
 
 ```bash
 usermod -g 属组名 -d 用户主目录 -s /bin/bash
 # -s表示修改用户的登录shell
+
+usermod -aG sudo 用户名	#给普通用户加到sudo组
 ```
 
 #### 查看用户属组
