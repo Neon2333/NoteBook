@@ -121,7 +121,7 @@ print((msg1 + " " + msg2).strip().upper())
 if str_ in string_
 ```
 
-### （7）禁止转义
+### （7）取消转义
 
 ```python
 with open(r"C:\Users\Administrator\Desktop\1.txt", "w") as file_object:

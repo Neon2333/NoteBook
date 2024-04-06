@@ -1350,6 +1350,8 @@ class Box
 
 ## 22. const
 
+### （1）常量
+
 常量不在栈开辟内存存储，存在常量区的符号表，编译时遇到常量直接替换。
 
 * 常量没有地址，初始化后不能修改。
@@ -1358,46 +1360,14 @@ class Box
 const int a = 10;	//a不可修改
 ```
 
-* const变量的指针、引用必须也是const：
-
-```cpp
-const int a = 10;
-const int* p = &a;	//必须用const指针
-```
-
-* **函数形参后面加 const，表明这个函数不会对这个类对象的数据成员（准确地说是非静态数据成员）作任何改变。**
-
-  即this指针是const的。
-
-  *原则：在设计类的时候，一个原则就是对于不改变数据成员的成员函数都要在后面加 const，而对于改变数据成员的成员函数不能加 const。*
-
-* **C++中只有被声明为const的成员函数才能被一个const类对象调用**
-
-  a.getA()，a调用成员方法getA()实质是将指代当前调用成员方法的对象a的指针this传入getA()，即getA(this)，以此实现对象和独属于它的成员之间的绑定。
-
-  形参列表的const A& a，a是const，表示不允许在test1()中修改a，所以this要修饰为const。所以在getA()后加上const。
+* const变量的指针、引用必须也是const
 
   ```cpp
-  Class A 
-  { 
-  private: 
-  
-  	int a; 
-  public: 
-  	int getA() const  //这里的const是修饰this指针的，const this 
-  	{ 
-  		return this->a; 
-  	} 
-  } 
-  
-  int  test1(const A& a)  //const a表明不想在test1()修改a 
-  
-  { 
-  	return  a.getA()+1; 
-  } 
+  const int a = 10;
+  const int* p = &a;	//必须用const指针
   ```
 
-* const常量的内存
+* 常量的内存
 
   **const全局常量：**其值不可以修改，也不可以通过指针修改，因为其存储空间分配在常量区。
 
@@ -1407,7 +1377,43 @@ const int* p = &a;	//必须用const指针
 
   在C++语言中，const常量在符号表中定义，引用该常量时会自动填入其常量值，以保证const的有效。如果对const常量取地址，编译器会为其生成存储空间，这个存储空间的内容可以改变；但是不会影响符号表中的值。
 
+### （2）const变量
 
+```cpp
+int  test1(const A& a)  //const a表明不想在test1()修改a 
+
+{ 
+	return  a.getA()+1; 
+} 
+```
+
+### （3）const函数
+
+**函数形参后面加 const，表明这个函数不会对这个类对象的数据成员（准确地说是非静态数据成员）作任何改变。**
+
+即this指针是const的。
+
+*原则：在设计类的时候，一个原则就是对于不改变数据成员的成员函数都要在后面加 const，而对于改变数据成员的成员函数不能加 const。*
+
+**C++中只有被声明为const的成员函数才能被一个const类实例对象调用**
+
+a.getA()，a调用成员方法getA()实质是将指代当前调用成员方法的对象a的指针this传入getA()，即getA(this)，以此实现对象和独属于它的成员之间的绑定。this要修饰为const。所以在getA()后加上const。
+
+```cpp
+Class A 
+{ 
+private: 
+
+	int a; 
+public: 
+	int getA() const  //这里的const是修饰this指针的，const this 
+	{ 
+		return this->a; 
+	} 
+} 
+
+
+```
 
 ## 23. 内联inline
 
@@ -1911,7 +1917,9 @@ int main()
 
 
 
-## 
+## 39. viotile
+
+
 
 
 
@@ -1948,6 +1956,13 @@ for(vector<int>::iterator it = v.begin();it!=v.end();++it)
 ```
 
 ## 2. string
+
+```cpp
+#include<string>
+std::string str = "str";
+```
+
+
 
 ## 3. vector
 
@@ -2177,17 +2192,19 @@ auto p = std::make_pair(val1, val2);
 **当key是自定义类时，需要用仿函数指定存储规则：**
 
 ```cpp
-map<Person, int, comp> m;
-m.insert(new Person(), 1);
-m.insert(new Person(), 2);
-m.insert(new Person(), 3);
+std::map<Person, int, comp> mp;
+mp.insert(new Person(), 1);
+mp.insert(new Person(), 2);
+mp.insert(new Person(), 3);
 ```
 
 ## 11. unordered_map
 
 **哈希表，只完成key到value的映射，不对key进行排序，查找比map快很多。**
 
-头文件`#include<unordered_map>`
+```c++
+#include<unordered_map>
+```
 
 ## 12. sort
 
@@ -2236,7 +2253,7 @@ int sum = accumulate(it1, it2, val0)	//sum=val0+it1~it2范围内的求和
 
 ## 16. 可调用对象包装器
 
-
+function<void(int,const string&) f;
 
 ---
 
@@ -2246,7 +2263,309 @@ int sum = accumulate(it1, it2, val0)	//sum=val0+it1~it2范围内的求和
 
 右值引用
 
-## 1. 
+## 1. 取消转义
+
+```cpp
+string path = R"(E:\workspace\XML.md)"
+```
+
+## 2. nullptr
+
+cpp中NULL被define为0，是int类型。
+
+nullptr是为cpp量身定做的空指针。若编译器支持C++11标准，一律使用nullptr。
+
+```cpp
+int* p = nullptr;
+char* p = nullptr;
+double* p =nullptr;
+```
+
+## 3. constexpr
+
+作用：让编译器知道是常量表达式，在编译期进行计算。
+
+### （1）修饰常量
+
+因为const有两种语义：常量、只读变量。
+
+```cpp
+//常量
+const int NUM = 10;
+int arr[NUM]{0};	//定义静态数组时，长度不能是变量，而NUM是常量，所以这里不报错
+
+//只读变量
+void func(const int a)
+{
+    //函数体不允许修改a的值，因为a是个只读的变量
+}
+```
+
+常量表达式的计算是在编译时期就得出结果的，非常量表达式在运行时得出结果。
+
+但编译器是无法直接判断常量表达式、非常量表达式，C++11后的constexpr关键词可以直接声明为常量表达式，编译期就可以得出结果。
+
+所以，**对于常量表达式、基础类型的常量都推荐用constexpr修饰。**
+
+### （2）修饰常量表达式函数
+
+修饰的函数返回值是常量。
+
+在编译阶段，就将函数调用用常量替换。
+
+```cpp
+constexpr int func()
+{
+    constexpr int a = 10;
+    return a;
+}
+```
+
+### （3）修饰构造函数
+
+* 构造函数体必须是空的
+* 初始化参数必须使用列表初始化
+
+```cpp
+class T
+{
+    public:
+    	int a;
+    public:
+    	constexpr T():a(10)
+        {
+            
+        }
+}
+```
+
+## 4. auto
+
+必须初始化，通过初始化的值来进行类型的自动推导。
+
+限制：
+
+* 不能用于定义数组的类型
+
+  ```cpp
+  auto arr[]{1,2,3,4};	//error
+  ```
+
+* 不能用于推导模版
+
+  ```cpp
+  template<typename T>
+  class A
+  {
+  }
+  
+  int main()
+  {
+      A<double> t;
+      A<auto> tt = t;	//error，不能这么推导
+  }
+  ```
+
+常用场景：
+
+* STL迭代器的类型
+
+  ```cpp
+   std::map<int, std::string> mp;
+  
+   mp.insert(std::make_pair(1, "aaa"));
+   mp.insert(std::make_pair(2, "bbb"));
+   mp.insert(std::make_pair(3, "ccc"));
+   
+   for(auto iter=mp.begin();iter!=mp.end();iter++ )
+   {
+       std::cout<<iter->first<<std::endl;
+   }
+  ```
+
+## 5. decltype
+
+通过表达式的类型进行推导。
+
+```cpp
+const int a = 10;
+decltype(a) b = 20;	//b：const int
+```
+
+* 当括号內是函数名，用函数返回值类型推导。
+
+  （特例：对于返回纯右值（常量）的函数，推导出的类型要去掉const。）
+
+  ```cpp
+  //括号内是函数名。表示使用函数返回值推导。
+  const int& func(){}
+  decltype(func) a;	//a是const int&类型
+  ```
+
+* 括号内是左值（可取地址）
+
+  括号内是一个加了括号的表达式。
+
+  这两种情况推导出的是引用。
+
+  ```cpp
+  class A
+  {
+      public:
+      	int num = 9;
+  }
+  A a;
+  
+  decltype(a.num) aa = 0;	//aa:int
+  decltype((a.num)) bb = aa;	//a.num外面加了括号。bb:int&
+  //加法表达式
+  int m=0;
+  int n=0;
+  decltype(m+n) c = 0;	//c:int
+  decltype(q=m+n) d = c;	//q可取地址，是一个左值。d:int&
+  ```
+
+常用场景：
+
+常用于泛型。
+
+```c++
+//容器迭代器的类型推导
+template<typename T>
+class A
+{
+    public:
+    	printA(T& t)
+        {
+            for(m_iter=t.begin();m_iter!=t.end();m_iter++)
+            {
+                std::cout<<*m_iter<<std::endl;
+            }
+        }
+    private:
+    	decltype(T().begin()) m_iter;	//T::iterator m_iter这样写是不对的
+}
+```
+
+```c++
+//函数返回值类型后置
+```
+
+## 6. final
+
+放在类或者虚函数的后面。
+
+表示类不能被继承。
+
+虚函数的override截止到这里，调用了final的这个类的子类不能再override了。
+
+不能放在普通函数后。
+
+```c++
+class Base
+{
+    public:
+    	virtual void test(){}	//final不是放在这里的。不然这个虚函数就不能被override了，设为虚函数就没意义。
+}
+
+class Son:public Base
+{
+    public:
+    	void test() final{}		//override截止到这里为止。
+}
+
+class GrandSon:public Son
+{
+    public:
+    	void test(){}	//这里会报错。因为Son类对虚函数test()用final修饰了。
+}
+```
+
+```cpp
+class Base
+{
+    
+}
+
+class Son final:public Base	//类Son不允许有子类
+{
+    
+}
+
+class GrandSon:public Son	//报错
+{
+    
+}
+```
+
+## 7. override
+
+override虚函数，目的是实现多态。
+
+就是声明这个函数是重写的，让编译器检查虚函数重写是否出错（比如拼写函数名），也让阅读代码更直观，一看就知道是重写。
+
+## 8. using
+
+### （1）定义类型的别名
+
+```c++
+typedef oldname newname;
+using newname=oldname;
+
+//定义指针
+typedef int(*pt)(int,string);
+using pt=int(*)(int,string);	//更好理解
+```
+
+* 定义模版类型的别名
+
+  ```c++
+  需求在map里存int-int/int-double/int-string三种类型的键值对，可用map<int,T>
+  想把map<int,T>定义为一个关于T的类型：mapint<T>
+  typedef map<int,T> mapint<T>	//这是错的
+  using mapint<T> map<int,T>		//可行
+  ```
+
+  
+
+
+
+### （2）在子类中使用父类的成员
+
+子类继承父类，子类有父类同名函数，父类的函数会被隐藏。
+
+通过子类对象调用函数时，调用的是子类的而不是父类的该名称的函数。
+
+```cpp
+class Base
+{
+    public:
+    	int a;
+    	void func()
+        {
+            std::cout<<"base.."<<std::endl;
+        }
+}
+
+class Derived:public Base
+{
+    public:
+    	using Base::a;
+    	using Base::func;
+}
+
+int main()
+{
+    Derived d;
+    d.func();	//base..
+}
+```
+
+
+
+
+
+
 
 
 

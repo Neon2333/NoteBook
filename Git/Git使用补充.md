@@ -15,6 +15,10 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 
 ### 日常使用情景
 
+git message书写规范：Subject：body。
+
+git message换行：在未写右侧引号前按Enter。
+
 > * 未commit，未生成新的版本号
 >
 >   用暂存区还原工作区
@@ -48,7 +52,7 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 >   回滚本地仓库到上一版本号
 >
 >   ```
->  git reset HEAD~1        //HEAD指向上个commit，
+> git reset HEAD~1        //HEAD指向上个commit，
 >   git reset 版本号
 >   ```
 > 
@@ -57,7 +61,7 @@ https://blog.csdn.net/weixin_44802825/article/details/104814984
 >   回滚本地仓库到上一版本的同时，将工作区和暂存区也于新的HEAD保持一致
 >
 >   ```
->    git reset --hard HEAD~1
+>   git reset --hard HEAD~1
 >   git reset --hard 版本号
 >   ```
 
@@ -124,7 +128,7 @@ reset --hard    //将HEAD指向新版本号，且暂存区和工作区一起更�
 把自己工作区的代码改正，然后一步一步重新提交到远程仓库。
 把自己本地仓库回退到以前版本，然后强制提交到远程仓库。
 使用命令
-git push -f origin main
+`git push -f origin main`
 
 ---
 
