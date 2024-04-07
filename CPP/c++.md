@@ -1,3 +1,13 @@
+# 0. cpp效率的影响
+
+c++效率和C相近，但一下常用特性中，以下会影响效率：
+
+* 虚函数
+
+  
+
+* RTTI
+
 # 一、cpp基础
 
 ## SourceInsight入门使用
@@ -810,7 +820,7 @@ C++ 中的 struct 是一个新类型的定义声明, 所以可以省略 typedef,
 **用列表初始化成员变量会比赋值初始化快一些。**（赋值初始化是在构造函数当中做赋值的操作，而列表初始化是做纯粹的初始化操作。我们都知道，C++的赋值操作是会产生临时对象的。临时对象的出现会降低程序的效率。）
 
 ```cpp
-Line::Line( double len): length(len)
+Line::Line( double len): m_length(len)
 {
     cout << "Object is being created, length = " << len << endl;
 }
@@ -1871,7 +1881,7 @@ int main()
 
 ### （3）实现原理
 
-虚函数表VFtable，存有该类中所有虚函数的入口地址。
+虚函数表VFtable，存有该类中所有虚函数的入口地址的数组。
 
 虚表指针vptr，指向该类的虚函数表，32为系统下4字节。
 
@@ -1903,8 +1913,6 @@ int main()
 
 * 一个子类实例的内存占用是：**自身数据成员+父类实例对象大小+虚表指针个数*4**
 
-  
-
 * 对类使用ZeroMemory时，会将vptr置空，这会导致调用虚函数时程序崩溃。所以不要用ZeroMemory初始化类。
 
 
@@ -1913,7 +1921,7 @@ int main()
 
 
 
-## 38. RTII
+## 38. RTTI
 
 
 
@@ -2128,7 +2136,9 @@ FIFO，队尾入，队头出。
 
 set的适用情形/作用：**快速检索、去重、排序**。 
 
-存储数据时，会对数据自动排序。set和multiset的区别是，set不允许存储相同的数据，**multiset允许存储相同的数据**。 
+存储数据时，会对数据自动排序。set和multiset的区别是，set不允许存储相同的数据，**multiset允许存储相同的数据**。
+
+**set、multiset内的元素都是只读。** 
 
 set和multiset不能直接修改值，因为直接修改会使二叉树混乱，所以需要修改时应该先删除该元素，再insert()元素。 
 
@@ -2250,10 +2260,6 @@ reverse(it1, it2)
 ```cpp
 int sum = accumulate(it1, it2, val0)	//sum=val0+it1~it2范围内的求和
 ```
-
-## 16. 可调用对象包装器
-
-function<void(int,const string&) f;
 
 ---
 
@@ -2526,9 +2532,6 @@ using pt=int(*)(int,string);	//更好理解
   using mapint<T> map<int,T>		//可行
   ```
 
-  
-
-
 
 ### （2）在子类中使用父类的成员
 
@@ -2561,9 +2564,260 @@ int main()
 }
 ```
 
+## 9. 委托构造
 
+在构造函数中，通过初始化列表调用其他构造函数。
 
+目的：简化构造函数中写的重复代码。
 
+```cpp
+class A
+{
+    private:
+    	int m_min;
+    	int m_max;
+    	int m_mid;
+    
+    public:
+    	A(){}
+    	A(int min)
+        {
+            this.m_min=min;
+        }
+    	A(int min, int max):A(min)
+        {
+            this.m_max=max;
+        }
+    	A(int min, int max, int mid):A(min,max)
+        {
+            this.m_mid=mid;
+        }
+}
+```
+
+## 10. 继承构造函数
+
+对于从父类继承到的数据成员，使用父类的构造函数。
+
+```c++
+class Derived:public Base
+{
+    public:
+    	using Base::Base;	//使用父类的所有构造函数
+}
+```
+
+## 11. 列表初始化
+
+在C++11之前，对不同的数据类型有不完全相同的初始化方式。
+
+列表初始化把所有类型的初始化方式统一。
+
+**在花括号里写上要初始化的值，放在要初始化的变量、对象的后面。**
+
+使用要求：
+
+* 普通数组
+* 类和结构体要没有用户自定义的构造函数、没有private/protected的数据成员、没有基类、没有虚函数
+
+例子：
+
+```cpp
+double a{10.21};
+int arr[]{1,2,3,4};
+int* p = new int{10};
+int* arrp = new int[3]{1,2,3};
+```
+
+## 12. std::initializer_list
+
+类似c#中params。
+
+**可接受任意多个相同类型的数据。**
+
+传参用初始化列表，列表里可传任意个数的参数。
+
+```cpp
+//func可传任意个数
+void func(std::initializer_list<int> ils)
+{
+    for(auto it=ils.begin();it!=ils.end();it++)
+    {
+        std::cout<<*it<<std::endl;
+    }
+}
+int main()
+{
+    func({1,2,3,4,5,6});	//不能写成func(1,2,3,4,5,6);
+}
+```
+
+## 13. 基于范围的for循环
+
+**只读取（访问）一次容器，确定容器元素的范围，然后就遍历。所以遍历时修改容器中元素，遍历中无法体现。（比如删除几个元素，但是遍历时元素个数不变）**
+
+基于迭代器的for循环，每次循环都会判断边界，所以可以在遍历时动态修改容器中元素。
+
+* `auto item:vt`遍历容器vt时，发生拷贝，将每个元素拷贝到item。
+
+  拷贝降低效率。
+
+  修改item无法修改原容器中的元素。
+
+* `auto& item:vt` 使用引用，不发生拷贝效率提高，可修改容器中元素。
+* `const auto& item:vt`，不发生拷贝，且限定不可以修改容器中元素。
+
+```cpp
+vector<int> vt{1,2,3,4,5};
+for (auto item:vt)
+{   
+}
+```
+
+注意：
+
+set中元素是只读的。
+
+## 14. 可调用对象包装器function
+
+把不同类型的可调用对象进行包装，就可以用一种统一的方式来使用，或作为参数传递。
+
+* 可调用对象：可以按照函数使用的方法来调用的对象。
+
+  函数指针、仿函数、类成员函数指针、类数据成员指针
+
+  ```cpp
+  //函数指针
+  void func(int a, string str);
+  using fptr = void(*)(int,string);
+  
+  //仿函数
+  class A
+  {
+  public:
+      int m_a;
+  public:
+     	void operator()(int a)
+      {
+          std::cout<<a<<std::endl;
+      }
+      void print(string str)
+      {
+           std::cout<<str<<std::endl;
+      }
+      static void hello()
+      {
+          std::cout<<"hello"<<std::endl;
+      }
+  }
+  //类成员函数指针
+  //定义时要加上表明是哪个类。
+  using fptr=void(A::*)(string);
+  fptr fp=&A::print;
+  
+  //类数据成员指针
+  using ptr=int A::*	//表明是A类内的int*
+  ptr pt = &A::m_a;	
+  
+  int main()
+  {
+      A b;
+      b(3);	//仿函数
+      
+      A a;
+      (a.*fp)("hello");	//Test().print("hello");
+      a.*pt = 10;			//Test().m_a=10;
+  }
+  ```
+
+* 场景：
+
+  需要在一个函数func中把这4中可调用对象作为参数使用，那么需要写func的4种重载。麻烦！
+
+  所以，如果有种统一的类型可以接收这4种参数（类似用函数指针可以接一类函数），只要写1个func就行。
+
+  就可以用可调用对象包装器在func中接收参数，把可调用对象打包一下传进去。
+
+* 语法
+
+  把可调用对象赋值给包装器。
+
+  ```cpp
+  #include<functional>
+  //包装普通函数
+  function<void(int,string)> f1=func;	//函数名
+  //包装类的静态函数
+  function<void()> f2=A::hello;	//函数名要指定类作用域
+  //包装仿函数
+  A b;
+  function<void(int)> f3=b;	//可调用对象：实例对象
+  
+  
+  int main()
+  {
+      f1(1,"aaa");
+      f2(2,"aaaa");
+      f3(3);
+  }
+  ```
+
+  ```cpp
+  //实现回调（和函数指针一样，就是包了一层，向上又抽象了一个更广泛的类型）
+  class B
+  {
+      public:
+      	A(function<void(int,string)& f):callback(f){}
+      	void notify(int id, string name)
+          {
+              callback(id,name);	//调用传入
+          }
+      private:
+      	function<void(int,string) callback;
+  }
+  
+  int main()
+  {
+      B b(func);
+      b.notify(1,"aaa");
+      B c(A::hello);
+      c.notify();
+  }
+  ```
+
+## 15. 可调用对象绑定器bind
+
+**C++14起bind已没什么用。**
+
+std::bind：
+
+* 绑定后得到一个**仿函数**。
+* 可以绑定常数，也可以绑定变量。
+
+* 把可调用对象的所有参数绑定。
+
+  ```cpp
+  void output(int x, int y)
+  {
+      std::cout<<x<<y<<std::endl;
+  }
+  
+  std::bind(output, 1, 2)();	//把x/y分别绑定了值1/2，得到一个仿函数，用()调用
+  ```
+
+* 将可调用对象的部分参数进行绑定。
+
+  占位符：`std::placeholders_1`表示第一个参数先占位，仿函数的参数传入到这个参数。
+
+  ```cpp
+  //普通函数、变量
+  auto f = std::bind(可调用对象地址, 绑定的参数/占位符)
+  	bind(output, placeholders_1,2)(10);		//10->placeholders_1->x
+  	bind(output, placeholders_2,2)(10);		//10->10->placeholders_2->y
+  //类的成员函数
+  auto f = std::bind(可调用对象地址, 类实例对象的地址, 绑定的参数/占位符)
+  ```
+
+* 
 
 
 

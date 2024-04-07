@@ -214,11 +214,15 @@ git clone git@github.com:FluxionNetwork/fluxion.git
 
 ## 2）钓鱼WiFi
 
-HandShake Snooper=>扫描2.4G信道=>选择WIFI_id=>重置攻击=>mdk4=>抓包成功会显示HandShake Snooper攻击完成
+* 创建：
 
-1选择攻击方式=>1创建WiFi=>重置攻击=>mdk3=>hostapd=>hash-cowpatty=>1使用抓到的hash=>2cowpatty验证=>1创建SSL证书
+  HandShake Snooper=>扫描2.4G信道=>选择WIFI_id=>重置攻击=>mdk4=>抓包成功会显示HandShake Snooper攻击完成
 
-=>1断开原网络=>3Chinese=>出现6个窗口表示成功
+  1选择攻击方式=>1创建WiFi=>重置攻击=>mdk3=>hostapd=>hash-cowpatty=>1使用抓到的hash=>2cowpatty验证=>1创建SSL证书
+
+  =>1断开原网络=>3Chinese=>出现6个窗口表示成功
+
+* 
 
 # 4. 生成字典
 
