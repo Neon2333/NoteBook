@@ -40,7 +40,7 @@ py -3 -m pip install xxxx
 
 # 基础语法
 
-## 0. pip3
+## python3的pip
 
 python install package
 
@@ -61,6 +61,60 @@ python install package
   matplotlib==3.5.1
   pandas==1.4.0
   ```
+
+## 安装python2的pip
+
+需要运行python2代码时，可能要用到python2的依赖，需要python2的pip。
+
+* 查看当前pip默认的python版本
+
+```bash
+pip -V
+#pip 24.0 from /usr/lib/python3/dist-packages/pip (python 3.11)
+查看当前pip默认对应的python版本
+可以看见是python3.9版本
+```
+
+* **安装python2的pip,注意一定要安装与上面查看的python3相同版本的pip，我的python3.9 pip是20.1.1版，所以给python2.7也安装20.1.1版的php**
+
+  ```bash
+  #查看python2的的版本
+  python2 -V       
+  #Python 2.7.18
+  ```
+
+* 安装python2的pip：
+
+  20.3.4 这是支持python 2 的最新也是最后一个pip版本
+
+  ```bash
+  curl -o get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
+  sudo python2 get-pip.py
+  ```
+
+## 修改pip的默认python版本
+
+* 查看pip路径
+
+  ```bash
+  which pip
+  #/usr/local/bin/pip
+  ```
+
+* 根据路径用root权限打开pip文件：
+
+  ```bash
+  vim /usr/local/bin/pip
+  ```
+
+* 修改第一行解释器
+
+  ```bash
+  #!/usr/bin/python
+  #修改完成，用pip -V重新查看版本即可。
+  ```
+
+  
 
 
 
@@ -1486,6 +1540,15 @@ for i in tqdm(range(100),desc='任务名:',unit='单位'):
 ```
 
 ---
+
+# 19. 时间戳
+
+```python
+import time
+time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) 
+```
+
+
 
 # 19. 定时器
 

@@ -14,6 +14,36 @@ python3 test.py
 ./test.py
 ```
 
+## 2. bad interpreter: /usr/bin/python3^M: 没有那个文件或目录
+
+报错：zsh: ./Bluetooth-DOS-Attack.py: bad interpreter: /usr/bin/python3^M: 没有那个文件或目录
+
+原因：脚本是在Windows下写的，换行符为\r\n，而Unix下是\n，多了一个\r。
+
+使用vim修改：
+
+```bash
+#首先使用vim查看文件格式
+vim xxx.sh
+:set ff
+#可以看到文件格式为
+fileformat=dos
+#修改文件格式
+:set ff=unix
+#保存退出
+:wq
+```
+
+## 3. Missing parentheses in call to 'print'. Did you mean print(...)?
+
+print ""是python2的print语法。
+
+修改代码，或改解释器为Python3.
+
+
+
+
+
 ## 2. subprocess模块
 
 ***可执行bash命令或bash脚本。***
@@ -83,8 +113,8 @@ import subprocess
 ##使用列表形式的命令
 mycmd=["ls", "-la"]
 res=subprocess.Popen(args=mycmd,shell=False,stdout=subprocess.PIPE)
-##直接把命令字符串卸载Popen中（推荐使用）
-res=subprocess.Popen('ls -al',stdout=subprocess.PIPE,shell=False)
+##直接把命令字符串写在Popen中（推荐使用）
+res=subprocess.Popen('ls -al',stdout=subprocess.PIPE,shell=True)
 
 out=res.stdout.read()
 res.stdout.close()
@@ -96,7 +126,7 @@ print(out.decode('utf-8').strip())
 s.stdin.write(b"import os\n")
 ```
 
-# 3.获取Popen输出
+## 3.获取Popen输出
 
 ```python
 #stdout=subprocess.PIPE参数表示将命令的输出重定向到一个管道中。然后使用communicate()方法获取进程的输出结果。
@@ -186,7 +216,24 @@ else:
 运行这个 Python 脚本，它将启动 C# 应用程序，并在应用程序退出后打印相应的消息。
 ```
 
+## 7. 程序结束前执行某些操作
 
+Python的标准库中，有一个atexit模块专门用于注册在程序退出前执行的函数。
+
+```python
+import atexit
+
+def save_data():
+    # 保存数据的逻辑
+    print("正在保存数据...")
+
+atexit.register(save_data)
+
+# 程序逻辑
+print("程序运行中...")
+```
+
+定义了一个 `save_data` 函数来表示保存数据的逻辑。然后，我们使用 `atexit.register` 方法将该函数注册为程序退出前要执行的函数。当程序退出时，`save_data` 函数将被调用，执行数据保存操作。
 
 
 

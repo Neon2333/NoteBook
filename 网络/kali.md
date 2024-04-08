@@ -77,6 +77,40 @@ apt --fix-broken install
 
 # 2. kali必备安装
 
+## 安装python2的pip
+
+需要运行python2代码时，可能要用到python2的依赖，需要python2的pip。
+
+* 查看当前pip默认的python版本
+
+```bash
+pip -V
+#pip 24.0 from /usr/lib/python3/dist-packages/pip (python 3.11)
+查看当前pip默认对应的python版本
+可以看见是python3.9版本
+```
+
+* **安装python2的pip,注意一定要安装与上面查看的python3相同版本的pip，我的python3.9 pip是20.1.1版，所以给python2.7也安装20.1.1版的php**
+
+  ```bash
+  #查看python2的的版本
+  python2 -V       
+  #Python 2.7.18
+  ```
+
+* 安装python2的pip：
+
+  20.3.4 这是支持python 2 的最新也是最后一个pip版本
+
+  ```bash
+  curl -o get-pip.py https://bootstrap.pypa.io/pip/2.7/get-pip.py
+  sudo python2 get-pip.py
+  ```
+
+  
+
+
+
 ## 更改语言为中文
 
 * `dpkg-reconfigure locales`
@@ -446,38 +480,40 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 
 概念：
 
-* le设备，小功率设备
+* BLE设备，小功率蓝牙设备
 * device：可以接受其他设备连接的那种。连上需要配对，所以才需要强连。或者通过克隆，让其他设备连上伪造的克隆。
 
 ## （0）蓝牙相关命令
 
-| -命令                                  | -功能                      |
-| -------------------------------------- | -------------------------- |
-| ===============蓝牙适配器============= | ========================== |
-| systemctl status bluetooth.service     | 查看蓝牙服务状态           |
-| systemctl enable bluetooth.service     | 启动蓝牙服务               |
-| bluetoothctl show                      | 查看所有蓝牙设备           |
-| hciconfig -a                           | 查看本地蓝牙设备信息       |
-| hcitool -i hci0 dev                    | 查看本地蓝牙设备           |
-| hciconfig hci0 up                      | 启动本地设备hci0           |
-| lsusb                                  | 查看所有连接的USB设备信息  |
-| bluetoothctl                           | **进入交互模式**。退出exit |
-| list                                   | List available controllers |
-| paired-devices                         | 查看当前配对设备           |
-| devices                                | 查看范围内的蓝牙设备       |
-| scan on                                | 主动搜索可以连接的蓝牙设备 |
-| remove FC:69:47:7C:9D:A3               | 取消和指定mac设备的配对    |
-| disconnect FC:69:47:7C:9D:A3           | 断开指定mac设备            |
-| block FC:69:47:7C:9D:A3                | 阻止指定mac设备连接到系统  |
-| trust FC:69:47:7C:9D:A3                | 信任指定mac设备            |
-| untrust FC:69:47:7C:9D:A3              | 不信任指定mac设备          |
-| l2ping -i hci0 -s size -f addr         | 同网络协议栈中的ping       |
-|                                        |                            |
-|                                        |                            |
-|                                        |                            |
-|                                        |                            |
-|                                        |                            |
-|                                        |                            |
+| -命令                                  | -功能                                                      |
+| -------------------------------------- | ---------------------------------------------------------- |
+| ===============蓝牙适配器============= | ==========================                                 |
+| systemctl status bluetooth.service     | 查看蓝牙服务状态                                           |
+| systemctl enable bluetooth.service     | 启动蓝牙服务                                               |
+| bluetoothctl show                      | 查看所有蓝牙设备                                           |
+| hciconfig -a                           | 查看本地蓝牙设备信息                                       |
+| hcitool -i hci0 dev                    | 查看本地蓝牙设备                                           |
+| hciconfig hci0 up                      | 启动本地设备hci0                                           |
+| lsusb                                  | 查看所有连接的USB设备信息                                  |
+| -----------------------------------    |                                                            |
+| bluetoothctl                           | **进入交互模式**。退出exit。可以实时查看蓝牙扫描等工作状态 |
+| -----------------------------------    |                                                            |
+| list                                   | List available controllers                                 |
+| paired-devices                         | 查看当前配对设备                                           |
+| devices                                | 查看范围内的蓝牙设备                                       |
+| **scan on**                            | **主动搜索可以连接的蓝牙设备（效果好）**                   |
+| remove FC:69:47:7C:9D:A3               | 取消和指定mac设备的配对                                    |
+| disconnect FC:69:47:7C:9D:A3           | 断开指定mac设备                                            |
+| block FC:69:47:7C:9D:A3                | 阻止指定mac设备连接到系统                                  |
+| trust FC:69:47:7C:9D:A3                | 信任指定mac设备                                            |
+| untrust FC:69:47:7C:9D:A3              | 不信任指定mac设备                                          |
+| l2ping -i hci0 -s size -f addr         | 同网络协议栈中的ping                                       |
+|                                        |                                                            |
+|                                        |                                                            |
+|                                        |                                                            |
+|                                        |                                                            |
+|                                        |                                                            |
+|                                        |                                                            |
 
 
 
@@ -517,8 +553,12 @@ https://blog.csdn.net/u010764600/article/details/119684001
 hcitool -i hci0 scan --class #远程扫描设备。若对方隐藏设备，使用fang扫描隐藏设备。#-i指定蓝牙适配器。--class列出设备种类
 hcitool -i hci0 info 88:A9:B7:E6:F1:8F	#查询设备信息
 hcitool -i hci0 inq		#扫描获取远程设备详细信息的命令
+hcitool -i hci0 cc	MAC	#连接设备
+hcitool -i hci0 auth
+
 
 hcitool lescan	#扫描小功率设备（耳机那些接收设备）
+hcitool -i hci0 leinfo mac
 ```
 
 ### 2）spooftooph
@@ -566,7 +606,15 @@ BTLEJACK
 
 bluebugger——针对手机攻击的工具
 
-## 3）DDos
+## 3）扫描设备
+
+```bash
+bluetoothctl
+
+scan on
+```
+
+## 4）DDos
 
 ```bash
 l2ping -i hci0 -s 999 -f addr	#设定ping包大小999
@@ -576,13 +624,39 @@ https://hackmag.com/security/bluetooth-ddos/
 
 https://blog.csdn.net/qq_42378173/article/details/129013781
 
-## 4）配合msf蓝牙渗透手机步骤
+## 5）配合msf蓝牙渗透手机步骤
 
 https://www.cnblogs.com/webapplee/p/4060322.html
 
 ---
 
-# 13. MetaSploit（msf)
+# 13. websploit
+
+## （1）安装
+
+
+
+# 14. bettercap
+
+## （1）arp中间人查看目标http请求
+
+```bash
+bettercap
+
+net.probe on
+
+net.show
+
+ set arp.spoof.targets targetIP,gatewayIP 
+
+arp.spoof on
+
+net.sniff on
+```
+
+## 
+
+# 15. MetaSploit（msf)
 
 安装：
 
