@@ -71,8 +71,6 @@ https://www.cnblogs.com/zhizhiyu/p/10134044.html
 
 在example.h头文件中定义
 
-
-
 ```html
 #ifndef WHAT
 #define WHAT
@@ -105,7 +103,7 @@ extern "C" __declspec(dllexport) void SayHello();
 
 ---
 
-# 静态库制作与链接
+# 静态库生成与链接
 
 ## 1. 将源文件编译为目标文件/汇编文件.o
 
