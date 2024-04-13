@@ -908,17 +908,17 @@ project
 
 ```cmake
 #子CMakeLists.txt
-option(USE_CAT2 "compile cat" OFF)	#宏USE_CAT默认值设为ON
+option(USE_CAT2 "compile cat" OFF)	#宏USE_CAT默认值设为OFF
 
 if(USE_CAT2)
-	set(SRC cat.cpp)
+	set(SRC cat1.cpp)
 else()
-	set(SRC dog.cpp)
+	set(SRC cat2.cpp)
 endif()
 
-add_library(Animal ${SRC})	#生成静态库
+add_library(Animal dog.cpp ${SRC})	#生成静态库
 
-#若使用USE_CAT，则向AnimalLib相关代码中声明要使用宏USE_CAT
+#若使用USE_CAT2，则向AnimalLib相关代码中声明要使用宏USE_CAT2
 if(USE_CAT2)
 	target_compile_definitions(AnimalLib PRIVATE "USE_CAT2")
 endif()
