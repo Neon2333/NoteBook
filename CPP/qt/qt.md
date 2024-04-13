@@ -1,5 +1,7 @@
 # 1. Qt安装
 
+---
+
 https://blog.csdn.net/zhizhengguan/article/details/107567449
 
 ## 在线版
@@ -34,11 +36,9 @@ https://blog.csdn.net/LUCYcanFire/article/details/126402240
 
 配置完之后可以在Kit标签页给配置命名。
 
----
-
 # 2.  
 
-
+---
 
 
 
