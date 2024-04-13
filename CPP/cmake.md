@@ -235,7 +235,7 @@ Makefile不跨平台，cmake会根据编译器类型来确定是否生成Makefil
 
 Windows下默认的cpp编译器（generator）是MSVC。你可以自己安装MinGW（gcc、clang）。
 
-可以通过参数设定cmake不使用默认的MSVC：
+**设定编译器：**可以通过参数设定cmake不使用默认的MSVC：
 
 > cmake -G "MinGW Makefiles"
 
@@ -281,7 +281,9 @@ Windows下默认的cpp编译器（generator）是MSVC。你可以自己安装Min
 
 CMake主要是编写CMakeLists.txt文件，然后用cmake命令将CMakeLists.txt文件转化为make所需要的makefile文件，最后用make命令编译源码生成可执行程序或共享库（so(shared object)）。
 
-**一般把CMakeLists.txt文件放在工程目录下**，使用时，先创建一个叫build的文件夹（这个并非必须，**因为cmake命令指向CMakeLists.txt所在的目录**，例如**cmake ..** 表示CMakeLists.txt在当前目录的上一级目录。cmake后会生成很多编译的中间文件以及makefile文件，所以一般建议新建一个新的目录build，专门用来编译），然后执行：
+建议不要用make执行cmake生成的Makefile，使用cmake自己的指令。
+
+**一般把CMakeLists.txt文件放在工程目录下**，使用时，先创建一个叫build的文件夹（这个并非必须，**因为cmake需要指定CMakeLists.txt所在的目录下**，例如**cmake ..** 指定在CMakeLists.txt在当前目录的上一级目录。cmake后会生成很多编译的中间文件以及makefile文件，所以一般建议新建一个新的目录build，专门用来编译），然后执行：
 
 ```cmake
 cd build 
@@ -305,6 +307,7 @@ make	#也可用cmake --build .
 
   ```cmake
   mkdir build
+  cd build
   cmake ..
   ```
 

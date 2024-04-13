@@ -1,4 +1,4 @@
-# 软件下载与安装
+# 1. Qt安装
 
 https://blog.csdn.net/zhizhengguan/article/details/107567449
 
@@ -20,13 +20,25 @@ https://blog.csdn.net/LUCYcanFire/article/details/126402240
 
 **依次配置：**
 
-编译器：如果你安装的是mingw版本的qt，那就请选择mingw中的g++。如果是msvc版本的qt，那就请选择vs下的msvc。mingw版本和msvc版本的qt是不互通的，所以要选择对应版本编译器。
+* 编译器：
 
-Debuggers：与编译器一致即可，g++则用GDB，msvc则找到CDB。
+  如果你安装的是mingw版本的qt，那就请选择mingw中的g++。如果是msvc版本的qt，那就请选择vs下的msvc。mingw版本和msvc版本的qt是不互通的，所以要选择对应版本编译器。
 
-Cmake：与上面的方法一致，找到Cmake编译器，添加就行了。
+* Debuggers：
+
+  与编译器一致即可，g++则用GDB，msvc则找到CDB。
+
+* Cmake：
+
+  与上面的方法一致，找到Cmake编译器，添加就行了。
 
 配置完之后可以在Kit标签页给配置命名。
+
+---
+
+# 2.  
+
+
 
 
 

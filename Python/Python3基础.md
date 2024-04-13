@@ -5,20 +5,34 @@ Python中传值是通过引用传值
 ### （1）同时存在python2和python3时解释器
 
 ```python
-py -2 demo.py	#python2解释器
-py -3 demo.py	#python3解释器
+python2 demo.py	#python2解释器
+python3 demo.py	#python3解释器
 ```
 
 ### （2）同时存在python2和python3时pip使用
 
 ```python
-py -2 -m pip install xxxx
-py -2 -m pip uninstall xxxx
+python2 -m pip install xxxx
+python2 -m pip uninstall xxxx
 
-py -3 -m pip install xxxx
+python3 -m pip install xxxx
 ```
 
+### （3）安装库时报use_2to3参数错误
 
+会在setuptools里的setup函数里增加一个use_2to3=True的参数进行转换。
+
+但是setuptools>=58的版本是不支持这个参数了（黑人问号），于是需要把版本降低，小于58的最后一个版本是57.5.0，pip降一下就可以了：
+
+
+
+```bash
+pip install setuptools==57.5.0
+#或者
+pip install --upgrade pip setuptools==57.5.0
+```
+
+然后就可以重新安装库了。
 
 ---
 

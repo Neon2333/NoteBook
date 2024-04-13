@@ -16,10 +16,6 @@ ctrl-alt-上下，可在一列上出现多个光标。
 
 # 一、cpp基础
 
-## SourceInsight入门使用
-
-https://blog.csdn.net/mjy520123/article/details/120297021
-
 ## 1. C++内存分区
 
 **代码区：**存放程序的代码，即CPU执行的二进制机器指令，并且是只读的。
@@ -2277,10 +2273,6 @@ int sum = accumulate(it1, it2, val0)	//sum=val0+it1~it2范围内的求和
 
 # 三、现代C++
 
-智能指针
-
-右值引用
-
 ## 1. 取消转义
 
 ```cpp
@@ -2645,7 +2637,7 @@ int* arrp = new int[3]{1,2,3};
 
 类似c#中params。
 
-**可接受任意多个相同类型的数据。**
+**可接受任意多个相同类型的参数。**
 
 传参用初始化列表，列表里可传任意个数的参数。
 
@@ -2992,7 +2984,7 @@ std::forward<T>(t);
 
 ## 19. std::shared_ptr
 
-可以多个shared_ptr（共享的智能指针）指向同一块内存，内部引用计数管理。
+**共享指针**，可以多个shared_ptr指向同一块内存，内部引用计数管理。
 
 unique_ptr不能管理同一块内存。
 
@@ -3000,16 +2992,24 @@ unique_ptr不能管理同一块内存。
 #include<memory>
 ```
 
-* 初始化
+### （1）初始化
 
-  ```cpp
-  std::shared_ptr<T> pt(创建堆内存)			//pt管理这块堆内存
-      std::shared_ptr<int> ptr(new int(1));	//new int(1)堆内存初始化值为1
-  std::shared_ptr<T> pt2 = pt1;				//pt2也管理pt1指向的这块内存
-  std::shared_ptr<T> pt3(move(pt1))			//move把pt1转成右值。pt1对那块堆内存的管理权交给了pt3
-  shared_ptr<T> pt4 = make_shared<T>(初始值);	//make_shared代替new开辟了内存、初始化值，然后让pt4管理
-  std::shared_ptr<T>.reset(ptr, d)			//从指向当前堆内存解除管理，指向指定的新内存
-  ```
+**直接用堆内存+构造函数初始化的方式只能初始化一个共享指针。**
+
+```cpp
+std::shared_ptr<T> sp(创建堆内存)			//pt管理这块堆内存
+std::shared_ptr<T> sp2 = pt1;						//pt2也管理pt1指向的这块内存
+std::shared_ptr<T> sp3(move(pt1))					//move把pt1转成右值。pt1失去了管理的堆内存。
+shared_ptr<T> pt4 = make_shared<T>(初始值);			//make_shared代替new开辟了内存、初始化值，然后让pt4管理
+
+sp.reset()										//重置。ptr解除了对原内存的管理
+sp.reset(new int(1))							//从指向当前堆内存解除管理，指向指定的新内存new int(1)
+```
+
+```cpp
+std::shared_ptr<int> sp(new int(1));	//new int(1)堆内存初始化值为1
+std::shared_ptr<int> sp = make_shared<int>(1);
+```
 
 * 获取内部原始指针
 
@@ -3023,17 +3023,240 @@ unique_ptr不能管理同一块内存。
   use_count()
   ```
 
+### （2）使用方法
+
+* 获取原始指针，进行操作
+
+  ```cpp
+  std::shared_ptr sp = make_shared(new A());
+  A* sp = ptr.get();		//pta指向这个对象	
+  sp->func();		
+  ```
+
+* 直接使用智能指针
+
+  ```cpp
+  sp->func();			//直接调用
+  ```
+
+### （3）删除器
+
+第二个参数，传入删除器函数的地址。
+
+本质是回调函数，当内部计数器为0时，自动调用，用来清理内存。类型是函数指针或函数对象。
+
+智能指针管理的内存不是数组时，智能指针自己会在释放内存时调用删除器。
+
+**C++11中管理的内存是数组时，需要手动指定删除器：**
+
+**编译器一般都支持C++11以后版本，不用手动指定deleter。**
+
+* 可以用默认删除器`default_deleter<T>`
+
+  ```cpp
+  std::shared_ptr<A> sp(new A()[5], default_deleter<A[]>());
+  ```
+
+* 也可以自己写lambda
+
+  ```cpp
+  std::shared_ptr<A> sp(new A(), [](A* p){
+      delete p;
+  });
+  
+  std::shared_ptr<A> sp(new A()[5], [](A* p){
+      delete[] p;	//pa指向一个数组
+  });
+  ```
+
+### （4）C++11以后版本对于数组也可以自动调用删除器
+
+```cpp
+std::shared_ptr<A[]> sp(new A[]);	//默认的删除器就行。把类型指定成数组类型就行
+```
+
+### （5）注意
+
+* new出来的内存地址通过构造函数初始化共享指针，只能初始化一次。
+
+  否则会导致内存析构2次。
+
+  ```cpp
+  int* p = new int(1);
+  shared_ptr sp1(p);	//ok
+  shared_ptr sp2(p);	//error
+  //这种初始化的方式不对。可以用：
+  shared_ptr sp2 = sp1;	//ok
+  shared_ptr sp2(sp1);	//ok
+  ```
+
+* 不要直接return一个管理了this的shared_ptr（类里面）
+
+  
+
+  ```cpp
+  class A
+  {
+  public:
+      shared_ptr<A> getsharedptr()
+      {
+          //error
+          //因为this和new A()是同一块内存。相当于用这块内存地址用构造初始化了2个共享指针。犯了注意点1的错
+          return shared_ptr<A>(this);	
+      }
+  }
+  
+  int main()
+  {
+      shared_ptr<A> sp(new A());	
+  }
+  ```
+
+  正确做法：
+
+  ```cpp
+  class A:public enable_shared_from_this<A>
+  {
+  public:
+      shared_ptr<A> getsharedptr()
+      {
+       	return shared_from_this();
+      }
+  }
+  
+  int main()
+  {
+      shared_ptr<A> sp(new A());	
+  }
+  ```
+
+  类去继承`enable_shared_from_this<T>`类，然后`return shared_from_this()`
+
+  `enable_shared_from_this<T>`类内部有个weak_ptr，被继承后，这个类new的时候就会自动关联到父类这个弱指针，`shared_from_this()`就会调用弱指针的lock()函数返回一个shared_ptr。
+
+
+
+### （6）std::weak_ptr
+
+弱引用指针。
+
+**作用：辅助shared_ptr，监视shared_ptr管理的内存。**
+
+* 初始化
+
+  ```cpp
+  std::shared_ptr sp(new int);
+  
+  std::weak_ptr p1(sp);
+  std::weak_ptr p2 = ptr1;
+  std::weak_ptr p3(p1);
+  ```
+
+* use_count()
+
+  获取shared_ptr管理的内存的引用计数
+
+* expired()
+
+  判断shared_ptr管理的内存是否已被释放
+
+  ```cpp
+  bool expired() const noexcept;
+  ```
+
+* lock()
+
+  创建一个管理weak_ptr监视的这块内存的shared_ptr
+
+  ```cpp
+  shared_ptr<T> lock() const noexcept;
+  ```
+
+  ```cpp
+  shared_ptr<int> sp1,sp2;
+  sp1 = std::make_shared<int>(10);
+  
+  weak_ptr<int> sp3 = sp1;
+  sp2=sp3.lock();		//ptr2此时也指向了ptr1管理的内存
+  ```
+
+  
+
 ## 20. std::unique_ptr
 
+独占指针，某块内存只能有1个指针指向。
 
+### （1）初始化
+
+```cpp
+unique_ptr<T> ptr1(new int(1));		//构造函数初始化
+unique_ptr<T> ptr2 = move(ptr1);	//将ptr1转右值，资源转移给ptr2（调用了移动构造）
+unique_ptr<int> ptr3 = func();		//将亡值的资源转移给了ptr3。（调用了移动构造）
+ptr3.reset();						//重置
+ptr3.reset(new int(10));			//重置，指向另一块内存
+
+unique_ptr<int> func()
+{
+    return unique_ptr<int>(new int(10));	//将亡值。右值
+}
+```
+
+### （2）删除器
+
+手动指定，比共享指针稍微麻烦点，需要在模版类型中指定删除器类型。
+
+一般不用手动指定，默认删除器会自己调用。
+
+* lambda不捕获外部变量
+
+  此时lambda是仿函数，但也可以用函数指针接收。
+
+  ```cpp
+  using delefunc = void(*)(int);
+  unique_ptr<int, delefunc> ptr(new int(10),[](int* p){
+      delete p;
+  });
+  ```
+
+* lambda捕获外部变量
+
+  此时lambda是仿函数，但是不能用函数指针接收了。
+
+  但是仿函数、函数指针都是可以用可调用对象包装器包装的。
+
+  注意：lambda的返回值、参数列表类型。
+
+  ```cpp
+  unique_ptr<int,function<void(int*)> ptr(new int(10), [=](int* p){
+      delete p;
+  });
+  ```
+
+* 默认删除器可管理数组
+
+  ```cpp
+  unique_ptr<A[]> sp(new A()[5]);
+  ```
+
+* shared_ptr循环引用导致内存泄漏
+
+  内存计数永远不为0，永远不被释放回收，泄漏。
+
+  
+
+## 21. lambda
+
+仿函数。不捕捉外部变量时，可看成函数指针。
 
 
 
 ---
 
-# 四、并发
+# 四、C++语言支持多线程
 
-协程、线程池
+线程池
+
+协程
 
 
 

