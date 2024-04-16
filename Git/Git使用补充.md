@@ -739,9 +739,54 @@ git remote set-url origin https://hao203:ghp_EMi7kzbpzQE9YO24O6JsTdgbzpARzU2un9n
 
 ## 1. 生成ssh key关联GitHub
 
-https://blog.csdn.net/qq_35495339/article/details/92847819#:~:text=1.%E7%99%BB%E5%BD%95GitHub%EF%BC%8C%E8%BF%9B%E5%85%A5%E4%BD%A0%E7%9A%84Settings%202.%E4%BC%9A%E7%9C%8B%E5%88%B0%E5%B7%A6%E8%BE%B9%E8%BF%99%E4%BA%9B%E7%9B%AE%E5%BD%95%EF%BC%8C%E7%82%B9%E5%87%BBSSH%20and%20GPG%20keys%203.%E5%88%9B%E5%BB%BANew%20SSH,key%204.%E7%B2%98%E8%B4%B4%E4%BD%A0%E7%9A%84%E5%AF%86%E9%92%A5%E5%88%B0%E4%BD%A0key%E8%BE%93%E5%85%A5%E6%A1%86%E4%B8%AD%205.%E7%82%B9%E5%87%BBAdd%20SSH%20key%206.%E5%86%8D%E5%BC%B9%E5%87%BA%E7%AA%97%E5%8F%A3%EF%BC%8C%E8%BE%93%E5%85%A5%E4%BD%A0%E7%9A%84GitHub%E5%AF%86%E7%A0%81%EF%BC%8C%E7%82%B9%E5%87%BB%E7%A1%AE%E8%AE%A4%E6%8C%89%E9%92%AE%E3%80%82%207.%E5%88%B0%E6%AD%A4%EF%BC%8C%E5%B0%B1%E5%A4%A7%E5%8A%9F%E5%91%8A%E6%88%90%E4%BA%86%E3%80%82
+* 设置用户名和邮箱
 
+  ```bash
+  git config user.name "xxx"
+  git config user.email "xxx"
+  
+  # 移出设置
+  git config --global --unset user.name
+  git config --global --unset user.email
+  # 报错：
+  #$ git config unset user.name=
+  # error: key does not contain a section: unset
+  
+  # 这是因为username有多个值导致的：
+  $ git config --global --replace-all user.name "你的 git 的名称"
+  $ git config --global --replace-all uesr.email "你的 git 的邮箱"
+  #做完这一步，再键入 $ git config --list 会发现 name 和 email 只有一个值了，这时候就不会报错了。
+  ```
 
+* 生成ssh key
+
+  ```bash
+  ssh-keygen -t rsa -C ‘上面的邮箱’
+  ```
+
+* 打开id_rsa.pub公钥
+
+  ```bash
+  # linux
+  cd ~/.ssh
+  # windows
+  cd 用户/.ssh
+  ```
+
+* 点击头像，选择Setting，选择SSH and GPG keys
+
+* 点击 New SSH key
+
+* 将公钥中内容复制到Key，title填写公钥使用者kali-dev等说明
+
+* Add SSH key
+
+* 回到bash
+
+  ```bash
+  ssh -T git@github.com 
+  # Hi,xxxx！You've successfully authenticated.
+  ```
 
 ## 2. 使用已有的rsa私钥在另一台电脑上使用已有远程仓库
 
