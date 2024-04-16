@@ -172,10 +172,48 @@ res=subprocess.Popen(cmd)
 https://blog.csdn.net/fengqianlang/article/details/131190515
 
 ```bash
-# 打开新终端并执行bash
-gnome-terminal -- /bin/bash -c 'python3 --version;sleep 5;exec bash'
-#-e在Ubuntu下报错option “-e” is deprecated and might be removed in a later version of gnome-terminal.
-# -e改成--还是报错
+sudo apt install gnome-terminal
+```
+
+### （1）exec bash和bash区别
+
+`exec bash`和`bash`主要区别就是前者会开新bash替换原bash。
+
+```bash
+exec bash	# 在当前bash下开新bash替代当前bash（pid变了）
+
+exec bash -c "ping www.baidu.com"	#新bash下执行了命令，命令执行完新bash会退出（原bash被替换了）
+
+gnome-terminal -- /usr/bin/bash -c 'exec bash'
+# 在当前焦点的bash下开新的bash窗口，原bash窗口不会被关闭，并将焦点在新bash窗口下，直到新bash被关闭。
+```
+
+```bash
+bash	#在当前bash下开新的子shell。若执行了命令或脚本，执行完后子shell将自动终止
+bash -c "ping www .baidu.com"
+bash demo.sh
+```
+
+### （2）打开新终端执行命令后新终端保留
+
+```bash
+# 打开新终端并执行命令
+# 休眠5s
+# 不exec bash开的新bash会自动终止（命令执行完了）
+# exec bash在新bash-ver1.0的基础上开新bash-ver2.0
+gnome-terminal -- /bin/bash -c 'pgrep bash;sleep 3;exec bash'
+```
+
+### （3）打开新终端执行不结束命令固定时间后新终端保留
+
+```bash
+gnome-terminal -- /bin/bash -c 'timeout 10s ping www.baidu.com;sleep 3;exec bash'
+```
+
+### （4）打开新终端执行命令后新终端退出
+
+```bash
+gnome-terminal -- /bin/bash -c 'python3 --version'
 ```
 
 ```python
@@ -183,12 +221,33 @@ gnome-terminal -- /bin/bash -c 'python3 --version;sleep 5;exec bash'
 
 import subprocess
 def run_command(command):
-    cmd="gnome-terminal -- /bin/bash -c '" + command + ";exec bash'"
+    cmd="gnome-terminal -- /bin/bash -c '" + command +"'"
     subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=None,shell=True)	
 	out=res.stdout.read()
 	res.stdout.close()
 run_command("ls -al")
 ```
+
+### （5）打开新终端执行不结束命令固定时间后新终端退出
+
+```bash
+gnome-terminal -- /bin/bash -c 'timeout 10s ping www.baidu.com'
+```
+
+### （6）循环执行，每次执行完一次后新终端退出
+
+```python
+# python
+while True:
+    subprocess.Popen("gnome-terminal -- /bin/bash -c 'timeout 10s ping www.baidu.com'",shell=True)
+    time.sleep(10+5)	#新终端退出后sleep 5s再开新终端
+```
+
+### （7）开新终端循环执行，新终端不退出
+
+
+
+
 
 ## 6. 调用c#程序
 

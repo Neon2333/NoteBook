@@ -716,7 +716,34 @@ https://blog.csdn.net/weixin_41975655/article/details/82887273
 
 # Git日常使用
 
-## 1. 使用已有的rsa私钥在另一台电脑上使用已有远程仓库
+## 0. 使用token关联远程仓库
+
+```git
+git remote rm origin url
+```
+
+可以通过对远程仓库重新设置
+
+```git
+git remote rm origin
+git remote add origin https://hao203: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@github.com/hao203/Demo.git
+```
+
+或者直接改，不删原先的origin（**推荐该法**）
+
+```cpp
+git remote set-url origin https://hao203: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@github.com/hao203/Demo.git
+```
+
+然后就ok了
+
+## 1. 生成ssh key关联GitHub
+
+https://blog.csdn.net/qq_35495339/article/details/92847819#:~:text=1.%E7%99%BB%E5%BD%95GitHub%EF%BC%8C%E8%BF%9B%E5%85%A5%E4%BD%A0%E7%9A%84Settings%202.%E4%BC%9A%E7%9C%8B%E5%88%B0%E5%B7%A6%E8%BE%B9%E8%BF%99%E4%BA%9B%E7%9B%AE%E5%BD%95%EF%BC%8C%E7%82%B9%E5%87%BBSSH%20and%20GPG%20keys%203.%E5%88%9B%E5%BB%BANew%20SSH,key%204.%E7%B2%98%E8%B4%B4%E4%BD%A0%E7%9A%84%E5%AF%86%E9%92%A5%E5%88%B0%E4%BD%A0key%E8%BE%93%E5%85%A5%E6%A1%86%E4%B8%AD%205.%E7%82%B9%E5%87%BBAdd%20SSH%20key%206.%E5%86%8D%E5%BC%B9%E5%87%BA%E7%AA%97%E5%8F%A3%EF%BC%8C%E8%BE%93%E5%85%A5%E4%BD%A0%E7%9A%84GitHub%E5%AF%86%E7%A0%81%EF%BC%8C%E7%82%B9%E5%87%BB%E7%A1%AE%E8%AE%A4%E6%8C%89%E9%92%AE%E3%80%82%207.%E5%88%B0%E6%AD%A4%EF%BC%8C%E5%B0%B1%E5%A4%A7%E5%8A%9F%E5%91%8A%E6%88%90%E4%BA%86%E3%80%82
+
+
+
+## 2. 使用已有的rsa私钥在另一台电脑上使用已有远程仓库
 
 设置用户名： git config --global user.name wk
 

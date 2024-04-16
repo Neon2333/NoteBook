@@ -36,7 +36,32 @@ https://blog.csdn.net/LUCYcanFire/article/details/126402240
 
 配置完之后可以在Kit标签页给配置命名。
 
-# 2.  
+# 2.  字符串
+
+---
+
+QString是对QByteArray进一步封装。后者只是简单封装char*
+
+QString不能直接转成char*，需要先转成QByteArray：
+
+```cpp
+QByteArray QString::toUtf8() const
+```
+
+字符串拼接：
+
+```cpp
+QString str = QString("(%1)....(%2)").arg("hhh").arg("zzz")	//hhh....zzz
+qDebug()<<std;
+```
+
+QString的length()、size()、count()计算是字符的个数（包括汉字），内部编码是utf8
+
+QByteArray计算出的是字节数。
+
+
+
+# 3.QVariant
 
 ---
 

@@ -840,6 +840,28 @@ int型的n1重新赋值时，在栈中的值会被取代。
 
 ### （2）String.Format
 
+```C#
+string str1 =string.Format("{0:N1}",56789);               //result: 56,789.0
+ string str2 =string.Format("{0:N2}",56789);               //result: 56,789.00
+ string str3 =string.Format("{0:N3}",56789);               //result: 56,789.000
+ string str8 =string.Format("{0:F1}",56789);               //result: 56789.0
+ string str9 =string.Format("{0:F2}",56789);               //result: 56789.00
+ string str11 =(56789 / 100.0).ToString("#.##");           //result: 567.89
+```
+
+### （3）$处理字符串拼接
+
+**用{}包住变量名，直接放到字符串中**
+
+```c#
+ var k = "a";  
+ var a0 = "User";  
+ var a1 = "Id";  
+ var a2 = 5;  
+ var ccc = string.Format("select * from {0} where {1} = {2}", a0, a1, a2);  
+ var ccb = $"select * from {a0} where {a1}={a2}";	  
+```
+
 
 
 ### （3）string一些API
