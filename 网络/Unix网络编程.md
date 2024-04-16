@@ -1,5 +1,7 @@
 # Part 00——注意点收集
 
+---
+
 
 
 ## 1. vs code编译报错`__imp_WASartup`等的解决办法
@@ -16,11 +18,9 @@ https://www.yht7.com/news/127552
 
 ## 3. Unix主进程结束后，fork的子进程也会立即结束吗？
 
+# Part 01——系统编程
 
-
----
-
-# Part 01——系统编程C/C++ Socket
+>  **主要介绍使用Unix系统API的系统网络编程。重点是Unix系统，Windows系统编程不要管，通过C#/python等语言级网络编程API可进行。**
 
 [Socket技术详解](https://www.jianshu.com/p/066d99da7cbd)
 

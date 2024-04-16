@@ -179,6 +179,8 @@ sudo apt install gnome-terminal
 
 `exec bash`和`bash`主要区别就是前者会开新bash替换原bash。
 
+`exec bash` 适用于需要在脚本执行后保留环境状态的场景，而 `bash` 适用于需要独立运行脚本且不影响当前Shell环境的场景。
+
 ```bash
 exec bash	# 在当前bash下开新bash替代当前bash（pid变了）
 

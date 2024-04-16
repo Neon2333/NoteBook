@@ -712,30 +712,9 @@ https://blog.csdn.net/weixin_41975655/article/details/82887273
 
 ![image-20210726171937862](https://s2.loli.net/2022/03/23/PKvNLms5dWoAyBG.png)
 
----
-
 # Git日常使用
 
-## 0. 使用token关联远程仓库
-
-```git
-git remote rm origin url
-```
-
-可以通过对远程仓库重新设置
-
-```git
-git remote rm origin
-git remote add origin https://hao203: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@github.com/hao203/Demo.git
-```
-
-或者直接改，不删原先的origin（**推荐该法**）
-
-```cpp
-git remote set-url origin https://hao203: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@github.com/hao203/Demo.git
-```
-
-然后就ok了
+---
 
 ## 1. 生成ssh key关联GitHub
 
