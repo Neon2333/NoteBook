@@ -658,7 +658,117 @@ QString getSaveFileName()
 
 ---
 
-连接数据库服务器
+> 连接数据库服务器，增删改查。
+>
+> 编译Qt提供的**数据库驱动**编译成动态库。要和使用的**编译器kit**保持一致。
+
+在这里查看、修改编译器kit使用：
+
+![image-20240419201636130](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240419201636130.png)
+
+**添加sql模块**：
+
+打开`.pro`文件，在`QT+=`后面添加`sql`
+
+```cpp
+QT	+= core gui sql
+```
+
+**常用类：**
+
+```cpp
+QSqlDatabase	//通过这个类增、删、复制、关闭数据库
+QSqlQuery		//数据库查询类
+QSqlError		//数据库操作失败，通过这个类获取相关的错误信息    
+QSqlRecord		//数据库记录
+QSqlField		//数据库字段
+QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）的数据源
+```
+
+**流程：**
+
+* 创建数据库实例
+* 连接数据库
+* 执行操作
+* 关闭连接
+
+## （1）QSqlDatabase类
+
+* 创建数据库实例：
+
+  ```cpp
+  //创建数据库实例
+  [static] QSqlDatabase::addDatabase(QString& type, QString& connectionName);//type-数据库类型，connectionName-实例名
+  
+  //克隆实例，必须指定另一个实例名进行区分
+  [static] QSqlDatabase::cloneDatabase(QSqlDatabase& another, QString& connectionName);
+  
+  //删除实例
+  [static] void removeDatabase(QString& connectionName);
+  
+  //获取所有实例名
+  [static] QStringList connectionNames();	
+  
+  //判断实例是否存在
+  [static] bool contains(QString& connectionName);
+  
+  //根据实例名获取实例对象
+  [static] QSalDatabase database(QString& connectionName, bool open=true);	//open=true指定返回实例的连接是打开还是关闭
+  
+  //返回当前可用的数据库驱动名
+  QStringList drivers();
+  ```
+
+* 指定连接信息：
+
+  ```cpp
+  //指定连接名
+  void setDatabaseName(QString& name);
+  //指定主机名
+  void setHostName(QString& host);
+  //指定用户名
+  void setUserName(QString& usr);
+  //指定密码
+  void setPassword(QString& pwd);
+  //设定端口号
+  void setPort(int port);	//MySQL默认3306
+  //连接
+  bool open();
+  //判断当前数据库实例是否连接
+  bool isOpen();
+  //获取连接失败的原因信息
+  QSqlError lastError();
+  ```
+
+* demo
+
+  ```cpp
+  QStringList dblist = QSqlDatabase::drivers();
+  qDebug()<<dblist;
+  
+  //创建实例，设置连接参数
+  QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+  db.setHostName("localhost");
+  db.setUserName("root");
+  db.setPassword("root");
+  db.setPort(3306);
+  
+  //连接
+  if(db.isOpen())
+  {
+   	qDebug()<<"succeed..";
+  }
+  else
+  {
+      qDebug()<<"失败原因："<<db.lastError().text();
+  }
+  ```
+
+  
+
+
+
+
 
 
 
