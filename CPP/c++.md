@@ -753,6 +753,46 @@ if(find != NULL)
 | 拼接s1和s2 | s1+s2     |
 | 长度       | s1.size() |
 
+### （3）基本类型转字符串
+
+`to_string()`是C++11标准。
+
+```cpp
+int a = 1;
+std::string str = std::to_string(a);
+```
+
+```cpp
+template<class T>
+string NumToStr(T& num){
+    ostringstream oss;
+    oss<<num;
+    string str(oss.str());
+    return str;
+}
+```
+
+### （4）字符串转基本类型
+
+```cpp
+//string 转 int,long,double
+string c = "3.14"
+//方法一
+cout << atoi(c.c_str()) << endl;	//str.c_str()从字符串返回一个C风格字符串：const char*
+cout << atol(c.c_str()) << endl;	//atoi()是C中将const char*转int的函数
+cout << atof(c.c_str()) << endl;  
+//方法二
+template<class T>
+T StrToNum(const string& str){
+    istringstream iss(str);
+    T num;
+    iss>>num;
+    return num;
+}
+```
+
+
+
 ## 13. 引用
 
 引用很容易与指针混淆，它们之间有三个主要的不同：
@@ -2599,7 +2639,7 @@ class A
 }
 ```
 
-## 10. 继承构造函数
+## 10. 继承构造
 
 对于从父类继承到的数据成员，使用父类的构造函数。
 
