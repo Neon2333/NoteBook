@@ -654,7 +654,7 @@ QString getSaveFileName()
 
 
 
-# 16. 操作数据库
+# 16. 数据库
 
 ---
 
@@ -692,7 +692,9 @@ QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）�
 * 执行操作
 * 关闭连接
 
-## （1）QSqlDatabase类
+## （1）连接数据库
+
+`QSqlDatabase类`
 
 * 创建数据库实例：
 
@@ -736,39 +738,126 @@ QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）�
   bool open();
   //判断当前数据库实例是否连接
   bool isOpen();
-  //获取连接失败的原因信息
+  //获取最后一个错误
   QSqlError lastError();
+  ```
+
+## （2）增删改查
+
+`QSqlQuery`类
+
+```cpp
+//构造：
+//指定sql语句：sqlquery-调用的sql语句，db-数据库实例
+QSqlQuery(const QString& sqlquery, QSqlDatabase db);
+//执行sql
+bool exec();
+//QSqlQuery里没有指定sqlquery时，调用有参数的exec()，将sql传入
+bool exec(const QString& sqlquery);
+```
+
+INSERT、DELETE、UPDATE，执行增删改语句需要判断sql是否执行成功。
+
+* SELECT语句得到的结果保存在QSqlQuery实例里，取记录：
+
+```cpp
+//遍历完返回false。查询结果为空。
+bool next();
+//返回第一条记录
+bool first();
+//返回最后一条记录
+bool last();
+```
+
+* 取记录的字段值：
+
+  用QVariant封装数据，然后用type()获取Type，用toxxxx转成对应类型数据。
+
+```cpp
+//按index取值。index从0开始
+QVariant value(int index);
+//按字段名取值
+QVariant value(const QString& fieldname);
+```
+
+## （3）基本流程demo
+
+```cpp
+QStringList dblist = QSqlDatabase::drivers();
+qDebug()<<dblist;
+
+//创建实例，设置连接参数
+QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+db.setHostName("localhost");
+db.setUserName("root");
+db.setPassword("root");
+db.setPort(3306);
+
+//连接
+if(db.isOpen())
+{
+ 	qDebug()<<"succeed..";
+}
+else
+{
+    qDebug()<<"失败原因："<<db.lastError().text();
+}
+
+QSqlQuery query;
+QString sql = "SELECT * FROM PERSON";
+query.exec(sql);	//执行sql语句
+
+while(query.next())
+{
+    qDebug()<<query.value(0).toInt()		//value()返回的是QVariant，需要根据表格中某field类型调用toxxx
+        	<<query.value("sex").toString();
+        	<<query.value("name").toString();
+}
+
+db.close();	//关闭连接
+```
+
+## （4）错误信息
+
+`QSqlError`类
+
+```cpp
+//获取最后一个错误
+QSqlError QSqlDatabase::lastError();
+//调用text()方法，获取错误信息
+QString QSqlError::text();
+```
+
+## （5）事务
+
+* API
+
+  ```cpp
+  //开启事务
+  bool QSqlDatabase::transaction();	
+  //提交事务
+  bool QSqlDatabase::commit();
+  //回滚
+  bool QSqlDatabase::rollback();
   ```
 
 * demo
 
   ```cpp
-  QStringList dblist = QSqlDatabase::drivers();
-  qDebug()<<dblist;
-  
-  //创建实例，设置连接参数
-  QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-  db.setHostName("localhost");
-  db.setUserName("root");
-  db.setPassword("root");
-  db.setPort(3306);
-  
-  //连接
-  if(db.isOpen())
+  QString sql = "INSERT INTO person VALUES(9,20,'xxx')";
+  db.transaction();	//开启事务
+  QSqlQuery query;
+  if(query.exec(sql))	//判断语句是否执行成功
   {
-   	qDebug()<<"succeed..";
+      db.commit();	//提交
   }
   else
   {
-      qDebug()<<"失败原因："<<db.lastError().text();
+      db.rollback();	//回滚
   }
   ```
 
   
-
-
-
-
 
 
 

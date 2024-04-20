@@ -152,6 +152,21 @@ https://blog.csdn.net/hktkfly6/article/details/123302335
 
 ### （11）ssh连接
 
+修改linux默认端口22：
+
+```bash
+vim /etc/ssh/sshd_config
+
+找到#Port 22，默认是注释掉的，先把前面的#号去掉，再插入一行设置成你想要的端口号，注意不要跟现有端口号重复
+Port 22
+Port 6666
+#”Port 22”注不注释都是开放22访问端口。保留了22端口，防止之后因为各种权限和配置问题，导致连22端口都不能访问了，那就尴尬了。等一切都ok了，再关闭22端口
+
+# 重启SSH服务，最好也重启下服务器
+systemctl restart sshd  
+shutdown -r now  
+```
+
 ```bash
 #删除本身的ssh秘钥
 rm -rf /etc/ssh/ssh_host_*
