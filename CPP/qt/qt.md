@@ -4,13 +4,13 @@
 
 https://blog.csdn.net/zhizhengguan/article/details/107567449
 
-## 在线版
+## 在线版（用这个）
 
-* 在线安装包网址：https://download.qt.io/official_releases/online_installers/#:~:text=qt-unified-windows-x86-online.exe
+* [在线安装包网址](https://mirrors.tuna.tsinghua.edu.cn/qt/official_releases/online_installers/)
 
-* [在线版本安装流程：先注册账号。安装包不分商业版、开源版，根据你的账号申请了哪个版本自动下载。若下载的是商业版，则重新注册一个账号申请开源版然后登录。](https://blog.csdn.net/weixin_45191386/article/details/128115635?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522169112289516800185882901%2522%252C%2522scm%2522%253A%252220140713.130102334..%2522%257D&request_id=169112289516800185882901&biz_id=0&utm_medium=distribute.pc_search_result.none-task-blog-2~all~top_positive~default-2-128115635-null-null.142%5Ev92%5Ekoosearch_v1&utm_term=QT%E5%AE%89%E8%A3%85&spm=1018.2226.3001.4187)
+* [在线版本安装流程：先注册账号。安装包不分商业版、开源版，根据你的账号申请了哪个版本自动下载。若下载的是商业版，则重新注册一个账号申请开源版然后登录。](https://blog.csdn.net/appup/article/details/132367320)
 
-* 在线版环境配置过程：https://blog.csdn.net/weixin_45112748/article/details/132101874
+* [在线版环境配置过程](https://blog.csdn.net/weixin_45112748/article/details/132101874)
 
 ## 离线版
 
@@ -53,6 +53,22 @@ ifdef DOUBLE
 //这里写double代码    
 #endif
 ```
+
+## 快捷键
+
+| -                        | -                  |
+| ------------------------ | ------------------ |
+| 添加头文件               | atl+enter          |
+| 由函数声明快速生成函数体 | Ctrl + T           |
+| f4                       | 跳转头文件、源文件 |
+
+### 没用到的参数不要报错
+
+```cpp
+Q_UNUNSED(a);	//变量a没用到，编译器报错，用这个宏编译器就不提醒了
+```
+
+
 
 # 2.  字符串
 
@@ -270,7 +286,7 @@ bool isSingleShot()
   | Qt::VeryCoarseTimer | 精度1s，粗糙                  |
 
 
-# 7. 事件处理机制-信号槽
+# 7. 信号槽
 
 ---
 
@@ -427,7 +443,53 @@ connect(this->pushbutton, &QPushButton::click, a, &A::test);
 disconnect(sender, signal, receiver, slot);
 ```
 
-# 8. QWidget
+# 8. 事件处理函数
+
+事件处理函数`xxxEvent`，去protected里找、虚函数。
+
+**只要事件产生了，对应的事件处理函数handler就会被框架自动调用。若想要自行定义函数的功能。用子类继承然后override。但，override以后，父类的该函数体内的行为将不执行了，所以再调用一下父类的的事件处理函数。**
+
+```cpp
+//MainWindow.h
+MainWindow:public QMainWindow
+{
+protected:
+	void closeEvent(QCloseEvent* ev);	//窗口关闭事件handler
+	void resizeEvent(QResizeEvent* ev);	//窗口尺寸改变handler
+}
+
+//MainWindow.cpp
+MainWindow:QMainWindow	//定义类继承自QMainWindow
+{
+    //override类QMainWindow的closeEvent函数
+    void MainWindow::closeEvent(QCloseEvent* ev)	//参数是事件，父类是QEvent
+    {
+        int ret = QMessageBox::question(this, "提问", "你要关闭窗口吗？");
+        if(ret==QMessageBox::Yes)
+        {
+            ev->accept();	//QEvent的函数accept()，接受事件
+        }
+        else
+        {
+            ev->ignore();	//忽视事件，向上层窗口传递事件	
+        }
+        QMainWindow::closeEvent(ev);	//调用父类默认的closeEvent事件处理
+    }
+    
+    void  MainWindow::resizeEvent((QResizeEvent* ev)
+   	{
+   		qDebug()<<"oldsize="<<ev->oldSize()<<"size="<<ev->size();
+        QMainWindow::resizeEvent(ev);
+   	}                              
+}    
+
+```
+
+
+
+
+
+# 9. QWidget
 
 ---
 
@@ -546,7 +608,7 @@ connect(this, QWidget::customContextMenuRequested,this,[=](){
 });
 ```
 
-# 9. QDialog
+# 10. QDialog
 
 https://subingwen.cn/qt/qt-base-window/#3-QDialog%E7%9A%84%E5%AD%90%E7%B1%BB
 
@@ -573,7 +635,7 @@ accepted()
 rejected()
 ```
 
-# 10. QMessage
+# 11. QMessage
 
 ---
 
@@ -581,7 +643,7 @@ rejected()
 
 关注Static Public Members
 
-# 11. QFileDialog
+# 12. QFileDialog
 
 ---
 
@@ -607,7 +669,7 @@ QString getSaveFileName()
 | filter          | 过滤满足条件的文件：`Images(*.png *.jpg);;TextFiles(*.tet)` |
 | selectedFileter | 默认filter                                                  |
 
-# 12. QFontDialog
+# 13. QFontDialog
 
 ---
 
@@ -615,13 +677,13 @@ QString getSaveFileName()
 
 
 
-# 13. QColorDialog
+# 14. QColorDialog
 
 ---
 
 > 选颜色
 
-# 14. QInputDialog
+# 15. QInputDialog
 
 ---
 
@@ -638,7 +700,7 @@ QString getSaveFileName()
 | editable  | 下拉菜单是否可编辑 |
 | step      | 步长               |
 
-# 15. 
+# 16. 
 
 ---
 
@@ -652,9 +714,51 @@ QString getSaveFileName()
 
 
 
+# 图片
+
+---
+
+## （1）QPixmap
+
+* API
+
+  ```cpp
+  QPixmap pixmap;
+  //载入图片
+  pixmap.load(path);
+  
+  //加载图片后，图片尺寸就可获得
+  pixmap.size();
+  //获取图片data
+  pixmap.data();
+  ```
+
+## （2）Image
+
+# 自定义控件
+
+---
+
+ ## （1）在designer添加自定义控件
+
+拖一个父类，然后右键`提升为`，填写自定义控件类名。
+
+![image-20240421014917937](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240421014917937.png)
+
+## （2）自定义按钮demo
+
+```cpp
+class muButton:public QPushButton
+{
+    
+}
+```
 
 
-# 16. 数据库
+
+
+
+# 17. 数据库
 
 ---
 
@@ -691,6 +795,73 @@ QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）�
 * 连接数据库
 * 执行操作
 * 关闭连接
+
+## （0）编译MySQL驱动
+
+* [安装MySQL](https://dev.mysql.com/downloads/installer/)，已安装跳过。
+
+  > ![image-20240422152623790](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240422152623790.png)
+  >
+  > **需要选中要安装的组件，才能弹出【Advanced Options】，修改安装路径。**
+  >
+  > 根据需要设定下root密码。一路next。
+  >
+  > ![](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240422152920187.png)
+
+* 查看Qt安装目录下是否有`源码目录Src`，编译驱动是基于这个目录进行的。**没有安装的去qt官网下载(Source)或者通过qt在线安装工具，对你的qt添加Source组件：**
+
+* 将下面2个目录添加到环境变量：
+
+  ```bash
+  D:\Qt\5.15.2\mingw81_64\bin
+  D:\Qt\Tools\mingw810_64\bin
+  ```
+
+* 打开qt安装目录，进入`D:\Qt\5.15.2\Src\qtbase\src\plugins\sqldrivers （根据你自己的qt安装目录进行调整)`，在这个目录输入`ctrl-l`，`cmd`打开命令行窗口。
+
+* 编译：
+
+  > 目录写成`/`分隔。
+  >
+  > 如果之前编译失败，在`sqldrivers`目录下点击按时间顺序排列，把最新的、编译产生的文件全删掉。执行下面的qmake重新编译。
+
+  ```cmd
+  qmake -- MYSQL_INCDIR="D:/MySQL/include" MYSQL_LIBDIR="D:/MySQL/lib"
+  //开始编译。
+  
+  //mysql显示yes则成功
+  ```
+
+  ![image-20240422160925811](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240422160925811.png)
+
+  ```cmd
+  mingw32-make sub-mysql 和 mingw32-make install进行编译和安装。
+  ```
+
+  在目录`Src\qtbase\src\plugins\sqldrivers\plugins\sqldrivers`下出现2文件：
+
+  > qsqlmysql.dll
+  >
+  > qsqlmysql.dll.debug
+
+* 使用驱动：
+
+  把上面2个文件，拷贝到当前项目使用的编译器的目录下，如：`mingw81_64/plugins/sqldrivers`（使用mingw_64编译器）
+
+  把`mysql/lib`下的`libmysql.dll`拷贝到编译器的bin目录下
+
+* qtcreator的.pro文件
+
+  ```cpp
+  QT += sql
+  ```
+
+  ```cpp
+  #include"QSqlDatabase"
+  
+  QStringList dblist = QSqlDatabase::drivers();
+  qDebug()<<dblist;
+  ```
 
 ## （1）连接数据库
 
@@ -734,6 +905,8 @@ QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）�
   void setPassword(QString& pwd);
   //设定端口号
   void setPort(int port);	//MySQL默认3306
+  //设定要连接的s库名
+  void setDatabaseName(QString& dbName);
   //连接
   bool open();
   //判断当前数据库实例是否连接
@@ -789,12 +962,13 @@ qDebug()<<dblist;
 //创建实例，设置连接参数
 QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
 db.setHostName("localhost");
+db.setPort(3306);
 db.setUserName("root");
 db.setPassword("root");
-db.setPort(3306);
+db.setDatabaseName("sys");
 
 //连接
-if(db.isOpen())
+if(db.open())
 {
  	qDebug()<<"succeed..";
 }
