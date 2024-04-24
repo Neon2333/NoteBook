@@ -1,3 +1,49 @@
+# 0. 杂项
+
+---
+
+## 使用Vim
+
+Preference->FakeVim
+
+## 条件编译
+
+```cpp
+#define INT
+
+#ifdef INT
+//这里些int代码
+#endif
+
+ifdef DOUBLE
+//这里写double代码    
+#endif
+```
+
+## 快捷键
+
+| -                        | -                  |
+| ------------------------ | ------------------ |
+| 添加头文件               | atl+enter          |
+| 由函数声明快速生成函数体 | alt+enter          |
+| f4                       | 跳转头文件、源文件 |
+| ctrl-鼠标左键/f2         | 跳转到函数定义     |
+| F5                       | 开始调试           |
+| F10                      | 单步前进           |
+| F11                      | 单步进入函数       |
+
+## 没用到的参数不要报错
+
+```cpp
+Q_UNUNSED(a);	//变量a没用到，编译器报错，用这个宏编译器就不提醒了
+```
+
+## 在项目里创建子文件夹
+
+https://blog.csdn.net/y_q_m/article/details/106293218
+
+
+
 # 1. Qt安装
 
 ---
@@ -36,47 +82,13 @@ https://blog.csdn.net/LUCYcanFire/article/details/126402240
 
 配置完之后可以在Kit标签页给配置命名。
 
-## 使用Vim
-
-Preference->FakeVim
-
-## 条件编译
-
-```cpp
-#define INT
-
-#ifdef INT
-//这里些int代码
-#endif
-
-ifdef DOUBLE
-//这里写double代码    
-#endif
-```
-
-## 快捷键
-
-| -                        | -                  |
-| ------------------------ | ------------------ |
-| 添加头文件               | atl+enter          |
-| 由函数声明快速生成函数体 | Ctrl + T           |
-| f4                       | 跳转头文件、源文件 |
-
-### 没用到的参数不要报错
-
-```cpp
-Q_UNUNSED(a);	//变量a没用到，编译器报错，用这个宏编译器就不提醒了
-```
-
-
-
 # 2.  字符串
 
 ---
 
-## QByteArray
+## （1）QByteArray
 
-## QString
+## （2）QString
 
 QString是对QByteArray进一步封装。后者只是简单封装char*
 
@@ -86,12 +98,14 @@ QString不能直接转成char*，需要先转成QByteArray：
 QByteArray QString::toUtf8() const
 ```
 
-## 字符串拼接
+## （3）字符串拼接
+
+占位符：`%1`
 
 **注意：arg在QString()的后面。不是在字符串的后面**
 
 ```cpp
-QString str = QString("(%1)....(%2)").arg("hhh").arg("zzz")	//hhh....zzz
+QString str = QString("%1....%2").arg("hhh").arg("zzz")	//hhh....zzz
 qDebug()<<std;
 ```
 
@@ -117,6 +131,21 @@ QByteArray计算出的是字节数。
         label_01->setText(content);
     });
 ```
+
+## （4）类型转换
+
+* int转QString
+
+  ```cpp
+  int a = QString::number(10);
+  ```
+
+* QString转int
+
+  ```cpp
+  QString str = "123";
+  int a = str.toInt();
+  ```
 
 # 3.QVariant
 
@@ -250,11 +279,11 @@ T QVariant::value() const;
 
 ## （4）QRect
 
-# 6. 定时器QTimer
+# 6. 定时器
 
 ---
 
-## （1）常用API
+## （1）QTimer类
 
 ```cpp
 //构造
@@ -285,6 +314,44 @@ bool isSingleShot()
   | Qt::CoarseTimer     | 1ms精度误差5%范围内，默认精度 |
   | Qt::VeryCoarseTimer | 精度1s，粗糙                  |
 
+## （2）QObject类的timerEvent事件
+
+QObject的子类都有这个事件。
+
+**所有启动的定时器都会触发`timerEvent()`事件。**
+
+```cpp
+int id = QObject::startTimer(int interval);	//启动定时器
+```
+
+```cpp
+void QObject::killTimer(int id);	//关闭定时器
+```
+
+通过`startTimer()`启动定时器，返回定时器的id。
+
+通过`killTimer()`关闭定时器。
+
+所有定时器在`timerEvent()`中通过判断当前是哪个定时器触发`timerEvent`事件，进行逻辑处理：
+
+```cpp
+m_timer_loop = startTimer(1000);
+m_timer_msg = startTimer(3000);
+
+
+if(m_timer_loop == event->timerId())
+    {
+        qDebug()<<"timer_loop="<<m_timer_loop<<"event_id="<<event->timerId();
+
+        m_pixmap.load(QString(":/%1").arg((m_index++)%3));
+        update();
+    }
+    else if(m_timer_msg == event->timerId())
+    {
+        qDebug()<<"timer_msg="<<m_timer_msg<<"event_id="<<event->timerId();
+        QMessageBox::information(this, "EVA", "ayanamirei");
+    }
+```
 
 # 7. 信号槽
 
@@ -332,7 +399,7 @@ class MyMainWindow:MainWindow
 
 * 类的成员函数
 
-  返回值void
+  **返回值void**
 
   只要声明不要实现
 
@@ -353,7 +420,7 @@ class MyMainWindow:MainWindow
 
   因为是自定义的信号，系统不会自己发送。需要手动发送。
 
-  加不加`emit`都行，只是便于阅读。
+  **加不加`emit`都行，只是便于阅读。**
 
 * **传入信号的参数，会被传递到槽函数中。**
 
@@ -361,7 +428,7 @@ class MyMainWindow:MainWindow
 
 ## （3）自定义槽函数
 
-* 用`slots`声明
+* 用`public slots:`声明
 
   ```cpp
   class B
@@ -437,15 +504,31 @@ connect(this->pushbutton, &QPushButton::click, a, &A::test);
 //pushbutton的信号没有被handle，而是触发了A的test信号
 ```
 
-## （6）信号和槽的关联可断开
+## （6）传递参数
+
+clicked这种自带信号本身不带参数，所以一般在其handler里发送自定义的信号传参。
+
+**信号传递的参数类型若不支持，需要通过`qRegisterMetaType()`函数进行注册。**
+
+`main.cpp`中添加：
+
+```cpp
+qRegisterMetaType<QVector<int>>("QVector<int>");	//注册QVector<int>类型
+```
+
+## （7）信号和槽的关联断开
 
 ```cpp
 disconnect(sender, signal, receiver, slot);
 ```
 
-# 8. 事件处理函数
+# 8. qt事件处理函数
 
-事件处理函数`xxxEvent`，去protected里找、虚函数。
+---
+
+事件处理函数名称：`xxxEvent`，去protected里找、虚函数。
+
+一些内置的信号和对应的处理函数。
 
 **只要事件产生了，对应的事件处理函数handler就会被框架自动调用。若想要自行定义函数的功能。用子类继承然后override。但，override以后，父类的该函数体内的行为将不执行了，所以再调用一下父类的的事件处理函数。**
 
@@ -485,11 +568,833 @@ MainWindow:QMainWindow	//定义类继承自QMainWindow
 
 ```
 
+# 9. 容器
+
+---
+
+## （1）QVector
+
+* 不仅仅提供拷贝构造，还支持移动构造。
+
+### 取数据
+
+取数据可用：`at()`、`operator[]`，前者返回const T&，后者返回T&。
+
+**at()很快**，不发生深拷贝。
+
+所以：
+
+只是读取数据而不修改，用`at()`
+
+需要修改数据用`[]`
+
+# 10. 程序执行时间
+
+---
+
+```cpp
+#include <QElapsedTimer>
+
+QElapsedTimer* elapsetimer = new QElapsedTimer();
+elapsetimer->start();
+bubbleSort(this->vec);
+qDebug()<<"耗时:" <<elapsetimer->elapsed()<<" ms";
+```
 
 
 
 
-# 9. QWidget
+
+# 11. 图片
+
+---
+
+## （1）QPixmap
+
+* API
+
+  ```cpp
+  QPixmap pixmap;
+  //载入图片
+  pixmap.load(path);
+  
+  //加载图片后，图片尺寸就可获得
+  pixmap.size();
+  //获取图片data
+  pixmap.data();
+  ```
+
+##  （2）QPainter
+
+```cpp
+void SimpleExampleWidget::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);		//指定画在什么上面this
+    painter.setPen(Qt::blue);	//画笔颜色
+    painter.setFont(QFont("Arial", 30));	//字体颜色
+    painter.drawText(rect(), Qt::AlignCenter, "Qt");	//画布范围rect()
+}
+```
+
+## （3）Image
+
+
+
+# 12. 添加资源
+
+---
+
+* 项目名右键
+
+  Qt
+
+  Qt Source File
+
+  输入资源名
+
+* 右键qrc文件`OPen in Editor`
+
+  Add Prefix添加前缀`/`
+
+  Add Files
+
+* 文件上右键`Copy Path`复制路径
+* 可选中文件，在`Alias`中指定别名
+
+# 13. 自定义控件
+
+---
+
+ ## （1）在designer添加自定义控件
+
+拖一个父类，然后右键`提升为`，填写自定义控件类名。
+
+![image-20240421014917937](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240421014917937.png)
+
+## （2）自定义按钮
+
+* QPainter绘图
+* **update()触发paintEvent事件。重绘不会导致重新调用构造函数。**
+* enterEvent-鼠标进入事件
+* leaveEvent-鼠标离开事件
+* mousePressEvent-鼠标点击事件
+* paintEvent-重绘事件
+* 自定义控件，可通过emit发射自定义信号
+* res添加资源文件。可给文件修改别名`Alias`。
+
+```cpp
+//myButton.h
+
+#ifndef MYBUTTON_H
+#define MYBUTTON_H
+
+#include <QWidget>
+
+
+class myButton : public QWidget
+{
+    Q_OBJECT
+public:
+    explicit myButton(QWidget *parent = nullptr);
+
+protected:
+    void enterEvent(QEvent *event); //QWidget的内置事件处理：鼠标进入事件
+
+    void leaveEvent(QEvent* event); //鼠标离开事件
+
+    void mousePressEvent(QMouseEvent *event);   //鼠标点击事件
+
+    void paintEvent(QPaintEvent *event);    //重绘事件
+    
+     void timerEvent(QTimerEvent *event);    //定时器事件处理
+
+private:
+    QPixmap m_pixmap;
+    int m_timer_loop;	//图片变化定时器id
+    int m_timer_msg;	//弹窗定时器id
+    int m_index = 0;
+
+signals:
+    void clicked();	//自定义信号clicked
+};
+
+#endif // MYBUTTON_H
+```
+
+```cpp
+//myButton.cpp
+#include "mybutton.h"
+#include <QPainter>
+
+myButton::myButton(QWidget *parent)
+    : QWidget{parent}
+{
+    this->setFixedSize(400,500);	//myButton固定大小
+    m_pixmap.load("://pics/88861cbe3e2276f8830499ede37ce892_r.jpg");	//初始载入图片
+    m_timer_loop = startTimer(1000);
+    m_timer_msg = startTimer(3000);
+    qDebug()<<"construct once";
+}
+
+void myButton::enterEvent(QEvent *event)
+{
+    m_pixmap.load("://pics/v2-586102f656d80f55378acb6c938816c4_r.jpg");	//鼠标进入载入新图片
+    update();   //触发paintEvent()
+    QWidget::enterEvent(event);  //voerrideWidget的enterEvent后，调用Widget默认的enterEvent()
+}
+
+void myButton::leaveEvent(QEvent *event)
+{
+    m_pixmap.load("://pics/88861cbe3e2276f8830499ede37ce892_r.jpg");
+    update();
+    QWidget::leaveEvent(event);
+}
+
+void myButton::mousePressEvent(QMouseEvent *event)
+{
+    m_pixmap.load(":/pics/v2-854298e5ee5f811b943b4591185a62e0_r.jpg");
+    update();
+    emit clicked(); //发出自定义信号clicked
+    QWidget::mousePressEvent(event);
+}
+
+void myButton::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    //调用update()会自动触发paintEvent事件
+    QPainter p(this);
+    p.drawPixmap(this->rect(),m_pixmap);
+}
+
+//startTimer开启的定时器都会触发timerEvent事件
+void myButton::timerEvent(QTimerEvent *event)
+{
+    //通过event->timerId()获取当前是哪个定时器触发了事件
+    if(m_timer_loop == event->timerId())
+    {
+        qDebug()<<"timer_loop="<<m_timer_loop<<"event_id="<<event->timerId();
+
+        m_pixmap.load(QString(":/%1").arg((m_index++)%3));
+        update();
+    }
+    else if(m_timer_msg == event->timerId())
+    {
+        qDebug()<<"timer_msg="<<m_timer_msg<<"event_id="<<event->timerId();
+        QMessageBox::information(this, "EVA", "ayanamirei");
+    }
+
+}
+```
+
+```cpp
+//MainWindow
+#ifdef __customButton__
+#include"mybutton.h"
+
+#ifdef __customButton__
+
+    mybutton2 = new myButton(this);
+    connect(this->mybutton2, &myButton::clicked, this, [=](){
+        QMessageBox::information(this, "title", "mybutton clicked..");
+    });
+
+#endif
+
+//如果通过designer添加
+//打开ui文件，拖一个父类控件，也就是拖一个Widget
+//右键提升为。在子类名称中填写自定义类名：myButton
+ connect(ui->button01, &myButton::clicked, this, [=](){
+        QMessageBox::information(this, "title", "mybutton clicked..");
+    });
+```
+
+# 14. 数据库
+
+---
+
+> 连接数据库服务器，增删改查。
+>
+> 编译Qt提供的**数据库驱动**编译成动态库。要和使用的**编译器kit**保持一致。
+
+在这里查看、修改编译器kit使用：
+
+![image-20240419201636130](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240419201636130.png)
+
+**添加sql模块**：
+
+打开`.pro`文件，在`QT+=`后面添加`sql`
+
+```cpp
+QT	+= core gui sql
+```
+
+**常用类：**
+
+```cpp
+QSqlDatabase	//通过这个类增、删、复制、关闭数据库
+QSqlQuery		//数据库查询类
+QSqlError		//数据库操作失败，通过这个类获取相关的错误信息    
+QSqlRecord		//数据库记录
+QSqlField		//数据库字段
+QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）的数据源
+```
+
+**流程：**
+
+* 创建数据库实例
+* 连接数据库
+* 执行操作
+* 关闭连接
+
+## （0）编译MySQL驱动
+
+* [安装MySQL](https://dev.mysql.com/downloads/installer/)，已安装跳过。
+
+  通过remove可卸载之前已安装版本。
+
+  但还需要：注册表`regedit`中在`\HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services`找到之前mysql版本的服务名，一般为mysql或mysql80，删除，重启。从而在`services.msc`中清除该服务。
+
+  
+
+  > ![image-20240422152623790](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240422152623790.png)
+  >
+  > **需要选中要安装的组件，才能弹出【Advanced Options】，修改安装路径。**
+  >
+  > 根据需要设定下root密码。一路next。
+  >
+  > ![](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240422152920187.png)
+
+* 查看Qt安装目录下是否有`源码目录Src`，编译驱动是基于这个目录进行的。**没有安装的去qt官网下载(Source)或者通过qt在线安装工具，对你的qt添加Source组件：**
+
+* 将下面2个目录添加到环境变量：
+
+  ```bash
+  D:\Qt\5.15.2\mingw81_64\bin
+  D:\Qt\Tools\mingw810_64\bin
+  ```
+
+* 打开qt安装目录，进入`D:\Qt\5.15.2\Src\qtbase\src\plugins\sqldrivers （根据你自己的qt安装目录进行调整)`，在这个目录输入`ctrl-l`，`cmd`打开命令行窗口。
+
+* 编译：
+
+  > 目录写成`/`分隔。
+  >
+  > 如果之前编译失败，在`sqldrivers`目录下点击按时间顺序排列，把最新的、编译产生的文件全删掉。执行下面的qmake重新编译。
+
+  ```cmd
+  qmake -- MYSQL_INCDIR="D:/MySQL/include" MYSQL_LIBDIR="D:/MySQL/lib"
+  //向qmake指定MySQL的include目录和库目录
+  
+  //mysql显示yes则成功
+  ```
+
+  ![image-20240422160925811](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240422160925811.png)
+
+  ```cmd
+  mingw32-make sub-mysql 和 mingw32-make install进行编译和安装。
+  ```
+
+  在目录`Src\qtbase\src\plugins\sqldrivers\plugins\sqldrivers`下出现2文件：
+
+  > qsqlmysql.dll
+  >
+  > qsqlmysql.dll.debug
+
+* 使用驱动：
+
+  把上面2个文件，拷贝到当前项目使用的编译器的目录下，如：`mingw81_64/plugins/sqldrivers`（使用mingw_64编译器）
+
+  把`mysql/lib`下的`libmysql.dll`拷贝到编译器的bin目录下
+
+* qtcreator的.pro文件
+
+  ```cpp
+  QT += sql
+  ```
+
+  ```cpp
+  #include"QSqlDatabase"
+  
+  QStringList dblist = QSqlDatabase::drivers();
+  qDebug()<<dblist;
+  ```
+
+## （1）连接数据库
+
+[`QSqlDatabase类`](https://doc.qt.io/qt-5/qsqldatabase.html)
+
+* 创建数据库实例：
+
+  ```cpp
+  //创建数据库实例
+  [static] QSqlDatabase::addDatabase(QString& type, QString& connectionName);//type-数据库类型，connectionName-实例名
+  
+  //克隆实例，必须指定另一个实例名进行区分
+  [static] QSqlDatabase::cloneDatabase(QSqlDatabase& another, QString& connectionName);
+  
+  //删除实例
+  [static] void removeDatabase(QString& connectionName);
+  
+  //获取所有实例名
+  [static] QStringList connectionNames();	
+  
+  //判断实例是否存在
+  [static] bool contains(QString& connectionName);
+  
+  //根据实例名获取实例对象
+  [static] QSalDatabase database(QString& connectionName, bool open=true);	//open=true指定返回实例的连接是打开还是关闭
+  
+  //返回当前可用的数据库驱动名
+  QStringList drivers();
+  ```
+
+* 指定连接信息：
+
+  ```cpp
+  //指定连接名
+  void setDatabaseName(QString& name);
+  //指定主机名
+  void setHostName(QString& host);
+  //指定用户名
+  void setUserName(QString& usr);
+  //指定密码
+  void setPassword(QString& pwd);
+  //设定端口号
+  void setPort(int port);	//MySQL默认3306
+  //设定要连接的s库名
+  void setDatabaseName(QString& dbName);
+  //连接
+  bool open();
+  //判断当前数据库实例是否连接
+  bool isOpen();
+  //获取最后一个错误
+  QSqlError lastError();
+  ```
+
+## （2）增删改查
+
+[`QSqlQuery`类](https://doc.qt.io/qt-5/qsqlquery.html)
+
+```cpp
+//构造：
+//指定sql语句：sqlquery-调用的sql语句，db-数据库实例
+QSqlQuery(const QString& sqlquery, QSqlDatabase db);
+//执行sql
+bool exec();
+//QSqlQuery里没有指定sqlquery时，调用有参数的exec()，将sql传入
+bool exec(const QString& sqlquery);
+```
+
+INSERT、DELETE、UPDATE，执行增删改语句需要判断sql是否执行成功。
+
+* SELECT语句得到的结果保存在QSqlQuery实例里，取记录：
+
+```cpp
+//遍历完返回false。查询结果为空。
+bool next();
+//返回第一条记录
+bool first();
+//返回最后一条记录
+bool last();
+```
+
+* 取记录的字段值：
+
+  返回值是QVariant。
+  
+  **用QVariant封装数据，然后用type()获取Type，用toxxxx转成对应类型数据。**
+
+```cpp
+//按index取值。index从0开始
+QVariant value(int index);
+//按字段名取值
+QVariant value(const QString& fieldname);
+```
+
+## （3）基本流程demo
+
+```cpp
+QStringList dblist = QSqlDatabase::drivers();
+qDebug()<<dblist;
+
+//创建实例，设置连接参数
+QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+db.setHostName("localhost");
+db.setPort(3306);
+db.setUserName("root");
+db.setPassword("root");
+db.setDatabaseName("sys");
+
+//连接
+if(db.open())
+{
+ 	qDebug()<<"succeed..";
+}
+else
+{
+    qDebug()<<"失败原因："<<db.lastError().text();
+}
+
+  db.transaction();
+    QSqlQuery query;
+    QString sqlquery = "SELECT * FROM name";
+    if(query.exec(sqlquery))
+    {
+        while(query.next())
+        {
+            qDebug()<<query.value("name").toString();
+        }
+    }
+
+	db.transaction();
+    QString sqlinsert = "INSERT INTO name VALUES('101','qqq')";
+
+   if(query.exec(sqlinsert))
+   {
+       db.commit();
+       qDebug()<<"insert succeed..";
+   }
+   else
+   {
+       db.rollback();
+       qDebug()<<"insert failed..";
+   }
+
+   db.close();	//关闭连接
+   qDebug()<<db.isOpen();	//false
+```
+
+## （4）错误信息
+
+`QSqlError`类
+
+```cpp
+//获取最后一个错误
+QSqlError QSqlDatabase::lastError();
+//调用text()方法，获取错误信息
+QString QSqlError::text();
+```
+
+## （5）事务
+
+* API
+
+  ```cpp
+  //开启事务
+  bool QSqlDatabase::transaction();	
+  //提交事务
+  bool QSqlDatabase::commit();
+  //回滚
+  bool QSqlDatabase::rollback();
+  ```
+
+* demo
+
+  ```cpp
+  QString sql = "INSERT INTO person VALUES(9,20,'xxx')";
+  db.transaction();	//开启事务
+  QSqlQuery query;
+  if(query.exec(sql))	//判断语句是否执行成功
+  {
+      db.commit();	//提交
+  }
+  else
+  {
+      db.rollback();	//回滚
+  }
+  ```
+
+
+
+# 15. 多线程
+
+---
+
+> UI线程负责**事件处理、窗口显示数据的更新**
+>
+> 子线程负责业务逻辑，**不能更新UI中的数据显示**
+>
+> **线程间传递数据，可通过信号的参数**
+
+## （1）QThread类
+
+继承QThread，**override其run()**函数编写任务。调用start()启动线程。
+
+自定义finished(int num)信号，在run()结束时调用用来传参。
+
+* API
+
+  ```cpp
+  //判断线程是否执行完
+  bool QThread::isFinshed();	
+  //判断线程是否正在执行
+  bool QThread::isRunning();
+  //给线程设置优先级
+  void QThread::setPriority(Priority p);	//Priority是枚举。查文档
+  //获取当前线程优先级
+  Priority QThread::Priority();	
+  //线程退出函数
+  void QThread::exit();	//调用这个函数后线程不会立刻退出，因为还有任务没执行完
+  //等待线程执行完。一般都是先调用exit()再调用wait()，搭配使用。
+  bool QThread::wait();
+  ```
+
+   ```cpp
+   //线程执行完毕后会发出这个信号
+   [signal] void QThread::finished();	
+   ```
+
+  ```cpp
+  [slot] void start(Priority p);	//线程启动。自动执行run()函数。
+  [slot] void terminate();	//线程直接终止（一般不用。后面不用wait）
+  ```
+
+  ```cpp
+  //返回指向当前运行线程的指针
+  [static] QThread* QThread::currentThread();		
+  //线程休眠
+  [static] void QThread::msleep(mesc);	//毫秒
+  sleep();							//秒
+  usleep();							//微秒
+  ```
+
+  ```cpp
+  //handler
+  virtual protected void QThread::run()
+  {}
+  ```
+
+  ## （2）demo
+  
+  ```cpp
+  //generator.h
+  
+  #ifndef GENERATOR_H
+  #define GENERATOR_H
+  
+  #include <QObject>
+  #include <QThread>
+  
+  class Generator : public QThread
+  {
+      Q_OBJECT
+  public:
+      explicit Generator(QObject *parent = nullptr);
+  protected:
+      void run() override;	//override QThread的run
+  private:
+      int m_num;
+      QVector<int> m_vec;		//存储随机生成的数字
+  
+  signals:
+      void finished(QVector<int>);	//自定义run()执行完后发送的信号
+  public slots:
+      void recvNum(int num);			//接收num的槽函数
+  
+  };
+  
+  #endif // GENERATOR_H
+  ```
+  
+  ```cpp
+  //generator.cpp
+  
+  #include "generator.h"
+  
+  Generator::Generator(QObject *parent)
+      : QThread{parent}
+  {
+  
+  
+  }
+  
+  void Generator::recvNum(int n)
+  {
+      //获取生成个数
+      this->m_num=n;
+      //启动子线程
+      this->start();
+  }
+  
+  void Generator::run()
+  {
+      for(int i=0;i<m_num;i++)
+      {
+          m_vec.push_back(rand()%10000);
+      }
+  
+      emit finished(m_vec);	//发射子线程执行完的信号
+  
+  }
+  ```
+  
+  ```cpp
+  //bubblesort.h
+  
+  #ifndef BUBBLESORT_H
+  #define BUBBLESORT_H
+  
+  #include <QObject>
+  #include <qthread.h>
+  #include <QVector>
+  #include <QElapsedTimer>
+  
+  class BubbleSort : public QThread
+  {
+      Q_OBJECT
+  public:
+      explicit BubbleSort(QObject *parent = nullptr);
+      void bubbleSort(QVector<int>& vec);
+      QVector<int> vec;
+  
+  signals:
+      void finished(QVector<int> sortedVec);
+  
+  public slots:
+      void run() override;
+      void recvNums(QVector<int> vec);
+  };
+  
+  #endif // BUBBLESORT_H
+  ```
+  
+  ```cpp
+  //bubblesort.cpp
+  
+  #include "bubblesort.h"
+  #include <QDebug>
+  
+  BubbleSort::BubbleSort(QObject *parent)
+      : QThread{parent}
+  {}
+  
+  void BubbleSort::recvNums(QVector<int> vec)
+  {
+      this->vec=std::move(vec);	//接收待排序数组
+  
+      this->start();			//启动子线程。自动执行run()
+  
+  }
+  
+  //冒泡排序函数
+  void BubbleSort::bubbleSort(QVector<int>& vec)
+  {
+      int n=vec.count();
+      for (int i = 0; i < n - 1; i++) {
+          for (int j = 0; j < n - i - 1; j++) {
+              if (vec.at(j) > vec.at(j+1)) {
+                  // int temp = vec.at(j);
+                  // vec.at(j)=vec.at(j+1);
+                  // vec.at(j+1)=temp;
+                  int temp=vec[j];
+                  vec[j]=vec[j+1];
+                  vec[j+1]=temp;
+              }
+          }
+      }
+  }
+  
+  void BubbleSort::run()
+  {
+      //子线程
+      QElapsedTimer* elapsetimer = new QElapsedTimer();	
+      elapsetimer->start();	//启动计时
+      bubbleSort(this->vec);	//排序
+      emit finished(this->vec);	//发射自定义finished信号
+      qDebug()<<"耗时:" <<elapsetimer->elapsed()<<" ms";
+  }
+  ```
+  
+  ```cpp
+  //MainWindow.h
+  
+  #ifndef MAINWINDOW_H
+  #define MAINWINDOW_H
+  
+  #include <QMainWindow>
+  #include"mybutton.h"
+  QT_BEGIN_NAMESPACE
+  namespace Ui {
+  class MainWindow;
+  }
+  QT_END_NAMESPACE
+  
+  class MainWindow : public QMainWindow
+  {
+      Q_OBJECT
+  
+  public:
+      MainWindow(QWidget *parent = nullptr);
+      ~MainWindow();
+  signals:
+      void transNum(int num);
+  
+  private slots:
+      void on_pushButton_01_clicked();
+  
+  private:
+      Ui::MainWindow *ui;
+      myButton* mybutton2;
+  };
+  #endif // MAINWINDOW_H
+  ```
+  
+  ```cpp
+  //MainWindow.cpp
+  
+  #include <Bubblesort.h>
+  #include"generator.h"
+  
+  #define __multithread__
+  
+  #ifdef __multithread__
+  
+  
+      Generator* gen = new Generator();
+      //点击按钮把num传给gen。在recvNum中启动子线程
+      connect(this, &MainWindow::transNum, gen, &Generator::recvNum);
+      //bubblesort nums
+      BubbleSort* bubble = new BubbleSort();
+      connect(gen, &Generator::finished, bubble, &BubbleSort::recvNums);
+      connect(bubble, &BubbleSort::finished, this, [=](QVector<int> vec){
+          for(auto it=vec.begin();it!=vec.end();it++)
+          {
+              ui->listWidget_2->addItem(QString::number(*it, 10));
+          }
+      });
+  
+  
+      //gen中子线程结束后，发送自定义finished信号传参给this
+      connect(gen, &Generator::finished, this, [=](QVector<int> vec){
+          for(auto it=vec.begin();it!=vec.end();it++)
+          {
+              ui->listWidget->addItem(QString::number(*it, 10));
+          }
+  
+  
+      });
+  #endif
+  
+  void MainWindow::on_pushButton_01_clicked()
+  {
+      //按钮事件不带参数，所以自定义一个transNum信号传参
+      emit transNum(ui->lineEdit->text().toInt());
+  }
+  ```
+  
+  
+
+
+
+
+
+# 16. Qt网络通信
+
+---
+
+
+
+# 1. QWidget
 
 ---
 
@@ -523,14 +1428,14 @@ void setMinimumSize(int maxw, int maxh);
 void setFixedSize(const QSize&);
 void setFixedSize(int w,int h);
 void setFixedHeight(int h);
-void setFixed
 
 //同时设定尺寸、位置
 QRect frameGeometry()	//获取x,y,w,h信息，包括边框
 const QRect& Geometry() const	//不包括边框
     
 //获取尺寸
-QSize size() const
+QSize size() const;
+QRect rect() const;
 int height() const;
 int width() const;
 int maximumHeight() const;
@@ -608,7 +1513,7 @@ connect(this, QWidget::customContextMenuRequested,this,[=](){
 });
 ```
 
-# 10. QDialog
+# 2. QDialog
 
 https://subingwen.cn/qt/qt-base-window/#3-QDialog%E7%9A%84%E5%AD%90%E7%B1%BB
 
@@ -635,15 +1540,17 @@ accepted()
 rejected()
 ```
 
-# 11. QMessage
+# 3. QMessageBox
 
 ---
 
-> 就是MessageBox
-
 关注Static Public Members
 
-# 12. QFileDialog
+```cpp
+QMessageBox::information()
+```
+
+# 4. QFileDialog
 
 ---
 
@@ -669,7 +1576,7 @@ QString getSaveFileName()
 | filter          | 过滤满足条件的文件：`Images(*.png *.jpg);;TextFiles(*.tet)` |
 | selectedFileter | 默认filter                                                  |
 
-# 13. QFontDialog
+# 5. QFontDialog
 
 ---
 
@@ -677,13 +1584,13 @@ QString getSaveFileName()
 
 
 
-# 14. QColorDialog
+# 6. QColorDialog
 
 ---
 
 > 选颜色
 
-# 15. QInputDialog
+# 7. QInputDialog
 
 ---
 
@@ -699,341 +1606,6 @@ QString getSaveFileName()
 | **items** | **下拉菜单**       |
 | editable  | 下拉菜单是否可编辑 |
 | step      | 步长               |
-
-# 16. 
-
----
-
-
-
-
-
-
-
-
-
-
-
-# 图片
-
----
-
-## （1）QPixmap
-
-* API
-
-  ```cpp
-  QPixmap pixmap;
-  //载入图片
-  pixmap.load(path);
-  
-  //加载图片后，图片尺寸就可获得
-  pixmap.size();
-  //获取图片data
-  pixmap.data();
-  ```
-
-## （2）Image
-
-# 自定义控件
-
----
-
- ## （1）在designer添加自定义控件
-
-拖一个父类，然后右键`提升为`，填写自定义控件类名。
-
-![image-20240421014917937](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240421014917937.png)
-
-## （2）自定义按钮demo
-
-```cpp
-class muButton:public QPushButton
-{
-    
-}
-```
-
-
-
-
-
-# 17. 数据库
-
----
-
-> 连接数据库服务器，增删改查。
->
-> 编译Qt提供的**数据库驱动**编译成动态库。要和使用的**编译器kit**保持一致。
-
-在这里查看、修改编译器kit使用：
-
-![image-20240419201636130](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240419201636130.png)
-
-**添加sql模块**：
-
-打开`.pro`文件，在`QT+=`后面添加`sql`
-
-```cpp
-QT	+= core gui sql
-```
-
-**常用类：**
-
-```cpp
-QSqlDatabase	//通过这个类增、删、复制、关闭数据库
-QSqlQuery		//数据库查询类
-QSqlError		//数据库操作失败，通过这个类获取相关的错误信息    
-QSqlRecord		//数据库记录
-QSqlField		//数据库字段
-QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）的数据源
-```
-
-**流程：**
-
-* 创建数据库实例
-* 连接数据库
-* 执行操作
-* 关闭连接
-
-## （0）编译MySQL驱动
-
-* [安装MySQL](https://dev.mysql.com/downloads/installer/)，已安装跳过。
-
-  > ![image-20240422152623790](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240422152623790.png)
-  >
-  > **需要选中要安装的组件，才能弹出【Advanced Options】，修改安装路径。**
-  >
-  > 根据需要设定下root密码。一路next。
-  >
-  > ![](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240422152920187.png)
-
-* 查看Qt安装目录下是否有`源码目录Src`，编译驱动是基于这个目录进行的。**没有安装的去qt官网下载(Source)或者通过qt在线安装工具，对你的qt添加Source组件：**
-
-* 将下面2个目录添加到环境变量：
-
-  ```bash
-  D:\Qt\5.15.2\mingw81_64\bin
-  D:\Qt\Tools\mingw810_64\bin
-  ```
-
-* 打开qt安装目录，进入`D:\Qt\5.15.2\Src\qtbase\src\plugins\sqldrivers （根据你自己的qt安装目录进行调整)`，在这个目录输入`ctrl-l`，`cmd`打开命令行窗口。
-
-* 编译：
-
-  > 目录写成`/`分隔。
-  >
-  > 如果之前编译失败，在`sqldrivers`目录下点击按时间顺序排列，把最新的、编译产生的文件全删掉。执行下面的qmake重新编译。
-
-  ```cmd
-  qmake -- MYSQL_INCDIR="D:/MySQL/include" MYSQL_LIBDIR="D:/MySQL/lib"
-  //开始编译。
-  
-  //mysql显示yes则成功
-  ```
-
-  ![image-20240422160925811](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240422160925811.png)
-
-  ```cmd
-  mingw32-make sub-mysql 和 mingw32-make install进行编译和安装。
-  ```
-
-  在目录`Src\qtbase\src\plugins\sqldrivers\plugins\sqldrivers`下出现2文件：
-
-  > qsqlmysql.dll
-  >
-  > qsqlmysql.dll.debug
-
-* 使用驱动：
-
-  把上面2个文件，拷贝到当前项目使用的编译器的目录下，如：`mingw81_64/plugins/sqldrivers`（使用mingw_64编译器）
-
-  把`mysql/lib`下的`libmysql.dll`拷贝到编译器的bin目录下
-
-* qtcreator的.pro文件
-
-  ```cpp
-  QT += sql
-  ```
-
-  ```cpp
-  #include"QSqlDatabase"
-  
-  QStringList dblist = QSqlDatabase::drivers();
-  qDebug()<<dblist;
-  ```
-
-## （1）连接数据库
-
-`QSqlDatabase类`
-
-* 创建数据库实例：
-
-  ```cpp
-  //创建数据库实例
-  [static] QSqlDatabase::addDatabase(QString& type, QString& connectionName);//type-数据库类型，connectionName-实例名
-  
-  //克隆实例，必须指定另一个实例名进行区分
-  [static] QSqlDatabase::cloneDatabase(QSqlDatabase& another, QString& connectionName);
-  
-  //删除实例
-  [static] void removeDatabase(QString& connectionName);
-  
-  //获取所有实例名
-  [static] QStringList connectionNames();	
-  
-  //判断实例是否存在
-  [static] bool contains(QString& connectionName);
-  
-  //根据实例名获取实例对象
-  [static] QSalDatabase database(QString& connectionName, bool open=true);	//open=true指定返回实例的连接是打开还是关闭
-  
-  //返回当前可用的数据库驱动名
-  QStringList drivers();
-  ```
-
-* 指定连接信息：
-
-  ```cpp
-  //指定连接名
-  void setDatabaseName(QString& name);
-  //指定主机名
-  void setHostName(QString& host);
-  //指定用户名
-  void setUserName(QString& usr);
-  //指定密码
-  void setPassword(QString& pwd);
-  //设定端口号
-  void setPort(int port);	//MySQL默认3306
-  //设定要连接的s库名
-  void setDatabaseName(QString& dbName);
-  //连接
-  bool open();
-  //判断当前数据库实例是否连接
-  bool isOpen();
-  //获取最后一个错误
-  QSqlError lastError();
-  ```
-
-## （2）增删改查
-
-`QSqlQuery`类
-
-```cpp
-//构造：
-//指定sql语句：sqlquery-调用的sql语句，db-数据库实例
-QSqlQuery(const QString& sqlquery, QSqlDatabase db);
-//执行sql
-bool exec();
-//QSqlQuery里没有指定sqlquery时，调用有参数的exec()，将sql传入
-bool exec(const QString& sqlquery);
-```
-
-INSERT、DELETE、UPDATE，执行增删改语句需要判断sql是否执行成功。
-
-* SELECT语句得到的结果保存在QSqlQuery实例里，取记录：
-
-```cpp
-//遍历完返回false。查询结果为空。
-bool next();
-//返回第一条记录
-bool first();
-//返回最后一条记录
-bool last();
-```
-
-* 取记录的字段值：
-
-  用QVariant封装数据，然后用type()获取Type，用toxxxx转成对应类型数据。
-
-```cpp
-//按index取值。index从0开始
-QVariant value(int index);
-//按字段名取值
-QVariant value(const QString& fieldname);
-```
-
-## （3）基本流程demo
-
-```cpp
-QStringList dblist = QSqlDatabase::drivers();
-qDebug()<<dblist;
-
-//创建实例，设置连接参数
-QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
-db.setHostName("localhost");
-db.setPort(3306);
-db.setUserName("root");
-db.setPassword("root");
-db.setDatabaseName("sys");
-
-//连接
-if(db.open())
-{
- 	qDebug()<<"succeed..";
-}
-else
-{
-    qDebug()<<"失败原因："<<db.lastError().text();
-}
-
-QSqlQuery query;
-QString sql = "SELECT * FROM PERSON";
-query.exec(sql);	//执行sql语句
-
-while(query.next())
-{
-    qDebug()<<query.value(0).toInt()		//value()返回的是QVariant，需要根据表格中某field类型调用toxxx
-        	<<query.value("sex").toString();
-        	<<query.value("name").toString();
-}
-
-db.close();	//关闭连接
-```
-
-## （4）错误信息
-
-`QSqlError`类
-
-```cpp
-//获取最后一个错误
-QSqlError QSqlDatabase::lastError();
-//调用text()方法，获取错误信息
-QString QSqlError::text();
-```
-
-## （5）事务
-
-* API
-
-  ```cpp
-  //开启事务
-  bool QSqlDatabase::transaction();	
-  //提交事务
-  bool QSqlDatabase::commit();
-  //回滚
-  bool QSqlDatabase::rollback();
-  ```
-
-* demo
-
-  ```cpp
-  QString sql = "INSERT INTO person VALUES(9,20,'xxx')";
-  db.transaction();	//开启事务
-  QSqlQuery query;
-  if(query.exec(sql))	//判断语句是否执行成功
-  {
-      db.commit();	//提交
-  }
-  else
-  {
-      db.rollback();	//回滚
-  }
-  ```
-
-  
-
-
 
 
 
