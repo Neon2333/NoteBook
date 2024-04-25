@@ -309,13 +309,19 @@ mysql -h192.168.42.128 -uroot -p
 
   多行/**/
 
-* 启动服务
+* linux启动服务
 
   ```bash
-  systemctl restart mysql
+  systemctl start mysql
+  systemctl enable mysql
   ```
 
+* Windows启动
 
+  ```bash
+  net start mysql
+  net stop mysql
+  ```
 
 ## 2. 数据结构
 

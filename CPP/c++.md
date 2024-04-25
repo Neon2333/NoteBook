@@ -1235,6 +1235,8 @@ int main()
 
 override保留字表示当前函数重写了基类的虚函数。
 
+使用override关键字时，只需要在派生类的函数声明中添加即可，不需要在函数实现中使用。同时，override关键字的使用并不是强制性的。
+
 ```cpp
 #include <iostream>
  

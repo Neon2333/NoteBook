@@ -22,15 +22,33 @@ ifdef DOUBLE
 
 ## 快捷键
 
-| -                        | -                  |
-| ------------------------ | ------------------ |
-| 添加头文件               | atl+enter          |
-| 由函数声明快速生成函数体 | alt+enter          |
-| f4                       | 跳转头文件、源文件 |
-| ctrl-鼠标左键/f2         | 跳转到函数定义     |
-| F5                       | 开始调试           |
-| F10                      | 单步前进           |
-| F11                      | 单步进入函数       |
+`工具->选项->环境->键盘`
+
+在搜索栏里搜索关键字，可以自己设置：
+
+> 移动行-搜moveline
+>
+> 复制行-copy
+>
+> 补全-complete
+>
+> 删除一行-deleteline
+
+| -                        | -                        |
+| ------------------------ | ------------------------ |
+| 添加头文件               | atl+enter                |
+| 由函数声明快速生成函数体 | alt+enter                |
+| f4                       | 跳转头文件、源文件       |
+| ctrl-鼠标左键/f2         | 跳转到函数定义           |
+| F5                       | 开始调试                 |
+| F10                      | 单步前进                 |
+| F11                      | 单步进入函数             |
+| ///                      | 回车后自动创建下一行注释 |
+| ctrl+space               | 补全                     |
+| ctrl-ins                 | 复制行                   |
+| 移动行                   | alt-up、alt-down         |
+| 按住alt                  | 同步输入                 |
+| ctrl-l                   | 删除一行                 |
 
 ## 没用到的参数不要报错
 
@@ -279,11 +297,21 @@ T QVariant::value() const;
 
 ## （4）QRect
 
+```cpp
+int right() const noexcept	//右边界的x坐标
+```
+
+
+
 # 6. 定时器
 
 ---
 
 ## （1）QTimer类
+
+```cpp
+#include <QTimer>
+```
 
 ```cpp
 //构造
@@ -316,6 +344,12 @@ bool isSingleShot()
 
 ## （2）QObject类的timerEvent事件
 
+```cpp
+#include <QTimerEvent>
+
+virtual void timerEvent(QTimerEvent* ev) override;
+```
+
 QObject的子类都有这个事件。
 
 **所有启动的定时器都会触发`timerEvent()`事件。**
@@ -328,9 +362,9 @@ int id = QObject::startTimer(int interval);	//启动定时器
 void QObject::killTimer(int id);	//关闭定时器
 ```
 
-通过`startTimer()`启动定时器，返回定时器的id。
+通过`QObject::startTimer()`启动定时器，返回定时器的id。
 
-通过`killTimer()`关闭定时器。
+通过`QObject::killTimer()`关闭定时器。
 
 所有定时器在`timerEvent()`中通过判断当前是哪个定时器触发`timerEvent`事件，进行逻辑处理：
 
@@ -526,9 +560,11 @@ disconnect(sender, signal, receiver, slot);
 
 ---
 
-事件处理函数名称：`xxxEvent`，去protected里找、虚函数。
+事件处理函数名称：`xxxEvent`，去`protected virtual`里找
 
 一些内置的信号和对应的处理函数。
+
+要声明为`protected`
 
 **只要事件产生了，对应的事件处理函数handler就会被框架自动调用。若想要自行定义函数的功能。用子类继承然后override。但，override以后，父类的该函数体内的行为将不执行了，所以再调用一下父类的的事件处理函数。**
 
@@ -537,8 +573,8 @@ disconnect(sender, signal, receiver, slot);
 MainWindow:public QMainWindow
 {
 protected:
-	void closeEvent(QCloseEvent* ev);	//窗口关闭事件handler
-	void resizeEvent(QResizeEvent* ev);	//窗口尺寸改变handler
+	virtual void closeEvent(QCloseEvent* ev) override;	//窗口关闭事件handler
+	virtual void resizeEvent(QResizeEvent* ev) override;	//窗口尺寸改变handler
 }
 
 //MainWindow.cpp
@@ -568,6 +604,60 @@ MainWindow:QMainWindow	//定义类继承自QMainWindow
 
 ```
 
+## （1）鼠标事件
+
+| -鼠标常用函数                | -                        |
+| ---------------------------- | ------------------------ |
+| 鼠标按下相对于整个屏幕的坐标 | QMouseEvent::globalPos() |
+| 鼠标按下相对于当前控件的坐标 | MouseEvent::pos()        |
+| 鼠标按下的按钮               | MouseEvent::button()     |
+|                              |                          |
+|                              |                          |
+|                              |                          |
+
+* QWidget的事件：
+
+```cpp
+
+    
+virtual void mousePressEvent(QMouseEvent* ev) override;
+virtual void mouseMoveEvent(QMouseEvent* ev) override;
+
+//注意参数是QEvent而不是QMouseEvent
+virtual void enterEvent(QEvent* ev);	//只鼠标触碰到边缘时触发一次。进入内部后不会多次触发。
+virtual void leaveEvent(QEvent* ev);
+```
+
+```cpp
+void rei::mousePressEvent(QMouseEvent *ev)
+{
+    if(ev->button() == Qt::LeftButton)  //判断按下的是左键
+    {
+        mousePosInRei = ev->globalPos() - this->geometry().topLeft();   //记录鼠标按下时在图片内的相对位置
+    }
+}
+
+void rei::mouseMoveEvent(QMouseEvent *ev)
+{
+    //位与运算：判断左键参与移动
+    if(ev->buttons() && Qt::LeftButton) 
+    {
+        this->move(ev->globalPos() - this->mousePosInRei);
+
+    }
+}
+```
+
+## （2）重绘事件
+
+```cpp
+virtual void paintEvent()
+```
+
+
+
+
+
 # 9. 容器
 
 ---
@@ -576,17 +666,21 @@ MainWindow:QMainWindow	//定义类继承自QMainWindow
 
 * 不仅仅提供拷贝构造，还支持移动构造。
 
-### 取数据
+* 取数据
 
-取数据可用：`at()`、`operator[]`，前者返回const T&，后者返回T&。
+  取数据可用：`at()`、`operator[]`，前者返回const T&，后者返回T&。
 
-**at()很快**，不发生深拷贝。
+  **at()很快**，不发生深拷贝。
 
-所以：
+  所以：
 
-只是读取数据而不修改，用`at()`
+  只是读取数据而不修改，用`at()`
 
-需要修改数据用`[]`
+  需要修改数据用`[]`
+
+ 
+
+
 
 # 10. 程序执行时间
 
@@ -602,6 +696,43 @@ qDebug()<<"耗时:" <<elapsetimer->elapsed()<<" ms";
 ```
 
 
+
+# 11. 随机数
+
+---
+
+```cpp
+#include <QRandomGenerator>
+
+QRandomGenerator* QRandomGenerator::global();	//返回一个QRandomGenerator指针对象
+int randnum = int bounded(int highest);	//设定上限。可为负值
+int randnum = int bounded(int lowest, int highest);	//设定上下限。可为负值
+```
+
+# 12. 获取屏幕尺寸
+
+---
+
+`QDesktopWidget`类，但已被弃用。
+
+```cpp
+QDesktopWidget* wt = QApplication::desktop();
+QRect screen = wt->geometry();
+
+//通过scrren获取屏幕尺寸
+int rightX = screen.right();	//返回右边界横坐标
+int leftX = screen.left();
+int topY = scrren.top();
+int bottomY = screen.botton();
+```
+
+```cpp
+#include <QGuiApplication>
+#include <QScreen>
+
+[static] QList<QScreen*> QGuiApplication::screens();
+QRect screen = QGuiApplication::screens().first()->geometry();
+```
 
 
 
@@ -696,6 +827,7 @@ class myButton : public QWidget
     Q_OBJECT
 public:
     explicit myButton(QWidget *parent = nullptr);
+    explicit myButton(QWidget *parent = nullptr, int w = 100, int h = 50);	//构造
 
 protected:
     void enterEvent(QEvent *event); //QWidget的内置事件处理：鼠标进入事件
@@ -730,6 +862,16 @@ myButton::myButton(QWidget *parent)
     : QWidget{parent}
 {
     this->setFixedSize(400,500);	//myButton固定大小
+    m_pixmap.load("://pics/88861cbe3e2276f8830499ede37ce892_r.jpg");	//初始载入图片
+    m_timer_loop = startTimer(1000);
+    m_timer_msg = startTimer(3000);
+    qDebug()<<"construct once";
+}
+
+myButton::myButton(QWidget *parent, int w, int h)
+    : QWidget{parent}
+{
+    this->setFixedSize(w, h);	//myButton大小
     m_pixmap.load("://pics/88861cbe3e2276f8830499ede37ce892_r.jpg");	//初始载入图片
     m_timer_loop = startTimer(1000);
     m_timer_msg = startTimer(3000);
@@ -1060,7 +1202,8 @@ else
        qDebug()<<"insert failed..";
    }
 
-   db.close();	//关闭连接
+	//关闭连接
+   db.close();	
    qDebug()<<db.isOpen();	//false
 ```
 
@@ -1103,8 +1246,6 @@ QString QSqlError::text();
       db.rollback();	//回滚
   }
   ```
-
-
 
 # 15. 多线程
 
@@ -1160,7 +1301,7 @@ QString QSqlError::text();
 
   ```cpp
   //handler
-  virtual protected void QThread::run()
+  virtual protected void QThread::run() override
   {}
   ```
 
@@ -1181,7 +1322,7 @@ QString QSqlError::text();
   public:
       explicit Generator(QObject *parent = nullptr);
   protected:
-      void run() override;	//override QThread的run
+      virtual void run() override;	//override QThread的run
   private:
       int m_num;
       QVector<int> m_vec;		//存储随机生成的数字
@@ -1394,6 +1535,14 @@ QString QSqlError::text();
 
 
 
+# 0. 常用设置
+
+```cpp
+
+```
+
+
+
 # 1. QWidget
 
 ---
@@ -1513,7 +1662,46 @@ connect(this, QWidget::customContextMenuRequested,this,[=](){
 });
 ```
 
-# 2. QDialog
+# 2. QMainWindow
+
+## （1）API
+
+```cpp
+//标题
+setWindowTitle(QString);
+
+```
+
+## （2）常用设置
+
+### 窗口去边框
+
+```cpp
+setWindowFlags(windowFlags() | Qt::FramelessWindowHint);
+```
+
+### 窗口透明
+
+```cpp
+setAttribute(Qt::WA_TranslucentBackground);
+```
+
+### 窗口最大化
+
+```cpp
+showMaximized();
+//窗口最大化后，内部的子控件需要手动调用show()才能显示
+widget->show();
+```
+
+### 设置某个控件在窗口的中心
+
+```cpp
+//设置某个控件的位置在父控件的中心点
+wt.move((this->width() - wt->width())/2,(this->height() - wt->height())/2);
+```
+
+# 3. QDialog
 
 https://subingwen.cn/qt/qt-base-window/#3-QDialog%E7%9A%84%E5%AD%90%E7%B1%BB
 
