@@ -150,7 +150,7 @@ QByteArray计算出的是字节数。
     });
 ```
 
-## （4）类型转换
+## （4）字符串转int/double
 
 * int转QString
 
@@ -395,13 +395,13 @@ if(m_timer_loop == event->timerId())
 >
 > 槽函数：
 >
-> connect()：属于QObject类的函数，将槽函数注册到信号上：
+> connect()：属于`QObject`类的函数，将槽函数注册到信号上：
 >
 > ```cpp
 > connect(const Object sender, &QObject::signal,const Object receiver, &QObject::method)
 > ```
 >
-> 
+> **只有QObject的子类才能connect。**
 
 ## （1）内置信号、槽函数
 
@@ -525,6 +525,8 @@ class MyMainWindow:MainWindow
 ## （4）关联多个槽函数
 
 一个信号可以关联多个槽函数，connect多次，槽函数**执行顺序随机**，和注册顺序无关。
+
+一个信号要触发多个函数的时候，可以分开写。
 
 ## （5）信号触发信号
 
@@ -1257,15 +1259,16 @@ QString QSqlError::text();
 >
 > **线程间传递数据，可通过信号的参数**
 
-## （1）QThread类
+## （1）方法1—别用这个
 
-继承QThread，**override其run()**函数编写任务。调用start()启动线程。
-
-自定义finished(int num)信号，在run()结束时调用用来传参。
+> **继承QThread类**，封装要多线程执行的代码，**override其run()**函数编写任务。调用`start()`启动线程。
+>
+> 自定义finished(int num)信号，在run()结束时调用用来传参。
 
 * API
 
   ```cpp
+  QThread类
   //判断线程是否执行完
   bool QThread::isFinshed();	
   //判断线程是否正在执行
@@ -1279,17 +1282,17 @@ QString QSqlError::text();
   //等待线程执行完。一般都是先调用exit()再调用wait()，搭配使用。
   bool QThread::wait();
   ```
-
+  
    ```cpp
    //线程执行完毕后会发出这个信号
    [signal] void QThread::finished();	
    ```
-
+  
   ```cpp
   [slot] void start(Priority p);	//线程启动。自动执行run()函数。
   [slot] void terminate();	//线程直接终止（一般不用。后面不用wait）
   ```
-
+  
   ```cpp
   //返回指向当前运行线程的指针
   [static] QThread* QThread::currentThread();		
@@ -1298,14 +1301,14 @@ QString QSqlError::text();
   sleep();							//秒
   usleep();							//微秒
   ```
-
+  
   ```cpp
   //handler
   virtual protected void QThread::run() override
   {}
   ```
-
-  ## （2）demo
+  
+  * demo
   
   ```cpp
   //generator.h
@@ -1330,7 +1333,7 @@ QString QSqlError::text();
   signals:
       void finished(QVector<int>);	//自定义run()执行完后发送的信号
   public slots:
-      void recvNum(int num);			//接收num的槽函数
+      void recvNum(int num);			//接收num的槽函数。因为run()不能接收参数。
   
   };
   
@@ -1345,8 +1348,6 @@ QString QSqlError::text();
   Generator::Generator(QObject *parent)
       : QThread{parent}
   {
-  
-  
   }
   
   void Generator::recvNum(int n)
@@ -1393,7 +1394,7 @@ QString QSqlError::text();
   
   public slots:
       void run() override;
-      void recvNums(QVector<int> vec);
+      void recvNums(QVector<int> vec);	//接收参数。因为run()不能接收参数。
   };
   
   #endif // BUBBLESORT_H
@@ -1412,9 +1413,7 @@ QString QSqlError::text();
   void BubbleSort::recvNums(QVector<int> vec)
   {
       this->vec=std::move(vec);	//接收待排序数组
-  
       this->start();			//启动子线程。自动执行run()
-  
   }
   
   //冒泡排序函数
@@ -1424,6 +1423,7 @@ QString QSqlError::text();
       for (int i = 0; i < n - 1; i++) {
           for (int j = 0; j < n - i - 1; j++) {
               if (vec.at(j) > vec.at(j+1)) {
+  				//at()只读
                   // int temp = vec.at(j);
                   // vec.at(j)=vec.at(j+1);
                   // vec.at(j+1)=temp;
@@ -1523,15 +1523,234 @@ QString QSqlError::text();
   }
   ```
   
-  
 
+## （2）方法2—继承QObject、moveToThread
 
+> **任务类继承`QObject`，**任务函数是普通函数。
+>
+> 调用任务类对象的`moveToThread(QThread*)`移动到子线程中，调用子线程对象的`start()`启动子线程。
+>
+> **此时任务函数未执行。**手动调用任务类的任务函数，此时函数运行在子线程上。
+>
+> 所以子线程可以在任务函数执行前先start()
+
+```cpp
+class MyTask:public QObject
+{
+    void work1(int num)
+    {
+        ....
+    }
+    
+    void work2(int num)
+    {
+        ....
+    }
+    
+    void work3(int num)
+    {
+        ....
+    }
+}
+
+int main()
+{
+    //任务类和QThread都不能有父对象
+    QThread* thread1= new QThread();
+    
+    MyTask* task = new MyTask();
+    MyTask2* task2 = new MyTask2();
+   	MyTask3* task3 = new MyTask3();
+    
+    task->moveToThread(thread1);
+    task2->moveToThread(thread2);
+    task3->moveToThread(thread3);
+    
+    //注意thread1在this上定义，所以接收对象是this
+    connect(button_threadstart, QPUshButton::clicked, this, [=](){
+        thread1->start();	//先启动线程1
+    });
+   //在thread1上运行work1
+    task->work1(9);	
+    //OK,task2在thread2上运行
+    connect(button, QPushButton::clicked, task2, &MyTask2::work);	
+    
+    //error，task3在this所在的主线程上执行。因为信号接受者是this，不是task3，task3在thread3上。
+    connect(button, QPushButton::clicked, this, [](){
+        task3->work();	
+    });
+}
+```
+
+### 注意点：
+
+* 任务类是QObject的子类。
+* 任务类创建时不能指定父类。
+* 一个任务类可以封装多个函数。
+* 一个线程可以接收多个任务对象。调用多个任务函数时，任务函数在子线程上线性调用。
+* 方法1中`run()`函数不能带参数。而方法2任务类封装的任务函数可以有参数，直接传参就能用。很方便。
+
+* 方法1，所有的任务都要放在run()里。方法2，可能封装多个任务函数，把逻辑分开。
+* 任务函数是在任务类所在线程上执行的。
+
+### 销毁线程
+
+* 创建QThread时指定父对象。父对象销毁时会自动先销毁子对象。
+
+* 通过父对象销毁时发出的`destroyed()`信号
+
+  **局部变量不能在析构函数内销毁。析构函数负责销毁成员变量，若写成成员变量则可在析构内delete。**
+
+  ```cpp
+  connect(this, &MainWindow::destroy, this, [=](){
+      thread1->quit();	//等价于thread->exit(0)，退出线程返回0
+      thread1->wait();
+      thread1->deletelater();	//封装了 delete thread1
+      
+      task->deletelater();	//销毁任务类对象
+  });
+  ```
+
+### demo
+
+```cpp
+ //quicksort
+    textEdit_03 = new QTextEdit(this);
+    textEdit_03->setGeometry(550,50,200,500);
+
+    _QuickSort* quick = new _QuickSort;
+    QThread* thread1 = new QThread;
+    quick->moveToThread(thread1);
+
+	//this接收finished信号，thread1启动
+    connect(gen,&Generator::finished, this, [=](){
+         thread1->start();
+    });
+	//quick接收finished信号，调用task()
+    connect(gen, &Generator::finished, quick, &_QuickSort::task);
+
+	//下面的写法错误!!!
+	//因为thread1定义在this（MainWindow)上，信号传给quick，thread1接收不到
+	/*
+	connect(gen, &Generator::finished, quick, [=](QVector<int> vec){
+        thread1->start();
+        quick->task(vec);
+    });
+	*/
+
+    connect(quick, &_QuickSort::finished, this, [=](QVector<int> vec){
+        for(auto it=vec.begin();it!=vec.end();it++)
+        {
+            textEdit_03->append(QString::number(*it, 10));
+        }
+    });
+
+	//MainWindow销毁时释放子线程和任务类对象
+    connect(this,&MainWindow::destroyed,this,[=](){
+        thread1->quit();
+        thread1->wait();
+        thread1->deleteLater();
+
+        quick->deleteLater();
+    });
+```
+
+## （3）使用线程池—继承QRunnable、run()
+
+> 好处：
+>
+> 自动释放资源
+>
+> 线程的管理由线程池完成，节约资源
+
+```cpp
+#include <QThreadPool>
+```
+
+```cpp
+//获取Qt提供的全局线程池对象（不用自己创建）
+static QThreadPool* QThreadPool::globalInstance();
+//设置线程池最大线程数（可选）
+void setMaxThreadCount(int maxThreadCount);
+//获取最大线程数
+int maxThreadCount() const;
+//设定任务在线程上处理完后自动释放资源
+void QRunnable::setAutoDelete(bool);
+//把任务封装成Runnable对象，给线程池执行。若池中没有空闲线程，会放在任务队列等待线程执行
+void QThreadPool::start(QRunnable* runnable, int priority=0);
+//封装任务
+//public
+[pure virtual] public void QRunnable::run();	
+继承QRunnable类和QObject类，用任务override这个函数
+```
+
+### demo
+
+```cpp
+class BubbleSort:public QObject,public QRunnable
+{
+public:
+    void run() override;
+}
+```
+
+# 17. 线程池实现
 
 
 
 # 16. Qt网络通信
 
 ---
+
+
+
+
+
+# 17. 程序打包
+
+* 在release下编译程序
+
+* 拷贝可执行文件、资源文件
+
+* 需要动态库：
+
+  通过`编译器kit/bin`下的`windeployqt`工具自动将需要的动态库拷贝到发布文件夹下。
+
+  在发布文件夹下打开cmd：
+
+  ```powershell
+  windeployqt ./demo.exe
+  ```
+
+  完成。
+
+* 想要打包成安装版本：
+
+  下载Inno Setup
+
+  https://www.bilibili.com/video/BV1J5411T7or/?p=2&spm_id_from=pageDriver&vd_source=3b08e97e50222fa2ec22737f6dcb2202
+
+![image-20240426171735894](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240426171735894.png)
+
+指定用户安装默认目录：
+
+选custom，输入C:\，让用户可以自行选择安装目录。
+
+![image-20240426171807676](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240426171807676.png)
+
+添加可执行文件和动态库：
+
+动态库添加，选择Add folder，选Y包含所以子目录。
+
+![image-20240426172037524](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240426172037524.png)
+
+询问可执行文件是否要关联一些文件格式（某些程序需要，比如：音乐、视频播放器），不需要就不勾选。
+
+![image-20240426172201225](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240426172201225.png)
+
+当前生成脚本的存储目录、安装包名、安装包图标、安装密码
+
+![image-20240426172439246](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240426172439246.png)
 
 
 
@@ -1672,7 +1891,11 @@ setWindowTitle(QString);
 
 ```
 
-## （2）常用设置
+
+
+
+
+## （2）UI常用设置
 
 ### 窗口去边框
 
@@ -1727,6 +1950,10 @@ finished(int result)
 accepted()
 rejected()
 ```
+
+## （2）
+
+
 
 # 3. QMessageBox
 
@@ -1794,6 +2021,27 @@ QString getSaveFileName()
 | **items** | **下拉菜单**       |
 | editable  | 下拉菜单是否可编辑 |
 | step      | 步长               |
+
+# 多行文本显示TextEdit
+
+https://blog.csdn.net/XZ2585458279/article/details/97820501
+
+## （1）API
+
+```cpp
+//设置文本
+setText();
+//设置多行文本框的文本内容
+setPlainText()	
+//返回多行文本框的文本内容
+toPlainText()
+//设置多行文本框的内容为HTML文档，HTML文档是描述网页的
+setHtml()	
+//返回多行文本框的HTML文档内容
+toHtml()
+//清除多行文本框的内容
+clear()	
+```
 
 
 
