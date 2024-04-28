@@ -79,6 +79,12 @@ apt --fix-broken install
 
 # 2. kali必备安装
 
+## 安装gnome-terminal
+
+```bash
+apt update && apt install gnome-terminal -y
+```
+
 ## 安装python2的pip
 
 需要运行python2代码时，可能要用到python2的依赖，需要python2的pip。

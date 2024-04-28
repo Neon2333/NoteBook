@@ -736,9 +736,15 @@ int bottomY = screen.botton();
 QRect screen = QGuiApplication::screens().first()->geometry();
 ```
 
+# 13. IO操作
+
+---
 
 
-# 11. 图片
+
+
+
+# 14. 图片
 
 ---
 
@@ -773,7 +779,7 @@ void SimpleExampleWidget::paintEvent(QPaintEvent *)
 
 
 
-# 12. 添加资源
+# 15. 添加资源
 
 ---
 
@@ -794,7 +800,7 @@ void SimpleExampleWidget::paintEvent(QPaintEvent *)
 * 文件上右键`Copy Path`复制路径
 * 可选中文件，在`Alias`中指定别名
 
-# 13. 自定义控件
+# 16. 自定义控件
 
 ---
 
@@ -952,7 +958,7 @@ void myButton::timerEvent(QTimerEvent *event)
     });
 ```
 
-# 14. 数据库
+# 17. 数据库
 
 ---
 
@@ -1249,7 +1255,7 @@ QString QSqlError::text();
   }
   ```
 
-# 15. 多线程
+# 18. 多线程
 
 ---
 
@@ -1627,7 +1633,9 @@ int main()
          thread1->start();
     });
 	//quick接收finished信号，调用task()
-    connect(gen, &Generator::finished, quick, &_QuickSort::task);
+    //connect(gen, &Generator::finished, quick, &_QuickSort::task);
+	connect(thread1, &QThread::finished, quick, &_QuickSort::task);	
+
 
 	//下面的写法错误!!!
 	//因为thread1定义在this（MainWindow)上，信号传给quick，thread1接收不到
@@ -1645,7 +1653,7 @@ int main()
         }
     });
 
-	//MainWindow销毁时释放子线程和任务类对象
+	//释放资源时机：MainWindow销毁时
     connect(this,&MainWindow::destroyed,this,[=](){
         thread1->quit();
         thread1->wait();
@@ -1694,11 +1702,9 @@ public:
 }
 ```
 
-# 17. 线程池实现
 
 
-
-# 16. Qt网络通信
+# 19. Qt网络通信
 
 ---
 
@@ -1706,7 +1712,7 @@ public:
 
 
 
-# 17. 程序打包
+# 20. 程序打包
 
 * 在release下编译程序
 
@@ -1754,7 +1760,9 @@ public:
 
 
 
-# 0. 常用设置
+# 0. 控件常用参数设置
+
+---
 
 ```cpp
 

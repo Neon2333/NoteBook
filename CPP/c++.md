@@ -727,7 +727,7 @@ for(auto var : arr)
 | ------------------------------------------------------ | ------------------------------------------------------------ |
 | strcpy(s1, s2)                                         | s2拷贝到s1                                                   |
 | strcat(s1, s2)                                         |                                                              |
-| strlen(s1)                                             |                                                              |
+| strlen(s1)                                             | 求const char*的长度。不包括结尾的\0。（sizeof()获得的字节数包括\0） |
 | char *strchr(const char *str, int c)                   | 字符ch在字符串s1中第一次出现的位置。找到字符 c，则函数返回指向该字符的指针，如果未找到该字符则返回 NULL |
 | char *strstr(const char *haystack, const char *needle) | 返回一个指针，指向字符串 s1 中字符串 s2 的第一次出现的位置。 |
 
@@ -747,13 +747,16 @@ if(find != NULL)
 
 头文件：\<string\>
 
-| 功能       |           |
-| ---------- | --------- |
-| 拷贝s1到s2 | s2=s1     |
-| 拼接s1和s2 | s1+s2     |
-| 长度       | s1.size() |
+| 功能                    |                                      |
+| ----------------------- | ------------------------------------ |
+| 拷贝s1到s2              | s2=s1                                |
+| 拼接s1和s2              | s1+s2                                |
+| str.size()、str.lengt() | 功能完全相同：求长度，不包括结尾的\0 |
+|                         |                                      |
+|                         |                                      |
+|                         |                                      |
 
-### （3）基本类型转字符串
+### （3）其他类型转字符串
 
 `to_string()`是C++11标准。
 
@@ -772,7 +775,11 @@ string NumToStr(T& num){
 }
 ```
 
-### （4）字符串转基本类型
+### （4）字符串转其他类型
+
+```cpp
+str.c_str();		//从字符串返回一个C风格字符串：const char*。包括结尾的'\0'
+```
 
 ```cpp
 //string 转 int,long,double
@@ -990,7 +997,27 @@ ClassName t = new ClassName();
   }
   ```
 
-### （4）拷贝构造
+### （4）构造函数
+
+编译器默认添加1个无参构造。	
+
+**不要在构造里写业务。**
+
+若显式添加任意一种构造（包括拷贝构造），则默认无参构造消失，需要手动添加。（C#也这样）
+
+* 拷贝构造：
+
+  ```cpp
+  T t1 = T(t2);	//调用T的拷贝构造
+  T t1 = t2;		//调用T的拷贝构造
+  //调用=重载，不调用拷贝构造
+  T t1;
+  t1 = t2;
+  ```
+
+  
+
+### （5）拷贝构造
 
 **自定义类建议都写上拷贝构造和=操作符重载。**便于赋值、存放于容器中。
 
@@ -999,11 +1026,11 @@ ClassName t = new ClassName();
 **=赋值是调用了拷贝构造函数的。**
 
 ```cpp
-class ClassName
+class MyClass
 {
-    template<typename T> ClassName (const ClassName<T>& another) 
+    template<typename T> MyClass (const MyClass<T>& another) 
     {
-   	    this.m_a = another.m_a;	//ClassName的普通成员
+   	    this.m_a = another.m_a;					//ClassName的普通成员
         this.p_addr_size = another.p_addr_size;	//容器大小
         this.p_addr = new T[this.p_addr_size];	//指针深拷贝
         for(int i=0;i<this.p_addr_size;++i)
@@ -1011,6 +1038,19 @@ class ClassName
             this.p_addr[i] = another.p_addr[i];	//T是基本类型的话可以直接赋值。若T是复杂类型，需要重载=
         }
 	}
+    
+    // 赋值运算符重载
+    //如果返回直接对象MyClass，return *this时把临时对象拷贝一份给当前接收的变量，然后临时对象*this销毁。
+    //返回的是引用MyClass&，通过引用指向临时变量，不发生拷贝，延长临时对象*this的生命周期，在原对象上进行操作。
+    MyClass& operator=(const MyClass& other) {
+		//如果是同一块地址就返回
+        if (this == &other) 	//防止对象自己给自己赋值,a=a,会导致无限递归调用operator=()导致栈溢出
+        {
+            return *this;
+        }
+        x = other.x;
+        return *this;
+    }
 }
 
 ```
@@ -1408,6 +1448,10 @@ class Box
 
 ### （1）常量
 
+**实际上理解为`readonly`更适合，即只读变量。并不是真正的常量。**通过const_cast可以强转成变量。
+
+真正的常量是纯右值，字面量，如：1,2,3，"hello"等。
+
 常量不在栈开辟内存存储，存在常量区的符号表，编译时遇到常量直接替换。
 
 * 常量没有地址，初始化后不能修改。
@@ -1433,7 +1477,9 @@ const int a = 10;	//a不可修改
 
   在C++语言中，const常量在符号表中定义，引用该常量时会自动填入其常量值，以保证const的有效。如果对const常量取地址，编译器会为其生成存储空间，这个存储空间的内容可以改变；但是不会影响符号表中的值。
 
-### （2）const变量
+### （2）修饰参数列表
+
+表明在函数体内不可修改这个参数
 
 ```cpp
 int  test1(const A& a)  //const a表明不想在test1()修改a 
@@ -1479,23 +1525,7 @@ public:
 
 ## 24. 构造函数
 
-编译器默认添加1个无参构造。	
-
-**不要在构造里写业务。**
-
-若显式添加任意一种构造（包括拷贝构造），则默认无参构造消失，需要手动添加。（C#也这样）
-
-* 拷贝构造：
-
-  ```cpp
-  T t1 = T(t2);	//调用T的拷贝构造
-  T t1 = t2;		//调用T的拷贝构造
-  //调用=重载，不调用拷贝构造
-  T t1;
-  t1 = t2;
-  ```
-
-  
+* 
 
 
 
@@ -1505,14 +1535,14 @@ public:
 
 * static定义类成员：成员将属于类所有。
 
-* **必须在类外初始化static成员。**
+* **非const静态成员必须在类外初始化**
 
 ```cpp
 Test{ 
 private: 
 	static int m_c; 
 } 
-int   Test::m_c=1;      //在类外初始化static变量m_c
+int Test::m_c=1;      //在类外初始化static变量m_c
 ```
 
 非static成员在C++11标准后可通过=在声明处直接初始化。
@@ -1530,7 +1560,9 @@ private:
 
   因为static成员函数属于类所有，没有指代当前调用成员函数的对象的this指针，所以不能调用非static成员。
 
+* const静态成员可以在类内部初始化
 
+  因为初始化后
 
 ## 26. 常用操作符重载
 
@@ -1609,7 +1641,7 @@ private:
 
   
 
-## 
+## 27. delete关键字
 
 
 
@@ -1680,15 +1712,17 @@ using int(*)(int, string) = pt;	//定义了一个函数指针类型p
 
 ## 31. IO
 
-### getline
+---
+
+### （1）getline()
 
 有2种getline()函数
 
-* \<istream>中的getline函数
+* `<istream>`中的getline函数
 
-  | getline(char* str, streamsize n)                 | 读取最多n个字符存储str中。n包含字符串结束标记符null，所以 最多读n-1个字符。 |
-  | ------------------------------------------------ | ------------------------------------------------------------ |
-  | **getline(char* str, streamsize n, char delim)** | **结束符delim会被读取，但不会放到str中**                     |
+  | istream& getline(char* str, streamsize n)                 | 读取最多n个字符存储str中。n包含字符串结束标记符null，所以 最多读n-1个字符。 |
+  | --------------------------------------------------------- | ------------------------------------------------------------ |
+  | **istream& getline(char* str, streamsize n, char delim)** | **结束符delim会被读取，但不会放到str中**                     |
 
   ```cpp
   char name[256], wolds[256];
@@ -1696,33 +1730,26 @@ using int(*)(int, string) = pt;	//定义了一个函数指针类型p
    cin.getline(name,256);
   ```
 
-* \<string>的getline函数
-
-  | istream& getline (istream& is, string& str);                 |      |
-  | ------------------------------------------------------------ | ---- |
-  | **istream& getline (istream& is, string& str, ``char` `delim);** |      |
+* `<string>`中的std::getline()（**用这种**）
 
   ```cpp
-  int main(){
-   string str;
-   getline(cin, str, 'A');
-   cout<<"The string we have gotten is :"<<str<<'.'<<endl;
-   getline(cin, str, 'B');
-   cout<<"The string we have gotten is :"<<str<<'.'<<endl;
-  return 0;}
+  <string>
   ```
 
-### cin/cout
+  | istream& std::getline (istream& is, string& str);            | `getline`函数读取到文件末尾或者遇到错误时，它会返回一个空的`istream`对象，此时`while`循环的条件不成立，循环结束。 |
+  | ------------------------------------------------------------ | ------------------------------------------------------------ |
+  | **istream& std::getline (istream& is, string& str, ``char` `delim);** |                                                              |
+  
 
-**标准输入输出cin、cout：**
+### （2）标准输入输出
 
-|                                                              |      |
-| ------------------------------------------------------------ | ---- |
-| cout.put('h').put('e').put('l')<<endl; //put一次输出一个字符，支持链式编程。 |      |
-| cout.write("hello world!",strlen("hello world!"));//输出字符串 |      |
-| //读取一个字符到ch： char ch; ch=cin.get()或cin.get(ch);     |      |
+`cin、cout`
 
-
+|                                                    |                                     |
+| -------------------------------------------------- | ----------------------------------- |
+| cout.put('h').put('e').put('l')<<endl;             | put一次输出一个字符，支持链式编程。 |
+| cout.write("hello world!",strlen("hello world!")); | 输出字符串                          |
+| char ch; ch=cin.get()或cin.get(ch);                | 读取一个字符到ch                    |
 
 **标准错误流cerr：**非缓冲，插入到cerr的流会立即输出。
 
@@ -1734,19 +1761,188 @@ cerr<<"error message.."<<endl;
 
 这些小实例，我们无法区分 cout、cerr 和 clog 的差异，但在编写和执行大型程序时，它们之间的差异就变得非常明显。所以良好的编程实践告诉我们，使用 cerr 流来显示错误消息，而其他的日志消息则使用 clog 流来输出。
 
-### 文本读写
+### （3）文本文件读写
 
-![cppiotext](https://raw.githubusercontent.com/WangKun233/ImageHost/main/cppiotext.png)
+* API
 
-### 二进制读写
+  ```cpp
+  #include <fstream>	//文件流
+  
+  //读取字符
+  istream& ifstream::open(path, std::ios::in);	//打开文件。openMode:std::ios::in
+  bool ifstream::isopen();					  //判断打开是否成功
+  istream& ifstream::get(char ch);			  //从流读个char到ch存储。读到末尾或错误返回空istream对象
+  
+  //写入字符
+  ostream& ifstream::open(path, std::ios::out);	//打开文件
+  ostream& ofstream::put(char ch);	//char写入流
+  ostream& ofstream::write(const char* str, strlen);	//char[]写入流
+  ```
 
-![cppbinaryio1](https://raw.githubusercontent.com/WangKun233/ImageHost/main/cppbinaryio1.png)
+  ```cpp
+  #include <string>
+  
+  //读取行
+  std::getline(istream& ism, string temp);
+  //写入字符串
+  
+  ```
 
-![cppbinaryio2](https://raw.githubusercontent.com/WangKun233/ImageHost/main/cppbinaryio2.png)
+* demo
+
+  ```cpp
+  #include<iostream>
+  #include <fstream>
+  
+  int main(int argc, char** args)
+  {
+      std::ifstream ifsm;
+      ifsm.open(R"(C:\Users\Administrator\Desktop\todo.txt)", std::ios::in);
+       if(!ifsm.is_open)
+      {
+          std::cerr<<"open readfile failed.."<<std::endl;
+          return;
+      }
+      
+      std::ofstream ofsm;
+      ofsm.open(R"(C:\Users\Administrator\Desktop\_todo.txt)", std::ios::out | std::ios::app);
+       if(!ofsm.is_open)
+      {
+          std::cerr<<"open writefile failed.."<<std::endl;
+          return;
+      }
+  
+      std::string strLine;	//存储每行
+      if (ifsm.is_open())
+      {
+          while (std::getline(ifsm, strLine))
+          {
+              const char* cc = strtemp.c_str();	//ofsm.write第一个参数是const char*，c_str()不包括末尾\0
+              ofsm.write(strtemp.c_str(), strtemp.length());
+              ofsm.write("\n",1);		//每行结尾补个换行
+          }
+  
+      }
+      ism.close();
+      osm.close();
+  
+      return 0;
+  }
+  ```
+
+  ```cpp
+  #include<iostream>
+  #include <fstream>
+  
+  int main(int argc, char** args)
+  {
+      std::ifstream ifsm;
+      ifsm.open(R"(C:\Users\Administrator\Desktop\todo.txt)", std::ios::in);
+      if(!ifsm.is_open)
+      {
+          std::cerr<<"open readfile failed.."<<std::endl;
+          return;
+      }
+      
+      std::ofstream osm;
+      ofsm.open(R"(C:\Users\Administrator\Desktop\_todo.txt)", std::ios::out | std::ios::app);
+      if(!ofsm.is_open)
+      {
+          std::cerr<<"open writefile failed.."<<std::endl;
+          return;
+      }
+     
+      char ch;
+      //一个char一个char读写。换行符和\0都不会漏掉
+      while (ifsm.get(ch))
+      {
+      	ofsm.put(ch);
+      }
+     
+      ism.close();
+      osm.close();
+  
+      return 0;
+  }
+  ```
+
+### （4）二进制文件读写
+
+* API
+
+  ```cpp
+  #include <fstream>	//文件流
+  
+  //把二进制数据从文件中读取到对象instance中保存
+  istream& ifstream::open(path, std::ios::in|std::ios::binary);	//打开文件
+  bool ifstream::isopen();				//判断打开是否成功
+  istream& ifstream::read(char* instance, int sizeOf);	//instance为对象的地址，sizeOf为该对象的sizeof
+  
+  //把对象instance的二进制数据写入到文件中
+  istream& ofstream::open(path, std::ios::out|std::ios::binary);	
+  istream& ofstream::write((char*)&instance, int sizeOf);	//sizeOf=sizeof(Instance)
+  ```
+
+* demo
+
+  ```cpp
+  class A
+  {
+  private:
+  public:
+      int a = 0;
+      A(){}
+      A(int a):a(a){}
+      A (const A& another):a(another.a){}
+      A& operator=(const A& another)
+      {
+          if (this == &another)
+              return *this;
+          this->a = another.a;
+          return *this;
+      }
+      virtual ~A(){}
+  };
+  
+  
+  int main(int argc, char** args)
+  {
+      A a(20);
+      std::cout << "a=" << a.a << std::endl;
+  
+      //写入文件
+      std::ofstream ofsm;
+      ofsm.open(R"(C:\Users\Administrator\Desktop\w.dat)", std::ios::out | std::ios::binary);
+      if (!ofsm.is_open())
+      {
+          std::cerr << "open writefile failed.." << std::endl;
+          return 0;
+      }
+      ofsm.write((char*)&a, sizeof(A));
+      ofsm.close();
+  
+      //从文件中读取
+      std::ifstream ifsm;
+      ifsm.open(R"(C:\Users\Administrator\Desktop\w.dat)", std::ios::in | std::ios::binary);
+      if (!ifsm.is_open())
+      {
+          std::cerr << "open readfile failed.." << std::endl;
+          return 0;
+      }
+      A b;
+      ifsm.read((char*)&b, sizeof(A));
+      std::cout << "b=" << b.a << std::endl;
+      ifsm.close();
+  
+      return 0;
+  }
+  ```
 
 ## 32. 异常
 
-**不要用异常，尤其是对性能要求比较高的地方。**
+---
+
+**不要用c++自带异常，尤其是对性能要求比较高的地方。**
 
 因为写出异常安全的代码不容易 容易泄露内存 所以大家都禁止异常。
 
@@ -2914,34 +3110,42 @@ std::bind：
 
 **定义时就必须初始化。**
 
-左值引用：
+* 左值引用：
 
-```cpp
-int& a = b;	
-```
+  **本身不是地址，绑定了变量的地址。**因此可修改绑定其变量的值，因为左值后面代表的是变量的地址。
 
-右值引用：
+  可接收：变量、临时对象、返回左值的函数返回值（能取地址的）
 
-```cpp
-int&& a = 1;
-```
+  不可直接接收：纯右值（常量、常量字符串等）
 
-```cpp
-//左值
-int num = 1;
-//左值引用
-int& a = num;
-//右值引用
-int&& b = 1;
-//常量左值引用。四种都可以接收。
-const int& c =num;
-const int& c = a;
-const int& c = 1;
-const int& c = d;
-//常量右值引用
-const int&& d = 6;
-const int&& e = b;	//error。右值引用不能初始化另一个右值引用。右值引用只能通过右值初始化。
-```
+  ```cpp
+  //左值
+  int num = 1;
+  //左值引用
+  int& a = num;
+  ```
+
+* 右值引用：
+
+  可接收：**常量、临时对象（将亡值）、返回右值的函数返回值**
+
+  ```cpp
+  //右值引用
+  int&& a = 1;	//常量（纯右值）
+  ```
+
+* 特殊情况：常量左值引用、常量右值引用
+
+  ```cpp
+  //常量左值引用。四种都可以接收。
+  const int& c =num;
+  const int& c = a;
+  const int& c = 1;
+  const int& c = d;
+  //常量右值引用
+  const int&& d = 6;
+  const int&& e = b;	//error。右值引用不能初始化另一个右值引用。右值引用只能通过右值初始化。
+  ```
 
 ### （3）移动构造
 
@@ -2997,7 +3201,13 @@ int main()
 
 ## 17. std::move
 
-`std::move`作用就是把**左值转换成右值**。
+> ```cpp
+> #include <utility>
+> ```
+>
+> 用于将一个对象从左值转换为右值引用。它的作用是将对象的所有权从一个对象转移到另一个对象，从而实现移动语义。
+
+作用就是把**左值转换成右值**。
 
 给右值引用初始化时，若右侧的值不满足条件（是左值），用move转换一下就成了右值。
 
@@ -3018,15 +3228,19 @@ A&& a = move(c)
   list<string> ls3 = move(ls1);	//将ls1转成右值赋值给ls3，会调用移动构造，现在ls3拥有了ls1的资源。减少了拷贝次数，提高效率
   ```
 
-## 18. std::forward
+## 18. 完美转发std::forward
 
-```cpp
-std::forward<T>(t);
-```
+> ```cpp
+> #include <utility>
+> 
+> std::forward<T>(t);
+> ```
+>
+> 将函数的参数以相同的类型和值完全传递给其他函数，包括左值引用和右值引用。这在模板编程中非常有用，因为它允许我们编写通用的函数模板，而不需要关心参数的类型和值。
 
 只有T是左值引用时，forward才返回左值。
 
-其他类型的T，forward都返回右值。
+其他类型的T，forward都返回右值。	
 
 ## 19. std::shared_ptr
 
@@ -3180,7 +3394,7 @@ std::shared_ptr<A[]> sp(new A[]);	//默认的删除器就行。把类型指定�
 
   `enable_shared_from_this<T>`类内部有个weak_ptr，被继承后，这个类new的时候就会自动关联到父类这个弱指针，`shared_from_this()`就会调用弱指针的lock()函数返回一个shared_ptr。
 
-
+​	
 
 ### （6）std::weak_ptr
 
@@ -3294,11 +3508,542 @@ unique_ptr<int> func()
 
 仿函数。不捕捉外部变量时，可看成函数指针。
 
+## 22. delete
+
+> 优先使用delete关键字删除函数而不是private却又不实现的函数  
+>
+> ```cpp
+> template <class charT, class traits = char_traits<charT> >
+> class basic_ios : public ios_base {
+> public:
+> ...
+> basic_ios(const basic_ios& ) = delete;
+> basic_ios& operator=(const basic_ios&) = delete;
+> ...
+> };
+> ```
+
+* 方便起见， 删除函数被声明为公有的， 而不是私有的。  
+
 
 
 ---
 
-# 四、C++语言支持多线程
+# 四、C++11 Thread线程库
+
+> ```cpp
+> #include <thread>
+> ```
+>
+> 不是Posix系统编程，C++11的线程库是跨平台的。使用Posix标准函数只能在Unix平台上编程。
+
+## 1. 创建线程
+
+```cpp
+#include <thread>
+
+//创建时就会开始执行函数func
+//args是传入到func的参数
+std::thread th(func, args);
+
+//主线程阻塞在该语句，等待子线程执行完毕
+th.join();
+
+//判断子线程是否可以调用join
+//有的线程不能使用join，使用join会报错system_error。所以调用join前一般使用joinable()判断一下
+bool th.joinable();
+
+//当前线程休眠
+std::this_thread::sleep_for(std::chrono::microseconds(100));	//休眠100ms
+
+//分离子线程（使用的少）
+//主线程可以结束。子线程在后台执行
+th.detach();
+```
+
+## 2. 线程函数中的数据未定义错误
+
+* 线程函数的参数类型是左值引用
+
+  解决：要用`ref()`把局部变量转成左值引用再传给线程函数。
+
+  ```cpp
+  void test(int& a)
+  {
+      a += 1;
+  }
+  
+  int main(int argc, char** args)
+  {
+      //error
+      //std::thread th1(test, 1);
+      
+      //error
+      //int a = 1;
+      //int& ra = a;
+      //std::thread th1(test, ra);
+  
+      //OK
+      int a = 1;	//a在主线程中定义，在主线程结束前地址一直存在
+      std::thread th1(test, std::ref(a));	//ref(a)转成左值引用，传递地址
+      
+      th1.join();
+  }
+  ```
+
+* 指针或引用指向局部变量
+
+  **本质：主线程和子线程各跑各的，主线程先结束，局部变量被销毁，子线程通过引用（地址）访问该局部变量时，访问的值随机。**
+
+  **解决：设法让变量在子线程访问之前不会被销毁。**
+
+  ```cpp
+  std::thread th1;
+  void test(int& a)
+  {
+      std::this_thread::sleep_for(std::chrono::seconds(5));
+      a += 1;
+      std::cout << a << std::endl;
+  }
+  
+  void func()
+  {
+      //a定义在func中，开线程对a进行操作，若func先执行完就会对a销毁。若test还未执行对a的操作，就无法正确访问a
+      //解决：可以把a放到func()外面定义，延长生命周期
+      int a = 1;	
+      th1= std::thread(test, std::ref(a));
+      std::cout << a << std::endl;
+  }
+  
+  int main(int argc, char** args)
+  {
+      func();
+      th1.join();
+  }
+  ```
+
+  ```cpp
+  void func(int* ptr)
+  {
+      *ptr+=1;
+      std::cout<<*ptr<<std::endl;
+  }
+  
+  int main()
+  {
+      int ptr = new int(1);
+  	std::thread th(func, ptr);   
+  	//解决：用智能指针跟踪ptr。线程调用ptr，所以ptr不会被释放。
+      delete ptr;		//可能在子线程还没访问ptr那块地址时，ptr被某些操作意外释放了。然后子线程才访问，出现错误。
+  	
+      
+      th.join();
+  }
+  ```
+
+  ```cpp
+  #include <memory>
+  class A
+  {
+      public:
+      	void func()
+          {
+              std::cout<<"hello"<<std::endl;
+          }
+  }
+  
+  int main()
+  {
+      //和上面一样。a可能在th线程还未执行func时就被意外释放了。
+      //解决：智能指针，子线程里用到a，那么a就不会被释放。
+      //shared_ptr<A> a = std::make_shared<A>();
+      //std::thread th(a.func, a);
+      A a;
+      std::thread th(a.func, &a);	//a.func()实际是A::func(&a)
+  	delete a;	//a被释放了
+      
+      th.join();
+  }
+  ```
+
+* 线程想调用类的私有成员方法
+
+  把调用代码封装成函数，设定为类的友元函数。
+
+  ```cpp
+  class A
+  {
+      //friend void functhread();
+      private:
+      	void func(){}
+  }
+  
+  /*
+  void functhread()
+  {
+      shared_ptr<A> a(new A());
+      std::thread th(a->func, a);	//报错，func是private的。把这几行封装成函数，设定为A的友元函数。
+      
+      th.join();
+  }
+  */
+  
+  int main()
+  {
+      shared_ptr<A> a(new A());
+      std::thread th(a->func, a);	//报错，func是private的。把这几行封装成函数，设定为A的友元函数。
+      
+      th.join();
+  }
+  ```
+
+## 2.5 **不能多个线程同时对一块内存进行读写。**这是最根本的问题。
+
+## 3. 互斥量
+
+> 当多个线程都会去读写一个变量时，可能1线程还未把执行结果写进变量，CPU就切到线程2执行了，线程2读的是线程1操作前的。又可能切到1运行，写进变量，又切到2运行，可当前2会把自己执行的结果覆盖1写进变量的结果。
+>
+> 当有线程在读写一个变量时，不允许其他线程读写这个变量。
+>
+> **线程安全：多线程执行的结果和单线程执行结果一致，就是线程安全。**
+>
+> ```cpp
+> #include <mutex>
+> 
+> std::mutex mtx;
+> int a = 0;
+> 
+> //lock()和unlock()中间的部分是临界区，其他线程访问时会被阻塞
+> mtx.lock();		//lock()当前线程获取互斥量所有权
+> a+=1;
+> mtx.unlock();	//unlock()释放互斥量所有权
+> ```
+
+## 4. 互斥量死锁
+
+lock()获取互斥量。
+
+lock()与unlock()中间代码为临界区，临界区内代码是原子操作，不被其他线程打断。在临界区内操作共享变量。
+
+只有互斥量没有处于被其他线程获取的情况下，才能被获取。
+
+当互斥量比较多、代码多的时候容易出现死锁。	
+
+```cpp
+std::mutex mtx1;
+std::mutex mtx2;
+
+void functhread1()
+{
+    mtx1.lock();
+    mtx2.lock();	//等待mtx2释放
+    mtx1.unlock();	//释放mtx1
+}
+
+void functhread2()
+{
+    mtx2.lock();
+    mtx1.lock();	//等待mtx1释放
+    mtx2.unlock();	//释放mtx2	
+}
+```
+
+## 5. lock_guard
+
+> STL中的一种互斥量封装类。
+>
+> **自动加锁解锁，**对于传入的互斥量在构造中加锁、析构中解锁。
+>
+> **lock_guard对象所在作用域为临界区，临界区内操作原子操作。**
+>
+> 当作用域结束会调用析构内的unlock()解锁。
+>
+> **禁用了拷贝构造，=拷贝**
+>
+> ```cpp
+> //lock_guard源码
+> //RAII
+> template <class _Mutex>
+> class _NODISCARD lock_guard { // class with destructor that unlocks a mutex
+> public:
+>  using mutex_type = _Mutex;
+> 
+>  explicit lock_guard(_Mutex& _Mtx) : _MyMutex(_Mtx) { // construct and lock
+>      _MyMutex.lock();
+>  }
+> 
+>  lock_guard(_Mutex& _Mtx, adopt_lock_t) : _MyMutex(_Mtx) {} // construct but don't lock
+> 
+>  ~lock_guard() noexcept {
+>      _MyMutex.unlock();
+>  }
+> 
+>  lock_guard(const lock_guard&) = delete;
+>  lock_guard& operator=(const lock_guard&) = delete;
+> 
+> private:
+>  _Mutex& _MyMutex;
+> };
+> ```
+
+```cpp
+std::mutex mtx;
+int data = 0;
+void func()
+{
+    std::lock_guard<std::mutex> lg(mtx);	//拿到了mtx
+    for (int i = 0; i < 10000; i++)
+    {
+        data++;
+    }
+    //lg销毁时调用析构，释放mtx
+}
+
+int main(int argc, char** args)
+{
+    std::thread th1(func);
+    std::thread th2(func);
+
+    th1.join();
+    th2.join();
+
+    std::cout << "data=" << data << std::endl;
+}
+```
+
+```cpp
+//互斥锁+双重检查实现懒汉式单例模式
+static std::mutex mtx;
+class LazyA
+{
+private:
+    static LazyA* ins;
+public:
+    lazyA(){}=delete;
+    ~lazyA(){}=delete;
+   
+    static LazyA& getInstance()
+    {
+         if (ins == nullptr)
+         {
+             std::lock_guard<std::mutex>  lg(mtx);
+             if (ins == nullptr)
+             {
+                 ins = new LazyA();
+             }
+             return *ins;
+         }
+         return *ins;
+    }
+    
+    void printMsg(std::string msg)
+    {
+        std::cout << msg << std::endl;
+    }
+};
+LazyA* LazyA::ins = nullptr;	//非const静态变量必须在类外初始化
+
+void func()
+{
+    LazyA::getInstance()->printMsg("hello");
+}
+
+int main(int argc, char** args)
+{
+    std::thread th1(func);
+    std::thread th2(func);
+
+    th1.join();
+    th2.join();
+
+    return 0;
+}
+```
+
+## 6. std::unique_lock（常用）
+
+> ```cpp
+> #include <mutex>
+> ```
+>
+> 是lock_guard的加强版，所以用这个比较多。
+
+### 上锁
+
+```cpp
+std::unique_lock<std::mutex> ul(mtx);	//上锁
+
+std::unique_lock<std::mutex> ul(mtx, std::defer_lock);	//延迟上锁
+ul.lock();	//手动上锁
+```
+
+### 超时
+
+**`std::mutex`不支持时间操作。改用`std::timed_mutex`**
+
+设定时间内尝试获取锁，超时就返回false
+
+普通的加锁拿不到时会阻塞在这里，`try_lock_for`只阻塞规定时间。
+
+```cpp
+//这2行代码放在同一个作用域内
+std::unique_lock<std::timed_mutex> ul(mtx, std::defer_lock);	//std::defer_lock设定延迟加锁了。构造中没有加锁
+ul.try_lock_for(std::chrono::seconds(5));		//尝试获取锁5s，超过5s没有获取锁就返回false
+```
+
+## 7. call_once
+
+> 多个线程去调用某个函数。**call_once确保该函数只会被调用1次。**
+>
+> ```cpp
+> call_once(std::once_flag, &func);
+> ```
+>
+> call_once只能在线程中使用。在main()中调用会报错。
+
+```cpp
+#include<iostream>
+#include <thread>
+#include <string>
+#include <mutex>
+
+
+static std::once_flag onceflag;  //没有拷贝构造、=拷贝
+class LazyA
+{
+private:
+    static LazyA* ins;
+    LazyA(){}   //构造不允许直接访问
+public:
+    LazyA(LazyA& another) = delete; //删除拷贝构造
+    LazyA& operator=(LazyA& another) = delete;  //删除=
+    virtual ~LazyA() {};
+    static LazyA& getInstance()
+    {
+        if (!ins)
+        {
+            std::call_once(onceflag, &initIns);
+        }
+        return *ins;
+    }
+
+    static void initIns()	//getInstance()是static的，所以initIns也要是static的才可调用
+    {
+        if (!ins) 
+        {
+            ins = new LazyA();
+        }
+    }
+
+    void printMsg(std::string msg)
+    {
+        std::cout << msg << std::endl;
+    }
+};
+LazyA* LazyA::ins = nullptr;
+
+void func()
+{
+    LazyA::getInstance().printMsg("hello");
+}
+
+
+int main(int argc, char** args)
+{
+    std::thread th1(func);
+    std::thread th2(func);
+
+    th1.join();
+    th2.join();
+
+    return 0;
+}
+```
+
+## 8. condition_variable
+
+>  **条件变量**
+>
+> ```cpp
+> #include <condition_variable>
+> ```
+>
+> ```cpp
+> std::unique_lock<std::mutex> ul(mtx);
+> 
+> std::condition_variable cv;
+> 
+> cv.wait(ul, Predicate);	//Predicate是谓词，是可调用对象，通常用lambda，为true就将传入的互斥锁ul解锁，并使当前线程阻塞在该语句等待。为false时直接返回，保持ul锁定，线程继续向下执行代码
+> 
+> cv.notify_one();	//通知一个线程解除阻塞向下执行
+> ```
+>
+> 子线程123从任务队列中取任务执行，任务队列为空时，子线程需要暂停从队列中取任务。
+>
+> 线程暂停通过`wait()`阻塞等待获取条件变量来实现。
+>
+> 生产者向队列中加任务时，调用`notify_one()`或`notify_all()`通知等待条件变量的线程继续执行线程。
+>
+> ![image-20240428172036409](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240428172036409.png)
+
+```cpp
+#include<iostream>
+#include <thread>
+#include <string>
+#include <mutex>
+#include <condition_variable>
+#include <queue>
+
+
+std::mutex mtx;	//互斥量
+std::unique_lock<std::mutex> ul(mtx);	//互斥锁
+std::condition_variable cv;	//条件变量
+std::queue<int> q;  //多个线程共同访问的队列
+
+void producer()
+{
+    for (int i = 0; i < 100; i++)
+    {
+        q.push(i);
+        //通知一个线程来取
+        cv.notify_one();
+    }
+}
+
+void consumer()
+{
+    int value;
+    while (true)
+    {
+        //若q为空则等待
+        cv.wait(ul, []() {
+            return !q.empty();
+            });
+        value = q.front();
+        std::cout << value << std::endl;
+        q.pop();
+    }
+}
+
+int main(int argc, char** args)
+{
+    std::thread th1(producer);  //线程1执行生产者，往队列q里放任务（这里用int替代）
+    std::thread th2(consumer);  //线程2执行消费者，从队列q里取任务（这里用int替代）
+
+    th1.join();
+    th2.join();
+
+    return 0;
+}
+```
+
+
+
+
+
+
+
+
 
 线程池
 

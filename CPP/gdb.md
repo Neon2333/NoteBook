@@ -1,4 +1,12 @@
- 
+ 可视化调试：
+
+gdb -tui a.out
+
+b a.cpp:linenum
+
+
+
+
 
 1.编译
 
@@ -84,7 +92,13 @@ p——按照变量定义的类型打印
 
 Ctrl+x，a关掉界面
 
-layout asm——可视化汇编
+layout asm——汇编窗口
+
+layout splict——同时查看源码、汇编
+
+layout regs——显示寄存器窗口
+
+
 
 si——汇编界面的单步
 
