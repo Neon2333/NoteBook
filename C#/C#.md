@@ -2431,6 +2431,28 @@ public class Win32 {
 
 # 四、多线程
 
+```text
+System.Threading.Thread类：表示一个操作系统级别的线程。可以使用该类创建新线程并启动执行。
+
+System.Threading.ThreadStart委托：用于指定线程启动时要执行的方法。
+
+System.Threading.ParameterizedThreadStart委托：与ThreadStart类似，但允许传递参数给线程方法。
+
+System.Threading.ThreadPool类：提供对线程池的访问，可以创建和调度多个工作线程。
+
+System.Threading.Tasks.Task类：表示一个异步操作，并提供了一些方法和属性来控制任务的执行。
+
+System.Threading.Tasks.Parallel类：提供并行执行任务的方法，如Parallel.For和Parallel.ForEach等。
+
+System.Threading.Mutex类：用于实现互斥锁，确保同一时间只有一个线程可以访问共享资源。
+
+System.Threading.Monitor类：提供监视器对象，用于同步对共享资源的访问。
+
+System.Threading.Semaphore类：用于限制同时访问特定资源的线程数量。
+
+System.Threading.AutoResetEvent和System.Threading.ManualResetEvent类：用于线程间的信号通知和等待。
+```
+
 线程是轻量的进程，C#程序运行时第一个线程自动创建，称为**主线程**。
 
 线程生命周期开始于Thread对象创建时，状态有：未启动、就绪、休眠、死亡。
