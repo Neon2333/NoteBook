@@ -814,11 +814,19 @@ T StrToNum(const string& str){
 
 ## 14. 时间
 
-https://www.runoob.com/cplusplus/cpp-date-time.html
+---
 
+https://zhuanlan.zhihu.com/p/373392670
 
+> `std::chrono`是C++11标准库中的一个模块，用于处理日期和时间。
+>
+> `<ctime>`是C风格的日期时间库。
+>
+> 用`std::chrono`，详见C++11。
 
 ## 16. 结构体
+
+---
 
 C++定义结构体变量时用不用加struct关键词？
 
@@ -3806,9 +3814,112 @@ std::tuple<int, double> tp2 = std::make_tuple(1, 2.5);
 std::tuple<int, double, string> tp3 = std::make_tuple(1, 2.5, “”);
 ```
 
+## 26. std::chrono
+
+---
+
+### （1）时间段
+
+> 类型是`std::chrono::duratioin`
+>
+> **时间段可以直接使用`+`和`-`相加相减**
+>
+> **时间段可以通过`==`判断是否相等**
+>
+> 调用duration类的`count()`成员函数来获取具体数值
+
+| std::chrono::nanoseconds  | duration<至少 64 位的有符号整数类型, std::nano>        |
+| ------------------------- | ------------------------------------------------------ |
+| std::chrono::microseconds | duration<至少 55 位的有符号整数类型, std::micro>       |
+| std::chrono::milliseconds | duration<至少 45 位的有符号整数类型, std::milli>       |
+| std::chrono::seconds      | duration<至少 35 位的有符号整数类型>                   |
+| std::chrono::minutes      | duration<至少 29 位的有符号整数类型, std::ratio<60>>   |
+| std::chrono::hours        | duration<至少 23 位的有符号整数类型, std::ratio<3600>> |
+
+```cpp
+// 时间段单位转换
+auto toHours = std::chrono::duration_cast<std::chrono::hours>(secs); 
+auto toSeconds = std::chrono::duration_cast<std::chrono::seconds>(hours); 
+```
+
+```cpp
+//想要知道2个小时零5分钟一共是多少秒
+
+chrono::hours two_hours(2);		//创建2hours的时间段
+chrono::minutes five_minutes(5);
+auto duration = two_hours + five_minutes;	//时间段求和
+auto duaration_seconds = chrono::duration_cast<chrono::seconds>(duration);	//时间段转成秒单位
+cout << "02:05 is " << duaration_seconds.count() << " seconds" << endl;		//获取秒计时的数
+```
+
+### （2）时间点
+
+> 类型是`std::chrono::time_point`
+>
+> 时间点重载了操作符，**可通过`==`，`!=`，`<`，`<=`，`>`，`>=`操作符来实现比较操作。**
+>
+> ```text
+> 时间点 + 时间段 = 时间点
+> 时间点 - 时间点 = 时间段
+> ```
+
+```cpp
+auto start = chrono::steady_clock::now();	//获取当前时间点
+double sum = 0;
+for(int i = 0; i < 100000000; i++) {
+    sum += sqrt(i);
+}
+auto end = chrono::steady_clock::now();		//获取当前时间点
+
+auto time_diff = end - start;	//计算时间段
+auto duration = chrono::duration_cast<chrono::milliseconds>(time_diff);	//将时间段转成ms单位
+cout << "Operation cost : " << duration.count() << "ms" << endl;
+```
+
+## 27. 分数
+
+---
+
+> 提供了编译期的比例计算功能
+>
+> ```cpp
+> #include <ratio>
+> ```
+
+* API
+
+  ```cpp
+  类成员Num即为分子，类成员Denom即为分母。我们可以直接通过调用类成员来获取相关值。    
+  ratio_add，ratio_subtract，ratio_multiply，ratio_divide来完成分数的加减乘除四则运算
+  ```
+
+  ```cpp
+  #include <iostream>
+  #include <chrono>
+  #include <ctime>
+  #include <ratio>
+  
+  
+  int main()
+  {
+      std::ratio<5, 22> r1;
+      std::ratio<4, 33> r2;
+      
+      std::ratio_add<std::ratio<5, 22>, std::ratio<4, 33>> result;
+  	
+      std::cout << "res=" << ((double)result.num / (double)result.den) << std::endl;
+  
+      return 0;
+  }
+  ```
+
+  
 
 
-## 25. 可变模版参数
+
+
+
+## 28. 可变模版参数
 
 ---
 
@@ -3908,7 +4019,9 @@ int main()
 >
 > 不是Posix系统编程，C++11的线程库是跨平台的。使用Posix标准函数只能在Unix平台上编程。
 
-## 1. API
+## 1. Thread创建
+
+---
 
 ```cpp
 #include <thread>
@@ -3933,6 +4046,8 @@ th.detach();
 ```
 
 ## 2. 线程函数中的数据未定义错误
+
+---
 
 * 线程函数的参数类型是左值引用
 
@@ -4072,6 +4187,8 @@ th.detach();
 
 ## 3. 互斥量
 
+---
+
 > 当多个线程都会去读写一个变量时，可能1线程还未把执行结果写进变量，CPU就切到线程2执行了，线程2读的是线程1操作前的。又可能切到1运行，写进变量，又切到2运行，可当前2会把自己执行的结果覆盖1写进变量的结果。
 >
 > 当有线程在读写一个变量时，叫做**共享变量**，不允许其他线程读写这个变量。
@@ -4091,6 +4208,8 @@ th.detach();
 > ```
 
 ## 4. 互斥量死锁
+
+---
 
 lock()获取互斥量。
 
@@ -4120,6 +4239,8 @@ void functhread2()
 ```
 
 ## 5. lock_guard
+
+---
 
 > STL中的一种互斥量封装类。
 >
@@ -4248,6 +4369,8 @@ int main(int argc, char** args)
 
 ## 6. std::unique_lock（常用）
 
+---
+
 > ```cpp
 > #include <mutex>
 > ```
@@ -4277,7 +4400,58 @@ std::unique_lock<std::timed_mutex> ul(mtx, std::defer_lock);	//std::defer_lock�
 ul.try_lock_for(std::chrono::seconds(5));		//尝试获取锁5s，超过5s没有获取锁就返回false
 ```
 
-## 7. call_once
+## 7. 原子量
+
+---
+
+> 互斥量，通过上锁、解锁，解决多线程执行临界区内代码问题
+>
+> 变量是原子量的话，本身的操作就是原子性的
+>
+> ```cpp
+> #include <atomic>
+> ```
+
+* API
+
+  ```cpp
+  //原子获取值
+  load();
+  //原子赋值
+  store();
+  ```
+
+* demo
+
+  ```cpp
+  #include <iostream> 
+  #include <atomic>
+  #include <thread>
+  
+  std::atomic<int> data;
+  
+  void func()
+  {
+  	for (int i = 0; i < 1000000; i++)
+  	{
+  		data++;	//不用加锁了。对data的操作本身就是原子的
+  	}
+  }
+  
+  int main()
+  {
+  	std::thread th1(func);
+  	std::thread th2(func);
+  
+  	th1.join();
+  	th2.join();
+  	std::cout << data.load() << std::endl;
+  }
+  ```
+
+## 8. call_once
+
+---
 
 > 多个线程去调用某个函数。**call_once确保该函数只会被调用1次。**
 >
@@ -4346,7 +4520,9 @@ int main(int argc, char** args)
 }
 ```
 
-## 8. condition_variable
+## 9. condition_variable
+
+---
 
 >  **条件变量**
 >
@@ -4424,30 +4600,205 @@ int main(int argc, char** args)
 }
 ```
 
-## 9. 线程池实现
+## 10. 线程池实现
 
-线程池一般全局就1个，可以禁用拷贝构造和operator=()，同时使用单例模式。
+---
+
+线程池一般全局就1个，可以禁用拷贝构造和operator=()，同时使用单例模式封装。
 
 ```cpp
 ```
 
-
-
-
-
-
-
-## 10. 异步并发
-
-https://www.cnblogs.com/qicosmos/p/3534211.html
-
-## 11. 协程
-
-
+## 11. 异步
 
 ---
 
-# 五、泛型
+https://www.cnblogs.com/qicosmos/p/3534211.html
+
+### （1）std::async
+
+> **获取子线程执行的返回值。**
+>
+> async是更方便的异步操作，不用自己创建子线程，还能通过`std::launch`指定线程启动的策略。
+>
+> 为啥要有async：对`package_task`、`std::future`使用的简化。不用再去拿package_task包装任务，再创建thread，再调用`get_future`获取`future`了。
+>
+> **首选async解决异步问题。**
+>
+> ```cpp
+> #include <future>
+> ```
+
+* API
+
+  ```cpp
+  std::future = async(std::launch::async | std::launch::deferred, f, args...);
+  
+  //std::launch::async——调用async()时就开线程执行函数f（默认情况）
+  //std::launch::deffered——调用async()时不开线程执行f，等调用future.get()或future.wait()时才开线程执行
+  //f——任务
+  //args——传进f的参数
+  ```
+
+  ```cpp
+  #include <thread>
+  #include <future>
+  
+  int func()
+  {
+  	int data = 0;
+  	for (int i = 0; i < 1000000000; i++)
+  	{
+  		data++;
+  	}
+  	return data;
+  }
+  
+  int main()
+  {
+     	std::future<int> future_ret1 = std::async(func);	//默认：std::launch::async
+  	std::cout<<future_ret1.get()<<std::endl;
+      
+      //lambda
+      std::future<int> future_ret2 = std::async([](){
+          int a = 0;
+          for(int i=0;i<1000000;i++)
+          {
+              a++;
+          }
+          return a;
+      });
+     	std::cout<<future_ret2get()<<std::endl;
+  }
+  ```
+
+### （2）std::future
+
+> **提供了一种访问异步操作结果的机制。搭配async或promise使用。**
+>
+> 因为一个异步操作我们是不可能马上就获取操作结果的，只能在未来future某个时候获取。
+>
+> 可通过枚举`future_status`查询任务执行的状态。
+>
+> 注意：给接左值引用的函数传future时，用`ref(future)`
+
+* API
+
+  ```cpp
+  //阻塞调用线程，直到获取异步返回值
+  get();
+  //阻塞调用线程，直到超时，或者获取异步返回值
+  future_status wait_for(std::chrono::microseconds(1000));
+  
+  //状态
+  std::future_status::ready		//任务已完成
+  std::future_status::timeout		//规定时间内未完成
+  ```
+
+  ```cpp
+  //搭配async使用时：
+  int main()
+  {
+  	std::future<int> future_ret2 = std::async([]() {
+  		int a=0;
+  		for (int i = 0; i < 1000000; i++)
+  		{
+  			a++;
+  		}
+  		return a;
+  		});
+  
+  	auto status = future_ret2.wait_for(std::chrono::microseconds(100));	//wait_for阻塞执行，返回状态
+  	if (status == std::future_status::timeout)	//100ms内没执行完任务
+  	{
+  		std::cout << "timeout.." << std::endl;
+  	}
+  	else if(status == std::future_status::ready)	//100ms内执行完
+  	{
+  		std::cout << "done.." << std::endl;
+  		std::cout << future_ret2.get() << std::endl;	//get()获取返回值
+  	}	
+  }
+  ```
+
+### （3）std::promise
+
+> **不同线程之间传递数据。**
+>
+> **`future.get()`会一直阻塞，直到另一个线程中的`promise.set_value()`调用赋值后。**
+
+```cpp
+std::promise 只能被设置一次值，如果尝试多次设置值，将会抛出异常。此外
+
+#include <iostream>      
+#include <functional>    
+#include <thread>        
+#include <future>         
+#include <exception>    // std::exception, std::current_exception
+
+void get_int(std::promise<int>& prom) {
+    int x;
+    std::cout << "Please, enter an integer value: ";
+    std::cin.exceptions (std::ios::failbit);   // throw on failbit
+    try {
+        std::cin >> x;                         // sets failbit if input is not int
+        prom.set_value(x);
+    } catch (std::exception&) {
+        prom.set_exception(std::current_exception());
+    }
+}
+
+void print_int(std::future<int>& fut) {
+    try {
+        int x = fut.get();
+        std::cout << "value: " << x << '\n';
+    } catch (std::exception& e) {
+        std::cout << "[exception caught: " << e.what() << "]\n";
+    }
+}
+
+int main ()
+{
+    std::promise<int> prom;
+    std::future<int> fut = prom.get_future();
+
+    std::thread th1(get_int, std::ref(prom));
+    std::thread th2(print_int, std::ref(fut));
+
+    th1.join();
+    th2.join();
+
+    return 0;
+}
+```
+
+### （4）std::packaged_task
+
+> 别用这个。
+>
+> 还要自己创建thread，传进任务，不方便。async已经简化了操作。
+>
+> 流程：
+>
+> 对可调用对象（函数、lambda、bind()返回值）进行包装。包装后，可通过`get_future()`获取`std::future`，通过future获得返回值。
+
+```cpp
+std::packaged_task<int()> task([](){ return 7; });
+std::thread t1(std::ref(task)); 	//注意：这里要传进 ref(task)，直接传task报错
+std::future<int> f1 = task.get_future(); 
+auto r1 = f1.get();
+```
+
+## 12. 协程
+
+https://blog.csdn.net/github_18974657/article/details/108526591
+
+> 协程就是一种特殊的函数，它可以在函数执行到某个地方的时候暂停执行，返回给调用者或恢复者（可以有一个返回值），并允许随后从暂停的地方恢复继续执行。注意，这个暂停执行不是指将函数所在的线程暂停执行，而是单纯的暂停执行函数本身。
+>
+> 那么，这种特殊函数有什么用呢？最常见的用途，就是将“异步”风格的编程“同步”化。
+>
+
+# 五、模版
 
 ## 模板的二次编译
 
@@ -4524,12 +4875,6 @@ template<class T>  void Animal<T>:bark()
 ```
 
 ### 使用模板要把声明和头文件写在一起
-
-![image-20230829094124978](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230829094124978.png)
-
-![image-20230829094147738](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230829094147738.png)
-
-![image-20230829094206559](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230829094206559.png)
 
 上面的代码会报错，因为模板的2次编译，以及每个.cpp文件都是编译成单独.o目标文件再链接的。所以在.main文件中include"Person.h"文件后，main文件中只有模板类Person的声明，这样第一次编译时只检查语法错误，虽然在main文件中对Person类进行了特化\<int>。由于头文件中无函数定义，所以编译器会认为这里的函数实现在其他文件中，会在这里做一个符号代替函数，将找函数实现的工作交给连接器。
 
