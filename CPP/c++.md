@@ -816,8 +816,6 @@ T StrToNum(const string& str){
 
 ---
 
-https://zhuanlan.zhihu.com/p/373392670
-
 > `std::chrono`是C++11标准库中的一个模块，用于处理日期和时间。
 >
 > `<ctime>`是C风格的日期时间库。
@@ -915,6 +913,14 @@ Line::Line( double len)
 ```cpp
 ClassName t = new ClassName();
 ```
+
+
+
+
+
+
+
+
 
 ### （3）继承
 
@@ -1133,7 +1139,18 @@ int main() {
 
 防止两个对象的成员指针指向同一块堆内存，在析构函数中delete释放堆内存时对同一块内存释放2次。
 
-### （5）父类引用指向子类
+### （6）移动构造
+
+```cpp
+A(const A&& another):m_ptr(another.m_ptr)
+{
+    //你的一部分资源（another的m_ptr指向的堆内存）归我了
+    another.m_ptr=nullptr;		        //为了防止another析构的时候把资源释放掉
+    std::cout<<"move construct..."<<std::endl;
+}
+```
+
+### （7）父类引用指向子类
 
 **父类引用/指针指向子类，需要把父类的构造、析构都声明为virtual。**
 
@@ -1562,11 +1579,16 @@ private:
 } 
 ```
 
-* static成员函数只能访问static成员（C#也一样）
+* **static成员函数只能访问static成员**（C#也一样）
 
   成员通过this指针实现和调用对象的绑定。
 
   因为static成员函数属于类所有，没有指代当前调用成员函数的对象的this指针，所以不能调用非static成员。
+
+
+* **如果static成员函数想要访问非静态成员对象，也有办法：**
+
+  在static成员函数内增加一个当前对象指针的参数，传入this，通过this获取实例的非静态成员对象
 
 * const静态成员可以在类内部初始化
 
@@ -2232,7 +2254,7 @@ std::string str = "str";
 
 ## 3. vector
 
-动态数组。压入、弹出都在尾部。
+> 动态数组。压入、弹出都在尾部。
 
 **可随机访问。**
 
@@ -2279,16 +2301,71 @@ v.assign(d.begin(), d.end());
 
 ### 末尾添加数据
 
-**使用`vec.emplace_back();`，不要用`push_back()`**
+* **使用`vec.emplace_back();`，不要用`push_back()`**
 
-```cpp
-vec.push_back();
-vec.emplace_back();
-```
+  ```cpp
+  vec.push_back();
+  vec.emplace_back();
+  ```
 
-两者的底层实现不同：push_back()是将元素构造后调用拷贝构造到容器中，emplace_back()则是在容器末尾直接构造元素。后者少一次拷贝，所以效率更高。
+  两者的底层实现不同：push_back()是将元素构造后调用拷贝构造到容器中，emplace_back()则是在容器末尾直接构造元素。后者少一次拷贝，所以效率更高。
 
-push_back()在拷贝对象时，会优先调用移动构造，若没移动构造会调用拷贝构造。
+  push_back()在拷贝对象时，会优先调用移动构造，若没移动构造会调用拷贝构造。
+
+* 如果元素存在有参构造，可以直接传参数，push_back()和emplace_back()会直接调用构造
+
+  ```cpp
+  #include <iostream> 
+  #include <vector> 
+  using namespace std;
+  
+  class Person
+  {
+  private:
+  	int age;
+  	int bbb;
+  public:
+  	Person()
+  	{
+  		std::cout << "construct.." << std::endl;
+  	}
+  	Person(int a, int b) :age(a), bbb(b)
+  	{
+  		std::cout << "variable construct.." << std::endl;
+  	}
+  	Person(const Person& ano) :age(ano.age)
+  	{
+  		std::cout << "copy construct.." << std::endl;
+  
+  	}
+  	Person(const Person&& ano) :age(ano.age)
+  	{
+  		std::cout << "move construct.." << std::endl;
+  	}
+  
+  	Person& operator=(const Person& ano)
+  	{
+  		std::cout << "= construct.." << std::endl;
+  
+  		if (this == &ano)
+  			return *this;
+  		this->age = ano.age;
+  		return *this;
+  	}
+  
+  	~Person() {}
+  };
+  
+  int main(int argc, char** argv)
+  {
+  	std::vector<Person> vec;
+  	Person p;	//调用1次构造
+  	vec.push_back(p);	//调用1次拷贝构造
+  	vec.emplace_back(std::move(p));	//调用1次移动构造
+  	//可以不在外面创建p
+  	vec.emplace_back(1, 2);	//自动调用Person的有参构造，在vec尾部构造一个对象
+  }
+  ```
 
 ### 随机访问
 
@@ -2303,20 +2380,21 @@ C++11增加了data()的用法，它返回内置vector所指的数组内存的第
 #include<vector>
 using namespace std;
 
-int main(){
+int main()
+{
 	vector<int> v;
 	v.reserve(5);
-	for(int i=0;i<5;i++){
+	for(int i=0;i<5;i++)
+    {
 		v.push_back(i);
 	}
 	int* p=v.data();
-	for(int i=0;i<v.size();i++){
+	for(int i=0;i<v.size();i++)
+    {
 		cout<<p[i]<<endl;
 	}
 }
 ```
-
-
 
 ### 按pos插入、删除
 
@@ -2329,7 +2407,13 @@ v.clear()——清空V
 
 vector清空时，capacity不变，只size变化，因此仍占有较多的空间。
 
-所以可用`vector<T>(v).swap(v)`shrink：拷贝构造用capacity初始化自己的size、swap交换指针指向的内存块、vector(v)定义了一个匿名对象用v来拷贝。
+所以可用：
+
+```cpp
+vector<T>(v).swap(v)	//用v的size创建一个reserve再换给v
+```
+
+shrink：拷贝构造用capacity初始化自己的size、swap交换指针指向的内存块、vector(v)定义了一个匿名对象用v来拷贝。
 
 ### reserve预留空间
 
@@ -2533,9 +2617,15 @@ reverse(it1, it2)
 int sum = accumulate(it1, it2, val0)	//sum=val0+it1~it2范围内的求和
 ```
 
----
-
 # 三、现代C++
+
+> 左值引用、右值引用
+>
+> 移动语义、完美转发
+>
+> 可变参数列表
+>
+> 智能指针
 
 ## 1. 取消转义
 
@@ -3198,9 +3288,6 @@ std::bind：
   xvalue有标识符，所以也被称为lvalue。跟左值 lvalue 不同，xvalue 仍然是不能取地址的——这点上，xvalue 和 prvalue 相同。所以，xvalue 和 prvalue 都被归为右 值 rvalue。
   ```
 
-  
-
-
 
 ### （2）引用
 
@@ -3785,15 +3872,113 @@ unique_ptr<int> func()
 
 ## 23. emplace_back()
 
+> `emplace_back()` 方法的主要优点是避免了不必要的拷贝或移动构造过程。它通过在容器的尾部直接调用构造函数来构造新元素，从而减少了一次拷贝或移动构造的操作。
+>
+> **然而，在某些特定情况下，它仍然可能会触发拷贝构造函数。**这取决于具体的编译器、容器实现以及代码的具体使用情况。
+
 对应`push_back()`
 
-从C++11开始所有，的顺序容器都有这个函数，相较于`push_back()`少一次拷贝或移动，效率更高。
+从C++11开始vector、list、deque、queue都有这个函数，相较于`push_back()`不用拷贝，效率更高。（用法：
 
-```cpp
-vector::emplace_back()
-list::emplace_back()
-deque::emplace_back()
-```
+* ```cpp
+  #include <iostream> 
+  #include <vector> 
+  using namespace std;
+  
+  
+  class Person
+  {
+  private:
+  	int age;
+      int bbb;
+  public:
+  	Person()
+  	{
+  		std::cout << "construct.." << std::endl;
+  	}
+  	Person(int a, int b) :age(a),bbb(b)
+  	{
+  		std::cout << "variable construct.." << std::endl;
+  	}
+  	Person(const Person& ano):age(ano.age)
+  	{
+  		std::cout << "copy construct.." << std::endl;
+  
+  	}
+  	Person(const Person&& ano) :age(ano.age)
+  	{
+  		std::cout << "move construct.." << std::endl;
+  	}
+  
+  	Person& operator=(const Person& ano)
+  	{
+  		std::cout << "= construct.." << std::endl;
+  
+  		if (this == &ano)
+  			return *this;
+  		this->age = ano.age;
+  		return *this;
+  	}
+  
+  	~Person() {}
+  };
+  
+  int main(int argc, char** argv)
+  {
+  	std::vector<Person> vec;
+  	Person p;	//调用1次构造
+  	vec.push_back(p);	//调用1次拷贝构造
+  	vec.emplace_back(std::move(p));	//调用1次移动构造
+  	//可以不在外面创建p
+  	vec.emplace_back(1, 2);	//自动调用Person的有参构造，在vec尾部构造一个对象
+  }
+  ```
+
+  ```text
+  construct..			//Person p
+  copy construct..	//vec.push_back(p)
+  move construct..	//std::move(p)
+  copy construct..	//vec.emplace_back()
+  variable construct..	//Person p(1)
+  copy construct..		//
+  copy construct..
+  ```
+
+  
+
+* 区别：
+
+  首先使用 `push_back()` 方法添加创建好的元素，可以看出使用到了**拷贝构造函数**。
+
+  ```cpp
+  int main() {
+      using namespace std;
+      vector<Person> person;
+      auto p = Person(1); // >: Construct a person.1
+      person.push_back(p);
+      /**
+       * >: Copy-Construct1 因为容器扩容，需要把前面的元素重新添加进来，因此需要拷贝
+       */
+  }
+  ```
+
+  然后再使用 `emplace_back()` 函数添加元素进来：
+
+  ```cpp
+  int main() {
+      using namespace std;
+      vector<Person> person;
+      auto p = Person(1); // >: Construct a person.1
+      person.emplace_back(move(p)); // >: Move-Construct1
+      person.emplace_back(2);
+      /**
+       * >: Construct a person.2  // 构建一个新的元素
+       * >: Move-Construct1       // 拷贝之前的元素过来，这个时候用的是 Person(const Person &&p)
+       */
+  }
+  ```
+
+  可以看到直接使用**构造参数列表**来添加元素的方法，它会使用到了**移动构造函数 `move`** 。这也是 `emplace_back()` 方法的一大特色。
 
 ## 24. emplace
 
@@ -3817,6 +4002,18 @@ std::tuple<int, double, string> tp3 = std::make_tuple(1, 2.5, “”);
 ## 26. std::chrono
 
 ---
+
+> https://zhuanlan.zhihu.com/p/373392670
+>
+> C++11添加的时间库
+>
+> ```cpp
+> #include <chrono>
+> ```
+>
+> `chrono::system_clock`来源是系统时钟。然而在大多数系统上，系统时间是可以在任何时候被调节的。所以如果用来计算两个时间点的时间差，这并不是一个好的选择。
+>
+> `chrono::steady_clock`是一个单调时钟。此时钟的时间点无法减少，因为物理时间向前移动。因而**steady_clock是度量间隔的最适宜的选择。**
 
 ### （1）时间段
 
@@ -3936,11 +4133,11 @@ https://www.cnblogs.com/qicosmos/p/4325949.htmls
 >
 > 省略号的作用有两个：
 >
-> 1.Args是可变参数列表类型（也叫：参数包）
+> 1.Args是**可变参数列表**类型（也叫：参数包）
 >
-> 2.`Args...`表示声明一个可变参数列表类型的对象args，这个参数包args中可以包含0到任意个模板参数；
+> 2.`...Args`表示声明一个可变参数列表的类型，这个类型的参数包args中可以包含0到任意个模板参数；
 >
-> **3.在args右侧时，表示将参数包展开成一个一个独立的参数，即：`args...`**
+> **3.在args右侧时，表示将参数包对象args展开成一个一个独立的参数，即：`args...`**
 >
 > args前面有省略号，它就是可变参数列表，它里面包含了0到N（N>=0）个模版参数。
 >
@@ -3982,7 +4179,7 @@ print(4);
 
 ```cpp
 #include <iostream>
-#include <utility>
+#include <utility>	//foward
 using namespace std;
 
 template<typename T>
@@ -4023,6 +4220,8 @@ int main()
 
 ---
 
+Thread的禁用了拷贝和operator=。
+
 ```cpp
 #include <thread>
 
@@ -4039,6 +4238,9 @@ bool th.joinable();
 
 //当前线程休眠
 std::this_thread::sleep_for(std::chrono::microseconds(100));	//seconds休眠单位秒
+
+//获取当前线程ID
+ std::this_thread::get_id();
 
 //分离子线程（使用的少）
 //主线程可以结束。子线程在后台执行
@@ -4185,13 +4387,13 @@ th.detach();
 
 ##  **不能多个线程同时对一块内存进行读写。**这是最根本的问题。
 
-## 3. 互斥量
+## 3. 互斥量mutex
 
 ---
 
 > 当多个线程都会去读写一个变量时，可能1线程还未把执行结果写进变量，CPU就切到线程2执行了，线程2读的是线程1操作前的。又可能切到1运行，写进变量，又切到2运行，可当前2会把自己执行的结果覆盖1写进变量的结果。
 >
-> 当有线程在读写一个变量时，叫做**共享变量**，不允许其他线程读写这个变量。
+> 当有线程在**读或写**一个变量时，叫做**共享变量**，不允许其他线程读或写这个变量。
 >
 > **线程安全：多线程执行的结果和单线程执行结果一致，就是线程安全。**
 >
@@ -4379,12 +4581,24 @@ int main(int argc, char** args)
 
 ### 上锁
 
+**调用构造时开始上锁。**
+
 ```cpp
 std::unique_lock<std::mutex> ul(mtx);	//上锁
 
 std::unique_lock<std::mutex> ul(mtx, std::defer_lock);	//延迟上锁
 ul.lock();	//手动上锁
 ```
+
+### 解锁
+
+* 析构时自动解锁
+
+* 或手动调用
+
+  ```cpp
+  ul.unlock();
+  ```
 
 ### 超时
 
@@ -4400,13 +4614,15 @@ std::unique_lock<std::timed_mutex> ul(mtx, std::defer_lock);	//std::defer_lock�
 ul.try_lock_for(std::chrono::seconds(5));		//尝试获取锁5s，超过5s没有获取锁就返回false
 ```
 
-## 7. 原子量
+## 7. 原子量atomic
 
 ---
 
 > 互斥量，通过上锁、解锁，解决多线程执行临界区内代码问题
 >
 > 变量是原子量的话，本身的操作就是原子性的
+>
+> 原子量不能拷贝或移动
 >
 > ```cpp
 > #include <atomic>
@@ -4467,7 +4683,6 @@ ul.try_lock_for(std::chrono::seconds(5));		//尝试获取锁5s，超过5s没有�
 #include <string>
 #include <mutex>
 
-
 static std::once_flag onceflag;  //没有拷贝构造、=拷贝
 class LazyA
 {
@@ -4526,16 +4741,21 @@ int main(int argc, char** args)
 
 >  **条件变量**
 >
+>  控制线程的阻塞和继续执行。（阻塞在条件变量cv上）
+>
+>  **当线程阻塞在条件变量cv上时，释放互斥锁mtx给其他线程。当线程继续向下执行时，拿到互斥锁mtx。**
+>
+>  所以构造条件变量时，要把互斥锁作为参数传入。
+>
 >  ```cpp
 >  #include <condition_variable>
 >  ```
 >
 >  ```cpp
->  std::unique_lock<std::mutex> ul(mtx);
->  
+>  std::unique_lock<std::mutex> ul(mtx);	
 >  std::condition_variable cv;
 >  
->  //为true就将传入的互斥锁ul解锁，并使当前线程阻塞在该语句等待。为false时直接返回，保持ul锁定，线程继续向下执行代码
+>  //Predicate成立，即true时向下执行。false时阻塞等待，释放锁mtx。
 >  cv.wait(ul, Predicate);	//Predicate是谓词，是可调用对象，通常用lambda，
 >  
 >  cv.notify_one();	//通知一个线程解除阻塞向下执行
@@ -4600,16 +4820,7 @@ int main(int argc, char** args)
 }
 ```
 
-## 10. 线程池实现
-
----
-
-线程池一般全局就1个，可以禁用拷贝构造和operator=()，同时使用单例模式封装。
-
-```cpp
-```
-
-## 11. 异步
+## 10. 异步
 
 ---
 
@@ -4641,8 +4852,12 @@ https://www.cnblogs.com/qicosmos/p/3534211.html
   ```
 
   ```cpp
+  #include <iostream> 
+  #include <utility> 
+  #include <atomic>
   #include <thread>
   #include <future>
+  #include <chrono>
   
   int func()
   {
@@ -4656,19 +4871,29 @@ https://www.cnblogs.com/qicosmos/p/3534211.html
   
   int main()
   {
-     	std::future<int> future_ret1 = std::async(func);	//默认：std::launch::async
-  	std::cout<<future_ret1.get()<<std::endl;
-      
-      //lambda
-      std::future<int> future_ret2 = std::async([](){
-          int a = 0;
-          for(int i=0;i<1000000;i++)
-          {
-              a++;
-          }
-          return a;
-      });
-     	std::cout<<future_ret2get()<<std::endl;
+  	std::future<int> future_ret2 = std::async([]() {
+  		auto start = std::chrono::steady_clock::now();
+  		int a=0;
+  		for (int i = 0; i < 1000000; i++)
+  		{
+  			a++;
+  		}
+  		auto end = std::chrono::steady_clock::now();
+  		std::cout << "use:	" << std::chrono::duration_cast<std::chrono::microseconds>(end - start).count() << "ms\n" << std::endl;
+  		return a;
+  		});
+  
+  
+  	auto status = future_ret2.wait_for(std::chrono::microseconds(2200));
+  	if (status == std::future_status::timeout)
+  	{
+  		std::cout << "timeout.." << std::endl;
+  	}
+  	else if(status == std::future_status::ready)
+  	{
+  		std::cout << "done.." << std::endl;
+  		std::cout << future_ret2.get() << std::endl;
+  	}
   }
   ```
 
@@ -4789,7 +5014,195 @@ std::future<int> f1 = task.get_future();
 auto r1 = f1.get();
 ```
 
-## 12. 协程
+## 11. 线程池实现
+
+---
+
+> ![threadpool](https://pic2.zhimg.com/80/v2-c0855ad44ea989c4d2825a2e1d98aecd_1440w.webp)
+
+线程池一般全局就1个，可以禁用拷贝构造和operator=()，同时使用单例模式封装。
+
+```cpp
+//无管理线程版本
+#include <iostream> 
+#include <mutex>
+#include <queue>
+#include <vector>
+#include <functional>
+#include <condition_variable>
+
+class ThreadPool
+{
+public:
+	ThreadPool(int num)
+	{
+		stopAll = false;	//线程池对象停止标志
+		m_numThreads = num < 1 ? 1 : num;	//最少1个线程
+		
+		for (int i = 0; i < m_numThreads; i++)
+		{
+			m_threads.emplace_back([=]() {	//emplace_back移动语义，不拷贝
+				while (true)	
+				{
+					std::unique_lock<std::mutex> ul(mtx);	//互斥锁，锁住对共享变量m_tasks的访问
+					cv.wait(ul, [=]() {						//条件变量控制锁ul的释放、线程的阻塞和继续
+						return !m_tasks.empty() || stopAll;	//任务队列非空或线程池停止则不阻塞
+						});
+					if (stopAll == true && m_tasks.empty())	//如果线程池停止线程立即return终止
+					{
+						return;
+					}
+					std::function<void()> task(std::move(m_tasks.front()));	//从头部取任务，移动语义减少拷贝，可调用对象包装器包装
+					m_tasks.pop();	//任务队列弹出
+					ul.unlock();	//任务队列访问结束，解锁
+					
+					task();	//线程执行任务
+				}
+				});
+		}
+	}
+	ThreadPool(ThreadPool& another) = delete;	//禁用拷贝
+	ThreadPool& operator=(ThreadPool& another) = delete;	//禁用operator=
+	~ThreadPool()
+	{
+		//析构销毁线程池，释放资源
+		std::unique_lock<std::mutex> ul(mtx);	//要访问共享变量stopAll（多个线程都访问了stopAll)，上锁
+		stopAll = true;	//线程池停止标志置true
+		ul.unlock();	//stopAll访问结束，解锁
+		cv.notify_all();	//线程池要销毁了。通知所有线程全部不阻塞向下执行
+		for (auto& item : m_threads)
+		{
+			item.join();	//等待全部线程return终止
+		}
+	}
+
+	//主线程添加任务。生产者
+	template<typename F, typename... Args>
+	void enqueue(F&& f, Args&&... args)	//万能引用
+	{
+		auto task = std::bind(std::forward<F>(f), std::forward<Args>(args)...);	//f和args是万能引用需要完美转发，通过bind把参数绑定到函数f上
+		//局部作用域，限定互斥锁ul锁定范围
+		{
+			std::unique_lock<std::mutex> ul(mtx);	//要访问共享变量m_tasks，上锁
+			m_tasks.emplace(std::move(task));		//任务队列里放1个任务，移动语义避免拷贝
+		}
+		cv.notify_one();	//放了个任务，解除1个线程的阻塞向下执行任务
+	}
+
+private:
+	std::mutex mtx;	//互斥量
+	std::condition_variable cv;	//条件变量
+	bool stopAll;
+	int m_numThreads;	//线程数
+	std::queue<std::function<void()>> m_tasks;	//任务队列
+	std::vector<std::thread> m_threads;	//线程容器
+};
+
+
+std::mutex mtxfunc;
+int data;
+void func()
+{
+	//std::unique_lock<std::mutex> ul(mtxfunc);
+	for (int i = 0; i < 1000000; i++)
+	{
+		data++;
+	}
+	std::cout << "threadID="<<std::this_thread::get_id()<<", data= " << data << std::endl;
+}
+```
+
+调用时有些注意点：
+
+* 放入线程池的函数，可能本身也会访问共享变量。要加锁：
+
+  ```cpp
+  std::mutex mtxfunc;
+  int data;
+  void func()
+  {
+  	std::unique_lock<std::mutex> ul(mtxfunc);	//要加锁
+  	for (int i = 0; i < 1000000; i++)
+  	{
+  		data++;
+  	}
+  	std::cout << "threadID="<<std::this_thread::get_id()<<", data= " << data << std::endl;
+  }
+  
+  int main()
+  {
+  	ThreadPool* tp = new ThreadPool(2);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	
+      delete tp;
+  	std::cout << "MainThreadID=" << std::this_thread::get_id() << ", final data= " << data << std::endl;
+  }
+  ```
+
+* 主线程可能不等线程池中线程执行结束就结束了。所以需要在主线程最后打印data前调用到线程池的析构，join()等待所有线程执行完。
+
+  比如下面的代码就会有问题：
+
+  ```cpp
+  //子线程还没执行完，主线程已经执行到cout了
+  //结果会先打印： final data，再子线程打印
+  int main()
+  {
+  	ThreadPool* tp = new ThreadPool(2);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	
+  	std::cout << "MainThreadID=" << std::this_thread::get_id() << ", final data= " << data << std::endl;
+      delete tp;
+  }
+  ```
+
+  ```cpp
+  //和上面一样问题，主函数执行到cout，线程池还没执行到析构
+  int main()
+  {
+  	ThreadPool tp(2);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	tp->enqueue(func);
+  	
+  	std::cout << "MainThreadID=" << std::this_thread::get_id() << ", final data= " << data << std::endl;
+  }
+  ```
+
+## 12. 总结
+
+---
+
+* 锁解决的问题：
+
+  多条线程访问（多或写）共享变量。**共享变量要放在临界区内访问。**
+
+* 条件变量解决的问题：
+
+  线程什么时候阻塞暂停、什么时候继续执行，条件变量控制有几条线程正在执行。
+
+  条件变量需要一个互斥锁来使用，阻塞在条件变量上时，互斥锁被释放，其他线程可以进入执行。阻塞解除时，拿到互斥锁，向下执行。
+
+* 
+
+
+
+## 13. 协程
+
+---
 
 https://blog.csdn.net/github_18974657/article/details/108526591
 
@@ -4797,6 +5210,7 @@ https://blog.csdn.net/github_18974657/article/details/108526591
 >
 > 那么，这种特殊函数有什么用呢？最常见的用途，就是将“异步”风格的编程“同步”化。
 >
+> C++20引入了协程。
 
 # 五、模版
 
