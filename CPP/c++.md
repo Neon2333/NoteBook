@@ -1,18 +1,15 @@
-# 0. cpp效率的影响
+# 0. 一些要注意的点
 
-c++效率和C相近，但一下常用特性中，以下会影响效率：
+* 使用push_back()和emplace_back()添加元素时，若元素有有参构造，不用手动构造，直接传参数进去，会自动构造，并拷贝/移动到容器中。
 
-* 虚函数
+  ```cpp
+  std::vector<std::thread> vec;
+  vec.push_back([](){
+      std::cout<<"hello"<<std::endl;	
+  });	//传的参数是函数，但放进容器的是线程，自动调用了thread()
+  ```
 
-  
-
-* RTTI
-
-## vscode修改多行
-
-alt+左键点击可在多位置出现光标。
-
-ctrl-alt-上下，可在一列上出现多个光标。
+* 
 
 # 一、cpp基础
 
@@ -4220,21 +4217,19 @@ int main()
 
 ---
 
-Thread的禁用了拷贝和operator=。
+> Thread的禁用了拷贝和operator=。
+>
+> ```cpp
+> #include <thread>
+> ```
 
 ```cpp
-#include <thread>
-
-//创建时就会开始执行函数func
+//一创建就开始执行func
 //args是传入到func的参数
 std::thread th(func, args);
 
 //主线程阻塞在该语句，等待子线程执行完毕
 th.join();
-
-//判断子线程是否可以调用join
-//有的线程不能使用join，使用join会报错system_error。所以调用join前一般使用joinable()判断一下
-bool th.joinable();
 
 //当前线程休眠
 std::this_thread::sleep_for(std::chrono::microseconds(100));	//seconds休眠单位秒
@@ -4242,9 +4237,14 @@ std::this_thread::sleep_for(std::chrono::microseconds(100));	//seconds休眠单�
 //获取当前线程ID
  std::this_thread::get_id();
 
+
 //分离子线程（使用的少）
 //主线程可以结束。子线程在后台执行
 th.detach();
+
+//判断子线程是否可以调用join
+//有的线程不能使用join，使用join会报错system_error。所以调用join前一般使用joinable()判断一下
+bool th.joinable();
 ```
 
 ## 2. 线程函数中的数据未定义错误
