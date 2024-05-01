@@ -192,15 +192,6 @@ cpp为了提供多态，编译函数时会根据函数签名给函数名进行�
   } 
   ```
 
-## 5. static
-
-* 修饰类成员，表示属于非实例成员
-* 修饰全局变量：将全局变量的作用域仅为当前文件或函数，不可被其他文件或函数访问。
-
-* 修饰局部变量：延长生命周期，在函数结束时不会销毁变量，仍可访问。
-
-
-
 ## 5. 作用域
 
 局部变量和全局变量的名称可以相同，但是在函数内，局部变量的值会覆盖全局变量的值。当变量间出现重名的情况下，作用域小的屏蔽作用域大的。
@@ -1555,7 +1546,11 @@ public:
 
 ## 25. static
 
-* static定义类成员：成员将属于类所有。
+> * 修饰类成员，表示成员属于类所有
+> * 修饰全局变量：将全局变量的作用域仅为当前文件或函数，不可被其他文件或函数访问。
+>
+> * 修饰局部变量：延长生命周期，在函数结束时不会销毁变量，仍可访问。
+>
 
 * **非const静态成员必须在类外初始化**
 
@@ -1586,6 +1581,11 @@ private:
 * **如果static成员函数想要访问非静态成员对象，也有办法：**
 
   在static成员函数内增加一个当前对象指针的参数，传入this，通过this获取实例的非静态成员对象
+
+  ```cpp
+  ```
+
+  
 
 * const静态成员可以在类内部初始化
 
@@ -4163,7 +4163,7 @@ void print(T head, Args... rest)
 
 int main(void)
 {
-   print(1,2,3,4);
+   print(1,2,3,4);	//编译器自动推导了T的类型。显式指定类型是print<int>(1, 2, 3, 4);
    return 0;
 }
 
@@ -4211,7 +4211,9 @@ int main()
 > #include <thread>
 > ```
 >
-> 不是Posix系统编程，C++11的线程库是跨平台的。使用Posix标准函数只能在Unix平台上编程。
+> 不是Posix系统编程，C++11标准库的线程库是跨平台的。使用Posix标准函数只能在Unix平台上编程的OS级API。
+>
+> 但底层也是封装的Posix线程API 。
 
 ## 1. Thread创建
 
@@ -4387,6 +4389,8 @@ bool th.joinable();
 
 ##  **不能多个线程同时对一块内存进行读写。**这是最根本的问题。
 
+---
+
 ## 3. 互斥量mutex
 
 ---
@@ -4396,20 +4400,20 @@ bool th.joinable();
 > 当有线程在**读或写**一个变量时，叫做**共享变量**，不允许其他线程读或写这个变量。
 >
 > **线程安全：多线程执行的结果和单线程执行结果一致，就是线程安全。**
->
-> ```cpp
-> #include <mutex>
-> 
-> std::mutex mtx;
-> int a = 0;
-> 
-> //lock()和unlock()中间的部分是临界区，其他线程访问时会被阻塞
-> mtx.lock();		//lock()当前线程获取互斥量所有权
-> a+=1;
-> mtx.unlock();	//unlock()释放互斥量所有权
-> ```
 
-## 4. 互斥量死锁
+```cpp
+#include <mutex>
+
+std::mutex mtx;
+int a = 0;
+
+//lock()和unlock()中间的部分是临界区，其他线程访问时会被阻塞
+mtx.lock();		//lock()当前线程获取互斥量所有权
+a+=1;
+mtx.unlock();	//unlock()释放互斥量所有权
+```
+
+## 4. 死锁
 
 ---
 
@@ -4450,34 +4454,30 @@ void functhread2()
 >
 > 代码执行到lock_guard对象作用域外时，解锁。
 >
-> **lock_guard对象所在作用域为临界区，临界区内操作原子操作。**
->
-> **可使用局部作用域，**让临界区尽量小，最好只影响共享变量。对于不是共享资源的操作，最好放到临界区外。
->
 > 当作用域结束会调用析构内的unlock()解锁。
 >
 > **禁用了拷贝构造，=拷贝**
 >
 > ```cpp
-> //lock_guard源码
+>//lock_guard源码
 > //RAII
-> template <class _Mutex>
+>template <class _Mutex>
 > class _NODISCARD lock_guard { // class with destructor that unlocks a mutex
 > public:
 > using mutex_type = _Mutex;
 > 
 > explicit lock_guard(_Mutex& _Mtx) : _MyMutex(_Mtx) { // construct and lock
->   _MyMutex.lock();
+> _MyMutex.lock();
 > }
 > 
 > lock_guard(_Mutex& _Mtx, adopt_lock_t) : _MyMutex(_Mtx) {} // construct but don't lock
-> 
+>   
 > ~lock_guard() noexcept {
->   _MyMutex.unlock();
+> _MyMutex.unlock();
 > }
 > 
 > lock_guard(const lock_guard&) = delete;
-> lock_guard& operator=(const lock_guard&) = delete;
+>   lock_guard& operator=(const lock_guard&) = delete;
 > 
 > private:
 > _Mutex& _MyMutex;
@@ -4578,6 +4578,12 @@ int main(int argc, char** args)
 > ```
 >
 > 是lock_guard的加强版，所以用这个比较多。
+>
+> **作用域为临界区，临界区内操作原子操作。**
+>
+> **可使用局部作用域，**让临界区尽量小，最好只影响共享变量。对于不是共享资源的操作，最好放到临界区外。
+>
+> 若一个共享变量访问频率很高，可以给这个共享变量单独1个锁。
 
 ### 上锁
 
@@ -5046,7 +5052,7 @@ public:
 				{
 					std::unique_lock<std::mutex> ul(mtx);	//互斥锁，锁住对共享变量m_tasks的访问
 					cv.wait(ul, [=]() {						//条件变量控制锁ul的释放、线程的阻塞和继续
-						return !m_tasks.empty() || stopAll;	//任务队列非空或线程池停止则不阻塞
+						return !m_tasks.empty() || stopAll;	//任务队列非空或线程池停止则不阻塞，拿到ul
 						});
 					if (stopAll == true && m_tasks.empty())	//如果线程池停止线程立即return终止
 					{
@@ -5054,9 +5060,11 @@ public:
 					}
 					std::function<void()> task(std::move(m_tasks.front()));	//从头部取任务，移动语义减少拷贝，可调用对象包装器包装
 					m_tasks.pop();	//任务队列弹出
-					ul.unlock();	//任务队列访问结束，解锁
+					ul.unlock();	//任务队列访问结束，解锁放掉ul
 					
+                      std::cout << "threadID=" << std::this_thread::get_id() << ",start working..." << std::endl;
 					task();	//线程执行任务
+                      std::cout << "threadID=" << std::this_thread::get_id() << ",end working..." << std::endl;	//线程执行完任务日志输出
 				}
 				});
 		}
@@ -5094,7 +5102,7 @@ private:
 	std::condition_variable cv;	//条件变量
 	bool stopAll;
 	int m_numThreads;	//线程数
-	std::queue<std::function<void()>> m_tasks;	//任务队列
+	std::queue<std::function<void()>> m_tasks;	//任务队列。bind绑定了参数，所以function的模版类型是void()
 	std::vector<std::thread> m_threads;	//线程容器
 };
 
@@ -5131,17 +5139,30 @@ void func()
   
   int main()
   {
-  	ThreadPool* tp = new ThreadPool(2);
+  	auto start1 = std::chrono::steady_clock::now();
+  	ThreadPool* tp = new ThreadPool(6);
+  	tp->enqueue<void()>(func);	//类型是func函数的类型
+  	tp->enqueue(func);	//自动推导类型
   	tp->enqueue(func);
   	tp->enqueue(func);
   	tp->enqueue(func);
   	tp->enqueue(func);
-  	tp->enqueue(func);
-  	tp->enqueue(func);
-  	
-      delete tp;
+  	auto end1 = std::chrono::steady_clock::now();
+  	delete tp;
   	std::cout << "MainThreadID=" << std::this_thread::get_id() << ", final data= " << data << std::endl;
+  
+  	auto start2 = std::chrono::steady_clock::now();
+  	std::cout << "pool spend:" << std::chrono::duration_cast<std::chrono::microseconds>(end1 - start1).count() << "ms" << std::endl;
+  	for (int i = 0; i < 6000000; i++)
+  	{
+  		data++;
+  	}
+  	auto end2 = std::chrono::steady_clock::now();
+  	std::cout << "mainthread spend:" << std::chrono::duration_cast<std::chrono::microseconds>(end2 - start2).count() << "ms" << std::endl;
   }
+  
+  //pool spend:157ms
+  //mainthread spend:12353ms
   ```
 
 * 主线程可能不等线程池中线程执行结束就结束了。所以需要在主线程最后打印data前调用到线程池的析构，join()等待所有线程执行完。
@@ -5288,13 +5309,15 @@ template<class T>  void Animal<T>:bark()
 }
 ```
 
-### 使用模板要把声明和头文件写在一起
+### 使用模板要把声明和头文件写在一起写成hpp
 
 上面的代码会报错，因为模板的2次编译，以及每个.cpp文件都是编译成单独.o目标文件再链接的。所以在.main文件中include"Person.h"文件后，main文件中只有模板类Person的声明，这样第一次编译时只检查语法错误，虽然在main文件中对Person类进行了特化\<int>。由于头文件中无函数定义，所以编译器会认为这里的函数实现在其他文件中，会在这里做一个符号代替函数，将找函数实现的工作交给连接器。
 
 而编译Person.cpp时，只有定义，却无法获得特化的T具体类型。因此最后Person.o和main.o链接时，main.o中的符号会找不到。
 
 **解决：模板函数、模板类的声明和实现不要分开写在不同文件中。可以用将声明和实现放在一个.hpp文件中。**
+
+### 如果分开写成.h和.cpp，要把两个文件都include，`#include "test.cpp"`
 
 
 
