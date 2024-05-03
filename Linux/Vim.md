@@ -1,5 +1,7 @@
 # 0. 常用
 
+---
+
 ```bash
 #配置vim
 vi /etc/vim/vimrc
@@ -54,7 +56,7 @@ ctrl-shift 黏贴
 也就说，快速选中一个单词，按v按e即可
 ```
 
-#### 移动整行
+### 移动整行
 
 ```bash
 dd 剪切行（将tab缩进也cut了）
@@ -64,7 +66,7 @@ i 进入insert mode
 tab/backspace 修改缩进
 ```
 
-#### 复制黏贴一部分
+### 复制黏贴一部分
 
 ```bash
 移动光标
@@ -72,68 +74,66 @@ y$ 复制当前行光标后的内容
 p 粘贴到光标后
 ```
 
-#### 复制/移动多行
+### 复制/移动多行
 
 ```bash
 :a,bmc 将a~b行代码块剪切到c行的下一行
 :a,btc 将a~b行代码块复制到c行的下一行
 ```
 
-
+# 1. 模式
 
 ---
 
-# 1. 模式
-
 ## （1）Normal模式
 
-### 默认/按ESC
+默认/按ESC
 
-### i——进入Insert模式，在当前光标所在字符左侧插入
+i——进入Insert模式，在当前光标所在字符左侧插入
 
-### a——进入Insert模式，在当前光标所在字符右侧插入
+a——进入Insert模式，在当前光标所在字符右侧插入
 
-### u——撤销
+u——撤销
 
-### Ctrl-r——恢复
+Ctrl-r——恢复
 
 ## （2）Visual可视模式
 
-### visual——Normal模式下按v，自由选中。按e选中到词尾
+visual——Normal模式下按v，自由选中。按e选中到词尾
 
-### visual line——V，行选中
+visual line——V，行选中
 
-### visual block——Ctrl-v，矩形块选中
+visual block——Ctrl-v，矩形块选中
 
-### 通过jkhl选中代码行/块后，y为copy，p为paste
+通过jkhl选中代码行/块后，y为copy，p为paste
 
-### 缩进——shift+>或<
+缩进——shift+>或<
 
 ## （3）命令行模式
 
-### Normal模式下按`:`
+Normal模式下按:
 
-### set number——显示行号
+set number——显示行号
 
-### q——退出
+q——退出
 
-### w——保存
+w——保存
 
-### !——强制
+!——强制
 
-### wq——退出保存
+wq——退出保存
 
-### wq!——强制退出保存
+wq!——强制退出保存
 
 ## （4）插入模式
 
-### i——光标前插入
+i——光标前插入
 
-### a——光标后插入
+a——光标后插入
 
 # 2. 光标移动
 
-## Normal模式下
+Normal模式下：
 
 j——光标向下移动
 
@@ -188,7 +188,7 @@ Ctrl-b(back)——向上翻一页
 
 # 3. 拷贝与删除
 
-## Normal模式下
+Normal模式下：
 
 yy——复制光标所在整行
 

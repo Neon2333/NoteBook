@@ -2080,7 +2080,7 @@ static_cast<type>()
 
 ### （1）静态多态
 
-也就是编译期多态，包括：函数重载、操作符重载。
+也就是编译期多态，包括：函数重载（和返回值无关，虽然函数签名包括：返回值、参数列表，但返回值与重载无关）、操作符重载。
 
 ```cpp
 void func(int a){}
@@ -2214,9 +2214,11 @@ int main()
 
 # 二、STL
 
-容器存入元素，都是将元素的**拷贝存入**容器中，不是将元素本身存入容器。所以把类对象放到容器中，一定要写类的拷贝构造和=重载。 
-
-使用算法需要引入`<algorithm>`头文件
+> 容器存入元素，都是将元素的**拷贝存入**容器中，不是将元素本身存入容器。所以把类对象放到容器中，一定要写类的拷贝构造和=重载。 （新标准有的函数不拷贝，但为了保险每个类都要写拷贝、移动、operator=）
+>
+> 使用算法需要引入`<algorithm>`头文件
+>
+> 计算容器占用内存：`v.count()*sizeof(typename)`，直接sizeof(v)计算的是容器变量自身的大小。
 
 ## 1. 迭代器
 
@@ -2307,7 +2309,7 @@ v.assign(d.begin(), d.end());
 
   两者的底层实现不同：push_back()是将元素构造后调用拷贝构造到容器中，emplace_back()则是在容器末尾直接构造元素。后者少一次拷贝，所以效率更高。
 
-  push_back()在拷贝对象时，会优先调用移动构造，若没移动构造会调用拷贝构造。
+  而新标准的C++中push_back()在拷贝对象时，也会优先调用移动构造，若没移动构造会调用拷贝构造。
 
 * 如果元素存在有参构造，可以直接传参数，push_back()和emplace_back()会直接调用构造
 
@@ -2485,20 +2487,18 @@ FIFO，队尾入，队头出。
 | reverse()——翻转链表                                 |      |
 | sort()——排序，从小到大。list自带排序，不是algorithm |      |
 
-## 8. set
+## 8. 排序规则
 
-set的适用情形/作用：**快速检索、去重、排序**。 
+---
 
-存储数据时，会对数据自动排序。set和multiset的区别是，set不允许存储相同的数据，**multiset允许存储相同的数据**。
+回调函数的功能，每个元素都会经过回调函数的比较。
 
-**set、multiset内的元素都是只读。** 
+### （1）仿函数
 
-set和multiset不能直接修改值，因为直接修改会使二叉树混乱，所以需要修改时应该先删除该元素，再insert()元素。 
-
-默认从小到大，若想从大到小，定义仿函数functor或lambda表达式指定排序规则：
+有一些内置仿函数
 
 ```cpp
-class myCompare 
+class Comp 	//仿函数functor
 { 
 public: 
 	bool operator()(typename val1,typename val2) 
@@ -2506,16 +2506,69 @@ public:
 		return val1>val2;      //val1<val2规则为从小到大排列，val1>val2表示规则从大到小排列。 
 	} 
 }; 
-
-set<typename,myCompare> s1;  //将类的类型作为第二参数传入，s1用该规则排序存储 
-s1.insert(1); 
-s1.insert(2); 
-s1.insert(3); 
-s1.insert(4); 
-s1.insert(5); 
-
-set<typename,[](typename val1, typename val2)->bool{return val1>val2}> s1;
 ```
+
+### （2）lambda
+
+泛型类型用`decltype()`推导lambda的类型。
+
+```cpp
+auto comp = [=](Person* a, Person* b) {return a->name < b->name; };
+set < Person, decltype(comp)> s1(comp);
+```
+
+### （3）函数
+
+```cpp
+//函数指针
+bool comp(Person a, Person b)
+{
+   return a.age < b.age;
+}
+using compPtr = bool(*)(Person,Person);
+map<Person, int, compPtr> aaa(comp);
+```
+
+### （4）谓词
+
+## 9. set
+
+---
+
+> 要指定排序规则。
+>
+> set的适用情形/作用：**快速检索、去重、排序**。 
+>
+> 存储数据时，会对数据自动排序。
+>
+> set不允许存储相同的数据，**multiset允许存储相同的数据**。
+>
+> **set、multiset内的元素都是只读。** 
+>
+> ```cpp
+> #include <set>
+> ```
+>
+> ```cpp
+> //仿函数排序规则
+> class Comp 	
+> { 
+> public: 
+> 	bool operator()(typename val1,typename val2) 
+> 	{ 
+> 		return val1>val2;      //val1<val2规则为从小到大排列，val1>val2表示规则从大到小排列。 
+> 	} 
+> }; 
+> 
+> set<typename,Comp> s1;  //将类的类型作为第二参数传入，s1用该规则排序存储 
+> ```
+>
+> ```cpp
+> auto comp = [=](Person* a, Person* b) {return a->name < b->name; };
+> set < Person, decltype(comp)> s1(comp);
+> ```
+
+set和multiset不能直接修改值，因为直接修改会使二叉树混乱，所以需要修改时应该先删除该元素，再insert()元素。 
 
 | 常用API                                 |      |
 | --------------------------------------- | ---- |
@@ -2523,7 +2576,11 @@ set<typename,[](typename val1, typename val2)->bool{return val1>val2}> s1;
 | erase(pos)/erase(ele)/erase(pos1, pos2) |      |
 | clear()                                 |      |
 
-## 9. pair
+## 10. multiset
+
+> 允许存储相同的数据
+
+## 11. pair
 
 数据对
 
@@ -2535,33 +2592,82 @@ cout<<p.first<<p.second<<endl;
 auto p = std::make_pair(val1, val2);
 ```
 
-## 10. map
+## 12. map
 
-存储的元素是pair，一个是key，一个是value。
+> 存储的元素是pair，一个是key，一个是value。
+>
+> 要指定排序规则。
+>
+> **key不能重复，会对key自动排序，可指定排序规则。**
+>
+> 内部是红黑树。
+>
+> 一个key只能对应一个value。
+>
+> ```cpp
+> #include <map>
+> ```
+>
+> ```cpp
+> //自定义排序规则仿函数Comp
+> class Comp
+> {
+>     bool operator(Person a,Person b)
+>     {
+>         return a.age < b.age;	//ascend
+>     }
+> }
+> 
+> map<Person, int, Comp> aaa;
+> ```
+>
+> ```cpp
+> //lambda
+> auto comp = [](Person a,Person b){return a.age < b.age;};
+> map<Person, int, decltype(comp)> aaa(comp);	//decltype(comp)推导comp的类型
+> ```
+>
+> ```cpp
+> //函数指针
+> bool comp(Person a, Person b)
+> {
+>    return a.age < b.age;
+> }
+> using compPtr = bool(*)(Person,Person);
+> 
+> map<Person, int, compPtr> aaa(comp);
+> ```
+>
+> 
 
-**会对key自动排序，可指定排序规则。**
-
-内部是红黑树。
-
-一个key只能对应一个value。**multimap可以多个key对应一个value。**
-
-| 常用API                                                      |
-| ------------------------------------------------------------ |
-| empty()——判断是否为空                                        |
-| size()——返回容器元素个数                                     |
-| pair<map<T1, T2>::iterator, bool> insert(make_pair(val1, val2))——插入pair，返回值first是map的迭代器，second是是否插入成功 |
-| map[key]——访问key对应的value。若key处的value不存在，则添加一个新的key/value对，并使用默认值初始化value。 |
+| 常用API                                                      |                                                              |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| empty()——判断是否为空                                        |                                                              |
+| size()——返回容器元素个数                                     |                                                              |
+| pair<map<T1, T2>::iterator, bool> insert(make_pair(val1, val2)) | 插入pair，返回值first是map的迭代器，second是是否插入成功     |
+| map[key]                                                     | 访问key对应的value。若key处的value不存在，则添加一个新的key/value对，并使用默认值初始化value。 |
+| pair<iter,bool> insert(const pair<>& val)                    | 将val插入，返回迭代器和是否插入成功的bool                    |
 
 **当key是自定义类时，需要用仿函数指定存储规则：**
 
 ```cpp
+//insert
 std::map<Person, int, comp> mp;
-mp.insert(new Person(), 1);
-mp.insert(new Person(), 2);
-mp.insert(new Person(), 3);
+mp.insert(make_pair(new Person(), 1));
+mp.insert({new Person(), 2});
 ```
 
-## 11. unordered_map
+## 13.multimap
+
+> 允许存储**key相同但value**不同的pair
+>
+> key相同的数据放在一起连续存储
+>
+> 可以通过key查询到所有该key对应的value
+
+
+
+## 14. unordered_map
 
 **哈希表，只完成key到value的映射，不对key进行排序，查找比map快很多。**
 
@@ -2569,16 +2675,50 @@ mp.insert(new Person(), 3);
 #include<unordered_map>
 ```
 
-## 12. sort
+## 15. sort
 
-头文件为`#include<algorithm>`和`using namespace std`。 
+> 不是list的成员函数那个sort，是算法库里的sort。
+>
+> 要指定排序规则。
+>
+> 时间复杂度为`n*log(n)`
+>
+> ```cpp
+> #include<algorithm>
+> ```
+>
+> ```cpp
+> //第三个参数传入函数地址或
+> sort(iter1, iter2, &funcComp);	
+> ```
+>
+> ```cpp
+> //回调函数
+> bool comp(int v1, int v2)
+> {
+>     return v1<v2;
+> }
+> //函数指针
+> using CompPtr = bool(*)(int,int);
+> CompPtr* compPtr = func;
+> 
+> //lambda
+> auto f = [](int v1, int v2){return v1<v2;};
+> 
+> sort(iter1, iter2, comp);
+> sort(iter1, iter2, compPtr);
+> sort(iter1, iter2, f);
+> ```
+>
+> 
 
-时间复杂度为`n*log(n)`
+
 
 ```cpp
 //默认从小到大
 template<class RandomAccesssIterator> 
 void sort(RandomAccessIterator first,RandomAccessIterator last); 
+
 //可通过comp指定
 template<class RandomAccesssIterator> 
 void sort(RandomAccessIterator first,RandomAccessIterator last,Compare comp); 
@@ -2986,13 +3126,13 @@ int* arrp = new int[3]{1,2,3};
 
 ## 12. std::initializer_list
 
-传任意个同类型参数
-
-类似c#中params。
-
-**可接受任意多个相同类型的参数。**
-
-传参用初始化列表，列表里可传任意个数的参数。
+> 初始化列表
+>
+> 在C++中，`std:.initializer list<T>`是一个模板类，接受任意个同类型参数，允许你以花括号{}初始化对象列表。它主要用于初始化包含多个元素的对象，如数组、vector等。当你用花括号初始化一个对象时，当使用花括号初始化时，如果存在接受std::initializer list<T>的构造函数，编译器将优先使用它，并用列表中的元素构造一个`std::initializer list<T>`对象。
+>
+> **可接受任意多个相同类型的参数。**
+>
+> 传参用列表里可传任意个数的参数。
 
 ```cpp
 //func可传任意个数
@@ -3008,6 +3148,18 @@ int main()
     func({1,2,3,4,5,6});	//不能写成func(1,2,3,4,5,6);
 }
 ```
+
+```cpp
+vector<vector<int>> vec;
+vec.push_back({1,2});	//push_back有以std::initializer_list<int>为参数的重载
+vec.emplace_back({1,2});	//error
+```
+
+当你在代码中使用`matrix.push back({1,2,3});`时，这里的{1,2,3}实际上是一个`std::initializer list9<int>`，编译器利用它来创建一个`std::vector<int>`的临时对象?，然后将这个临时对象添加到matrix中。std::vector有一个接受`std::initializer list<T>`作为参数的构造函数，所以这段代码可以成功编译。
+
+然而，当你尝试使用`matrix.emplace back9({1,2,3});`时，出现的编译错误是因为emplace back期望直接构造其元素，避免额外的复制或移动操作。emplace back会尝试用提供的参数直接在vector的存储空间中构造一个`std::vector<int>`对象，而不是接受一个已经构造好的对象。在这种情况下，{1,2,3}没有明确地告诉编译器它应该如何直接构造一个`std:.vector<int>`对象。为了使`emplace back`工作，你需要直接传递构造`std::vector<int>`所需的参数。但在这个例子中，你无法仅通过{1,2,3}来直接在matrix末尾就地构造一个`std:.vector<int>`对象，因为这里的(1,2,3}并不能直接解释为构造`std::vector<int>`所需的所有参数。
+
+
 
 ## 13. 基于范围的for循环
 
@@ -3869,7 +4021,9 @@ unique_ptr<int> func()
 
 ## 23. emplace_back()
 
-> `emplace_back()` 方法的主要优点是避免了不必要的拷贝或移动构造过程。它通过在容器的尾部直接调用构造函数来构造新元素，从而减少了一次拷贝或移动构造的操作。
+> `emplace_back()` 会试图通过提供的参数直接在vector的存储空间构造元素，而不是接受1个已经构造好的元素。从而避免了拷贝或移动。
+>
+> 优点是避免了不必要的拷贝或移动构造过程。它优先通过在容器的尾部直接调用构造函数来构造新元素，从而减少了拷贝或移动构造的操作。
 >
 > **然而，在某些特定情况下，它仍然可能会触发拷贝构造函数。**这取决于具体的编译器、容器实现以及代码的具体使用情况。
 
@@ -5324,3 +5478,6 @@ template<class T>  void Animal<T>:bark()
 ## 特化
 
 https://zhuanlan.zhihu.com/p/346400616
+
+
+

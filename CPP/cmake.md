@@ -1,5 +1,7 @@
 # 1. Makefile
 
+---
+
 指定编译、链接规则的脚本。
 
 ## 1）编译指令
@@ -217,9 +219,9 @@ clean:
 	rm -rf $(target1) $(target2) *.o   
 ```
 
----
-
 # 2. Cmake安装
+
+---
 
 跨平台、开源，自动构建工具。
 
@@ -287,18 +289,19 @@ CMake主要是编写CMakeLists.txt文件，然后用cmake命令将CMakeLists.txt
 
 ```cmake
 cd build 
-cmake .. 
-make	#也可用cmake --build . 
+cmake .. 	#因为CMakeLists.txt在build的上一级目录，cmake ..指定在build的上级目录运行cmake
+make	
+#也可用cmake --build . 
 ```
 
 * Cmake语法编写CmakeList.txt文件:
 
   ```cmake
-  **cmake_minmium_required(VERSION 3.20)**——指定最低版本
+  cmake_minmium_required(VERSION 3.20)	#指定最低版本
   
-  **project(Hello)**——指定项目名称
+  project(Hello)	#指定项目名称
   
-  **add_executable(Hello Hello.cpp)**——指定依赖
+  add_executable(Hello Hello.cpp)		#指定依赖
   ```
 
 * **cmake -B build**——创建build目录，并且在build目录下生成Makefile及其他文件。
@@ -314,6 +317,8 @@ make	#也可用cmake --build .
 * **cmake --build build**——生成项目
 
 # 3. Cmake语法
+
+---
 
 ## （1）message
 
@@ -513,56 +518,59 @@ message("var=${Var}")
 
 # 4. 构建项目
 
+---
+
 ## （1）直接写入源码路径
 
 简单的小项目用这个。
 
 * add_executable()中直接写入相对路径
+
 * 在源码中引入头文件时要写相对路径
 
-```c++
-//在项目project下新建animal文件夹：animal/dog.h
-#pragma once
-#include<string>
-class Dog{
-	public:
-    	std::string barking();
-}
+  ```cpp
+  //在项目project下新建animal文件夹：animal/dog.h
+  #pragma once
+  #include<string>
+  class Dog{
+  	public:
+      	std::string barking();
+  }
+  
+  ///dog.cpp
+  std:string Dog::barking()
+  {
+      std::cout<<"wow"<<std::endl;
+      return 0;
+  }
+  
+  //main.cpp
+  #include<iostream>
+  #include"animal/dog.h"
+  int main()
+  {
+      Dog dog;
+      dog.barking();
+      return 0;
+  }
+  ```
 
-///dog.cpp
-std:string Dog::barking()
-{
-    std::cout<<"wow"<<std::endl;
-    return 0;
-}
+  ```cmake
+  #CMakeLists.txt
+  cmake_minimum_required(VERSION 3.20)
+  project(Animal CXX)	#CXX表示C++
+  set(CMAKE_CXX_STANDARD 11)	#设定c++版本
+  set(CMAKE_CXX_STANDARD_REQUIRED True)
+  
+  add_exectuable(Animal main.cpp animal/dog.cpp)
+  ```
 
-//main.cpp
-#include<iostream>
-#include"animal/dog.h"
-int main()
-{
-    Dog dog;
-    dog.barking();
-    return 0;
-}
-```
-
-```cmake
-#CMakeLists.txt
-cmake_minimum_required(VERSION 3.20)
-project(Animal CXX)	#CXX表示C++
-set(CMAKE_CXX_STANDARD 11)	#设定c++版本
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-add_exectuable(Animal main.cpp animal/dog.cpp)
-```
-
-```bash
-cmake -B build
-cmake --build build
-
-./build/Animal
-```
+  ```bash
+  cmake -B build
+  cmake --build build
+  
+  ./build/Animal
+  ```
 
 
 
@@ -666,7 +674,130 @@ project
   target_link_libraries(App PUBLIC AnimalLib)	#链接库文件AnimalLib
   ```
 
-# 5. 调用库文件
+# 5. 通过FetchContent管理第三方库
+
+---
+
+> cmake 3.11版本及以上可使用
+>
+> 好用的包管理器
+>
+> **cmake脚本运行编译项目阶段**从外部下载依赖库源码，而不需事先下载到本地或作为项目的一部分提交到版本控制。
+>
+> 项目根目录下建`demo/ext`目录存放第三方库
+
+## （1）工作原理
+
+* 声明依赖
+
+  通过`FetchContent_Declare()`函数声明外部项目，指定项目位置（如Git仓库）、标签、分支、提交等
+
+* 下载依赖
+
+  通过`FetchContent_MakeAvailable()`下载声明的依赖到项目的子目录中
+
+* 使用依赖
+
+  依赖下载完成后，外部项目的源码就可以像项目内的代码一样被使用
+
+## （2）使用流程
+
+* 引入FetchContent模块
+
+  ```cmake
+  # CMakeLists.txt头部写这行命令
+  include(FetchContent)
+  ```
+
+* 声明外部依赖的名称、位置等信息
+
+  ```cmake
+  FetchContent_Declare(
+  	外部库名称	#库名字
+  	GIT_REPOSITORY https://urlofProjectOnGithub		# 仓库地址
+  	GIT_TAG 2.6.x	# 库版本（tag)
+  	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/库名称 # 指定库下载到当前目录下新建ext的【库名称文件夹】下
+  )
+  ```
+
+* 让第三方库可用
+
+  ```cmake
+  FetchContent_MakeAvaliable(外部库名称)
+  ```
+
+* 链接库中的某个模块到项目中
+
+  ```cmake
+  add_excutable(App main.cpp)
+  target_link_libraries(App PRIVATE 外部库::子模块)
+  ```
+
+## （3）项目demo
+
+```bash
+tree demo	#查看目录树形结构
+```
+
+* 创建项目下各目录
+
+  ```bash
+  demo
+  ├───build		# cmake的输出文件
+  ├───cmake		# cmake文件夹，存放 .cmake文件
+  ├───ext		# spdlog等第三方库的存放目录
+  ├───include		# 头文件路径
+  └───src
+          main.cc      # 主项目源文件
+  └───CMakeLists.txt # top directory下的cmake配置文件
+  ```
+
+* 在cmake目录下，创建负责第三方库的cmake脚本文件：`外部库名称.cmake`
+
+  ```cmake
+  include(FetchContent)
+  FetchContent_Declare(
+  	外部库名称	#库名字
+  	GIT_REPOSITORY https://urlofProjectOnGithub		# 仓库地址
+  	GIT_TAG 2.6.x	# 库版本（tag)
+  	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/库名称 # 指定库下载到当前目录下新建ext的【库名称文件夹】下
+  )
+  FetchContent_MakeAvaliable(spdlog)
+  ```
+
+  ```bash
+  demo
+  │   
+  ├───build
+  ├───cmake
+  │       外部库名称.cmake	# 新增的文件
+  │       
+  ├───ext
+  ├───include
+  └───src
+          main.cc
+  └───CMakeLists.txt
+  ```
+
+* 在最上层目录的`demo/CMakeLists.txt`中引入`外部库名称.cmake`脚本
+
+  把下面的代码加在`CMakeLists.txt`后面
+
+  ```cmake
+  # -----------------------------使用外部库1------------------------------------------------------
+  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
+  
+  # 引入spdlog2.camake, 
+  include(外部库1)	# 填写文件名
+  
+  # 项目中使用spdlog
+  target_link_libraries(App PRIVATE 外部库1::子模块)
+  # ----------------------------------------------------------------------------------------
+  ```
+
+# 6. 调用库文件
+
+---
 
 **.h头文件是编译时必须的，lib是链接时需要的，dll是运行时需要的**。
 
@@ -742,7 +873,9 @@ target_link_libraries(App PUBLIC animal)	#指定要链接的动态库名称
 - `link_libraries`用来链接静态库，`target_link_libraries`用来链接导入库，即按照`头文件 + .lib(动态库导入库) + .dll(动态库)`方式隐式调用动态库的`.lib`导入库
 - `link_libraries`用在`add_executable`之前，`target_link_libraries`用在`add_executable`之后
 
-# 6.命令总结
+# 7.命令总结
+
+---
 
 | -命令                                                        | -功能                                                        |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
@@ -778,7 +911,7 @@ target_link_libraries(App PUBLIC animal)	#指定要链接的动态库名称
 
   当然了，在**最终子目录**的 CMakeLists.txt 文件中，使用 `include_directories()` 和 `target_include_directories()` 的效果是相同的。
 
-# 7. 实例
+# 8. demo
 
 demo01
 
@@ -802,9 +935,27 @@ demo01
 > >
 > > CMakeLists.txt
 >
-> CMakeLists.txt
+> cmake
 >
-> main.cpp
+> > 外部库1.cmake
+> >
+> > 外部库2.cmake
+>
+> src
+>
+> > main.cpp
+>
+> ext
+>
+> > 外部库1
+> >
+> > > .........
+> >
+> > 外部库2
+> >
+> > > ...........
+>
+> CMakeLists.txt
 
 ```cpp
 //cat.h
@@ -839,7 +990,7 @@ std::string cat::bark()
 #include<iostream>
 #include"include/dog.h"
 #include "include/cat.h"
-
+#include "外部库名/子模块.h"	//外部库::子模块的头文件
 
 int main(int argc, char** argv)
 {
@@ -864,17 +1015,41 @@ project(App CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_subdirectory(animal)	#添加子目录/animal
+# 指定源文件
+set(src_file ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cc)
+
+#添加子目录/animal
+add_subdirectory(animal)	
 link_directories(${PROJECT_SOURCE_DIR}/so)
-#link_libraries(cat)		#链接静态库libcat.a
-add_executable(App main.cpp)
+#链接静态库libcat.a
+#link_libraries(cat)		
+add_executable(App ${src_file})
+
+# 指定头文件路径
 target_include_directories(App PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}/include") 
-target_link_libraries(App PUBLIC AnimalLib cat)	#链接库文件AnimalLib、动态库libcat.so
+#链接库文件AnimalLib、动态库libcat.so
+target_link_libraries(App PUBLIC AnimalLib cat)
+
+# -----------------------------使用外部库1------------------------------------------------------
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
+
+# 引入spdlog2.camake, 
+include(外部库1)	# 填写文件名
+
+# 项目中使用spdlog
+target_link_libraries(spdlog_demo PRIVATE 外部库1::子模块)
+# ----------------------------------------------------------------------------------------
 ```
 
----
+```bash
+# 在根目录demo01/下，执行脚本
+cmake -B build	
+cmake --build build
+```
 
-# 8. Cmake条件编译
+# 9. Cmake条件编译
+
+---
 
 通过对宏赋不同的值，编译不同的文件。
 

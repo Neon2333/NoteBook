@@ -36,14 +36,34 @@ http://c.biancheng.net/view/7152.html
 
 https://blog.csdn.net/fengzhantian/article/details/90213785
 
+https://blog.csdn.net/lj15559275886/article/details/117410996?spm=1001.2101.3001.6650.2&utm_medium=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-117410996-blog-99548745.235%5Ev43%5Epc_blog_bottom_relevance_base4&depth_1-utm_source=distribute.pc_relevant.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-2-117410996-blog-99548745.235%5Ev43%5Epc_blog_bottom_relevance_base4
+
 ```mysql
-set password for username @localhost = password(newpwd);
+# MySQL8.0以下版本
+root用户密码为空，设置密码
+进入mysql后直接set password ="xxxxxx"
+# MySQL8.0及其以上版本
+mysql -u root -p
+回车
+
+alter user 'root'@'localhost' identified with mysql_native_password by '321';
 ```
+
+* 查看密码：
+
+  ```mysql
+  use mysql;
+  show tables;
+  show columns from user;
+  select authentication_string from user where User='root';
+  ```
+
+
 
 ### （2）修改root密码
 
 ```mysql
-set password for username @localhost = password('321');		#密码修改为321
+set password for username@localhost = password('321');		#密码修改为321
 ```
 
 ### （3）修改环境变量
@@ -286,6 +306,92 @@ mysql -h192.168.42.128 -uroot -p
 ```
 
 
+
+### （4）远程连接问题归总
+
+> * 允许连接的主机被限制了
+>
+>   ```mysql
+>   # 查看允许的主机
+>   use mysql
+>   
+>   select host from user where user = 'root'; 
+>   ```
+>
+>   ```mysql
+>   #设置用户root可以从任意主机连接到MySQL
+>   update user set host='%' where user='root';	
+>   
+>   flush privileges;
+>   ```
+
+* `ERROR 1130 (HY000): Host 'xxx' is not allowed to connect to this MySQL server`
+
+  在数据库服务器上，我们必须检查上述用户允许连接的主机。
+
+  ```text
+  # mysql -u root -p 
+  ```
+
+  运行以下SQL命令来检查用户的主机：
+
+  ```sql
+  mysql> SELECT host FROM mysql.user WHERE user = "database_username";
+  ```
+
+  ![](https://pic1.zhimg.com/80/v2-5522e5f3fdc23a3fdedd372cbd836708_1440w.webp)
+
+  可以看到**MySQL只允许用户从本地主机连接到数据库服务器**。
+
+  ```mysql
+  use mysql
+  
+  update user set host='%' where user = 'root'; 
+  
+  select host from user where user = 'root'; 
+  
+  出现如下带Host字段“%”的即可
+  ```
+
+  ![](https://img-blog.csdnimg.cn/20200726094009576.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L2E2OTI5MDEzMTQ=,size_16,color_FFFFFF,t_70)
+
+  重启MySQL服务。
+
+* `ERROR 2003 (HY000): Can't connect to MySQL server on '172.20.10.8:3306' (10061)`
+
+  添加主机
+
+  ```mysql
+  use mysql
+  update user set host='%' where user='root';	
+  flush privileges;
+  ```
+
+  Linux上：
+
+  ```bash
+  cd /etc/mysql
+  my.cnf文件，找到 bind-address = 127.0.0.1 在前面加上#注释掉，如下：
+  #bind-address = 127.0.0.1
+  3.然后在添加如下代码；OK。
+  
+  skip-external-locking
+  skip-name-resolve
+  ```
+
+  若在my.cnf文件中找不到#bind-address = 127.0.0.1 如图所示：
+
+  ![](https://img-blog.csdn.net/20170308215708724?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvcXFfMzIxNDQzNDE=/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
+  进入 第二个路径 /etc/mysql/mysql.conf.d/ 文件夹中打开 mysqld.cnf文件修改即可。
+
+  重新启动mysql服务。
+
+  ```
+  service mysql restart
+  ```
+
+  
 
 ---
 

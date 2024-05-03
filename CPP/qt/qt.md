@@ -1056,7 +1056,7 @@ QSqlQueryModel	//对QSqlQuery结果的封装，作为视图类（QTableView）�
 
   把`mysql/lib`下的`libmysql.dll`拷贝到编译器的bin目录下
 
-* qtcreator的.pro文件
+* **qtcreator的.pro文件**
 
   ```cpp
   QT += sql
@@ -1714,6 +1714,8 @@ public:
 
 # 20. 程序打包
 
+## （1）流程
+
 * 在release下编译程序
 
 * 拷贝可执行文件、资源文件
@@ -1722,7 +1724,7 @@ public:
 
   通过`编译器kit/bin`下的`windeployqt`工具自动将需要的动态库拷贝到发布文件夹下。
 
-  在发布文件夹下打开cmd：
+  在发布文件夹下`ctrl-l`输入cmd打开输入
 
   ```powershell
   windeployqt ./demo.exe
@@ -1757,6 +1759,12 @@ public:
 当前生成脚本的存储目录、安装包名、安装包图标、安装密码
 
 ![image-20240426172439246](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240426172439246.png)
+
+## （2）打包MySQL程序到没有安装MySQL的主机
+
+连不上MySQL：
+
+https://blog.csdn.net/angiehelen/article/details/120214695
 
 
 
