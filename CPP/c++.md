@@ -1,4 +1,4 @@
-# 0. 一些要注意的点
+# 0. 注意点
 
 * 使用push_back()和emplace_back()添加元素时，若元素有有参构造，不用手动构造，直接传参数进去，会自动构造，并拷贝/移动到容器中。
 
@@ -2309,6 +2309,18 @@ v.assign(d.begin(), d.end());
 
   两者的底层实现不同：push_back()是将元素构造后调用拷贝构造到容器中，emplace_back()则是在容器末尾直接构造元素。后者少一次拷贝，所以效率更高。
 
+  ```cpp
+  void func(){}
+  
+  vector<std::thread> m_threads;
+  m_threads.emplace_back([]{
+      std::function<void()> func = std::bind(threadWork);
+      func();
+  });
+  ```
+
+  
+
   而新标准的C++中push_back()在拷贝对象时，也会优先调用移动构造，若没移动构造会调用拷贝构造。
 
 * 如果元素存在有参构造，可以直接传参数，push_back()和emplace_back()会直接调用构造
@@ -3191,7 +3203,7 @@ for (auto item:vt)
 
 作用：**把不同类型的可调用对象包装成统一的包装器类型**，就可以用一种统一的方式来使用，或作为参数传递。
 
-* 可调用对象：可以按照函数使用的方法来调用的对象。
+* **可调用对象**：可以按照函数使用的方法来调用的对象。
 
   函数指针、仿函数、类成员函数指针、类数据成员指针
 
@@ -3247,7 +3259,7 @@ for (auto item:vt)
 
   就可以用可调用对象包装器在func中接收参数，把可调用对象打包一下传进去。
 
-* 语法
+* **语法**
 
   把可调用对象赋值给包装器。
 
@@ -3260,6 +3272,8 @@ for (auto item:vt)
   //包装仿函数
   A b;
   function<void(int)> f3=b;	//可调用对象：实例对象
+  //包装bind
+  function<void()> ff(bind(func));
   
   
   int main()
@@ -3269,7 +3283,7 @@ for (auto item:vt)
       f3(3);
   }
   ```
-
+  
   ```cpp
   //实现回调（和函数指针一样，就是包了一层，向上又抽象了一个更广泛的类型）
   class B
@@ -3299,7 +3313,7 @@ for (auto item:vt)
 
 std::bind：
 
-* 绑定后得到一个**仿函数**。
+* 绑定后得到一个**function对象**。
 
 * 可以对这个得到的仿函数用包装器包装。包装器的泛型类型同被包装的函数。
 
@@ -3338,7 +3352,7 @@ std::bind：
   	f()=100;	//包装一个变量，没参数不用传参，加个括号调用可以赋值
   ```
 
-* 对bind绑定后得到的仿函数进行包装，得到包装器类型
+* **对bind绑定后得到的仿函数进行包装，得到包装器类型**
 
   ```cpp
   //类的成员函数
@@ -4379,12 +4393,37 @@ int main()
 > #include <thread>
 > ```
 
-```cpp
-//一创建就开始执行func
-//args是传入到func的参数
-std::thread th(func, args);
+* 一创建就开始执行func
 
-//主线程阻塞在该语句，等待子线程执行完毕
+* **std::thread创建的线程必须在主线程或其他一直存在的线程中join()或detach()**。否则会报错。
+
+* **`std::thread`作为类成员变量，不能通过new创建，怎么绑定执行函数？**
+
+  > ```cpp
+  > class A
+  > {
+  > private:
+  >     std::thread th1;
+  >     static std::thread th2;
+  >     
+  > public:
+  >     void func1(){}
+  >     static func2(){}
+  >     
+  >     A():th1(A::func2){}
+  > }
+  > ```
+  >
+  > 
+
+
+
+```cpp
+//args是传入到func的参数
+std::thread th(func, args);	//传入一个函数或是一个可调用对象，如lambda
+
+//主线程阻塞在该语句，等待子线程执行完毕。
+//创建的线程必须要join()
 th.join();
 
 //当前线程休眠
@@ -4402,6 +4441,19 @@ th.detach();
 //有的线程不能使用join，使用join会报错system_error。所以调用join前一般使用joinable()判断一下
 bool th.joinable();
 ```
+
+```cpp
+//传入函数构造线程
+std::thread(func);
+//传入可执行对象lambda构造线程
+std::thread([](){
+    func();
+})
+```
+
+
+
+
 
 ## 2. 线程函数中的数据未定义错误
 
@@ -4577,7 +4629,9 @@ lock()与unlock()中间代码为临界区，临界区内代码是原子操作，
 
 只有互斥量没有处于被其他线程获取的情况下，才能被获取。
 
-当互斥量比较多、代码多的时候容易出现死锁。	
+当互斥量比较多、代码多的时候容易出现死锁。
+
+死锁是指多个线程在等待彼此持有的锁释放，导致都无法继续执行的情况。合理设计锁的获取顺序和使用超时机制可以预防死锁。
 
 ```cpp
 std::mutex mtx1;
@@ -4915,8 +4969,8 @@ int main(int argc, char** args)
 >  std::unique_lock<std::mutex> ul(mtx);	
 >  std::condition_variable cv;
 >  
->  //Predicate成立，即true时向下执行。false时阻塞等待，释放锁mtx。
->  cv.wait(ul, Predicate);	//Predicate是谓词，是可调用对象，通常用lambda，
+>  //Predicate成立，即true时拿到锁向下执行。false时阻塞等待，释放锁mtx给其他线程。
+>  cv.wait(ul, Predicate);	//Predicate是谓词，是可调用对象，通常用lambda。
 >  
 >  cv.notify_one();	//通知一个线程解除阻塞向下执行
 >  ```
@@ -5275,6 +5329,16 @@ void func()
 ```
 
 调用时有些注意点：
+
+* 线程数设置：
+
+  在实际应用中，建议先根据下述原则设置一个初始值，然后通过监控和测试来不断调整优化。
+
+  > 以下是一些常见的设置策略：
+  >
+  > 1. **对于CPU密集型任务**：最大线程数可以设置为CPU核心数加1，这样可以充分利用CPU资源，同时避免过多的线程上下文切换导致的性能损耗。
+  > 2. **对于I/O密集型任务**：由于I/O操作时线程会等待I/O完成，因此可以设置更高的最大线程数，以保持CPU的忙碌状态。具体数值需要根据实际情况进行测试和调整。
+  > 3. **系统资源限制**：还需要考虑系统资源的承受能力，避免创建过多线程导致系统资源耗尽。
 
 * 放入线程池的函数，可能本身也会访问共享变量。要加锁：
 

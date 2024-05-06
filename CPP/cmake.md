@@ -619,9 +619,19 @@ target_link_libraries(target PUBLIC/PRIVATE 动态库1 动态库2 ...)	#链接�
   set(EXECUTABLE_OUTPUT_PATH /hone/xxx/code)	#指定可执行文件输出路径
   ```
 
-  链接动态库（target_link_libraries)
+  链接动态库
 
+  ```cmake
+  target_link_libraries()
+  ```
+  
   生成可执行文件
+  
+  ```cmake
+  add_exectuable()
+  ```
+  
+  
 
 # 7. 子目录CMakeLists
 
@@ -762,6 +772,8 @@ target_link_libraries(target PUBLIC/PRIVATE 动态库1 动态库2 ...)	#链接�
 
 ---
 
+> 官方示例：https://cmakebyexample.dev/use-library-fetchcontent/
+>
 > cmake 3.11版本及以上可使用
 >
 > 好用的包管理器
@@ -901,7 +913,7 @@ https://blog.csdn.net/weixin_45448662/article/details/132654732
   ```cmake
   ${CMAKE_CURRENT_SOURCE_DIR}	
   
-  ${PROJECT_SOURCE_DIR}
+  ${PROJECT_SOURCE_DIR}	# 当前项目的根目录。在子目录的CMakeLists中这个指子目录的这个模块（这个模块就是个项目）
   ```
 
 * 查看项目结构
@@ -932,12 +944,16 @@ https://blog.csdn.net/weixin_45448662/article/details/132654732
 > >
 > > module1
 > >
+> > > lib
+> > >
 > > > module1.cpp
 > > >
 > > > CMakeLists.txt
 > >
 > > module2
 > >
+> > > lib
+> > >
 > > > module2.cpp
 > > >
 > > > CMakeLists.txt
@@ -991,28 +1007,36 @@ demo01使用结构1
 > include
 >
 > > cat.h
->>>
+> >
 > > dog.h
->
+> >
 > > bird.h
 >
 > lib
-> 
+>
 > > libcat.so
->>
+>
 > src
 >
 > > animal
 > >
+> > > lib
+> > >
+> > > > libAnimal.a
+> > >
 > > > dog.cpp
->> >
+> > >
 > > > bird.cpp
->> >
+> > >
 > > > CMakeLists.txt
-> 
+>
 > ext
 >
 > > spdlog
+> >
+> > > include
+> > >
+> > > ...
 >
 > CMakeLists.txt
 >
@@ -1085,14 +1109,15 @@ FetchContent_MakeAvailable(spdlog)
 ```cmake
 #animal/CMakeLists.txt
 cmake_minimum_required(VERSION 3.28.3)
-project(App CXX)
+project(animal CXX)		#别写成项目名了。要写模块名animal。
 set(CMAKE_CXX_STANDARD 11)
 
 aux_source_directory(${CMAKE_CURRENT_SOURCE_DIR}/ SRC)	
 #file(GLOB SRC ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp)	
 
 include_directories(${PROJECT_SOURCE_DIR}/include)	#指定头文件
-set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)	#指定库生成目录
+# ${PROJECT_SOURCE_DIR}在这里指animal子项目
+set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)	#指定库生成目录，会生成到animal/lib下。
 # 模块animal没有依赖其他模块
 add_library(Animal STATIC ${SRC})	
 ```
@@ -1122,7 +1147,8 @@ include(FetchContent)	#使用FetchContent
 
 FetchContent_Declare(spdlog
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.4.1)
+        GIT_TAG v1.4.1
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog)
 FetchContent_MakeAvailable(spdlog)
 target_link_libraries(App PRIVATE spdlog::spdlog)
 # ----------------------------------------------------------------------------------------
@@ -1130,7 +1156,8 @@ target_link_libraries(App PRIVATE spdlog::spdlog)
 
 FetchContent_Declare(json
         GIT_REPOSITORY https://gitee.com/slamist/json.git
-        GIT_TAG v3.7.3)
+        GIT_TAG v3.7.3
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/json)
 FetchContent_MakeAvailable(json)
 target_link_libraries(mjson PRIVATE nlohmann_json::nlohmann_json)
 # --------------------------------------------------------------------------------------------
@@ -1141,11 +1168,11 @@ target_link_libraries(mjson PRIVATE nlohmann_json::nlohmann_json)
 # 在根目录demo01/下，执行脚本
 cmake -B build	
 cmake --build build
-# 或是这么些
+# 或是这么写
 mkdir build
 cd build 
 cmake ..
-make -j4
+make -j8
 ```
 
 # 10. Cmake条件编译
