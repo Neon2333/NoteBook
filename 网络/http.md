@@ -145,6 +145,7 @@ namespace WinHttpServer
             server.Start(int.Parse(this.txtPort.Text));
         }
 
+        //解析client的request后的业务处理
         private string server_Handler(string action, string args)
         {
             switch (action)
@@ -279,6 +280,7 @@ namespace WinHttpServer
             if (count > 0)
             {
                 string data = Encoding.UTF8.GetString(buffer, 0, count);
+                //解析client的request
                 if (data.StartsWith("GET "))
                 {
                     Regex regex = new Regex(@"GET /(?<action>[^?]+)\?+(?<args>[^\s]{0,})");
