@@ -1243,7 +1243,7 @@ from electric_car import ElectricCar
 
 ## 12. 文本文件IO
 
-### （1）打开文件——open
+### （1）open打开文件
 
 ```python
 with open("\\cc.txt") as file_object:
@@ -1255,7 +1255,7 @@ with open("\\cc.txt") as file_object:
 
 ### （2）读取文本文件
 
-#### 读取整个文本文件内容——read
+#### read读取整个文本文件内容
 
 我们使用方法read()（前述程序的第2行）读取这个文件的全部内容，并将其作为一个长长的字符串存储在变量contents中。
 
@@ -1303,7 +1303,50 @@ with open(filePath, "w") as file_object:
     file_object.write("coding\n")
 ```
 
-### 4）文件夹操作
+### （4）打开文件时既要写也要读的bug
+
+> **读写指针：**Python中的文件读写指针指的是在打开文件进行读取或写入操作时，程序内部维护的一个位置指示器，用于标记当前读写操作的位置。
+>
+> 你打开一个文件并调用`readline()`方法时，读写指针会从当前位置移动到下一行的开头。如果你执行写操作，如`write('Hello')`，则指针会从下一行开头开始write，write完后移动到写入内容的后面。
+>
+> ```python
+> f.tell()	#获取当前读写指针位置
+> 
+> seek(offset, whence)	 #方法用于移动文件读写指针到指定位置：
+> offset 参数表示要移动的【字节数】，如果是正数则向右侧移动，负数则向左侧移动。
+> whence 参数定义了移动的参考点，它可以是以下值之一：
+> 0（或省略）表示从文件开头开始计算偏移量。
+> ```
+>
+> 
+
+```python
+# 比如这段代码
+with open("data.txt", "w+") as f:
+    f.write("hello")
+    s1=f.read()
+    f.write("world")
+    s2=f.read()
+print(s1+s2)
+
+# 会报错。不会输出helloworld
+# f.write("hello")后指针位置在hello后面，此时f.read()往后读，读不到数据
+# 想要读到hello，要把指针重新移动到开头位置,f.seek(0)
+# 想要只读到world，要把指针从当前位置向后移动sizeof(world)=5个字节，f.seek(-5,1)
+
+with open(r"C:\Users\Administrator\Desktop\data.txt", "w+") as f:
+    f.write("hello")
+    f.seek(0)
+    s1=f.read()
+    f.write("world")
+    f.seek(5,0)	#移动
+    s2=f.read()
+print(s1+s2)	# helloworld
+```
+
+
+
+### （5）文件夹操作
 
 #### 打开指定目录
 

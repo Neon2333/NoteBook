@@ -1,4 +1,4 @@
-# 问题总结
+# 	问题总结
 
 ## 1. 获取系统时间
 
@@ -314,14 +314,14 @@ mysql -h192.168.42.128 -uroot -p
 >   ```mysql
 >   # 查看允许的主机
 >   use mysql
->   
+>               
 >   select host from user where user = 'root'; 
 >   ```
 >
 >   ```mysql
 >   #设置用户root可以从任意主机连接到MySQL
 >   update user set host='%' where user='root';	
->   
+>               
 >   flush privileges;
 >   ```
 
@@ -406,12 +406,12 @@ mysql -h192.168.42.128 -uroot -p
   常用客户端有GUI的也有CLI的，如cmd中的mysql、Navicat等。在cmd中输入mysql调用CLI形式的Client软件，直接输入mysql可能报错，因为该CLI客户端软件没有用户名和密码来连接服务器。
 
   ```mysql
-  mysql -hIP -p3036 -uroot -p 	//输入用户名和密码，调用CLI，连接服务器
+  mysql -hIP -P3036 -uroot -p 	//输入用户名和密码，调用CLI，连接服务器
   ```
 
 * 注释
 
-  单行：--空格，或#
+  单行：#
 
   多行/**/
 
@@ -455,9 +455,9 @@ mysql -h192.168.42.128 -uroot -p
 
 int(n)
 
-* 无论n是多少，int永远都是4字节。
+> **n只表示显示宽度。**
 
-  **n只表示显示宽度。**
+* 无论n是多少，int永远都是4字节。
 
   若数字位数多于n则无视n直接显示整个数字，**若数字位数少于n则其他位填充0（要设置unsigned zerofill）。**
 
@@ -515,7 +515,7 @@ show databases;	//显示所有数据库
 show create database db_name;	//显示数据库db_name创建时的信息
 show tables from db;	//显示库db的所有表
 desc t_name;	//显示表结构
-show create table t_name;	//显示表t_name创建时的信息
+show create table t_name;	//显示表t_name创建时的SQL命令
 ```
 
 
@@ -574,6 +574,8 @@ show create table t_name;	//显示表t_name创建时的信息
 
   可以按照查询的字段进行排序，也可按照未查询的字段进行排序。
 
+  在MySQL中，**可以**通过特定方式按照未查询的字段进行排序。虽然通常情况下，使用 ORDER BY 子句进行排序时，排序列必须是 SELECT 语句中返回的列之一。但是，如果希望对没有直接出现在 SELECT 列表中的列进行排序，可以通过一些技巧来实现。
+
   按多个字段排序，当第一个字段相同时，才会在第一个字段相同的行内部按照第二个字段进行排序。若所有行第一个字段都相同，不会按照第二个字段排序。
 
   ```mysql
@@ -598,6 +600,10 @@ show create table t_name;	//显示表t_name创建时的信息
 * 语句顺序
 
   SELECT => FROM => ORDER BY => LIMIT
+  
+  ```mysql
+  select DISTINCT sal from emp ORDER BY sal desc LIMIT 2,5
+  ```
 
 
 
@@ -655,6 +661,8 @@ show create table t_name;	//显示表t_name创建时的信息
 * BETWEEN AND
 
   操作符 BETWEEN ... AND 会选取介于两个值之间的数据范围，这些值**可以是数值、文本或者日期，属于一个闭区间查询。  **
+  
+  注意是：闭区间！！
 
 
 * NOT BETWEEN AND
@@ -741,17 +749,17 @@ show create table t_name;	//显示表t_name创建时的信息
   http://c.biancheng.net/view/2447.html
 
   ```mysql
-  mysql> CREATE TABLE tb_dept3
-      -> (
-      -> id INT(11) PRIMARY KEY,
-      -> name VARCHAR(22),
-      -> location VARCHAR(50) DEFAULT 'Beijing'
-      -> );
-      mysql>INSERT INTO tb_name
-      ->(id,name)				
-      ->VALUES
-      ->(1,'wang');
-      //某个字段是默认值时，插入字段中默认字段不写
+  CREATE TABLE tb_dept3
+  (
+  id INT(11) PRIMARY KEY,
+  name VARCHAR(22),
+  location VARCHAR(50) NOT NULL DEFAULT 'Beijing'
+  );
+  INSERT INTO tb_name
+  (id,name)				
+  VALUES
+  (1,'wang');
+  //某个字段是默认值时，插入字段中默认字段不写
   ```
 
 * 修改表时添加默认约束
@@ -793,9 +801,11 @@ http://c.biancheng.net/view/2448.html
 
 #### 定义
 
-==MySQL唯一约束（Unique Key）是指所有记录中字段的值不能重复出现。==例如，为 id 字段加上唯一性约束后，每条记录的 id 值都是唯一的，不能出现重复的情况。如果其中一条记录的 id 值为‘0001’，那么该表中就不能出现另一条记录的 id 值也为‘0001’。
+MySQL唯一约束（Unique Key）是指所有记录中字段的值不能重复出现。例如，为 id 字段加上唯一性约束后，每条记录的 id 值都是唯一的，不能出现重复的情况。如果其中一条记录的 id 值为‘0001’，那么该表中就不能出现另一条记录的 id 值也为‘0001’。
 
-**唯一约束与主键约束相似的是它们都可以确保列的唯一性。不同的是，唯一约束在一个表中可有多个**，并且设置唯一约束的列允许有空值，但是只能有一个空值。而主键约束在一个表中只能有一个，且不允许有空值。比如，在用户信息表中，为了避免表中用户名重名，可以把用户名设置为唯一约束。
+**唯一约束与主键约束相似的是它们都可以确保列的唯一性。不同的是，唯一约束在一个表中可有多个**，并且设置唯一约束的列允许有空值，但是只能有一个空值，主要目的就是确保这个field不能插入重复数据。比如，在用户信息表中，为了避免表中用户名重名，可以把用户名设置为唯一约束。
+
+而**主键约束在一个表中只能有一个，且不允许有空值**。
 
 #### 建表时添加唯一约束
 
@@ -811,7 +821,7 @@ mysql> CREATE TABLE tb_dept2
 #### 修改表时添加唯一约束
 
 ```mysql
-ALTER TABLE tb_name ADD CONSTRAINT unique_name UNIQUE(col_name);
+ALTER TABLE tb_name ADD CONSTRAINT unique_name UNIQUE(field_name);
 ```
 
 ```mysql
@@ -842,6 +852,7 @@ DROP DATABASE db_name;		//删
 ALTER DATABASE db_name;		//改
 SHOW DATABASES;			    //查
 USE db_name;	//使用库
+
 SELECT DATABASE();	//当前使用的库
 ```
 
@@ -859,8 +870,10 @@ CREATE TABLE IF NOT EXISTS runoob_tbl(
 
 ```mysql
 //删
-DROP TABLE runoob_tbl;	//表被删除
-TRUNCATE TABLE runoob_tb1;	//表还在，但是表中记录都被清空
+DROP TABLE runoob_tbl;	表被删除
+#DROP TABLE会完全删除整个表及其所有数据、索引、触发器、权限等，并且释放表所使用的存储空间。该操作立即执行且执行速度最快，但由于它彻底删除了表结构，因此是不可回滚的。
+TRUNCATE TABLE runoob_tb1;	表还在，但是表中记录都被清空
+#TRUNCATE仅删除表中的数据并保留表结构，与DELETE不同，TRUNCATE不会记录每一行的删除操作，不会触发触发器，且操作不可回滚。由于TRUNCATE不记录单个行的删除，它在清空大量数据时比DELETE快得多。不过，TRUNCATE并不会减少表所占用的空间，因为它不会真正删除表的存储空间。
 DELETE FROM t_name		//注意和TRUNCATE区别
 ```
 
@@ -868,8 +881,9 @@ DELETE FROM t_name		//注意和TRUNCATE区别
 //改
 ALTER TABLE tb_name ADD COLUMN `newField` typename(n) NOT NULL DEFAULT '...' COMMENT '...' AFTER field_;
 ALTER TABLE tb_name DROP COLUMN field_;
+ALTER TABLE tb_name CHANGE COLUMN field_old field_new typename(n) NOT NULL DEFAULT '' COMMENT '..';	#default空字符串
+
 ALTER TABLE tb_name MODIFY COLUMN field_ typename(n) NOT NULL DEFAULT '' COMMENT '..';
-ALTER TABLE tb_name CHANGE COLUMN field_old field_new typename(n) NOT NULL DEFAULT '' COMMENT '..'';
 ALTER TABLE tb_name ADD CONSTRAINT <唯一约束名> UNIQUE(<列名>);
 ```
 
@@ -895,13 +909,13 @@ INSERT INTO tb_name (field1,field2) VALUES (val11,val12),(val21,val22),(val31,va
 DELETE FROM tb_name [WHERE clause];
 //修改某条记录的某个字段的值
 UPDATE tb_name SET `field_name` = newVal;
-//查询
+# 查询，SELECT后面跟的是个表达式，可以是常量，也可以filed相关的运算表达式，不一定就是field名
 SELECT `field_name1` FROM tb_name; 
 ```
 
 ```mysql
-INSERT INTO t_student (name,age,email) values ('张三',18,'10000@qq.com');
-INSERT INTO t_student (name,age) values ('周七',22);
+INSERT INTO t_student (name,age,email) values ('张三',18,'10000@qq.com'),('张三',18,'10000@qq.com')
+INSERT INTO t_student (name,age) values ('周七',22),('周七',22),('周七',22)
 ```
 
 * MODIFY和CHANGE的区别：
@@ -927,7 +941,8 @@ INSERT INTO t_student (name,age) values ('周七',22);
 #### 复制表中一行的数据并修改某些字段的值插入当前表
 
 ```mysql
-//复制表中记录（其中，字段3、字段4的值不是表中的，其他字段是从表中查询得到的要拷贝插入的）
+#复制表中记录（其中，字段3、字段4的值不是表中的，其他字段是从表中查询得到的要拷贝插入的）
+# 注意：没有values。把取值写在语句里。
 insert into tablename (字段1,字段2,字段3,字段4...) select 字段1,字段2,自己赋值字段3的值 AS 字段3, 自己赋值的字段4的值 AS 字段4, from tablename where....;
 ```
 
@@ -958,13 +973,100 @@ https://blog.csdn.net/ZZQHELLO2018/article/details/103784869?utm_medium=distribu
 
 **一张表只能有一个主键。主键相当于给表加了一个索引。**
 
-确保字段的值不重复，不能为NULL。
+确保字段的值不重复，**不能为NULL**。
 
-可设置自增。
+可设置自增：
 
 ```mysql
-`id` int(5) unsigned PRIMARY KEY AUTO_INCREMENT
+`id` int(5) unsigned PRIMARY KEY AUTO_INCREMENT 2	#后面跟的数字表示从几开始自增
 ```
+
+删除记录后，自增主键不连续，没关系。因为自增主键的主要目的是为了唯一标识记录，而不是按顺序标识。
+
+如果实在需要删除记录后，重新展示数据时的ID重新按顺序排列，可通过：
+
+```mysql
+# 在数据表中重排主键
+ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
+# 在应用程序中以代码对查出数据的ID进行重新排序显示
+# 不使用自增ID，而是用其他算法、机制生成唯一标识符UUID之类的作为自增主键之外的一个field
+```
+
+```mysql
+DROP PROCEDURE IF EXISTS p_deleteDevice;
+CREATE PROCEDURE p_deleteDevice(IN ln VARCHAR(20), IN dn VARCHAR(20), OUT ifRowAffected INT(1))
+BEGIN
+DECLARE ifAffectedRow TINYINT(1) DEFAULT 1;
+DECLARE SQL_FOR_UPDATE_device_config VARCHAR(100);
+
+START TRANSACTION;
+
+-- device_config
+SET SQL_FOR_UPDATE_device_config=CONCAT('UPDATE device_config SET `DeviceStatus_', dn, '`=0 WHERE LineNO=', ln, ';');
+SET @sql=SQL_FOR_UPDATE_device_config;
+PREPARE stmt FROM @sql;
+EXECUTE stmt;
+-- 使用PREPARE，获取ROW_COUNT必须要在DEALLOCATE释放sql语句之前
+CASE ROW_COUNT()
+	WHEN 0 THEN 
+		SET ifAffectedRow=0;
+	ELSE 
+		BEGIN END;
+END CASE;	
+DEALLOCATE PREPARE stmt;
+
+-- device_info
+DELETE FROM device_info WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+	WHEN 0 THEN 
+		SET ifAffectedRow=0;
+	ELSE 
+		ALTER TABLE device_info AUTO_INCREMENT=1;
+-- 		ALTER TABLE device_info DROP `id`;
+-- 		ALTER TABLE device_info ADD `id` INT(10) NOT NULL AUTO_INCREMENT FIRST;
+END CASE;
+
+-- device_info_threshold
+DELETE FROM device_info_threshold WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_threshold AUTO_INCREMENT=1;
+END CASE;
+
+-- device_info_paranameandsuffix
+DELETE FROM device_info_paranameandsuffix WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE device_info_paranameandsuffix AUTO_INCREMENT=1;
+END CASE;
+
+-- faults_config
+DELETE FROM faults_config WHERE LineNO=ln AND DeviceNO=dn;
+CASE ROW_COUNT()
+WHEN 0 THEN 
+	SET ifAffectedRow=0;
+ELSE 
+	ALTER TABLE faults_config AUTO_INCREMENT=1;
+END CASE;
+
+IF(ifAffectedRow=1) THEN 
+	COMMIT;
+	SELECT ifAffectedRow INTO ifRowAffected;
+ELSE 
+	ROLLBACK;
+END IF;
+END
+```
+
+
+
+
+
+
 
 #### 联合主键
 
@@ -976,7 +1078,7 @@ https://blog.csdn.net/ZZQHELLO2018/article/details/103784869?utm_medium=distribu
 
 ```mysql
 -- 比如，设置学生选课数据表时，使用学生编号做主键还是用课程编号做主键呢？如果用学生编号做主键，那么一个学生就只能选择一门课程。如果用课程编号做主键，那么一门课程只能有一个学生来选。显然，这两种情况都是不符合实际情况的。实际上设计学生选课表，要限定的是一个学生只能选择同一课程一次。因此，学生编号和课程编号可以放在一起共同作为主键，这也就是联合主键了。
-PRIMARY KEY(`student_id`, `course_id`
+PRIMARY KEY(`student_id`, `course_id`)
 ```
 
 #### 唯一主键
@@ -1020,7 +1122,7 @@ WHERE t1.LineNO='001'
 ORDER BY t1.`NO`;
 ```
 
-### （2）去掉空格
+### （2）去掉查询结果的空格
 
 Trim(field)	//去掉field左右两侧的空格
 
@@ -1130,10 +1232,10 @@ https://www.cnblogs.com/yuezc/p/12149234.html
   已知出生年份birth，获得年龄
 
 ```mysql
-//查询2020年9月所有订单
+#查询2020年9月所有订单
 SELECT `id`,`name` 
 FROM orders
-WHERE Date(order_date) BETWEEN '2020-9-01' AND '2020-9-30';	//需要知道月中有多少天
+WHERE Date(order_date) BETWEEN '2020-9-01' AND '2020-9-30';	#需要知道月中有多少天
 ```
 
 ```mysql
@@ -1290,7 +1392,7 @@ mysql> SELECT md5('123456');
 
 ## 13. ORDER BY
 
-用GROUP BY/HAVING过滤后，显示，注意用ORDER BY排序。
+用GROUP BY/HAVING过滤后显示，注意用ORDER BY排序。
 
 ```mysql
 SELECT `prod_id`,COUNT(*) AS `prod_num`	//显示prod_id和prod_num
@@ -1300,7 +1402,15 @@ HAVING COUNT(*)>=2;
 ORDER BY `prod_num`;                    //按照prod_num排序
 ```
 
+* 可以同时按照多个field进行排序
 
+  **首先按照第一个filed排序，在第一个filed相同的情况下，再按照第二个field排序。**
+
+  ```mysql
+  SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,tmp.`total` FROM
+  (SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,COUNT(`goods_id`) AS 'total' FROM goods ORDER BY `cat_id` ASC,`goods_id` DESC) AS tmp
+  GROUP BY `cat_id`; -- `cat_id` ASC,`goods_id` DESC 表示在cat_id相同的情况下goods_id降序
+  ```
 
 ## 14. LIMIT
 
@@ -1339,6 +1449,27 @@ SELECT * FROM t_name ORDER BY `age` desc LIMIT 4,2;		-- 第三页
 
 ## 15.分组——GROUP BY（重点）
 
+> group by因为只能select聚合函数和分组filed，所以如果子查询中要涉及到group by，尽量把分组查询的过程放在子查询中，
+>
+> 查出子表再去和其他表联结处理，从而select最后的几个字段结果。分组查询的结果可以减少表中记录，再和其他表联结，也提高效率。（分组放在最后的外层查询，field显示不好写），如：
+>
+> ```mysql
+> # T2-6的解法不要写成：
+> with t3 as 
+> (select t1.Sid as sid,t1.Cid as cid,t2.Cname as cname from sc as t1 LEFT JOIN course as t2 on t1.Cid=t2.Cid)
+> select t3.cname,count(t3.sid) from t3 GROUP BY t3.cid	-- t3.name取不到
+> 
+> # 写成：
+> WITH t1 as (select Cid,count(Sid) as count
+> from sc
+> GROUP BY `Cid`)
+> 
+> select t1.count,t2.Cname from t1 INNER JOIN course as t2 
+> on t1.Cid = t2.Cid
+> ```
+>
+> 
+
 ### （1）注意事项
 
 * GROUP BY指定分组依据的字段
@@ -1351,13 +1482,13 @@ SELECT * FROM t_name ORDER BY `age` desc LIMIT 4,2;		-- 第三页
   > 文中使用的是5.7版本，默认是按照这种规范来的。
   > mysql早期的一些版本，没有上面这些要求，select后面可以跟任何合法的列  
 
-* **特别的，若SELECT后不是聚合函数，也非GROUP BY后的字段，则显示原始表格分组后分组中第一条记录的该字段值，不受前面几个SELECT字段的影响。**
+* **特别的，若SELECT后不是聚合函数，也非GROUP BY后的字段，则显示原始表格分组后分组中第一条记录的该字段值，不受前面几个SELECT字段的影响。不要这么用！似乎新版本的MySQL不支持？**
 
   ```mysql
   -- 需求：获取每个用户下单的最大金额及下单的年份，输出：用户id，最大金额，年份
   -- 错误写法：
   mysql> select
-  user_id 用户id, max(price) 最大金额, the_year 年份
+  user_id AS 用户id, max(price) AS 最大金额, the_year AS 年份
   FROM t_order t
   GROUP BY t.user_id;
   +----------+--------------+--------+
@@ -1390,7 +1521,7 @@ SELECT * FROM t_name ORDER BY `age` desc LIMIT 4,2;		-- 第三页
   > 1001|88.88|2017中显示的2017不是88.88的年份，**而与前两个字段无关**，显示的是分组中第一条记录1001|11.11|2017的值2017。
 
 ```mysql
--- 正确写法：
+# 正确写法：
 SELECT
 user_id 用户id,
 price 最大金额,
@@ -1399,7 +1530,7 @@ FROM
 t_order t1,(SELECT
 t.user_id uid, MAX(t.price) pc
 FROM
-t_order t
+t_order AS t
 GROUP BY t.user_id) t2
 WHERE
 t1.user_id = t2.uid
@@ -1425,7 +1556,7 @@ GROUP BY `prod_id`;					   //从products中按照prod_id分组
 ### （3）多字段分组
 
 ```mysql
-mysql> SELECT
+SELECT
 user_id 用户id, the_year 年份, COUNT(id) 下单数量
 FROM
 t_order
@@ -1446,6 +1577,8 @@ GROUP BY user_id , the_year;
 ### （4）分组前筛选数据——WHERE
 
 WHERE在分组前对行进行过滤
+
+不跟聚合函数
 
 ```mysql
 SELECT
@@ -1474,6 +1607,8 @@ GROUP BY user_id;
 HAVING后只可跟**聚合函数、分组依据字段**进行筛选。
 
 WHERE控制那些行进入分组。
+
+HAVING后也可跟`BETWEEN`
 
 ```mysql
 SELECT
@@ -1658,9 +1793,11 @@ date_format(now(),'%Y%m%d%H%i%s') as col2;
 
 ## 17.并集——UNION
 
-https://blog.csdn.net/mine_song/article/details/70184072
-
-https://www.jb51.net/article/65696.htm
+> https://blog.csdn.net/mine_song/article/details/70184072
+>
+> https://www.jb51.net/article/65696.htm
+>
+> 作用：合并多条记录
 
 MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但是对于交集Intersect、差集Except，就没有实现了。
 
@@ -1681,6 +1818,9 @@ MySql只支持Union(并集)集合运算，好像也是4.0以后才有的；但�
 ## 18.约束
 
 ## 19.子查询（重点）
+
+> * MySQL8.0开始可用`with t1 as(...)`写子句，非常方便
+> * 多个表互相关联select时候，filed写全称也有好处，比`as t1``as t2`这种写法好
 
 https://blog.csdn.net/weixin_35782148/article/details/113089077
 
@@ -1739,7 +1879,7 @@ https://www.cnblogs.com/zhuiluoyu/p/5822481.html
 ​    **子查询作为表必须取别名，否则这张表没有名称则无法访问表中的字段** 。注意：用临时表的别名引用字段时，反引号括住字段名，临时表名不要括住。
 
 ```mysql
- SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,tmp.`total` FROM
+SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,tmp.`total` FROM
 (SELECT `goods_id`,`goods_name`,`cat_id`,`shop_price`,COUNT(`goods_id`) AS 'total' FROM goods ORDER BY `cat_id` ASC,`goods_id` DESC) AS tmp
 GROUP BY `cat_id`; -- `cat_id` ASC,`goods_id` DESC 表示在cat_id相同的情况下goods_id降序
 ```
@@ -1752,14 +1892,14 @@ GROUP BY `cat_id`; -- `cat_id` ASC,`goods_id` DESC 表示在cat_id相同的情�
 
   不规范的用法？？？
   
-  A：见14分组，当SELECT后跟的字段不是分组依据字段或聚合函数时，只显示分组的第一条记录。
+  A：见14分组，**当SELECT后跟的字段不是分组依据字段或聚合函数时，只显示分组的第一条记录。**
 
-#### ——with as将临时表作为变量再操作
+#### with t1 as将临时表作为变量再操作，非常好用！！
 
 **MySQL8.0以上版本的特性，版本低于8.0使用该语法将会显示错误**
 
 ```mysql
-SELECT a.name FROM 
+SELECT t1.name FROM 
 (
 SELECT name, gender FROM employee
 )AS t1
@@ -1770,6 +1910,11 @@ WITH t1 AS(
 SELECT name,gender FROM emplyee
 )
 SELECT t1.gender='man';
+```
+
+```mysql
+with t1 as (SELECT deptno from emp where sal > (SELECT avg(sal) from emp ))
+SELECT * from dept where deptno in(SELECT deptno from t1)
 ```
 
 ```mysql
@@ -1947,14 +2092,14 @@ ERROR 1048 (23000): Column 'a' cannot be null
 ```
 
 #### 因为NULL的情况确实比较难以处理，容易出错，最有效的方法就是避免使用NULL。所以，强烈建议创建字段的时候字段不允许为NULL，设置一个默认值。  
-> 任何值和NULL使用运算符（>、<、>=、<=、!=、<>）或者（in、not in、any/some、all），
+> 任何值和NULL使用运算符（>、<、>=、<=、<>）或者（in、not in、any/some、all），
 > 返回值都为NULL
 > 当IN和NULL比较时，无法查询出为NULL的记录
 > 当NOT IN 后面有NULL值时，不论什么情况下，整个sql的查询结果都为空
 > 判断是否为空只能用IS NULL、IS NOT NULL
 > count(字段)无法统计字段为NULL的值，count(*)可以统计值为null的行
 > 当字段为主键的时候，字段会自动设置为not null
-> NULL导致的坑让人防不胜防，强烈建议创建字段的时候字段不允许为NULL，给个默认值  
+> **NULL导致的坑让人防不胜防，强烈建议创建字段的时候字段不允许为NULL，给个默认值**  
 
 ### (5)练习
 
@@ -2020,13 +2165,17 @@ WHERE `sal`>
 SELECT * FROM 
 emp
 WHERE `sal`>(SELECT MAX(`sal`) FROM emp WHERE `deptno`=10);
+
+select * from
+emp
+where `sal` > ALL(select `sal` from emp where deptno=10)
 ```
 
 ```mysql
 -- 3.获取员工的名字和部门的名字
-SELECT ename,(SELECT dname FROM dept WHERE dept.deptno=emp.deptno) AS `dept_name`
-FROM emp
-ORDER BY ename;
+ SELECT t1.`ename`,t2.`dname`
+ from emp as t1 INNER JOIN dept as t2
+ ON t2.deptno = t1.deptno
 ```
 
 ```mysql
@@ -2171,9 +2320,8 @@ WHERE `Tname` LIKE '数%';
 
 ```mysql
 -- 3.查询男生、女生人数
-SELECT `Ssex` AS '性别',COUNT(*)
-FROM student
-ORDER BY `Ssex`;
+select count(*) as 'count',Ssex from student
+GROUP BY Ssex 
 ```
 
 ```mysql
@@ -2197,33 +2345,32 @@ HAVING COUNT(Sname)>1;
 
 ```mysql
 -- 6.查询每门课程选修人数
-SELECT (SELECT `Cname` FROM course WHERE course.Cid=sc.Cid) AS '课程名称',COUNT(`Sid`)
-FROM sc
-GROUP BY `Cid`;
--- 解法2：
-SELECT course.Cname,COUNT(*) 
-FROM course INNER JOIN sc ON sc.Cid=course.Cid
-GROUP BY course.Cname
-ORDER BY course.Cname;
+select t2.Cname,t1.count
+from 
+(select Cid,count(Sid) as count
+from sc
+GROUP BY `Cid`) as t1 LEFT JOIN course as t2
+on t1.Cid=t2.Cid;
+
+-- solve2:
+WITH t1 as (
+select Cid,count(Sid) as count
+from sc
+GROUP BY `Cid`
+)
+select t1.count,t2.Cname from t1 INNER JOIN course as t2 
+on t1.Cid = t2.Cid;
 ```
 
 ```mysql
 -- 7.查询每门课程的平均成绩
-SELECT AVG(score) AS avgScore,(SELECT `Cname` FROM course WHERE course.`Cid`=sc.`Cid`) AS courseName
-FROM sc
-GROUP BY `Cid`;
-
--- 解法2：
-SELECT course.Cname,AVG(sc.score)
-FROM course INNER JOIN sc ON course.Cid=sc.Cid
-GROUP BY course.Cname
-ORDER BY course.Cid;
-
-#############################
-
-select t2.Cname,t1.avgScore from
-(select Cid,avg(SC.score) as avgScore from SC GROUP BY Cid) as t1 inner join Course as t2 
-on t1.cid=t2.Cid;
+with t1 as (
+select AVG(`score`) as avgscore,`Cid`
+from sc
+GROUP BY `Cid`
+)
+SELECT t1.avgscore,t2.Cname from t1 LEFT JOIN course as t2
+on t1.Cid=t2.Cid;
 ```
 
 ```mysql
@@ -2256,28 +2403,33 @@ UNION
 
 -- UNION组合的几个SELECT语句最好用括号括起来，若不括起来，LIMIT、ORDER BY语句在最后一个SELECT语句后，会影响整个查询结果，而不仅仅是最后一个SELECT。
 
--- 下面的代码中，最后的ORDER BY将覆盖第一个SELECT中按照Cid升序排序，整个表降序排序；LIMIT 3将整个表只显示3行
+# error 
+# 下面的代码中，最后的ORDER BY将覆盖第一个SELECT中按照Cid升序排序，整个表降序排序；LIMIT 3将整个表只显示3行
 (SELECT * 
 FROM sc
 WHERE `Cid`=(SELECT `Cid` FROM course WHERE `Cname`='语文')
-ORDER BY `Cid`
+ORDER BY `score` desc
 LIMIT 3)
 UNION 
 (SELECT * 
 FROM sc
 WHERE `Cid`=(SELECT `Cid` FROM course WHERE `Cname`='数学')
+order by score desc
 LIMIT 3)
 UNION
 SELECT * 
 FROM sc
 WHERE `Cid`=(SELECT `Cid` FROM course WHERE `Cname`='英语')
-ORDER BY `Cid` DESC
+ORDER BY score desc
 LIMIT 3;
 ```
 
 ```mysql
 -- 9.查询选修过任一课程的学生的学生信息
-
+SELECT student.* from
+(
+SELECT Sid from sc GROUP BY Sid HAVING count(Cid)>0
+) as t1 left join student on t1.Sid=student.Sid
 ```
 
 ```mysql
@@ -2312,9 +2464,10 @@ FROM student
 WHERE `Sid` IN (SELECT `Sid` FROM sc GROUP BY `Sid` HAVING COUNT(`Cid`)=(SELECT COUNT(`Cid`) FROM course));
 
 -- 解法2：
-SELECT * FROM student INNER JOIN 
-(SELECT sc.Sid FROM sc GROUP BY sc.Sid HAVING COUNT(sc.Cid)=(SELECT COUNT(course.Cid) FROM course)) AS tmp
-ON student.Sid=tmp.Sid
+SELECT student.* from
+(
+SELECT Sid from sc GROUP BY Sid HAVING count(Cid)=(SELECT count(Cid) from course)
+) as t1 left join student on t1.Sid=student.Sid
 ```
 
 ```mysql
@@ -2322,11 +2475,15 @@ ON student.Sid=tmp.Sid
 -- 解法1：
 SELECT * 
 FROM student 
-WHERE `Sid` IN (SELECT `Sid` FROM sc GROUP BY `Sid` HAVING COUNT(`Cid`)<(SELECT COUNT(`Cid`) FROM course));
+WHERE `Sid` IN (SELECT `Sid` FROM sc GROUP BY `Sid` HAVING COUNT(`Cid`)<(SELECT COUNT(`Cid`) FROM course) and COUNT(`Cid`)>1);
 -- 解法2：
 SELECT * 
 FROM student 
 WHERE `Sid` NOT IN (SELECT `Sid` FROM sc GROUP BY `Sid` HAVING COUNT(`Cid`)=(SELECT COUNT(`Cid`) FROM course));
+# solution3：
+select student.* from student RIGHT JOIN
+(SELECT Sid,count(Cid) from sc GROUP BY Sid HAVING count(Cid) BETWEEN 1 and (SELECT count(Cid) from course )) as t1
+on t1.Sid=student.Sid
 ```
 
 ```mysql
@@ -2337,7 +2494,10 @@ FROM student;
 
 ```mysql
 -- 15.查询所有学生的姓名、课程名称和分数
-
+SELECT student.Sname,course.Cname,score
+FROM sc 
+LEFT JOIN course on sc.Cid=course.Cid
+LEFT JOIN student on sc.Sid=student.Sid
 ```
 
 
@@ -2438,7 +2598,7 @@ mysql> select * from test1 t1,test2 t2 where t1.a = t2.b;
 for(Object eleA : A){
 	for(Object eleB : B){
 		if(连接条件是否为true){
-			System.out.print(eleA+","+eleB);
+			print(eleA+","+eleB);
 		}
 	}
 }
@@ -2504,12 +2664,6 @@ select t1.emp_name,t2.team_name from t_employee t1, t_team t2 where
 t1.team_id = t2.id and t2.team_name = '架构组';
 ```
 
-建议使用笛卡尔积+WHERE语法，简洁：
-
-```mysql
-select 字段 from 表1, 表2, 表3 [where 关联条件];  
-```
-
 
 
 ![img](https://i.loli.net/2021/11/15/DEICQmyYqB8gfjX.png)
@@ -2551,6 +2705,10 @@ ORDER BY t1.`NO`;
 
 ### （3）左联结/右联结
 
+> 使用方法：A表内容都要显示，但是里面有field需要“翻译”成表B里面的一个filed，用A左联B。
+>
+> 如T2-15题。
+
 https://blog.csdn.net/weixin_39608063/article/details/113187275
 
 左连接查询达到了同样的效果，但是不会有其它冗余数据，查询速度快，消耗内存小，而且使用了索引。左连接查询效率相比于全相乘的查询效率快了10+倍以上。
@@ -2590,7 +2748,7 @@ ORDER BY t1.`NO`;
 一张表看成两张表，要取2个别名。否则字段指定存在歧义。
 
 ```mysql
-select e.ename '无领导ename',le.ename '领导ename'
+select e.ename AS '无领导ename',le.ename AS '领导ename'
      from emp e(表别名) left join emp le
      on e.leaderid = le.eid;
 ```
@@ -2735,7 +2893,7 @@ mysql> SELECT * FROM t_user;
 7 rows in set (0.00 sec)
 ```
 
-#### CASE-WHEN-THEN
+#### CASE-WHEN-THEN-END
 
 数据SQL CASE 表达式是一种通用的条件表达式，**类似于其它语言中的switch语句**。
 
@@ -2818,12 +2976,12 @@ END CASE;
 
 ```mysql
 SELECT
-t.name 姓名,
+t.name '姓名',
 (CASE t.sex
 WHEN 1 THEN '男'
 WHEN 2 THEN '女'
 ELSE '未知' 
-END) 性别
+END) '性别'
 FROM t_stu t;
 ```
 
@@ -2984,7 +3142,7 @@ https://blog.csdn.net/qq_41174684/article/details/91350623
 #### 表已建立后创建索引
 
 ```mysql
-CREATE INDEX indexName ON t_name (`fieldName`);
+CREATE INDEX indexName ON t_name(`fieldName`);
 ```
 
 #### 修改表结构——添加索引
@@ -3002,7 +3160,7 @@ ALTER TABLE dept ADD INDEX index1(`deptno`);
 CREATE TABLE t_name(  
 `ID` INT NOT NULL,   
 `username` VARCHAR(16) NOT NULL,  
-INDEX [indexName] (username(length))  
+INDEX [indexName] (username(16))  
 );  
 ```
 
@@ -3165,11 +3323,11 @@ https://blog.csdn.net/weixin_39641173/article/details/113945257?utm_medium=distr
 
 * 使用保留点
 
-  SAVAPOINT P1
+  SAVEPOINT P1
 
   ROLLBACK TO P1
 
-  使用savepoint回滚难免有些性能消耗，一般可以用IF改写
+  **使用savepoint回滚难免有些性能消耗，一般可以用IF配合ROW_COUNT()判断语句是否执行成功，进行commit或rollback**
 
   savepoint的良好使用的场景之一是“嵌套事务”，你可能希望程序执行一个小的事务，但是不希望回滚外面更大的事务
 
@@ -3194,12 +3352,15 @@ UPDATE table1 SET field1='aaa' WHERE type=1;
 UPDATE table2 SET field2='bbb' WHERE type=1;
 COMMIT;//或ROLLBACK;
 END;
+SET AUTOCOMMIT=1
 ```
 
 ### （5）优化查询——只读事务
 
 ```mysql
-START TRANSACTION READ ONLY;
+START TRANSACTION READ ONLY;	-- 启动一个只读事务
+SELECT * FROM employees;	-- 查询employees表中的所有记录
+COMMIT	-- 结束只读事务
 ```
 
 表示在事务中执行的是一些只读操作，如查询，但是不会做insert、update、delete操作，**数据库内部对只读事务可能会有一些性能上的优化**  
@@ -3579,6 +3740,10 @@ END
 
 declare用于定义局部变量变量，**在存储过程和函数中通过declare定义变量在begin...end中，且在语句之前。**并且可以通过重复定义多个变量。declare变量的作用范围同编程里面类似，在这里一般是在对应的begin和end之间。在end之后这个变量就没有作用了，不能使用了。这个同编程一样。  
 
+```mysql
+DECLARE ifAffectedRow TINYINT(1) DEFAULT 1;
+```
+
 **局部变量的定义DECLARE只能写在开头？否则报错？**
 
 ![image-20211123144256331](https://i.loli.net/2021/11/23/pGtHYeRCJZf6Mou.png)
@@ -3630,9 +3795,51 @@ insert into employees (first_name,email) values (@first_name,@email);
 
 ---
 
-## 25. 存储过程
+## 25. 存储过程Procedure【sql脚本】
 
-存储过程类似批处理脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
+> 存储过程也就是sql脚本，但脚本未经编译。存储过程经过预编译，执行时不需要再次编译。
+>
+> **调试：**通过select打印变量调试脚本
+>
+> ```mysql
+> DROP PROCEDURE IF EXISTS initDtSideTileBar;
+> CREATE PROCEDURE initDtSideTileBar()
+> BEGIN
+> DECLARE different_device_num INT DEFAULT 0;
+> DECLARE colname VARCHAR(20);
+> DECLARE SQL_FOR_SELECT varchar(1000);
+> DECLARE ii INT(10) DEFAULT 2;
+> 
+> SELECT COUNT(*) INTO different_device_num FROM device;
+> 
+> -- SELECT 打印变量调试
+> -- SELECT different_device_num;
+> 
+> SET SQL_FOR_SELECT='SELECT device_config.LineNO ,DeviceStatus_001';
+> 
+> a:WHILE ii<=different_device_num DO
+> 	SELECT deviceNO INTO colname FROM device WHERE NO=ii;
+> 	SET SQL_FOR_SELECT=CONCAT(SQL_FOR_SELECT, '+DeviceStatus_', colname);
+> 	SET ii=ii+1;
+> END WHILE;
+> 
+> SET SQL_FOR_SELECT=CONCAT(SQL_FOR_SELECT, ' AS DeviceTotalNum FROM device_config');
+> 
+> SET SQL_FOR_SELECT=CONCAT('SELECT t1.LineNO,t2.LineName,t1.DeviceTotalNum FROM (', SQL_FOR_SELECT, ') AS t1 INNER JOIN productionline AS t2 ON t1.LineNO=t2.LineNO;');
+> 
+> -- SELECT SQL_FOR_SELECT;
+> 
+> SET @sql=SQL_FOR_SELECT;
+> PREPARE stmt FROM @sql;
+> EXECUTE stmt;
+> DEALLOCATE PREPARE stmt;
+> 
+> END
+> ```
+>
+> 
+
+
 
 ### （1）概念
 
@@ -3687,17 +3894,14 @@ DELIMITER $
 CREATE PROCEDURE proc()
 BEGIN
 	SELECT * FROM t_name;
-END//
+END $
 
 DELIMITER ;
 ```
 
 ```mysql
 DELIMITER $
-CREATE PROCEDURE func(
-	OUT para1 VARCHAR(255),
-	OUT para2 INT(10)
-)
+CREATE PROCEDURE func(OUT para1 VARCHAR(255),OUT para2 INT(10))
 BEGIN
 	SELECT name FROM t1_name INTO para1;
 	SELECT age FROM t2_name INTO para2;
@@ -3708,7 +3912,7 @@ DELIMITER ;
 
 > * **OUT声明参数是传出存储过程的**
 > * **IN声明参数是传入存储过程的**
-> * **INTO语句表示将语句结果保存到变量para中**
+> * **INTO语句表示将语句结果保存到变量para中**。
 
 ```mysql
 -- 显示创建该存储过程的语句
@@ -3722,8 +3926,7 @@ DROP PROCEDURE IF EXISTS proc3;
 /*设置结束符为$*/
 DELIMITER $
 /*创建存储过程proc3*/
-CREATE PROCEDURE proc3(id int,age int,in name varchar(16),out user_count int,out
-max_id INT)
+CREATE PROCEDURE proc3(in id int,in age int(3),in name varchar(16),out user_count int,out max_id INT)
 BEGIN
 INSERT INTO t_user VALUES (id,age,name);
 /*查询出t_user表的记录，放入user_count中,max_id用来存储t_user中最小的id*/
@@ -3733,7 +3936,7 @@ END $
 DELIMITER ;
 
 /*创建了3个自定义变量*/
-SELECT @id:=4,@age:=55,@name:='郭富城';
+SET @id=4,@age=55,@name='郭富城';
 /*调用存储过程*/
 CALL proc3(@id,@age,@name,@user_count,@max_id);
 ```
@@ -3744,7 +3947,7 @@ DROP FUNCTION IF EXISTS get_user_id;
 /*设置结束符为$*/
 DELIMITER $
 /*创建函数*/
-CREATE FUNCTION get_user_id(v_name VARCHAR(16))
+CREATE FUNCTION get_user_id(in v_name VARCHAR(16))
 returns INT
 BEGIN
 DECLARE r_id int;
@@ -3770,7 +3973,7 @@ CALL func(@paraName, @paraAge);	//传递两个变量给存储过程
 > * **显示变量**
 >
 >   ```mysql
->   SELECT @paraName, @paraAge;
+>   SELECT @paraName, @paraAge;	#显示获取的结果
 >   ```
 
 ```mysql
@@ -3778,7 +3981,7 @@ CALL func(@paraName, @paraAge);	//传递两个变量给存储过程
 DELIMITER $
 CREATE PROCEDURE totalStudentEAchClass(IN classNO VARCHAR(255), OUT totalStudent INT(10))
 BEGIN
-	SELECT COUNT(studentID) FROM student WHERE classID=classNO INTO totalStudent; 
+	SELECT COUNT(studentID) INTO totalStudent FROM student WHERE classID=classNO; 
 END $
 DELIMITER ;
 
@@ -3804,17 +4007,14 @@ SHOW PROCEDURE STATUS;
 
 ```mysql
 DELIMITER $
-CREATE PROCEDURE ordertotal(
-	IN onumber INT,
-    IN taxable BOOLEAN,
-    OUT ototal DECIMAL(8,2)
-) COMMENT 'Obatin order total,optionally adding tax'
+CREATE PROCEDURE ordertotal(IN onumber INT,IN taxable BOOLEAN,OUT ototal DECIMAL(8,2)) 
+COMMENT 'Obatin order total,optionally adding tax'
 BEGIN
 
 	-- Declare variable for total
     DECLARE total DECIMAL(8,2);
     -- Declare tax percentage
-    DECLARE taxrate INT DEFAULT 6;
+    DECLARE taxrate INT DEFAULT 6;	# DEFAULT设定初始值
     
     -- Get the order total
     SELECT Sum(item_price*quantity)
@@ -3836,14 +4036,14 @@ END $
 DELIMITER ;
 ```
 
-### （9）字段名、表名作为变量传入存储过程进行查询，必须用动态SQL
+### （9）动态SQL——字段名、表名作为变量传入存储过程进行查询
 
 https://www.cnblogs.com/fenxiangheiye/archive/2013/02/18/Mysql.html
 
 ```mysql
 -- 动态SQL
 -- SQL_FOR_SELECT局部变量，保存最终执行的SQL语句
-CREATE PROCEDURE `proc1`(IN colname varchar(20))
+CREATE PROCEDURE proc1(IN colname varchar(20))
 BEGIN 
 DECLARE SQL_FOR_SELECT varchar(255);
 SET SQL_FOR_SELECT=CONCAT('SELECT `',colname,'` FROM device');
@@ -3894,10 +4094,6 @@ EXECUTE stmt;
 DEALLOCATE PREPARE stmt;
 
 END
-```
-
-```mysql
-
 ```
 
 
@@ -4095,21 +4291,23 @@ END IF;
 END
 ```
 
-
-
-
-
-
-
 ### （14）存储过程的导出导入
 
 https://jingyan.baidu.com/article/b7001fe1b162d80e7282ddcc.html
+
+* 导出：
+
+  得到1个整体.sql文件，可包含：表、过程
 
 ![image-20211123101611546](https://i.loli.net/2021/11/23/r2iIKCJXsjDYtxV.png)
 
 ![image-20211123101710673](https://i.loli.net/2021/11/23/CNTHqZFelxtrEhw.png)
 
+勾选需要导出的：
+
 ![image-20211123101805218](https://i.loli.net/2021/11/23/RXJyztoaiWhLjBv.png)
+
+* 导入：
 
 ![image-20211202165717296](https://i.loli.net/2021/12/02/XSyKrsu1xfZMiO3.png)
 
@@ -4446,15 +4644,35 @@ https://www.cnblogs.com/FengGeBlog/p/9974207.html
 
 ### （3）导出导入查询
 
+***一条查询对应一个.sql文件，导入时将文件放入文件夹即可，在查询页面F5刷新即可看见保存的查询***
+
 ![image-20211202165828229](https://i.loli.net/2021/12/02/19mqr7p53aZvEUy.png)
 
 ![image-20211202165856363](https://i.loli.net/2021/12/02/vmH9rC6QF7WotPy.png)
 
-***一条查询对应一个.sql文件，导入时将文件放入文件夹即可，在查询页面F5刷新即可看见保存的查询***
 
-### （4）表、存储过程、视图一起导出
 
-见24.存储过程—(14)
+### （4）表、存储过程导出导入
+
+这个方法不能备份【查询】
+
+整体打包：nb3文件。通过【备份】导出导入。
+
+nb3一般用来本地备份。
+
+### （5）表、存储过程、视图一起导出
+
+这个方法不能备份【查询】
+
+表、存储过程：导出：【工具】->【数据传输】->【文件】，导入：库上右键->【运行SQL文件】
+
+这个一般用于传输，不选【文件】选【连接】通过网络传输。
+
+> .nb3和.sql文件大小有些差异。
+
+### （6）备份查询
+
+查询：打开查询保存文件夹，拷贝。
 
 
 

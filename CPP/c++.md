@@ -684,7 +684,7 @@ int main()
 
 2. 因为返回的是局部变量的地址，因此数组应开辟在堆区以避免被系统回收。
 
-   new数组或者将局部变量的数组声明为静态static。
+   new1个数组或者将局部变量的数组声明为静态static。
 
 3. 返回值除了包含指针，还应该包含数组长度。（因为sizeof(指向首地址的指针)==4，而不是数组的长度）。
 
@@ -2154,6 +2154,10 @@ int main()
 
 ### （3）实现原理
 
+> https://www.zhihu.com/question/389546003/answer/3495215627
+
+虚表是c++编译器实现这种多态的一种方式。
+
 虚函数表VFtable，存有该类中所有虚函数的入口地址的数组。
 
 虚表指针vptr，指向该类的虚函数表，32为系统下4字节。
@@ -2200,17 +2204,190 @@ int main()
 
 ## 38. RTTI
 
+> RTTI是”Runtime Type Information”的缩写，意思是运行时类型信息，它提供了运行时确定对象类型的方法。
+>
+> 阅读这篇文章：https://www.jianshu.com/p/3b4a80adffa7
+>
+> ```cpp
+> #include <typeinfo>
+> ```
+
+### （1）获取类型
+
+```cpp
+std::type_info typeid();	
+
+const char* std::type_info::name();	//获取类型
+
+type_info类中重载的==和!=比较两个对象的类型是否相等
+```
+
+```cpp
+#include <iostream>
+#include <typeinfo>
+using namespace std;
+
+int main()
+{
+     short s = 2;
+     unsigned ui = 10;
+     int i = 10;
+     char ch = 'a';
+     wchar_t wch = L'b';
+     float f = 1.0f;
+     double d = 2;
+
+     cout<<typeid(s).name()<<endl; // short
+     cout<<typeid(ui).name()<<endl; // unsigned int
+     cout<<typeid(i).name()<<endl; // int
+     cout<<typeid(ch).name()<<endl; // char
+     cout<<typeid(wch).name()<<endl; // wchar_t
+     cout<<typeid(f).name()<<endl; // float
+     cout<<typeid(d).name()<<endl; // double
+
+     return 0;
+}
+```
+
+```cpp
+#include <iostream>
+#include <typeinfo>
+using namespace std;
+
+class A
+{
+public:
+     virtual void Print() { cout<<"This is class A."<<endl; }
+};
+
+class B : public A
+{
+public:
+     void Print() { cout<<"This is class B."<<endl; }
+};
+
+class C : public A
+{
+public:
+     void Print() { cout<<"This is class C."<<endl; }
+};
+
+void Handle(A *a)
+{
+     if (typeid(*a) == typeid(A))
+     {
+          cout<<"I am a A truly."<<endl;
+     }
+     else if (typeid(*a) == typeid(B))
+     {
+          cout<<"I am a B truly."<<endl;
+     }
+     else if (typeid(*a) == typeid(C))
+     {
+          cout<<"I am a C truly."<<endl;
+     }
+     else
+     {
+          cout<<"I am alone."<<endl;
+     }
+}
+
+int main()
+{
+     A *pA = new B();
+     Handle(pA);
+     delete pA;
+     pA = new C();
+     Handle(pA);
+     return 0;
+}
+```
+
+### （2）编译期和运行时类型
+
+```cpp
+#include <iostream>
+#include <typeinfo>
+using namespace std;
+
+class A
+{
+public:
+     void Print() { cout<<"This is class A."<<endl; }
+};
+
+class B : public A
+{
+public:
+     void Print() { cout<<"This is class B."<<endl; }
+};
+
+int main()
+{
+     A *pA = new B();
+     cout<<typeid(pA).name()<<endl; // class A *
+     cout<<typeid(*pA).name()<<endl; // class A
+     return 0;
+}
+```
+
+```cpp
+#include <iostream>
+#include <typeinfo>
+using namespace std;
+
+class A
+{
+public:
+     virtual void Print() { cout<<"This is class A."<<endl; }
+};
+
+class B : public A
+{
+public:
+     void Print() { cout<<"This is class B."<<endl; }
+};
+
+int main()
+{
+     A *pA = new B();
+     cout<<typeid(pA).name()<<endl; // class A *
+     cout<<typeid(*pA).name()<<endl; // class B
+     return 0;
+}
+```
+
+将Print函数变成了虚函数，输出结果就不一样了，这说明什么？
+
+这就是RTTI在捣鬼了，**当类中不存在虚函数时**，typeid是编译时期的事情，也就是静态类型，就如上面的`cout<<typeid(*pA).name()<<endl;`输出class A一样；
+
+**当类中存在虚函数时**，typeid是运行时期的事情，也就是动态类型，就如上面的`cout<<typeid(*pA).name()<<endl;`输出class B一样，关于这一点，我们在实际编程中，经常会出错，一定要谨记
+
+
+
 
 
 ## 39. viotile
 
 
 
-
-
-
+## 40. 动态库和静态库
 
 ---
+
+* 根据编译方式不同，库分为静态库、动态库，分别为**静态编译、动态编译**，这两个仅仅只是库编译方式的不同，生成不同的库而已。
+
+* 静态库会一起打包到可执行文件里。动态库是可执行文件运行时将库文件加载到进程地址空间。
+
+* 静态库发生改变时，需要重新编译来生成新的可执行文件。动态库发生改变时，不需要重新编译。
+
+* 动态库的加载方法有2种，一种是通过编译链接工具如：cmake进行链接。这种情况，库加载到内存时是程序刚开始执行时。
+
+  另一种是通过代码在运行时加载动态库，C#种使用`Assembly.LoadFile(dllpath)`，C++中可使用`dlopen()`来加载动态库。
+
+  后面一种方式的优点在于，可以根据代码中的条件动态的选择加载哪个库。前者是在编译期由开发者决定加载哪个库。
+
+## 41. dlopen()加载库文件
 
 # 二、STL
 
@@ -4543,32 +4720,74 @@ int main()
 > ```cpp
 > #include <thread>
 > ```
+>
+> ```cpp
+> //args是传入到func的参数
+> std::thread th(func, args);	//传入一个函数或是一个可调用对象，如lambda
+> 
+> //一般放在主线程里，主线程阻塞在该语句，等待子线程执行完毕。
+> //创建的线程必须要join()
+> //也可以放在其他子线程（要确保这个子线程不会结束）
+> th.join();
+> 
+> //当前线程休眠
+> std::this_thread::sleep_for(std::chrono::microseconds(100));	//seconds休眠单位秒
+> 
+> //获取当前线程ID
+>  std::this_thread::get_id();
+> 
+> 
+> //分离子线程。放在当前子线程执行的任务代码中。
+> //主线程可以结束。子线程在后台执行
+> th.detach();
+> 
+> //判断子线程是否可以调用join
+> //有的线程不能使用join，使用join会报错system_error。所以调用join前一般使用joinable()判断一下
+> bool th.joinable();
+> ```
+>
+> ```cpp
+> //传入函数构造线程
+> std::thread(func);
+> //传入可执行对象lambda构造线程
+> std::thread([](){
+>     func();
+> })
+> ```
+>
+> 
 
 * 一创建就开始执行func
 
 * **std::thread创建的线程必须在主线程或其他一直存在的线程中join()或detach()**。否则会报错。
 
-* **`std::thread`作为类成员变量，不能通过new创建，怎么绑定执行函数？**
+* 子线程结束
+
+  任务函数里调用`return`后子线程就会结束，但在主线程中需要`join()`或`detach()`该子线程，子线程的资源才会被销毁。
+
+* **`std::thread`作为类成员变量时，thread不能通过new创建只能thread(func)，怎么绑定执行函数？**
 
   > ```cpp
+  > //任务函数作为静态成员函数。调用时传入通过把this传进去，函数内通过该指针获取成员变量进行操作
+  > //th在构造函数的初始化列表里绑定任务函数
   > class A
   > {
   > private:
-  >     std::thread th1;
-  >     static std::thread th2;
-  >     
+  >  std::thread th1;
+  >  static std::thread th2;
+  > 
   > public:
-  >     void func1(){}
-  >     static func2(){}
-  >     
-  >     A():th1(A::func2){}
+  >  void func1(){}
+  >  static func2(A* a){}
+  > 
+  >  A():th1(A::func2, this){}
   > }
   > ```
   >
 
 * 用`vector<std::thread> v`存线程时，若某个线程元素`detach()`了，线程就与主线程分离，自己执行，可以通过return终止。执行完后，v中该元素还在，但是不能通过访问该元素访问该线程了。
 
-  但是该元素可以通过`erase()`等函数删除。
+  但是该元素还可以通过`erase()`等函数删除。
 
   ```cpp
   std::vector<std::thread> m_threads;
@@ -4587,42 +4806,6 @@ int main()
   	}
   }
   ```
-
-```cpp
-//args是传入到func的参数
-std::thread th(func, args);	//传入一个函数或是一个可调用对象，如lambda
-
-//一般放在主线程里，主线程阻塞在该语句，等待子线程执行完毕。
-//创建的线程必须要join()
-//也可以放在其他子线程（要确保这个子线程不会结束）
-th.join();
-
-//当前线程休眠
-std::this_thread::sleep_for(std::chrono::microseconds(100));	//seconds休眠单位秒
-
-//获取当前线程ID
- std::this_thread::get_id();
-
-
-//分离子线程。放在当前子线程执行的任务代码中。
-//主线程可以结束。子线程在后台执行
-th.detach();
-
-//判断子线程是否可以调用join
-//有的线程不能使用join，使用join会报错system_error。所以调用join前一般使用joinable()判断一下
-bool th.joinable();
-```
-
-```cpp
-//传入函数构造线程
-std::thread(func);
-//传入可执行对象lambda构造线程
-std::thread([](){
-    func();
-})
-```
-
-
 
 
 
@@ -5241,6 +5424,16 @@ int main(int argc, char** args)
 
 https://www.cnblogs.com/qicosmos/p/3534211.html
 
+> 异步编程模型和多线程有什么区别?
+>
+> 异步编程模型和多线程都是提高程序性能和响应能力的技术，但它们在实现机制等方面上存在差异。具体分析如下：
+>
+> 1. **实现机制**：多线程是指在单个进程中创建多个线程，每个线程能够并发执行不同的任务，且这些线程共享进程的内存空间，可以直接通信和共享数据。而异步编程允许程序在执行耗时操作（如I/O）时不阻塞，可以继续执行其他任务。当异步操作完成后，程序通过回调函数、事件或Promise等方式来处理结果。
+> 2. **资源占用和调度**：多线程可以充分利用CPU资源进行并行处理，适合计算密集型任务。然而，过多的线程可能导致上下文切换开销增大，反而降低系统性能。异步编程则更适合I/O密集型任务，它可以在等待I/O操作完成时让出控制权，使得CPU可以执行其他任务，从而提高了整体效率。
+> 3. **适用场景**：多线程适用于需要同时处理多个独立任务的场景，例如服务器处理大量并发请求。异步编程则更适用于那些涉及到大量等待时间的操作，如网络请求、文件读写等，它可以避免程序在等待过程中的闲置。
+>
+> 总的来说，多线程和异步编程各有优势和局限，选择使用哪一种技术取决于具体的应用场景和需求。在实际应用中，这两种技术往往结合使用，以达到最佳的性能表现。
+
 ### （1）std::async
 
 > **获取子线程执行的返回值。**
@@ -5331,12 +5524,18 @@ https://www.cnblogs.com/qicosmos/p/3534211.html
   //阻塞调用线程，直到获取异步返回值
   //若线程执行的函数没有返回值，则get()返回std::future_status::ready表示任务完成
   get();
-  //阻塞调用线程，直到超时，或者获取异步返回值
-  future_status wait_for(std::chrono::microseconds(1000));
+  
+  //阻塞直到线程返回值可获得
+  void wait() const
+  
+  //阻塞调用线程，直到超时或返回值可获得
+  //返回值：状态
+  std::future_status wait_for(std::chrono::microseconds(1000));
   
   //状态
   std::future_status::ready		//任务已完成
   std::future_status::timeout		//规定时间内未完成
+  future_status::deferred  		//任务仍未启动
   ```
   
   ```cpp
@@ -5418,7 +5617,9 @@ int main ()
 
 ### （4）std::packaged_task
 
-> 这个搭配`std::thread`使用。
+> 这个搭配`std::thread`使用
+>
+> **对可调用对象（函数、lambda、bind()返回值）进行包装**
 >
 > 模版参数类型：任务的函数签名。注意！不是任务的返回值类型。
 >
@@ -5427,7 +5628,7 @@ int main ()
 > ```cpp
 > std::packaged_task<int()> task([](){ return 7; });
 > std::thread th([task](){
->     task();		//放到子线程中执行task()
+>  task();		//放到子线程中执行task()
 > });
 > 
 > int res = task.get_future().get();	//th中task()未执行完时，会阻塞在get()
@@ -5527,7 +5728,6 @@ private:
 	std::queue<std::function<void()>> m_tasks;	//任务队列。bind绑定了参数，所以function的模版类型是void()
 	std::vector<std::thread> m_threads;	//线程容器
 };
-
 
 std::mutex mtxfunc;
 int data;
@@ -5659,11 +5859,12 @@ void func()
 
 https://blog.csdn.net/github_18974657/article/details/108526591
 
+> C++20引入了协程
+>
 > 协程就是一种特殊的函数，它可以在函数执行到某个地方的时候暂停执行，返回给调用者或恢复者（可以有一个返回值），并允许随后从暂停的地方恢复继续执行。注意，这个暂停执行不是指将函数所在的线程暂停执行，而是单纯的暂停执行函数本身。
 >
 > 那么，这种特殊函数有什么用呢？最常见的用途，就是将“异步”风格的编程“同步”化。
 >
-> C++20引入了协程。
 
 # 五、模版
 
@@ -5693,6 +5894,23 @@ https://blog.csdn.net/github_18974657/article/details/108526591
   ```
 
   
+
+### 非类型模版参数
+
+https://www.bilibili.com/video/BV1GJ4m1n7KM/
+
+```cpp
+template<struct_string str>
+f(){
+    std::cout<<str<<std::endl;
+}
+
+int main(){
+    f<"1">();	//error
+}
+```
+
+
 
 
 

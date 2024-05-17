@@ -1663,8 +1663,10 @@ int main()
     });
 ```
 
-## （3）使用线程池—继承QRunnable、run()
+## （3）使用线程池
 
+> 任务类继承QRunnable、QObject，override run()方法。
+>
 > 好处：
 >
 > 自动释放资源

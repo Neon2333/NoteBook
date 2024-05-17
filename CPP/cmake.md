@@ -902,7 +902,13 @@ tree demo	#查看目录树形结构
   cmake --build build
   ```
 
-# 9. demo
+# 10. vcpkg包管理器
+
+---
+
+
+
+# 11. demo
 
 ---
 
@@ -1175,7 +1181,7 @@ cmake ..
 make -j8
 ```
 
-# 10. Cmake条件编译
+# 12. Cmake条件编译
 
 ---
 

@@ -2413,9 +2413,17 @@ public static Int32 SetBitValueInt32(Int32 value, ushort index, bool bitValue)
         }
 ```
 
-## 42. 调用外部dll或exe
+## 42. 代码中调用外部dll或exe
 
-### （1）调用外部dll的非托管函数
+### （1）调用.NET程序集（dll或exe）
+
+`Assembly.LoadFile()`方法是用于加载另一个.NET库，并希望利用.NET的**反射等功能来操作该库的类型和方法时**。
+
+它加载一个.NET程序集（可以是DLL或EXE）到当前应用程序的应用程序域中。它返回一个`Assembly`实例，通过这个实例你可以进一步获取类型信息和创建实例等。
+
+### （2）调用C/C++编写的dll
+
+通过`DllImport`加载非托管代码库到C#中。DllImport通常涉及到跨语言互操作
 
 ```c#
 using System.Runtime.InteropServices;
