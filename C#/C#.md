@@ -3398,6 +3398,8 @@ https://www.jianshu.com/p/7f628015a243
 
 # 八、数据库
 
+> 连接数据库，一般从配置文件中读取host、user、password、port等参数。配置文件可选：json、xml或自定义格式。（建议选json）
+
 ## 1. ADO.NET
 
 ```sql

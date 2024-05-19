@@ -6,10 +6,16 @@
 > #include <mysql.h>
 > ```
 >
-> 使用API要引入的动态库：
+> * 使用API要引入的动态库：
 >
-> * **Windows：`libmysql.dll`**
-> * **Linux：`libmysqlclient.so`**
+>   **Windows：`libmysql.dll`**
+>
+>   **Linux：`libmysqlclient.so`**
+>
+> * Windows下VS引入动态库：
+>
+>   属性->VC++->包含目录：MySQL-include，库目录：MySQL-lib
+>   链接器->输入->附加依赖项：依赖的外部库的名称：libmysql.lib
 
 ## （1）连接MySQL服务器
 
@@ -34,7 +40,7 @@ MYSQL* mysql_real_connect(
     const char *host,       // mysql服务器的主机地址, 写IP地址即可
                             // localhost, null -> 代表本地连接
     const char *user,       // 连接mysql服务器的用户名, 默认: root 
-    const char *passwd,     // 连接mysql服务器用户对应的密码, root用户的密码
+    const char *pwd,     // 连接mysql服务器用户对应的密码, root用户的密码
     const char *db,         // 要使用的数据库的名字
     unsigned int port,      // 连接的mysql服务器监听的端口
                             // 如果==0, 使用mysql的默认端口3306, !=0, 使用指定的这个端口
@@ -67,7 +73,14 @@ int mysql_query(MYSQL* mysql, const char* query);
 MYSQL_RES *mysql_store_result(MYSQL* mysql);
 ```
 
-## （4）获取字段名
+## （4）获取字段个数
+
+```c
+// 得到列数
+int num = mysql_num_fields(res);
+```
+
+## （5）获取字段名
 
 ```c
 // 参数: 调用 mysql_store_result() 得到的返回值
@@ -121,18 +134,15 @@ for(int i=0; i<num; ++i)
 }
 ```
 
-## （5）遍历结果集
+## （6）遍历结果集
 
 ```c
+// 如果想遍历整个结果集, 需要对该函数进行循环调用
+// 如果要遍历整个结果集, 需要循环调用这个函数
 typedef char** MYSQL_ROW;	//char* []字符串数组，代表一条记录，每个字符串是记录中字段的值
 // 遍历结果集的下一行 
-// 如果想遍历整个结果集, 需要对该函数进行循环调用
-// 返回值是二级指针, char** 指向一个什么类型的内存呢?
-//    -- 指向一个指针数组, 类型是数组,里边的每个元素都是指针, char* 类型
-//    -- char* []; 数组中的字符串对应的一列数据
-
-// 需要对 MYSQL_ROW 遍历就可以得到每一列的值
-// 如果要遍历整个结果集, 需要循环调用这个函数
+//char* []; 数组中的字符串对应的一列数据
+// 对 MYSQL_ROW 遍历就可以得到每一列的值
 MYSQL_ROW mysql_fetch_row(MYSQL_RES *result);
 参数: 
     - result: 通过查询得到的结果集
@@ -141,7 +151,9 @@ MYSQL_ROW mysql_fetch_row(MYSQL_RES *result);
     - 失败: NULL, 说明数据已经读完了
 ```
 
-## （6）得到结果集中字段的长度
+## （7）得到字段的长度
+
+`int(5)`这种
 
 ```c
 /* 
@@ -156,7 +168,7 @@ unsigned long *mysql_fetch_lengths(MYSQL_RES *result);
     - 无符号长整数的数组表示各列的大小。如果出现错误，返回NULL。
 ```
 
-## （7）事务操作
+## （8）事务操作
 
 以1个不可分割的业务流程作为1个事务。
 
@@ -177,7 +189,7 @@ my_bool mysql_rollback(MYSQL *mysql)
 返回值: 成功: 0, 失败: 非0
 ```
 
-## （8）打印错误信息
+## （9）打印错误信息
 
 ```c
 // 返回错误的描述
@@ -186,7 +198,7 @@ const char *mysql_error(MYSQL *mysql);
 unsigned int mysql_errno(MYSQL *mysql);
 ```
 
-## （9）资源回收
+## （10）释放资源
 
 ```c
 // 释放结果集
@@ -198,7 +210,7 @@ void mysql_free_result(MYSQL_RES *result);
 void mysql_close(MYSQL* mysql);
 ```
 
-## （10）查看/设置当前使用的字符集
+## （11）查看/设置当前使用的字符集
 
 查看MySQL内中文数据的存储格式，用utf-8编码中文才不会乱码。
 
@@ -213,7 +225,7 @@ const char *mysql_character_set_name(MYSQL *mysql)
 int mysql_set_character_set(MYSQL *mysql, char *csname);
 ```
 
-## （11）demo
+## （12）demo
 
 ```c
 #include <stdio.h>
@@ -321,11 +333,345 @@ int main()
 }
 ```
 
-# 2. C++封装
+# 2. C++封装API
 
 ---
 
 将上述C接口封装成C++类MysqlHelper，简化使用。
+
+注意点：
+
+* Windows+VS环境下导入库方法：
+  属性->VC++->包含目录：MySQL-include，库目录：MySQL-lib
+  链接器->输入->附加依赖项：填写导入库的名称：libmysql.lib
+
+  导入库的图标是这样的：![image-20240518214703866](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240518214703866.png)
+
+* `MySQLConntion::value(unsigned int index)`中
+
+  ```cpp
+  std::string MySQLConntion::value(unsigned int index)
+  {
+  	if (queryResult == nullptr || queryResultRow == nullptr)
+  	{
+  		return std::string();
+  	}
+  
+  	if (index < 0 || index >= mysql_num_fields(queryResult))
+  	{
+  		return std::string();
+  	}
+  
+  	//防止某个字段的值包含'\0'，这样string(char*)到'\0'就会停止
+  	// char str[] = { '1', '2','3','4','5','\0','6','7' };
+  	//std::string s(str);	//12345
+  	//string(char*,int)遇到'\0'也不会停止，会把指定个数的char都包含
+  	unsigned long* colRealLengths = mysql_fetch_lengths(queryResult);
+  	return std::string(queryResultRow[index], colRealLengths[index]);	
+  }
+  ```
+
+* 调用一次`next()`才可以用`value`取到一行记录
+
+* 调用`startTransaction()`后的`update()`操作还是会正常的返回`true`或`false`，但只有调用了`commit()`后，才会将修改提交到数据库中
+
+```cpp
+/*
+Windows+VS环境下导入库方法：
+属性->VC++->包含目录：MySQL-include，库目录：MySQL-lib
+链接器->输入->附加依赖项：依赖的外部库的名称：libmysql.lib
+*/
+
+#pragma once
+#include <iostream>
+#include <mysql.h>
+#include <vector>
+
+class MySQLConntion
+{
+public:
+	/// <summary>
+	/// 初始化连接
+	/// </summary>
+	MySQLConntion();
+	//断开连接
+	~MySQLConntion();
+	/// <summary>
+	/// 连接服务器
+	/// </summary>
+	/// <param name="host">主机</param>
+	/// <param name="user">用户名</param>
+	/// <param name="pwd">密码</param>
+	/// <param name="dbName">数据库名</param>
+	/// <param name="port">端口(default=3306)</param>
+	/// <returns></returns>
+	bool connect(std::string host, std::string user, std::string pwd, std::string dbName, unsigned int port = 3306);
+	/// <summary>
+	/// 更新数据库：insert、delete、update
+	/// </summary>
+	/// <param name="sqlUpdate">增删改sql语句</param>
+	/// <returns></returns>
+	bool update(std::string sqlUpdate);
+	/// <summary>
+	/// 查询数据库
+	/// </summary>
+	/// <param name="sqlQuery">查询sql语句</param>
+	/// <returns></returns>
+	bool query(std::string sqlQuery);
+	/// <summary>
+	/// 查看所有字段名
+	/// </summary>
+	/// <returns></returns>
+	std::vector<std::string> fields();
+	/// <summary>
+	/// 遍历查询数据集，指向下一条记录
+	/// </summary>
+	/// <returns></returns>
+	bool next();
+	/// <summary>
+	/// 通过字段的index获取值
+	/// </summary>
+	/// <param name="index"></param>
+	/// <returns></returns>
+	std::string value(unsigned int index);
+	/// <summary>
+	/// 通过字段名获取字段值
+	/// </summary>
+	/// <param name="fieldName"></param>
+	/// <returns></returns>
+	std::string value(std::string fieldName);
+	/// <summary>
+	/// 开启事务操作，设置成手动提交、创建保存点
+	/// </summary>
+	/// <returns></returns>
+	bool startTransaction();
+	/// <summary>
+	/// 事务提交
+	/// </summary>
+	/// <returns></returns>
+	bool commit();
+	/// <summary>
+	/// 事务回滚
+	/// </summary>
+	/// <returns></returns>
+	bool rollback();
+private:
+	/// <summary>
+	/// 清空上一次查询结果
+	/// </summary>
+	void freeQueryResult();
+
+	MYSQL* mysqlConn = nullptr;	//MySQL连接
+	MYSQL_RES* queryResult = nullptr;	//查询结果集
+	std::vector<std::string> fieldNames;	//当前结果集的所有字段名
+	MYSQL_ROW queryResultRow = nullptr;	//当前查询记录
+};
+```
+
+```cpp
+#include "MySQLConntion.h"
+
+MySQLConntion::MySQLConntion()
+{
+	mysqlConn = mysql_init(mysqlConn);	//初始化连接
+}
+
+MySQLConntion::~MySQLConntion()
+{
+	if (mysqlConn != nullptr)
+	{
+		mysql_close(mysqlConn);	//关闭连接
+		freeQueryResult();	//清空结果集queryResult和结果集中字段fieldNames
+	}
+}
+
+bool MySQLConntion::connect(std::string host, std::string user, std::string pwd, std::string dbName, unsigned int port)
+{
+	mysqlConn = mysql_real_connect(mysqlConn, host.c_str(), user.c_str(), pwd.c_str(), dbName.c_str(), 
+		port, nullptr, 0);	//失败返回NULL
+	return mysqlConn != nullptr;	
+}
+
+bool MySQLConntion::update(std::string sqlUpdate)
+{
+	return mysql_query(mysqlConn, sqlUpdate.c_str()) == 0;	//修改成功返回0，否则返回非0
+}
+
+bool MySQLConntion::query(std::string sqlQuery)
+{
+	if (mysql_query(mysqlConn, sqlQuery.c_str()) != 0)	//查询成功返回非0
+	{
+		return false;
+	}
+
+	freeQueryResult();	//清空上次的查询结果和字段名
+	queryResult = mysql_store_result(mysqlConn);	//从MySQL服务器把查询结果拉到客户端
+	return true;
+}
+
+std::vector<std::string> MySQLConntion::fields()
+{
+	if (queryResult == nullptr)
+	{
+		return fieldNames;
+	}
+
+	std::vector<std::string>(0).swap(fieldNames);	//清空上次查询记录的字段
+	int colCount = mysql_num_fields(queryResult);	//获取字段的个数
+	MYSQL_FIELD* fields = mysql_fetch_fields(queryResult);	//获取字段名数组
+
+	for (int i = 0; i < colCount; i++)
+	{
+		fieldNames.emplace_back(fields[i].name);	//遍历存储字段名
+	}
+	return fieldNames;
+}
+
+bool MySQLConntion::next()
+{
+	if (queryResult == nullptr)
+	{
+		return false;
+	}
+
+	queryResultRow = mysql_fetch_row(queryResult);	//从结果集取下一条记录
+	return queryResultRow != nullptr;	//如果已经取完，返回NULL
+}
+
+std::string MySQLConntion::value(unsigned int index)
+{
+	if (queryResult == nullptr || queryResultRow == nullptr)
+	{
+		return std::string();	//返回空字符串
+	}
+
+	if (index < 0 || index >= mysql_num_fields(queryResult))
+	{
+		return std::string();
+	}
+
+	//防止某个字段的值包含'\0'，这样string(char*)到'\0'就会停止
+	// char str[] = { '1', '2','3','4','5','\0','6','7' };
+	//std::string s(str);	//12345
+	//string(char*,int)遇到'\0'也不会停止，会把指定个数的char都包含
+	unsigned long* colRealLengths = mysql_fetch_lengths(queryResult);	//获取该字段值的实际长度
+	return std::string(queryResultRow[index], colRealLengths[index]);	
+}
+
+std::string MySQLConntion::value(std::string fieldName)
+{
+	if (queryResult == nullptr || queryResultRow == nullptr)
+	{
+		return std::string();
+	}
+
+	if (fieldName == "")
+	{
+		return std::string();
+	}
+
+	for (unsigned int i = 0; i < fieldNames.size(); i++)
+	{
+		if (fieldName == fieldNames[i])
+		{
+			return value(i);
+		}
+	}
+	return std::string();
+}
+
+void MySQLConntion::freeQueryResult()
+{
+	if (queryResult != nullptr)
+	{
+		mysql_free_result(queryResult);
+		std::vector<std::string>(0).swap(fieldNames);
+	}
+}
+
+bool MySQLConntion::startTransaction()
+{
+	return mysql_autocommit(mysqlConn, 0) == 0;
+}
+
+bool MySQLConntion::commit()
+{
+	return mysql_commit(mysqlConn) == 0;
+}
+
+bool MySQLConntion::rollback()
+{
+	return mysql_rollback(mysqlConn) == 0;
+}
+```
+
+```cpp
+#include <iostream>
+#include "MySQLConntion.h"
+
+int main()
+{
+	MySQLConntion* mysql = new MySQLConntion();
+	
+	if (mysql->connect("localhost", "root", "wk3217609", "test"))
+	{
+		std::cout << "connected.." << std::endl;
+	}
+
+	mysql->query("select * from machine;");
+	
+	for (auto field : mysql->fields())
+	{
+		std::cout << "field=" << field << std::endl;
+	}
+
+	while (mysql->next())
+	{
+		int colCount = 0;
+		int fieldsCount = (int)mysql->fields().size();
+		for (int i = 0; i < fieldsCount; i++)
+		{
+			std::cout << mysql->value(colCount++) << "\t";
+		}
+		std::cout << std::endl;
+	}
+	
+	while (mysql->next())
+	{
+		std::cout << mysql->value("MachineName") << std::endl;
+	}
+
+	mysql->startTransaction();
+	bool flag1 = mysql->update("insert into machine values('16','201','test');");
+	bool flag2 = mysql->update("delete from machine where NO='1';");
+
+	if (flag1 && flag2)
+	{
+		mysql->commit();
+	}
+	else
+	{
+		mysql->rollback();
+	}
+
+}
+```
+
+# 3. 连接池实现
+
+连接池目的就是避免连接频繁的创建和销毁。
+
+后端服务器和数据库服务器往往是分开的。
+
+作为后端服务器，往往是通过多线程从连接池中取连接去访问数据库服务器，从中获取数据。在进行业务处理，返回结果给前端的。
+
+## （1）数据库连接配置文件
+
+> 连接数据库，一般从配置文件`dbconf`中读取dbServerIP、user、password、port等参数。配置文件可选：json、xml或自定义格式。（建议选json）
+
+
+
+
 
 
 

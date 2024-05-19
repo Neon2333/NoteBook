@@ -314,14 +314,14 @@ mysql -h192.168.42.128 -uroot -p
 >   ```mysql
 >   # 查看允许的主机
 >   use mysql
->               
+>                 
 >   select host from user where user = 'root'; 
 >   ```
 >
 >   ```mysql
 >   #设置用户root可以从任意主机连接到MySQL
 >   update user set host='%' where user='root';	
->               
+>                 
 >   flush privileges;
 >   ```
 
@@ -872,9 +872,11 @@ CREATE TABLE IF NOT EXISTS runoob_tbl(
 //删
 DROP TABLE runoob_tbl;	表被删除
 #DROP TABLE会完全删除整个表及其所有数据、索引、触发器、权限等，并且释放表所使用的存储空间。该操作立即执行且执行速度最快，但由于它彻底删除了表结构，因此是不可回滚的。
+
+DELETE FROM t_name		//注意和TRUNCATE区别
+
 TRUNCATE TABLE runoob_tb1;	表还在，但是表中记录都被清空
 #TRUNCATE仅删除表中的数据并保留表结构，与DELETE不同，TRUNCATE不会记录每一行的删除操作，不会触发触发器，且操作不可回滚。由于TRUNCATE不记录单个行的删除，它在清空大量数据时比DELETE快得多。不过，TRUNCATE并不会减少表所占用的空间，因为它不会真正删除表的存储空间。
-DELETE FROM t_name		//注意和TRUNCATE区别
 ```
 
 ```mysql
@@ -906,7 +908,7 @@ SHOW TABLES FROM db_name;	//显示库db_name中所有的表
 //插入记录
 INSERT INTO tb_name (field1,field2) VALUES (val11,val12),(val21,val22),(val31,val32);		//若每个字段都按顺序赋值则可省略字段名，若有字段值被省略，则需要将所有赋值的字段写出来
 //删除记录
-DELETE FROM tb_name [WHERE clause];
+DELETE FROM tb_name [WHERE clause];	#delete from tb;这是清空表
 //修改某条记录的某个字段的值
 UPDATE tb_name SET `field_name` = newVal;
 # 查询，SELECT后面跟的是个表达式，可以是常量，也可以filed相关的运算表达式，不一定就是field名

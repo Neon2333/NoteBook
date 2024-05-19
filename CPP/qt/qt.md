@@ -648,12 +648,29 @@ void rei::mouseMoveEvent(QMouseEvent *ev)
 
     }
 }
+
+void rei::enterEvent(QEvent *ev)
+{
+    Q_UNUSED(ev);
+    moveOnce(-200,200);
+}
 ```
 
 ## （2）重绘事件
 
+调用`update()`时会自动调用`paintEvent`事件
+
 ```cpp
 virtual void paintEvent()
+```
+
+```cpp
+void rei::paintEvent(QPaintEvent *event)
+{
+    Q_UNUSED(event);
+    QPainter p(this);
+    p.drawPixmap(this->rect(), this->pixmap);
+}
 ```
 
 
@@ -958,7 +975,13 @@ void myButton::timerEvent(QTimerEvent *event)
     });
 ```
 
-# 17. 数据库
+# 17. json解析
+
+---
+
+
+
+# 18. 数据库
 
 ---
 
@@ -1255,7 +1278,7 @@ QString QSqlError::text();
   }
   ```
 
-# 18. 多线程
+# 19. 多线程
 
 ---
 
@@ -1706,7 +1729,7 @@ public:
 
 
 
-# 19. Qt网络通信
+# 20. Qt网络通信
 
 ---
 
@@ -1714,7 +1737,7 @@ public:
 
 
 
-# 20. 程序打包
+# 21. 程序打包
 
 ## （1）流程
 

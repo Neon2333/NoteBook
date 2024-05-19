@@ -814,9 +814,11 @@ T StrToNum(const string& str){
 
 ---
 
-C++定义结构体变量时用不用加struct关键词？
+C 语言的 struct 定义了一组变量的集合，C 编译器并不认为这是一种新的类型。
 
-如果定义的**结构体名和变量名不冲突**，那么在定义[结构体变量](https://so.csdn.net/so/search?q=结构体变量&spm=1001.2101.3001.7020)时，**可以省略掉struct关键字：**
+C++ 中的 struct 是一个新类型的定义声明, 所以可以省略 typedef, 定义变量的时候也可以省略 struct, 而不用向c语言那样没用 typedef 取新名字, 就需要用 struct 结构体名 这种形式定义变量。
+
+**可以省略掉struct关键字：**
 
 ```cpp
 //编译通过
@@ -833,26 +835,16 @@ int main() {
     myEvent.end = 160;
     return 0;
 }
-
-//编译不通过
-struct Event {
-    int start;
-    int len;
-    int end;
-};
- 
-int main() {
-    Event Event;
-    Event.start = 100;
-    Event.len = 60;
-    Event.end = 160;
-    return 0;
-}
 ```
 
-C 语言的 struct 定义了一组变量的集合，C 编译器并不认为这是一种新的类型。
+* 默认情况下，struct的内存分配会以最大内存为标准，把所有类型都赋予那么大的内存
 
-C++ 中的 struct 是一个新类型的定义声明, 所以可以省略 typedef, 定义变量的时候也可以省略 struct, 而不用向c语言那样没用 typedef 取新名字, 就需要用 **struct 结构体名** 这种形式定义变量。
+  那么，如果希望每种类型都按本身的内存大小分配空间该怎么办呢？（把struct压实）
+  在C语言中，可以采用`__attribute__((packed))`
+
+  C++中，使用`#pragma pack(1)`
+
+
 
 ## 17. 类
 
@@ -2423,8 +2415,29 @@ for(vector<int>::iterator it = v.begin();it!=v.end();++it)
 
 ```cpp
 #include<string>
-std::string str = "str";
 ```
+
+### （1）和char*互转
+
+```cpp
+char* chs = str.c_str();
+string str(chs);
+```
+
+但是从char*到string有个问题：
+
+若chs中包含`'\0'`，用chs构造一个string会在`'\0'`处停止，将其看成是字符串末尾的`'\0'`，想要完整的把整个chs都转换成string，而不受`'\0`'`的影响，可以这么写：
+
+```cpp
+char chs[] = { '1', '2', '3', '\0', '4', '5' };
+std::string str(chs);		//123
+std::cout << str << "\n";	
+std::string str(chs, 8)	
+std::cout << str << "\n";	//12345		\0不会被显示
+std::cout << s.size() << "\n";	//6
+```
+
+
 
 
 
@@ -2437,8 +2450,6 @@ std::string str = "str";
 > **排序很快。增删慢。**
 >
 > ![vectorImg](https://raw.githubusercontent.com/WangKun233/ImageHost/main/vectorImg.png)
-
-### （1）API
 
 | 常用                                                        |          |
 | ----------------------------------------------------------- | -------- |
@@ -2454,18 +2465,26 @@ std::string str = "str";
 | v.assign(arr, arr + n)——使用数组arr的n个元素初始化给v       |          |
 | vector<T>(v).swap(v)——将v的capacity缩小为size               |          |
 
-#### 构造
+### （1）构造
 
 ![image-20230829164014517](https://raw.githubusercontent.com/WangKun233/ImageHost/main/image-20230829164014517.png)
 
-**拷贝构造vector\<T> v(v1)，会将v的size初始化为v1的capacity()。**
+* 拷贝构造vector\<T> v(v1)，会将v的size初始化为v1的capacity()。
 
-```cpp
-//也可用这种方法初始化
-vector<int> v{10,20,30,40,50};  
-```
+* 列表初始化
 
-#### 赋值
+  ```cpp
+  //也可用这种方法初始化
+  vector<int> v{10,20,30,40,50};  
+  ```
+
+* 构造一个空的vector
+
+  ```cpp
+  vector<int> v(0);
+  ```
+
+### （2）赋值
 
 用另一个vector的元素初始化当前vector
 
@@ -2477,7 +2496,7 @@ deque<int> d;
 v.assign(d.begin(), d.end());
 ```
 
-#### 末尾添加数据
+### （3）末尾添加数据
 
 * **使用`vec.emplace_back();`，不要用`push_back()`**
 
@@ -2557,7 +2576,7 @@ v.assign(d.begin(), d.end());
   }
   ```
 
-#### 随机访问
+### （4）随机访问
 
 可以用`[index]`也可以用`at(index)`。[]访问可修改元素，at()访问为只读。
 
@@ -2586,7 +2605,7 @@ int main()
 }
 ```
 
-#### 按pos插入、删除
+### （5）按pos插入、删除
 
 ```cpp
 //在pos前插入count个ele
@@ -2599,17 +2618,21 @@ v.erase(pos);
 v.clear();
 ```
 
+### （6）清空
+
+`clear()`
+
 vector清空时，capacity不变，只size变化，因此仍占有较多的空间。
 
-所以可用：
+所以清空v可用：
 
 ```cpp
-vector<T>(v).swap(v)	//用v的size创建一个reserve再换给v
+vector<T>(0).swap(v)	//用v的size创建一个capacity再换给v
 ```
 
-shrink：拷贝构造用capacity初始化自己的size、swap交换指针指向的内存块、vector(v)定义了一个匿名对象用v来拷贝。
+shrink：拷贝构造用size初始化自己的capacity、swap交换指针指向的内存块、vector(v)定义了一个匿名对象用v来拷贝。
 
-#### reserve
+### （7）reserve
 
 vector的capacity不够时，会以原来的2倍capacity申请内存，同时将所有元素拷贝到新内存，这一过程耗费资源。
 
@@ -2621,7 +2644,7 @@ vector的capacity不够时，会以原来的2倍capacity申请内存，同时将
 
 **reserve是只开辟内存空间，而resize是开辟了空间置了默认值。**
 
-#### 反向迭代器
+### （8）反向迭代器
 
 迭代器自增时的方向，是从尾部到头部。
 
@@ -2633,7 +2656,7 @@ iter++;
 cout<<*iter<<endll;	//4
 ```
 
-#### iter.base()
+### （9）iter.base()
 
 反向迭代器有个base()方法，用于返回正向迭代器（自增时方向从头到尾）。
 
@@ -2652,63 +2675,97 @@ it++;
 cout<<*it<<endll;	//5
 ```
 
+### （10）不允许在遍历容器时删除元素
 
+**在遍历过程中删除元素时，迭代器可能会失效。所以C++不允许在遍历容器时删除元素。**这是因为当我们删除一个元素后，后面的所有元素的内存都会向前移动一位，所以原来的迭代器可能就会指向错误的元素或者超出向量的范围。
 
+如下面的代码有问题：
 
+```cpp
+std::vector<int> v1{ 1,2,3,4,5,6 };
 
-### （2）注意点
+	for (auto iter = v1.begin(); iter != v1.end(); iter++)
+	{
+		if (*iter == 3)
+		{
+			v1.erase(iter);	
+		}
+	}
 
-* **在遍历过程中删除元素时，迭代器可能会失效。所以C++不允许在遍历容器时删除元素。**这是因为当我们删除一个元素后，后面的所有元素的内存都会向前移动一位，所以原来的迭代器可能就会指向错误的元素或者超出向量的范围。
+	for (auto& item : v1) {
+		std::cout << item << std::endl;
+	}
+```
 
-  如下面的代码有问题：
+改正：
 
-  ```cpp
-  std::vector<int> v1{ 1,2,3,4,5,6 };
-  
-  	for (auto iter = v1.begin(); iter != v1.end(); iter++)
-  	{
-  		if (*iter == 3)
-  		{
-  			v1.erase(iter);	
-  		}
-  	}
-  
-  	for (auto& item : v1) {
-  		std::cout << item << std::endl;
-  	}
-  ```
+```cpp
+for (auto iter = v1.begin(); iter != v1.end();)
+	{
+		if (*iter == 3)
+		{
+			iter = v1.erase(iter);	//erase会返回指向被删除元素下一个的迭代器，为了防止iter混乱，给iter重新赋值
+			std::cout << *iter << std::endl;
+		}
+		else
+		{
+			iter++;	//没删除，就自增指向下一个
+		}
+	}
+```
 
-  改正：
+```cpp
+//或者用个变量先记下要删除的元素，遍历完了再删
+std::vector<int>::iterator deliter;
+	for (auto iter = v1.begin(); iter != v1.end();iter++)
+	{
+		if (*iter == 3)
+		{
+			deliter = iter;
+		}
+	}
+	v1.erase(deliter);
+```
 
-  ```cpp
-  for (auto iter = v1.begin(); iter != v1.end();)
-  	{
-  		if (*iter == 3)
-  		{
-  			iter = v1.erase(iter);	//erase会返回指向被删除元素下一个的迭代器，为了防止iter混乱，给iter重新赋值
-  			std::cout << *iter << std::endl;
-  		}
-  		else
-  		{
-  			iter++;	//没删除，就自增指向下一个
-  		}
-  	}
-  ```
+### （11）`vector<bool>`的坑
 
-  ```cpp
-  //或者用个变量先记下要删除的元素，遍历完了再删
-  std::vector<int>::iterator deliter;
-  	for (auto iter = v1.begin(); iter != v1.end();iter++)
-  	{
-  		if (*iter == 3)
-  		{
-  			deliter = iter;
-  		}
-  	}
-  	v1.erase(deliter);
-  ```
+首先明确想要写个vector of bool，不要写成`vector<bool>`，而应该：`vector<char>`。
 
-  
+`vector<bool>`并不是一个STL容器，不是一个STL容器，不是一个STL容器！
+
+首先**vector< bool> 并不是一个通常意义上的vector容器**，这个源自于历史遗留问题。 早在[C++98](https://www.zhihu.com/search?q=C%2B%2B98&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A148258487})的时候，就有vector< bool>这个类型了，但是因为当时为了考虑到节省空间的想法，所以vector< bool>里面不是一个[Byte](https://www.zhihu.com/search?q=Byte&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A148258487})一个Byte储存的，它是一个bit一个bit储存的！
+
+因为C++没有直接去给一个bit来操作，所以用operator[]的时候，正常容器返回的应该是一个对应元素的引用，但是对于vector< bool>实际上访问的是一个"proxy reference"而不是一个"true reference"，返回的是"std::vector< bool>:reference"类型的对象。 而一般情况情况下
+
+```text
+vector<bool> c{ false, true, false, true, false }; 
+bool b = c[0]; 
+auto d = c[0]; 
+```
+
+对于b的初始化它其实暗含了一个隐式的[类型转换](https://www.zhihu.com/search?q=类型转换&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A148258487})。
+
+而对于d，它的类型并不是bool，而是一个vector< bool>中的一个[内部类](https://www.zhihu.com/search?q=内部类&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A148258487})。     
+
+而此时如果修改d的值，c中的值也会跟着修改
+
+```text
+d = true;
+for(auto i:c)
+    cout<<i<<" ";
+cout<<endl;
+//上式会输出1 1 0 1 0
+```
+
+而如果c被销毁，d就会变成一个[悬垂指针](https://www.zhihu.com/search?q=悬垂指针&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A148258487})，再对d操作就属于未定义行为。
+
+而为什么说vector< bool>不是一个标准容器，就是因为它不能支持一些容器该有的基本操作，诸如取地址给[指针初始化](https://www.zhihu.com/search?q=指针初始化&search_source=Entity&hybrid_search_source=Entity&hybrid_search_extra={"sourceType"%3A"answer"%2C"sourceId"%3A148258487})操作
+
+```text
+vector<bool> c{ false, true, false, true, false }; 
+&tmp = c[0];	//错误，不能编译，对于引用来说，因为c[0]不是一个左值 
+bool *p = &c[0];	//错误，不能编译，因为无法将一个临时量地址给绑定到指针 ``` 
+```
 
 
 
@@ -4093,10 +4150,10 @@ unique_ptr不能管理同一块内存。
 **直接用堆内存+构造函数初始化的方式只能初始化一个共享指针。**
 
 ```cpp
-std::shared_ptr<T> sp(new创建堆内存)			//pt管理这块堆内存
+std::shared_ptr<T> sp(指针)							//pt管理这块堆内存
+shared_ptr<T> pt4 = make_shared<T>(初始值);			//make_shared代替new开辟了内存、初始化值，然后让pt4管理
 std::shared_ptr<T> sp2 = pt1;						//pt2也管理pt1指向的这块内存
 std::shared_ptr<T> sp3(move(pt1))					//move把pt1转成右值。pt1失去了管理的堆内存。
-shared_ptr<T> pt4 = make_shared<T>(初始值);			//make_shared代替new开辟了内存、初始化值，然后让pt4管理
 
 sp.reset()										//重置。ptr解除了对原内存的管理
 sp.reset(new int(1))							//从指向当前堆内存解除管理，指向指定的新内存new int(1)
@@ -4136,6 +4193,8 @@ std::shared_ptr<int> sp = make_shared<int>(1);
   ```
 
 ### （3）删除器
+
+**自定义销毁指针时，执行的动作。**
 
 第二个参数，传入删除器函数的地址。
 
@@ -4188,8 +4247,6 @@ std::shared_ptr<A[]> sp(new A[]);	//默认的删除器就行。把类型指定�
 
 * 不要直接return一个管理了this的shared_ptr（类里面）
 
-  
-
   ```cpp
   class A
   {
@@ -4207,7 +4264,7 @@ std::shared_ptr<A[]> sp(new A[]);	//默认的删除器就行。把类型指定�
       shared_ptr<A> sp(new A());	
   }
   ```
-
+  
   正确做法：
 
   ```cpp
@@ -4225,7 +4282,7 @@ std::shared_ptr<A[]> sp(new A[]);	//默认的删除器就行。把类型指定�
       shared_ptr<A> sp(new A());	
   }
   ```
-
+  
   类去继承`enable_shared_from_this<T>`类，然后`return shared_from_this()`
 
   `enable_shared_from_this<T>`类内部有个weak_ptr，被继承后，这个类new的时候就会自动关联到父类这个弱指针，`shared_from_this()`就会调用弱指针的lock()函数返回一个shared_ptr。
@@ -4274,7 +4331,6 @@ std::shared_ptr<A[]> sp(new A[]);	//默认的删除器就行。把类型指定�
   sp2=sp3.lock();		//ptr2此时也指向了ptr1管理的内存
   ```
 
-  
 
 ## 20. std::unique_ptr
 
@@ -4336,7 +4392,6 @@ unique_ptr<int> func()
 
   内存计数永远不为0，永远不被释放回收，泄漏。
 
-  
 
 ## 21. lambda
 
@@ -4734,7 +4789,7 @@ int main()
 > std::this_thread::sleep_for(std::chrono::microseconds(100));	//seconds休眠单位秒
 > 
 > //获取当前线程ID
->  std::this_thread::get_id();
+> std::this_thread::get_id();
 > 
 > 
 > //分离子线程。放在当前子线程执行的任务代码中。
@@ -4747,11 +4802,28 @@ int main()
 > ```
 >
 > ```cpp
-> //传入函数构造线程
-> std::thread(func);
+> //普通函数，直接传入
+> std::thread(func, args);
+> 
+> //类的非静态函数，要指定函数的所属类，还要传入对象
+> A a;
+> thread(A::func, &a);	//如果在类内部a就是this
+> 
+> //类的静态函数，要指定类名
+> thread(A::func, args)
+> 
+> //仿函数，传入仿函数对象
+> class Func
+> {
+> public:
+>     void operator()(){}
+> }
+> Func f;
+> thread(f);
+> 
 > //传入可执行对象lambda构造线程
 > std::thread([](){
->     func();
+>  func();
 > })
 > ```
 >
@@ -5353,10 +5425,16 @@ int main(int argc, char** args)
 >  std::unique_lock<std::mutex> ul(mtx);	
 >  std::condition_variable cv;
 >  
->  //Predicate成立，即true时拿到锁向下执行。false时阻塞等待，释放锁mtx给其他线程。
->  cv.wait(ul, Predicate);	//Predicate是谓词，是可调用对象，通常用lambda。
+>  cv.wait(ul);
+>  cv.wait_for(ul, std::chrono::duration);
 >  
->  cv.notify_one();	//通知一个线程解除阻塞向下执行
+>  //Predicate成立，即true时拿到锁向下执行。false时阻塞等待，释放锁mtx给其他线程。
+>  //Predicate是谓词，是可调用对象，通常用lambda。
+>  cv.wait(ul, Predicate);	
+>  cv.wait_for(ul, std::chrono::duration, Predicate);
+>  
+>  cv.notify_one();	//唤醒1个线程，解除阻塞向下执行
+>  cv.notify_all();	//唤醒所有线程
 >  ```
 >
 >  子线程123从任务队列中取任务执行，任务队列为空时，子线程需要暂停从队列中取任务。
@@ -5367,56 +5445,101 @@ int main(int argc, char** args)
 >
 >  ![image-20240428172036409](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240428172036409.png)
 
-```cpp
-#include<iostream>
-#include <thread>
-#include <string>
-#include <mutex>
-#include <condition_variable>
-#include <queue>
+* 使用方法1
 
+  把**阻塞条件**写在while里
 
-std::mutex mtx;	//互斥量
-std::unique_lock<std::mutex> ul(mtx);	//互斥锁
-std::condition_variable cv;	//条件变量
-std::queue<int> q;  //多个线程共同访问的队列
+  ```cpp
+  //wait
+  void consumer()
+  {
+      int value;
+      //若q为空则等待
+      while (q.empty())
+      {
+          cv.wait(ul);  
+      }
+       value = q.front();
+       std::cout << value << std::endl;
+       q.pop();
+  }
+  
+  //wait_for
+  void consumer()
+  {
+      int value;
+      //若q为空则等待
+      while (q.empty())
+      {
+          if(cv_status::timeout == cv.wait_for(ul, chrono::milliseconds(1000)))
+          {
+              if(q.empty())
+                  continue;
+          	else
+                  break;
+          }
+      }
+       value = q.front();
+       std::cout << value << std::endl;
+       q.pop();
+  }
+  ```
 
-void producer()
-{
-    for (int i = 0; i < 100; i++)
-    {
-        q.push(i);
-        //通知一个线程来取
-        cv.notify_one();
-    }
-}
+* 使用方法2
 
-void consumer()
-{
-    int value;
-    while (true)
-    {
-        //若q为空则等待
-        cv.wait(ul, []() {
-            return !q.empty();
-            });
-        value = q.front();
-        std::cout << value << std::endl;
-        q.pop();
-    }
-}
+  把向下执行条件写在Predicate
 
-int main(int argc, char** args)
-{
-    std::thread th1(producer);  //线程1执行生产者，往队列q里放任务（这里用int替代）
-    std::thread th2(consumer);  //线程2执行消费者，从队列q里取任务（这里用int替代）
+  ```cpp
+  #include<iostream>
+  #include <thread>
+  #include <string>
+  #include <mutex>
+  #include <condition_variable>
+  #include <queue>
+  
+  std::mutex mtx;	//互斥量
+  std::unique_lock<std::mutex> ul(mtx);	//互斥锁
+  std::condition_variable cv;	//条件变量
+  std::queue<int> q;  //多个线程共同访问的队列
+  
+  void producer()
+  {
+      for (int i = 0; i < 100; i++)
+      {
+          q.push(i);
+          //通知一个线程来取
+          cv.notify_one();
+      }
+  }
+  
+  void consumer()
+  {
+      int value;
+      while (true)
+      {
+          //若q为空则等待
+          cv.wait(ul, []() {
+              return !q.empty();
+              });
+          value = q.front();
+          std::cout << value << std::endl;
+          q.pop();
+      }
+  }
+  
+  int main(int argc, char** args)
+  {
+      std::thread th1(producer);  //线程1执行生产者，往队列q里放任务（这里用int替代）
+      std::thread th2(consumer);  //线程2执行消费者，从队列q里取任务（这里用int替代）
+  
+      th1.join();
+      th2.join();
+  
+      return 0;
+  }
+  ```
 
-    th1.join();
-    th2.join();
-
-    return 0;
-}
-```
+  
 
 ## 10. 异步
 
@@ -5674,9 +5797,15 @@ public:
 				while (true)	
 				{
 					std::unique_lock<std::mutex> ul(mtx);	//互斥锁，锁住对共享变量m_tasks的访问
+                      /*while (m_tasks.empty() && !m_shutdown)
+					{
+						cvTasksNotEmpty.wait(ulTasks);
+					}*/
 					cv.wait(ul, [=]() {						//条件变量控制锁ul的释放、线程的阻塞和继续
 						return !m_tasks.empty() || stopAll;	//任务队列非空或线程池停止则不阻塞，拿到ul
 						});
+                     
+                   
 					if (stopAll == true && m_tasks.empty())	//如果线程池停止线程立即return终止
 					{
 						return;
