@@ -4090,14 +4090,23 @@ private void button1_Click(object sender, EventArgs e)
 
 ## 6. 序列化和反序列化
 
+> 序列化：将对象实例转成字符串形式（json、xml）或二进制数据
+>
+> 反序列化：序列化反过来
+>
+> 用途：便于将对象实例持久化或网络传输。
+
 https://www.cnblogs.com/amylis_chen/p/11578598.html
 https://www.cnblogs.com/1549983239yifeng/p/14789106.html
 https://www.cnblogs.com/xueyubao/p/11262320.html
 https://blog.csdn.net/qq_37179591/article/details/105736690
 https://www.cnblogs.com/guogangj/p/7489218.html
-![](https://img2023.cnblogs.com/blog/2415825/202306/2415825-20230629003317582-1631410764.png)
 
-### （1）二进制序列化
+## （1）json序列化
+
+## （2）二进制序列化
+
+> 二进制序列化相比json序列化的好处是：转换更快
 
 #### 设置某些字段、属性不二进制序列化
 
@@ -4144,9 +4153,7 @@ var obj = formatter.Deserialize(pipeServer);
 
 ##### 解决2——DLL
 
-
-
-### （2）XML序列化
+## （3）XML序列化
 
 #### 无法XML序列化的情况
 
@@ -4191,11 +4198,11 @@ var obj = formatter.Deserialize(pipeServer);
 
 #### XML序列化常用注解Attribute
 
-### 3）json序列化
+### 
 
 
 
-## 
+
 
 # 十、日志
 

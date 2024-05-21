@@ -768,12 +768,10 @@ target_link_libraries(target PUBLIC/PRIVATE 动态库1 动态库2 ...)	#链接�
 
   当然了，在**最终子目录**的 CMakeLists.txt 文件中，使用 `include_directories()` 和 `target_include_directories()` 的效果是相同的。
 
-# 9. （未成功）通过FetchContent管理第三方库
+# 9. 通过FetchContent管理第三方库
 
 ---
 
-> **未成功问题：**按照示例，找不到头文件，手动添加倒是可行，但是失去包管理的意义。
->
 > 官方示例：https://cmakebyexample.dev/use-library-fetchcontent/
 >
 > cmake 3.11版本及以上可使用
@@ -781,9 +779,9 @@ target_link_libraries(target PUBLIC/PRIVATE 动态库1 动态库2 ...)	#链接�
 > FetchContent 是 CMake 自带的功能，可以在构建之前下载外部库的源代码。 这种方法跟 Git Submodules 几乎没有区别。
 >
 > 比较麻烦
-> 支持版本管理
+>支持版本管理
 > 可以导入一部分托管项目
->
+> 
 > **cmake脚本运行编译项目阶段**从外部下载依赖库源码，而不需事先下载到本地或作为项目的一部分提交到版本控制。
 >
 > 项目根目录下建`demo/ext`目录存放第三方库
@@ -837,6 +835,18 @@ target_link_libraries(target PUBLIC/PRIVATE 动态库1 动态库2 ...)	#链接�
   target_link_libraries(App PRIVATE 外部库::子模块)
   ```
 
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+	外部库名称	#库名字
+	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog	# 指定库下载到当前目录下新建ext的【库名称文件夹】下，不能指定一个已存在的非空目录
+	GIT_REPOSITORY https://urlofProjectOnGithub		# 仓库地址
+	GIT_TAG 1.x	# 库版本（tag)
+	FIND_PACKAGE_ARGS
+)
+FetchContent_MakeAvailable(库名称)
+```
+
 ## （3）项目demo
 
 ```bash
@@ -848,7 +858,6 @@ tree demo	#查看目录树形结构
   ```bash
   demo
   ├───build		# cmake的输出文件
-  ├───cmake		# cmake文件夹，存放 .cmake文件
   ├───ext		# spdlog等第三方库的存放目录
   ├───include		# 头文件路径
   └───src
@@ -856,49 +865,47 @@ tree demo	#查看目录树形结构
   └───CMakeLists.txt # top directory下的cmake配置文件
   ```
 
-* 在cmake目录下，创建负责第三方库的cmake脚本文件：`外部库名称.cmake`
-
-  可以不写.cmake脚本，直接把脚本内容放到CMakeLists.txt文件。
+* 顶层`CMakeLists.txt`
 
   ```cmake
+  cmake_minimum_required(VERSION 3.28.3)
+  project(App)
+  set(CMAKE_CXX_STANDARD 20)
+  
+  add_executable(App ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
+  
   include(FetchContent)
+  # -----------------------------使用外部库spdlog------------------------------------------------------
   FetchContent_Declare(
-  	外部库名称	#库名字
-  	GIT_REPOSITORY https://urlofProjectOnGithub		# 仓库地址
-  	GIT_TAG 2.6.x	# 库版本（tag)
-  	SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/库名称 # 指定库下载到当前目录下新建ext的【库名称文件夹】下
-  )
-  FetchContent_MakeAvailable(库名称)
-  ```
-
-  ```bash
-  demo
-  │   
-  ├───build
-  ├───cmake
-  │       外部库名称.cmake	# 新增的文件
-  │       
-  ├───ext
-  ├───include
-  └───src
-          main.cc
-  └───CMakeLists.txt
-  ```
-
-* 在最上层目录的`demo/CMakeLists.txt`中引入`外部库名称.cmake`脚本
-
-  把下面的代码加在`CMakeLists.txt`后面
-
-  ```cmake
-  # -----------------------------使用外部库1------------------------------------------------------
-  set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake;${CMAKE_MODULE_PATH}")
+          spdlog
+          SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog
+          GIT_REPOSITORY https://github.com/gabime/spdlog.git
+          GIT_TAG v1.x
+          FIND_PACKAGE_ARGS)
+  FetchContent_MakeAvailable(spdlog)
   
-  # 引入spdlog.cmake, 
-  include(spdlog)	# 只填写文件名。
+  target_link_libraries(App PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
   
-  # 项目中使用spdlog
-  target_link_libraries(App PRIVATE spdlog::spdlog)
+  //main.cc
+  #include<iostream>
+  #include<spdlog/spdlog.h>
+  
+  int main()
+  {
+  	spdlog::info("hello");
+  	return 0;
+  }# 示例
+  include(FetchContent)
+  # -----------------------------使用外部库spdlog------------------------------------------------------
+  FetchContent_Declare(
+          spdlog
+          SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog
+          GIT_REPOSITORY https://github.com/gabime/spdlog.git
+          GIT_TAG v1.x
+          FIND_PACKAGE_ARGS)
+  FetchContent_MakeAvailable(spdlog)
   # ----------------------------------------------------------------------------------------
+  target_link_libraries(App PRIVATE spdlog::spdlog)
   ```
 
 * 下载子模块源码
@@ -974,9 +981,15 @@ https://blog.csdn.net/weixin_45448662/article/details/132654732
 > >
 > > ...
 >
+> docs
+>
+> > 相关文档
+>
 > main.cpp
 >
 > CMakeLists.txt
+>
+> ReadMe.md
 
 | -目录          | -说明                                               |
 | -------------- | --------------------------------------------------- |
@@ -1040,13 +1053,10 @@ demo01使用结构1
 >
 > > spdlog
 > >
-> > > include
-> > >
-> > > ...
->
+> 
 > CMakeLists.txt
->
-> main.cpp
+> 
+>main.cpp
 
 ```cpp
 //cat.h
@@ -1095,21 +1105,9 @@ int main(int argc, char** argv)
     bird b;
     std::cout<<b.bark()<<std::endl;
     
-    spdlog::info("i love c++");	//三方库spdlog，调用info()函数
+    spdlog::info("hello");	//三方库spdlog，调用info()函数
     return 0;
 }
-```
-
-```cmake
-# cmake/spdlog.cmake
-include(FetchContent)
-FetchContent_Declare(	
-						spdlog	#库名字
-						GIT_REPOSITORY https://github.com/gabime/spdlog.git	# 仓库地址
-						GIT_TAG v1.x # 库版本
-						SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog # 指定库下载地址
-						)
-FetchContent_MakeAvailable(spdlog)
 ```
 
 ```cmake
@@ -1131,7 +1129,7 @@ add_library(Animal STATIC ${SRC})
 ```cmake
 #demo01/CMakeLists.txt
 cmake_minimum_required(VERSION 3.28.3)
-project(App CXX)
+project(demo01 CXX)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
@@ -1150,24 +1148,25 @@ add_executable(App ${SRC})		#生成可执行文件
 # ------------------------------------------------------------------------------------------------
 include(FetchContent)	#使用FetchContent
 # -----------------------------使用外部库spdlog------------------------------------------------------
-
-FetchContent_Declare(spdlog
+FetchContent_Declare(
+        spdlog
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog	
         GIT_REPOSITORY https://github.com/gabime/spdlog.git
-        GIT_TAG v1.4.1
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/spdlog)
+        GIT_TAG v1.x
+        FIND_PACKAGE_ARGS)
 FetchContent_MakeAvailable(spdlog)
-target_link_libraries(App PRIVATE spdlog::spdlog)
+target_link_libraries(App PRIVATE spdlog::spdlog $<$<BOOL:${MINGW}>:ws2_32>)
 # ----------------------------------------------------------------------------------------
 # ---------------------------使用外部库json----------------------------------------------------
-
-FetchContent_Declare(json
+FetchContent_Declare(
+		json
+        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/json
         GIT_REPOSITORY https://gitee.com/slamist/json.git
         GIT_TAG v3.7.3
-        SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/ext/json)
+        FIND_PACKAGE_ARGS)
 FetchContent_MakeAvailable(json)
-target_link_libraries(mjson PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(App PRIVATE nlohmann_json::nlohmann_json $<$<BOOL:${MINGW}>:ws2_32>)
 # --------------------------------------------------------------------------------------------
-
 ```
 
 ```bash
@@ -1178,7 +1177,7 @@ cmake --build build
 mkdir build
 cd build 
 cmake ..
-make -j8
+make -j4
 ```
 
 # 11. Cmake条件编译

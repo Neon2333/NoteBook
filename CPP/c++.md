@@ -3014,11 +3014,9 @@ mp.insert({new Person(), 2});
 >
 > 可以通过key查询到所有该key对应的value
 
-
-
 ## 14. unordered_map
 
-**哈希表，只完成key到value的映射，不对key进行排序，查找比map快很多。**
+**哈希表，k-v结构，不对key进行排序，查找比map快很多。**
 
 ```c++
 #include<unordered_map>

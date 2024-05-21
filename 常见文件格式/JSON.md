@@ -37,6 +37,6 @@ null
 
 ## 应用场景
 
-常用在接口参数、返回结果、配置文件
+持久化、网络通信、配置文件存储参数
 
 ![image-20240310202758097](https://raw.githubusercontent.com/Neon2333/ImageHost/main/image-20240310202758097.png?token=ANG32YBRJW4OXC7OZXVECATF5WT5S)

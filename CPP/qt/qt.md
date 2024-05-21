@@ -165,6 +165,14 @@ QByteArray计算出的是字节数。
   int a = str.toInt();
   ```
 
+* QDateTime转QString
+
+  ```cpp
+  QString str = QDateTime::toString()
+  ```
+
+  
+
 # 3.QVariant
 
 将内置类型封装，然后统一处理。
@@ -280,6 +288,16 @@ T QVariant::value() const;
 ---
 
 ## （1）QDate
+
+> ```cpp
+> #include <QDate>
+> ```
+
+```cpp
+QDate date = QDate::fromString("2020/09/12", "yyyy/MM/dd")	//设定日期格式
+```
+
+
 
 ## （2）QTime
 
@@ -673,15 +691,17 @@ void rei::paintEvent(QPaintEvent *event)
 }
 ```
 
-
-
-
-
 # 9. 容器
 
 ---
 
+> 比STL更轻量、安全、易用
+
 ## （1）QVector
+
+> 随机访问：O(1)
+>
+> 插入：O(n)
 
 * 不仅仅提供拷贝构造，还支持移动构造。
 
@@ -697,9 +717,67 @@ void rei::paintEvent(QPaintEvent *event)
 
   需要修改数据用`[]`
 
- 
+## （2）QList
 
+> 不是链表，链表是QLinkedList
+>
+> 随机访问：O(1)
+>
+> 插入：O(n)
 
+* 遍历
+
+  只读遍历：只读迭代器`const_iterator`，`constbegin`，`constend`
+
+  读写遍历：读写迭代器`iterator`
+
+  ```cpp
+  QList<int> qlist;
+  for(int i=0;i<10;i++)
+  {
+      qlist.append(i);
+  }
+  for(QList<int>::const_iterator it=qlist.constbegin();it!=qlist.constend();it++)
+  {
+      qDebug()<<*it<<"\n";
+  }
+  for(QList<int>::iterator it=qlist.begin();it!=qlist.end();it++)
+  {
+      *it=10*(*it);
+  }
+  ```
+
+## （3）QMap
+
+> k-v结构
+>
+> 按照key排序
+>
+> 1个key多个value时，用QMultiMap<Key,T>
+
+```cpp
+//插入
+map.insert(key,val);	
+//只读遍历
+for(QMap<K,T>::const_iterator it = map.constbegin();it!=map.constend();it++)
+{
+    qDebug()<<it.key()<<it.value();
+}
+//查找
+QMap<K,T>::const_iterator it = map.find(key);
+//修改value
+it.value()=newVal;
+```
+
+## （4）QHash
+
+> k-v结构
+>
+> 不按照key排序
+>
+> 1个key多个value时，用QMultiHash<Key,T>
+>
+> API和QMap类似
 
 # 10. 程序执行时间
 
@@ -757,9 +835,156 @@ QRect screen = QGuiApplication::screens().first()->geometry();
 
 ---
 
+## （1）文本读写
+
+* 读
+
+  ```cpp
+  QFile("path");	//关联文件
+  QFile::setFileName("path");	//重新设置关联文件
+  file.open(QIODevice:ReadOnly);	//打开文件
+  file.close();	//关闭文件
+  
+  //读写方式
+  QIODevice:ReadOnly	//只读
+  QIODevice:WriteOnly	//只写
+  QIODevice:ReadWrite	//读写
+      
+  qint64 file.ReadLine(char* buffer, int sizeof(buffer));	//读取一行字符串到buffer，返回实际读取的字节数
+  QByteArray QIODevice::readLine(qint64 maxSize = 0);;	//读取一行字符串，不超过maxSize个字符，返回读取的字符串
+  QByteArray QIODevice::readAll();	//读取所有字符串。为空或错误时返回的QByteArray为空
+  ```
+
+  ```cpp
+  # include<QFile>
+  QFile file("filepath.txt");
+  if(!file.open(QIODevice:ReadOnly))
+  {
+      qDebug()<<"open error..\n";
+  }
+  QByteArray str = file.readAll();
+  qDebug()<<str<<"\n";
+  file.close();
+  ```
+
+* 写
+
+  ```cpp
+  qint64 QIODevice::write(const char *data, sizeof(data));	//把data中数据写入device，返回实际写入字节数，错误返-1
+  qint64 QIODevice::write(const QByteArray& byteArray);	//同上，把byteArray中数据写入device
+  ```
+
+## （2）二进制读写
+
+> ```cpp
+> #include <QDataStream>
+> ```
+>
+> 先用QFile关联、打开文件，把传递给QFile对象QDataStream。
+>
+> 二进制数据涉及编码、解码，读数据时候要知道写入数据的类型。
+>
+> 要是读取原始二进制数据，使用`readRawdata()`和`writeRawdata()`
+
+```cpp
+//写
+QFile file("filepath.dat");
+if(!file.open(QIODevice:WriteOnly | QIODevice:Truncate))
+{
+    qDebug()<<"open error..\n";
+}
+QDataStream out(&file);
+out<<QString(tr("wwww"));
+out<<QDate::fromString("2020/5/20","yyyy/MM/dd");
+out<<(int)10;
+file.close();	//关闭文件，写入文件
+
+//读
+file.setFileName("filepath.dat");
+if(!file.open(QIODevice:ReadOnly))
+{
+    qDebug()<<"open error..\n";
+}
+QDataStream in(&file);
+QString str;
+QDate date;
+int num;
+in>>str>>date>>num;
+file.close();
+```
 
 
 
+## （3）目录操作
+
+> ```cpp
+> #include <QDir>
+> ```
+
+```cpp
+QDir("path");
+setPath("path");	//重新设置目录路径
+path();	//返回目录路径
+absolutePath();	//返回绝对路径
+dirName();	//返回目录名
+exists();	//判断目录是否存在
+count();	//返回目录下所有条目个数
+QStringList entryList();	//返回目录下所有条目（文件、目录）名称组成的字符串链表
+QFileInfoList entryInfoList();	//返回目录下所有条目（文件、目录）的QFileInfo组成的链表
+
+bool mkdir();	//创建目录
+bool rmdir();	//删除目录
+bool rename();	//目录重命名
+bool remove(const QString& fileName);	//删除文件
+```
+
+
+
+
+
+## （4）获取文件信息
+
+> ```cpp
+> #include <QFileInfo> 
+> ```
+
+```cpp
+QFileInfo info("filepath");
+qint64 info.size();	//大小
+DateTime created = info.created();	//创建时间
+info.lastModified();
+info.lastRead();	//最后一次访问时间
+bool isdir = info.isDir();	//判断是否是目录
+info.isFile();	//判断是否是文件
+info.isReadable();
+info.isWriteable();
+info.isExectuable();	
+```
+
+## （5）监视目录或文件变化
+
+> ```cpp
+> #include <QFileSystemWatcher>
+> ```
+>
+> 被监视的文件被修改或删除时，产生`fileChanged(const QString &path)`信号。
+>
+> 被监视的目录被修改或删除时，产生`directoryChanged(const QString &path)`信号。
+
+```cpp
+addPath("path");	//添加监视目录
+removePath("path");	//移除监视目录
+```
+
+```cpp
+QFileSystemWatcher fsWatcher;
+
+connect(&fsWatcher, directoryChanged(QString),this,&onDirectoryChanged(QString));
+void onDirectoryChanged(QString path)
+{
+    QMessageBox::information(nullptr,tr("目录发生变化"),path);
+}
+```
 
 # 14. 图片
 
@@ -975,7 +1200,7 @@ void myButton::timerEvent(QTimerEvent *event)
     });
 ```
 
-# 17. json解析
+# 17. MVC架构
 
 ---
 
@@ -1727,9 +1952,392 @@ public:
 }
 ```
 
+# 20. json解析
+
+---
+
+> 序列化：将对象实例转成字符串文本形式（json、xml）或二进制数据
+>
+> 反序列化：序列化反过来
+>
+> 用途：便于将对象实例持久化或网络传输（调用API将json文件转成Json格式的字符串传输）
+
+## （1）json概念
+
+* 如果需要将Json数据持久化到磁盘文件中，需要注意一个问题：在一个Json文件中只能有一个Json数组或者Json对象的根节点，不允许同时存储多个并列的根节点
+
+  ```json
+  // 错误的写法
+  {
+      "name":"luffy",
+      "age":19
+  }
+  {
+      "user":"ace",
+      "passwd":"123456"
+  }
+  
+  // 正确写法
+  [
+      {
+      	"name":"luffy",
+      	"age":19
+  	}
+  	{
+      	"user":"ace",
+      	"passwd":"123456"
+  	}
+  ]
+  ```
+
+* 列表（数组）
+
+  使用中括号，元素类型可以一致，也可以不一致。
+
+  还可以嵌套。
+
+  ```json
+  [1,2,3,4]
+  ["hh","ww","rr"]
+  [1,2,3,"aa",4,true,null]
+  
+  [
+  	[1,2,3,4]
+  	[1,2,3,"aa",4]  
+       {
+          "luffy":{
+              "age":19,
+              "father":"Monkey·D·Dragon",
+              "grandpa":"Monkey D Garp",
+              "brother1":"Portgas D Ace",
+              "brother2":"Sabo"
+          }
+      }
+  ]
+  ```
+
+* 字典（json对象）
+
+  键值对k-v格式
+
+  ```json
+  {
+      "Name":"Ace",
+      "Sex":"man",
+      "Age":20,
+      "Family":{
+          "Father":"Gol·D·Roger",
+          "Mother":"Portgas·D·Rouge",
+          "Brother":["Sabo", "Monkey D. Luffy"]
+      },
+      "IsAlive":false,
+      "Comment":"yyds"
+  }
+  ```
+
+## （2）QJsonValue
+
+> 封装基本json数据类型：
+>
+> 布尔类型：QJsonValue::Bool
+> 浮点类型（包括整形）： QJsonValue::Double
+> 字符串类型： QJsonValue::String
+> Json数组类型： QJsonValue::Array
+> Json对象类型：QJsonValue::Object
+> 空值类型： QJsonValue::Null
+
+* 封装
+
+  ```cpp
+  // Json对象
+  QJsonValue(const QJsonObject &o);
+  // Json数组
+  QJsonValue(const QJsonArray &a);
+  // 字符串
+  QJsonValue(const char *s);
+  QJsonValue(QLatin1String s);
+  QJsonValue(const QString &s);
+  // 整形 and 浮点型
+  QJsonValue(qint64 v);
+  QJsonValue(int v);
+  QJsonValue(double v);
+  // 布尔类型
+  QJsonValue(bool b);
+  // 空值类型
+  QJsonValue(QJsonValue::Type type = Null);
+  ```
+
+  
+
+* 判断实际类型
+
+  ```cpp
+  // 是否是Json数组
+  bool isArray() const;
+  // 是否是Json对象
+  bool isObject() const;
+  // 是否是布尔类型
+  bool isBool() const;
+  // 是否是浮点类型(整形也是通过该函数判断)
+  bool isDouble() const;
+  // 是否是空值类型
+  bool isNull() const;
+  // 是否是字符串类型
+  bool isString() const;
+  // 是否是未定义类型(无法识别的类型)
+  bool isUndefined() const;
+  ```
+
+* 转换为对应的基础数据类型
+
+  ```cpp
+  // 转换为Json数组
+  QJsonArray toArray(const QJsonArray &defaultValue) const;
+  QJsonArray toArray() const;
+  // 转换为布尔类型
+  bool toBool(bool defaultValue = false) const;
+  // 转换为浮点类型
+  double toDouble(double defaultValue = 0) const;
+  // 转换为整形
+  int toInt(int defaultValue = 0) const;
+  // 转换为Json对象
+  QJsonObject toObject(const QJsonObject &defaultValue) const;
+  QJsonObject toObject() const;
+  // 转换为字符串类型
+  QString toString() const;
+  QString toString(const QString &defaultValue) const;
+  ```
+
+## （3） QJsonObject
+
+> 字典
+
+```cpp
+	// 构造空对象
+QJsonObject::QJsonObject();
+
+//将键值对添加到空对象中
+iterator QJsonObject::insert(const QString &key, const QJsonValue &value);	
+
+//获取对象中键值对个数
+int QJsonObject::count() const;	
+int QJsonObject::size() const;
+int QJsonObject::length() const;
 
 
-# 20. Qt网络通信
+//通过key得到value
+QJsonValue QJsonObject::value(const QString &key) const;    // utf8
+QJsonValue QJsonObject::value(QLatin1String key) const;	    // 字符串不支持中文
+QJsonValue QJsonObject::operator[](const QString &key) const;
+QJsonValue QJsonObject::operator[](QLatin1String key) const;
+
+//删除键值对
+void QJsonObject::remove(const QString &key);
+QJsonValue QJsonObject::take(const QString &key);	// 返回key对应的value值
+
+//通过key进行查找
+iterator QJsonObject::find(const QString &key);
+bool QJsonObject::contains(const QString &key) const;
+
+//遍历，方式有三种：
+
+使用相关的迭代器函数
+
+使用 [] 的方式遍历, 类似于遍历数组, []中是键值
+
+先得到对象中所有的键值, 在遍历键值列表, 通过key得到value值
+
+QStringList QJsonObject::keys() const;
+```
+
+## （4） QJsonArray
+
+> 列表
+
+QJsonArray封装了Json中的数组，在里边可以存储多个元素，为了方便操作，所有的元素类统一封装为QJsonValue类型。
+
+```cpp
+//创建空的Json数组
+QJsonArray::QJsonArray();
+//添加数据
+void QJsonArray::append(const QJsonValue &value);	// 在尾部追加
+void QJsonArray::insert(int i, const QJsonValue &value); // 插入到 i 的位置之前
+iterator QJsonArray::insert(iterator before, const QJsonValue &value);
+void QJsonArray::prepend(const QJsonValue &value); // 添加到数组头部
+void QJsonArray::push_back(const QJsonValue &value); // 添加到尾部
+void QJsonArray::push_front(const QJsonValue &value); // 添加到头部
+//计算数组元素的个数
+int QJsonArray::count() const;
+int QJsonArray::size() const;
+//从数组中取出某一个元素的值
+QJsonValue QJsonArray::at(int i) const;
+QJsonValue QJsonArray::first() const; // 头部元素
+QJsonValue QJsonArray::last() const; // 尾部元素
+QJsonValueRef QJsonArray::operator[](int i);
+//删除数组中的某一个元素
+iterator QJsonArray::erase(iterator it);    // 基于迭代器删除
+void QJsonArray::pop_back();           // 删除尾部
+void QJsonArray::pop_front();          // 删除头部
+void QJsonArray::removeAt(int i);      // 删除i位置的元素
+void QJsonArray::removeFirst();        // 删除头部
+void QJsonArray::removeLast();         // 删除尾部
+QJsonValue QJsonArray::takeAt(int i);  // 删除i位置的原始, 并返回删除的元素的值
+//Josn数组的遍历，常用的方式有两种：
+
+可以使用迭代器进行遍历（和使用迭代器遍历STL容器一样）
+可以使用数组的方式遍历	
+```
+
+## （5） QJsonDocument
+
+> 作用：序列化、反序列化
+>
+> QJsonObject 和 QJsonArray这两个对象中的数据与Json格式的字符串互相转换
+>
+> 如果要进行数据传输或者数据的持久化，操作的都是字符串类型而不是 QJsonObject 或者 QJsonArray类型
+
+```cpp
+//创建QJsonDocument对象
+QJsonDocument::QJsonDocument(const QJsonObject &object);
+QJsonDocument::QJsonDocument(const QJsonArray &array);
+
+//序列化：将文件对象中的数据序列化成json字符串
+//QJsonObject 或者 QJsonArray ===> 字符串
+QByteArray QJsonDocument::toBinaryData() const;	 // 二进制序列化
+QByteArray QJsonDocument::toJson(JsonFormat format = Indented) const;	// json序列化
+
+//用得到的字符串进行数据传输, 或者磁盘文件持久化
+
+//反序列：化字符串 ===> QJsonObject 或者 QJsonArray
+[static] QJsonDocument QJsonDocument::fromBinaryData(const QByteArray &data, DataValidation validation = Validate);
+// 参数文件格式的json字符串
+[static] QJsonDocument QJsonDocument::fromJson(const QByteArray &json, QJsonParseError *error = Q_NULLPTR);
+
+//判断实际类型
+bool QJsonDocument::isArray() const;	// 判断文档对象中存储的数据是不是数组
+bool QJsonDocument::isObject() const	// 判断文档对象中存储的数据是不是json对象
+
+//将文档对象转换为json数组/对象
+QJsonObject QJsonDocument::object() const;	// 文档对象中的数据转换为json对象
+QJsonArray QJsonDocument::array() const;	// 文档对象中的数据转换为json数组
+
+//调用QJsonArray , QJsonObject 类提供的 API 读出存储在对象中的数据
+```
+
+一般情况下，对于Json字符串的解析函数都是有针对性的，因为需求不同设计的Json格式就会有所不同，所以不要试图写出一个通用的Json解析函数，这样只会使函数变得臃肿而且不易于维护，每个Json格式对应一个相应的解析函数即可。
+
+```cpp
+void writeJson()
+{
+    QJsonObject obj;
+    obj.insert("Name", "Ace");
+    obj.insert("Sex", "man");
+    obj.insert("Age", 20);
+
+    QJsonObject subObj;
+    subObj.insert("Father", "Gol·D·Roger");
+    subObj.insert("Mother", "Portgas·D·Rouge");
+    QJsonArray array;
+    array.append("Sabo");
+    array.append("Monkey D. Luffy");
+    subObj.insert("Brother", array);
+    obj.insert("Family", subObj);
+    obj.insert("IsAlive", false);
+    obj.insert("Comment", "yyds");
+
+    QJsonDocument doc(obj);
+    QByteArray json = doc.toJson();
+
+    QFile file("d:\\ace.json");
+    file.open(QFile::WriteOnly);
+    file.write(json);
+    file.close();
+}
+
+
+作者: 苏丙榅
+链接: https://www.subingwen.cn/qt/qt-json/
+来源: 爱编程的大丙
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+```cpp
+void MainWindow::readJson()
+{
+    QFile file("d:\\ace.json");
+    file.open(QFile::ReadOnly);
+    QByteArray json = file.readAll();
+    file.close();
+
+    QJsonDocument doc = QJsonDocument::fromJson(json);
+    if(doc.isObject())
+    {
+        QJsonObject obj = doc.object();
+        QStringList keys = obj.keys();
+        for(int i=0; i<keys.size(); ++i)
+        {
+            QString key = keys.at(i);
+            QJsonValue value = obj.value(key);
+            if(value.isBool())
+            {
+                qDebug() << key << ":" << value.toBool();
+            }
+            if(value.isString())
+            {
+                qDebug() << key << ":" << value.toString();
+            }
+            if(value.isDouble())
+            {
+                qDebug() << key << ":" << value.toInt();
+            }
+            if(value.isObject())
+            {
+                qDebug()<< key << ":";
+                // 直接处理内部键值对, 不再进行类型判断的演示
+                QJsonObject subObj = value.toObject();
+                QStringList ls = subObj.keys();
+                for(int i=0; i<ls.size(); ++i)
+                {
+                    QJsonValue subVal = subObj.value(ls.at(i));
+                    if(subVal.isString())
+                    {
+                        qDebug() << "   " << ls.at(i) << ":" << subVal.toString();
+                    }
+                    if(subVal.isArray())
+                    {
+                        QJsonArray array = subVal.toArray();
+                        qDebug() << "   " << ls.at(i) << ":";
+                        for(int j=0; j<array.size(); ++j)
+                        {
+                            // 因为知道数组内部全部为字符串, 不再对元素类型进行判断
+                            qDebug() << "       " << array[j].toString();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+作者: 苏丙榅
+链接: https://www.subingwen.cn/qt/qt-json/
+来源: 爱编程的大丙
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
+```
+
+
+
+
+
+
+
+
+
+
+
+# 21. Qt网络通信
 
 ---
 
@@ -1737,7 +2345,7 @@ public:
 
 
 
-# 21. 程序打包
+# 22. 程序打包
 
 ## （1）流程
 
@@ -1793,7 +2401,7 @@ https://blog.csdn.net/angiehelen/article/details/120214695
 
 
 
-# 0. 控件常用参数设置
+# 0. css样式表收集
 
 ---
 
@@ -1812,6 +2420,11 @@ https://blog.csdn.net/angiehelen/article/details/120214695
 ## （1）常用API
 
 ```cpp
+//模态窗口显示（阻塞显示）
+exec();
+//非阻塞显示
+show();
+
 //设定位置
 void setGeometry(int x,int y,int w,int h);	
 void setGeometry(const QRect&)
@@ -1965,7 +2578,21 @@ widget->show();
 wt.move((this->width() - wt->width())/2,(this->height() - wt->height())/2);
 ```
 
-# 3. QDialog
+# 3. 字体
+
+---
+
+> ```cpp
+> #include<QFont>
+> ```
+
+```cpp
+bool ok;
+QFont ft = QFontDialog::getFont(&ok, QFont("微软雅黑",12,QFont::Bold), this, "选择字体");
+QWidget::setfont(ft);	//给QWidget控件设置字体
+```
+
+# 4. QDialog
 
 https://subingwen.cn/qt/qt-base-window/#3-QDialog%E7%9A%84%E5%AD%90%E7%B1%BB
 
@@ -2084,15 +2711,109 @@ toHtml()
 clear()	
 ```
 
+# 8. CheckBox
+
+---
 
 
 
+# 9. 进度条
+
+---
 
 
 
+## （1）QProgressBar
+
+> 水平或竖直的进度条
+>
+> 
 
 
 
+## （2）QProgressDialog
+
+> 进度条对话框
+>
+> ```cpp
+> #include<QProgessDialog>
+> ```
+
+```cpp
+QProgressDialog::QProgressDialog(const QString &labelText, const QString &cancelButtonText, int minimum, int maximum, QWidget *parent = Q_NULLPTR, Qt::WindowFlags f = Qt::WindowFlags());
+//labelText：提醒当前是什么的进度
+//minimun：进度起始值
+//maximum：进度终止值
+```
+
+```cpp
+// Operation constructor
+Operation::Operation(QObject *parent)
+    : QObject(parent), steps(0)
+{
+    pd = new QProgressDialog("Operation in progress.", "Cancel", 0, 100);
+    connect(pd, SIGNAL(canceled()), this, SLOT(cancel()));
+    t = new QTimer(this);
+    connect(t, SIGNAL(timeout()), this, SLOT(perform()));
+    t->start(0);
+}
+
+void Operation::perform()
+{
+    pd->setValue(steps);
+    //... perform one percent of the operation
+    steps++;
+    if (steps > pd->maximum())
+        t->stop();
+}
+
+void Operation::cancel()
+{
+    t->stop();
+    //... cleanup
+    delete pd;
+    delete t;
+    steps = 0;
+}
+```
+
+
+
+# 窗口布局
+
+---
+
+> 作用：缩放会自动调整间距和控件大小
+>
+> 顶层窗口必须布局，否则内部可能显示不全。
+>
+> 没有布局时，布局图标会有个红色小圈。
+
+## （1）水平、垂直、网状布局
+
+用Container->Widget作容器，把控件放进去，然后右键：水平、垂直、网状、去掉布局。
+
+被布局的控件，属性中会增加个`layout`
+
+```cpp
+//布局的这个容器框和窗口边框之间的间距（单位：像素）
+layoutLeftMargin
+layoutRightMargin
+layoutTopMargin
+layoutBottomMargin
+//布局后，控件之间的间距（单位：像素）
+layoutSpacing
+```
+
+
+
+## （2）弹簧
+
+把若干控件放到Widget容器中，布局后。
+
+用于把控件置中间
+
+如果需要控件之间有固定间距，在中间放个弹簧。改sizeType从Expanding（可伸缩）到fixed（固定），然后修改宽度或高度。
 
 
 
