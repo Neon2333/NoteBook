@@ -1076,6 +1076,26 @@ telnet失败的原因：
 
 
 
+### （6）tc
+
+为测试应用程序在不同网络条件下的性能，可手动增加网络延迟：
+
+```bash
+tc qdisc add dev ens160(网卡名) root netem delay 600ms
+```
+
+恢复：
+
+```bash
+tc qdisc add dev ens160(网卡名) root netem delay 600ms
+```
+
+
+
+
+
+
+
 ---
 
 ## 17. 系统服务管理（程序开机自启）

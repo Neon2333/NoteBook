@@ -34,21 +34,23 @@ ifdef DOUBLE
 >
 > 删除一行-deleteline
 
-| -                        | -                        |
-| ------------------------ | ------------------------ |
-| 添加头文件               | atl+enter                |
-| 由函数声明快速生成函数体 | alt+enter                |
-| f4                       | 跳转头文件、源文件       |
-| ctrl-鼠标左键/f2         | 跳转到函数定义           |
-| F5                       | 开始调试                 |
-| F10                      | 单步前进                 |
-| F11                      | 单步进入函数             |
-| ///                      | 回车后自动创建下一行注释 |
-| ctrl+space               | 补全                     |
-| ctrl-ins                 | 复制行                   |
-| 移动行                   | alt-up、alt-down         |
-| 按住alt                  | 同步输入                 |
-| ctrl-l                   | 删除一行                 |
+| -                                                | -                         |
+| ------------------------------------------------ | ------------------------- |
+| 添加头文件                                       | atl+enter                 |
+| 由函数声明快速生成函数体                         | alt+enter                 |
+| f4                                               | 跳转头文件、源文件        |
+| ctrl-鼠标左键/f2                                 | 跳转到函数定义            |
+| F5                                               | 开始调试                  |
+| F10                                              | 单步前进                  |
+| F11                                              | 单步进入函数              |
+| ///                                              | 回车后自动创建下一行注释  |
+| ctrl+space                                       | 补全                      |
+| ctrl-ins                                         | 复制行                    |
+| 移动行                                           | alt-up、alt-down          |
+| 按住alt                                          | 同步输入                  |
+| ctrl-l                                           | 删除一行                  |
+| ctrl+shift+f                                     | 查找变量所有的使用        |
+| 在需要查看的变量上右键，选择**添加表达式求值器** | qtcreator调试添加变量监视 |
 
 ## 没用到的参数不要报错
 
@@ -99,6 +101,20 @@ https://blog.csdn.net/LUCYcanFire/article/details/126402240
   与上面的方法一致，找到Cmake编译器，添加就行了。
 
 配置完之后可以在Kit标签页给配置命名。
+
+## VS配置Qt
+
+* 配置方法：
+
+  https://www.cnblogs.com/linuxAndMcu/p/14576033.html
+
+* 如果找不到 Qt 程序库，可以右击【项目】->【属性】-> 【配置属性】->【C/C++】->【常规】，编辑 “附加包含目录”，找到 Qt 的安装目录下的 include 文件夹的路径，将它添加进 “附加包含目录” 里面，然后一路确认即可。重新编译程序，编译通过。
+
+* vs打开qtcreator创建的.pro工程
+
+  【扩展】->【Qt vs Tools】->Open Qt Project Files(.pro)
+
+* vs创建的工程没有.pro只有.sln
 
 # 2.  字符串
 
@@ -155,7 +171,7 @@ QByteArray计算出的是字节数。
 * int转QString
 
   ```cpp
-  int a = QString::number(10);
+  QString a = QString::number(10);
   ```
 
 * QString转int
@@ -638,8 +654,6 @@ MainWindow:QMainWindow	//定义类继承自QMainWindow
 * QWidget的事件：
 
 ```cpp
-
-    
 virtual void mousePressEvent(QMouseEvent* ev) override;
 virtual void mouseMoveEvent(QMouseEvent* ev) override;
 
@@ -676,6 +690,8 @@ void rei::enterEvent(QEvent *ev)
 
 ## （2）重绘事件
 
+`QWidget`及其子类都有`painEvent`事件
+
 调用`update()`时会自动调用`paintEvent`事件
 
 ```cpp
@@ -690,6 +706,10 @@ void rei::paintEvent(QPaintEvent *event)
     p.drawPixmap(this->rect(), this->pixmap);
 }
 ```
+
+## （3）按键事件
+
+
 
 # 9. 容器
 
@@ -839,6 +859,8 @@ QRect screen = QGuiApplication::screens().first()->geometry();
 
 * 读
 
+  > 不会。在C++和Qt中，当你使用`QFile`的`open()`函数以`QIODevice::ReadOnly`模式（只读模式）打开一个文件时，如果该文件不存在，`QFile`不会自动创建新文件。相反，`open()`函数会返回`false`，并且你可以使用`QFile`的`error()`函数或者`errorString()`函数来获取错误信息。
+
   ```cpp
   QFile("path");	//关联文件
   QFile::setFileName("path");	//重新设置关联文件
@@ -869,6 +891,12 @@ QRect screen = QGuiApplication::screens().first()->geometry();
 
 * 写
 
+  * 使用`QFile`的`open()`函数以`QIODevice::WriteOnly`模式打开一个文件时，如果该文件不存在，`QFile`会自动创建一个新的空文件。
+  
+  * 当使用`QIODevice::WriteOnly`模式时，如果文件已经存在，其内容将被清空，因为`WriteOnly`模式会截断文件。
+  
+  * 如果你想在文件末尾追加内容，应该使用`QIODevice::Append`模式或者`QIODevice::WriteOnly | QIODevice::Append`组合模式。
+  
   ```cpp
   qint64 QIODevice::write(const char *data, sizeof(data));	//把data中数据写入device，返回实际写入字节数，错误返-1
   qint64 QIODevice::write(const QByteArray& byteArray);	//同上，把byteArray中数据写入device
@@ -920,14 +948,20 @@ file.close();
 > ```cpp
 > #include <QDir>
 > ```
+>
+> ```cpp
+> QFile("/");	//Unix系统表示系统根目录，Windows表示项目所在盘符根目录
+> ```
 
 ```cpp
 QDir("path");
 setPath("path");	//重新设置目录路径
 path();	//返回目录路径
 absolutePath();	//返回绝对路径
+projectRootPath = QCoreApplication::applicationDirPath(); // 获取项目根目录路径
 dirName();	//返回目录名
 exists();	//判断目录是否存在
+exists(QString dirPath);
 count();	//返回目录下所有条目个数
 QStringList entryList();	//返回目录下所有条目（文件、目录）名称组成的字符串链表
 QFileInfoList entryInfoList();	//返回目录下所有条目（文件、目录）的QFileInfo组成的链表
@@ -938,7 +972,29 @@ bool rename();	//目录重命名
 bool remove(const QString& fileName);	//删除文件
 ```
 
+```cpp
+//把文件写入当前项目所在目录
+#include <QFile>
+#include <QIODevice>
+#include <QDir>
 
+int main()
+{
+    QString fileName = "example.txt"; // 文件名
+    QString projectRootPath = QCoreApplication::applicationDirPath(); // 获取项目根目录路径
+
+    QFile file(projectRootPath + "/" + fileName); // 拼接文件路径
+    if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        // 在这里处理文件操作，例如写入数据
+        file.close();
+    } else {
+        qDebug() << "无法创建文件";
+        return -1;
+    }
+
+    return 0;
+}
+```
 
 
 
@@ -1041,6 +1097,34 @@ void SimpleExampleWidget::paintEvent(QPaintEvent *)
 
 * 文件上右键`Copy Path`复制路径
 * 可选中文件，在`Alias`中指定别名
+
+# 16. 随机数
+
+---
+
+```cpp
+int r = QRandomGenerator::global()->bounded(min,max)
+```
+
+
+
+
+
+# 17. 位置
+
+---
+
+* 当前屏幕尺寸
+
+  ```cpp
+  QRect screen = QGuiApplication::screens().first()->geometry();
+  int xMax = screen.right();	//屏幕最右坐标
+  int yMax = screen.bottom()l	//屏幕最下坐标
+  ```
+
+  
+
+
 
 # 16. 自定义控件
 
@@ -2110,7 +2194,7 @@ public:
 
 ## （3） QJsonObject
 
-> 字典
+> json对象
 
 ```cpp
 	// 构造空对象
@@ -2152,7 +2236,7 @@ QStringList QJsonObject::keys() const;
 
 ## （4） QJsonArray
 
-> 列表
+> 数组/列表
 
 QJsonArray封装了Json中的数组，在里边可以存储多个元素，为了方便操作，所有的元素类统一封装为QJsonValue类型。
 
@@ -2253,12 +2337,6 @@ void writeJson()
     file.write(json);
     file.close();
 }
-
-
-作者: 苏丙榅
-链接: https://www.subingwen.cn/qt/qt-json/
-来源: 爱编程的大丙
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 
 ```cpp
@@ -2318,16 +2396,128 @@ void MainWindow::readJson()
         }
     }
 }
-
-
-
-作者: 苏丙榅
-链接: https://www.subingwen.cn/qt/qt-json/
-来源: 爱编程的大丙
-著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 ```
 
+## （6）修改json
 
+> 不能直接写入。要先读取，进行修改，再写入。
+
+```cpp
+//读取已有json文件
+    QFile jsonFile(jsonPath);
+    if(!jsonFile.open(QFile::ReadOnly))
+    {
+        //ReadOnly，文件不存在不创建，返回false
+        return;
+    }
+    QByteArray jsonStrOld = jsonFile.readAll();
+    jsonFile.close();
+
+    // //反序列化为document
+    QJsonDocument doc = QJsonDocument::fromJson(jsonStrOld);
+    //因为规定了json是array类型
+    if(!doc.isArray())
+    {
+        return;
+    }
+    //转成array
+    QJsonArray jsonArr = doc.array();
+
+    //创建1个object。把要append的word转成object。
+    QJsonObject objAppend;
+    objAppend.insert("pageIndex", w.pageIndex);
+    objAppend.insert("spelling", w.spelling);
+
+    QJsonArray meaningArr;
+    for(int i=0;i<w.meanings.count();i++)
+    {
+        meaningArr.append(w.meanings.at(i));
+    }
+    objAppend.insert("meanings", meaningArr);
+
+    objAppend.insert("type", w.type);
+
+    QJsonArray synonymsArr;
+    for(int i=0;i<w.synonyms.count();i++)
+    {
+        synonymsArr.append(w.synonyms.at(i));
+    }
+    objAppend.insert("synonyms",synonymsArr);
+
+    QJsonArray antonymArr;
+    for(int i=0;i<w.antonyms.count();i++)
+    {
+        antonymArr.append(w.antonyms.at(i));
+    }
+    objAppend.insert("antonym",antonymArr);
+
+    QJsonArray nearSynonymsArr;
+    for(int i=0;i<w.nearSynonyms.count();i++)
+    {
+        nearSynonymsArr.append(w.nearSynonyms.at(i));
+    }
+    objAppend.insert("nearSynonyms",nearSynonymsArr);
+
+    QJsonArray similarArr;
+    for(int i=0;i<w.similar.count();i++)
+    {
+        similarArr.append(w.similar.at(i));
+    }
+    objAppend.insert("similar",similarArr);
+
+    QJsonArray nounArr;
+    for(int i=0;i<w.noun.count();i++)
+    {
+        nounArr.append(w.noun.at(i));
+    }
+    objAppend.insert("noun",nounArr);
+
+    QJsonArray verbArr;
+    for(int i=0;i<w.verb.count();i++)
+    {
+        verbArr.append(w.verb.at(i));
+    }
+    objAppend.insert("verb",verbArr);
+
+    QJsonArray adjArr;
+    for(int i=0;i<w.adj.count();i++)
+    {
+        adjArr.append(w.adj.at(i));
+    }
+    objAppend.insert("adj",adjArr);
+
+    QJsonArray advArr;
+    for(int i=0;i<w.adv.count();i++)
+    {
+        advArr.append(w.adv.at(i));
+    }
+    objAppend.insert("adv",advArr);
+
+    QJsonArray usefulExpressionsArr;
+    for(int i=0;i<w.usefulExpressions.count();i++)
+    {
+        usefulExpressionsArr.append(w.usefulExpressions.at(i));
+    }
+    objAppend.insert("usefulExpressions",usefulExpressionsArr);
+
+    //将新建的object添加到array末尾
+    jsonArr.append(objAppend);
+
+    // 将修改后的JSON数组设置回JSON文档
+    doc.setArray(jsonArr);
+    //序列化成字符串
+    QByteArray jsonStrNew = doc.toJson();
+
+
+    //字符串写入文件
+    if(!jsonFile.open(QFile::WriteOnly))
+    {
+        return;
+    }
+
+    jsonFile.write(jsonStrNew);
+    jsonFile.close();
+```
 
 
 
@@ -2401,13 +2591,11 @@ https://blog.csdn.net/angiehelen/article/details/120214695
 
 
 
-# 0. css样式表收集
+# 0. 样式表
 
 ---
 
-```cpp
 
-```
 
 
 
@@ -2578,7 +2766,7 @@ widget->show();
 wt.move((this->width() - wt->width())/2,(this->height() - wt->height())/2);
 ```
 
-# 3. 字体
+# 3. 字体、字体色、背景色
 
 ---
 
@@ -2586,11 +2774,38 @@ wt.move((this->width() - wt->width())/2,(this->height() - wt->height())/2);
 > #include<QFont>
 > ```
 
+## （1）字体选择对话框
+
 ```cpp
 bool ok;
 QFont ft = QFontDialog::getFont(&ok, QFont("微软雅黑",12,QFont::Bold), this, "选择字体");
 QWidget::setfont(ft);	//给QWidget控件设置字体
 ```
+
+## （2）设置字体
+
+```cpp
+textEdit_synonyms = new QTextEdit(this);
+    textEdit_synonyms->setFixedSize(185,200);
+    textEdit_synonyms->setReadOnly(true);
+    textEdit_synonyms->setFont(QFont("微软雅黑",10));
+    textEdit_synonyms->setAlignment(Qt::AlignCenter);
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+    textEdit_synonyms->append("distinguish");
+	//样式表
+    // textEdit_synonyms->setStyleSheet("background-color:rgb(0,0,0);color:rgb(255,255,255)");
+```
+
+
 
 # 4. QDialog
 
@@ -2690,17 +2905,46 @@ QString getSaveFileName()
 | editable  | 下拉菜单是否可编辑 |
 | step      | 步长               |
 
-# 多行文本显示TextEdit
+
+
+# 8. 单行文本显示QLabel
+
+---
+
+```cpp
+//设置背景、字体、颜色
+QLabel *label = new QLabel(tr("Hello Qt!"));    
+QPalette pe;
+//设置黑底红字
+pe.setColor(QPalette::Background,Qt::black);
+pe.setColor(QPalette::WindowText,Qt::red);    
+label->setPalette(pe);
+
+ui->label->setText(""); 
+//ui->label->setStyleSheet("color:red;"); 
+//设置指定背景色
+ui->label->setStyleSheet("QLabel{background-color:rgb(200,101,102);}");  
+```
+
+
+
+
+
+# 9. 多行文本显示TextEdit
+
+---
 
 https://blog.csdn.net/XZ2585458279/article/details/97820501
 
 ## （1）API
 
 ```cpp
+//添加一行
+textedit->append("123"); 
 //设置文本
 setText();
 //设置多行文本框的文本内容
-setPlainText()	
+setPlainText("这里是多行字符串\n这是第二行\n这是第三行");
 //返回多行文本框的文本内容
 toPlainText()
 //设置多行文本框的内容为HTML文档，HTML文档是描述网页的
@@ -2711,13 +2955,13 @@ toHtml()
 clear()	
 ```
 
-# 8. CheckBox
+# 9. CheckBox
 
 ---
 
 
 
-# 9. 进度条
+# 10. 进度条
 
 ---
 
@@ -2791,20 +3035,78 @@ void Operation::cancel()
 
 ## （1）水平、垂直、网状布局
 
-用Container->Widget作容器，把控件放进去，然后右键：水平、垂直、网状、去掉布局。
-
-被布局的控件，属性中会增加个`layout`
-
 ```cpp
-//布局的这个容器框和窗口边框之间的间距（单位：像素）
-layoutLeftMargin
-layoutRightMargin
-layoutTopMargin
-layoutBottomMargin
-//布局后，控件之间的间距（单位：像素）
-layoutSpacing
+#include<QLayout>
 ```
 
+* 设计器：
+
+  Container->Widget作容器，把控件放进去，然后右键：水平、垂直、网状、去掉布局。
+
+  被布局的控件，属性中会增加个`layout`
+
+  ```cpp
+  //布局的这个容器框和窗口边框之间的间距（单位：像素）
+  layoutLeftMargin
+  layoutRightMargin
+  layoutTopMargin
+  layoutBottomMargin
+  //布局后，控件之间的间距（单位：像素）
+  layoutSpacing
+  ```
+
+* 代码实现步骤：
+
+  **要从局部再到整体的写，否则对象没初始化**
+
+  > 创建QWidget对象、布局对象、控件对象
+  >
+  > 把控件添加到布局`layout->addWidget()`
+  >
+  > 把布局设置为QWidget的布局`widget->setLayout()`
+  >
+  > 最后把最外层QWidget设置为MainWindow的中心部件
+
+```cpp
+QHBoxLayout* layout_h = new QHBoxLyaout();
+layout_h->addWidget();	//添加容器Widget
+layout_h->addLayout();	//布局内添加布局
+layout_h->setMargin();	//设置容器框和窗口边框间距
+layout_h->setSpacing();	//设置控件间距	
+```
+
+```cpp
+#include <QApplication>
+#include <QMainWindow>
+#include <QPushButton>
+#include <QHBoxLayout>
+
+int main(int argc, char *argv[])
+{
+    QApplication app(argc, argv);
+
+    MainWindow mainWindow;
+
+    QWidget *widget = new QWidget;
+    QPushButton *button = new QPushButton("点击我");
+    QHBoxLayout *layout = new QHBoxLayout;
+    layout->addWidget(button);	//布局添加控件
+    widget->setLayout(layout);	//将布局设置为widget的布局
+
+    mainWindow.setCentralWidget(widget);	//widget设置为MainWindow的中心部件
+    mainWindow.show();
+    return app.exec();
+}
+```
+
+* 布局后保持原来尺寸
+
+  ```cpp
+  label_spelling->resize(600,200);
+  int originWidth = label_spelling->width();	//获取原始宽度
+  label_spelling->setMinimumWidth(originWidth);	//设置最小宽度为原始宽度
+  label_spelling->setMaximumWidth(originWidth);	//设置最大宽度为原始宽度
+  ```
 
 
 ## （2）弹簧
@@ -2815,7 +3117,166 @@ layoutSpacing
 
 如果需要控件之间有固定间距，在中间放个弹簧。改sizeType从Expanding（可伸缩）到fixed（固定），然后修改宽度或高度。
 
+# 树状目录
 
+---
+
+## （1）添加
+
+```cpp
+ QTreeWidgetItem* wordspellingItem = new QTreeWidgetItem();
+    wordspellingItem->setText(0,w.spelling);
+
+    QTreeWidgetItem*  meaningsItem = new QTreeWidgetItem();
+    meaningsItem->setText(1,"释义");
+    for(auto item : w.meanings)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        meaningsItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* partSpeechItem = new QTreeWidgetItem();
+    partSpeechItem->setText(1, w.type);
+
+
+    QTreeWidgetItem* synonymsItem = new QTreeWidgetItem();
+    synonymsItem->setText(1,"同义词");
+    for(auto item : w.synonyms)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        synonymsItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* anotonymsItem = new QTreeWidgetItem();
+    synonymsItem->setText(1,"反义词");
+    for(auto item : w.antonyms)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        anotonymsItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* nearSynonymsItem = new QTreeWidgetItem();
+    nearSynonymsItem->setText(1,"近义词");
+    for(auto item : w.nearSynonyms)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        nearSynonymsItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* similarsItem = new QTreeWidgetItem();
+    similarsItem->setText(1,"形近词");
+    for(auto item : w.similar)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        similarsItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* nounItem = new QTreeWidgetItem();
+    nounItem->setText(1,"名词");
+    for(auto item : w.noun)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        nounItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* verbItem = new QTreeWidgetItem();
+    verbItem->setText(1,"动词");
+    for(auto item : w.verb)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        verbItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* adjItem = new QTreeWidgetItem();
+    adjItem->setText(1,"形容词");
+    for(auto item : w.adj)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        adjItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* advItem = new QTreeWidgetItem();
+    advItem->setText(1,"副词");
+    for(auto item : w.adv)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        advItem->addChild(tempItem);
+    }
+
+    QTreeWidgetItem* usefulExpressionsItem = new QTreeWidgetItem();
+    usefulExpressionsItem->setText(1,"常用搭配");
+    for(auto item : w.usefulExpressions)
+    {
+        QTreeWidgetItem* tempItem = new QTreeWidgetItem();
+        tempItem->setText(2,item);
+        usefulExpressionsItem->addChild(tempItem);
+    }
+
+    qTreeWidget_wordsTree->addTopLevelItems(QList<QTreeWidgetItem*>{wordspellingItem,meaningsItem,partSpeechItem,synonymsItem,
+    anotonymsItem, nearSynonymsItem, similarsItem, nounItem, verbItem, adjItem, advItem, usefulExpressionsItem});
+```
+
+## （2）删除子项
+
+来清空一个树形控件中的子项
+
+```cpp
+QTreeWidgetItem.takeChild()
+```
+
+## （3）清空树
+
+```cpp
+#include <QTreeWidget>
+#include <QTreeWidgetItem>
+
+void clearTreeWidget(QTreeWidget *treeWidget)
+{
+    // 获取根节点
+    QTreeWidgetItem *root = treeWidget->invisibleRootItem();
+
+    // 遍历所有子项并删除它们
+    while (root->childCount() > 0)
+    {
+        delete root->takeChild(0);
+    }
+}
+```
+
+## （4）展开、折叠
+
+* 折叠
+
+  ```cpp
+  collapse(const QModelIndex &index);
+  collapseAll();
+  ```
+
+* 展开
+
+  ```cpp
+  expand(const QModelIndex &index);	//展开指定节点
+  expandAll();	//展开所有可展开节点
+  void QTreeView::expandToDepth(int depth);	//展开所有可展开节点到指定深度
+  ```
+
+## （5）选中
+
+```cpp
+QTreeWidgetItem *item = xxx//先获取要展开的项
+ui->treeWidget->clearSelection();    //清楚之前的 选中状态
+ui->treeWidget->scrollToItem(item);    //展开 并自动调整滚动条 到可以显示的位置
+item->setSelected(true);    //选中 此项
+```
 
 
 
