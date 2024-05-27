@@ -1649,29 +1649,47 @@ while True:
 
 # 20. 单元测试
 
-
-
-
-
 # 21. 代码规范
 
 
 
+# 22. 代码优化
+
+## （1）使用缓存提升函数运行速度
+
+```python
+import time
+def calc(x):
+    print(f'{x}+1 is:')
+    time.sleep(2)	# 延时2s
+    return x+1
+while True:
+    ii = int(input('>> '))
+    print(calc(ii))
+```
+
+上例中，每次调用calc都会延时2s。
+
+但如果把`calc`声明为使用缓存，运行一次后如果输入不变，会不调用`calc`直接从缓存中提取结果（表现上就是没有延时的2s）：
+
+```python
+from functools import cache
+
+@cache
+def calc(x):
+```
 
 
 
+
+
+---
 
 ---
 
 # Python调用C++代码
 
 ## （1）cppyy库
-
-
-
-
-
----
 
 # OCR识别库
 

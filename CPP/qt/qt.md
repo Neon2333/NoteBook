@@ -34,7 +34,7 @@ ifdef DOUBLE
 >
 > 删除一行-deleteline
 
-| -                                                | -                         |
+| qtcreator                                        | -                         |
 | ------------------------------------------------ | ------------------------- |
 | 添加头文件                                       | atl+enter                 |
 | 由函数声明快速生成函数体                         | alt+enter                 |
@@ -51,6 +51,12 @@ ifdef DOUBLE
 | ctrl-l                                           | 删除一行                  |
 | ctrl+shift+f                                     | 查找变量所有的使用        |
 | 在需要查看的变量上右键，选择**添加表达式求值器** | qtcreator调试添加变量监视 |
+
+| VS             | -                 |
+| -------------- | ----------------- |
+| ctrl-k，ctrl-o | 切换头文件/源文件 |
+
+
 
 ## 没用到的参数不要报错
 
@@ -104,6 +110,10 @@ https://blog.csdn.net/LUCYcanFire/article/details/126402240
 
 ## VS配置Qt
 
+VS下编写的代码编码默认是GB2312格式。要转成utf-8才跨平台。
+
+Qt creator是跨平台的，所以编码格式默认为utf-8格式。
+
 * 配置方法：
 
   https://www.cnblogs.com/linuxAndMcu/p/14576033.html
@@ -115,6 +125,20 @@ https://blog.csdn.net/LUCYcanFire/article/details/126402240
   【扩展】->【Qt vs Tools】->Open Qt Project Files(.pro)
 
 * vs创建的工程没有.pro只有.sln
+
+### qtcreator代码到VS编译，汉字会乱码
+
+在VS的每个头文件的`#pragma once`之后加上：
+
+```cpp
+#pragma execution_character_set("utf-8")
+```
+
+> 所以要用notepad++打开乱码文件（此时是utf-8编码），【编码】->**【转为ANSI编码】确保【使用ANSI编码】时不乱码**->【编码字符集】/【中文】/【GB2312】
+>
+> **Qt creator是跨平台的，所以编码格式默认为utf-8格式**，utf-8编码无论在windows还是在linux下都可以正常显示中文。
+> **但是VS不是跨平台的，VS是windows下的原生IDE，windows的系统编码为GB2312格式，**这就导致在qtcreator中按照utf-8编码的中文，在VS中用GB2312来解码（VS打开Qt creator编写的文件）或者按照GB2312来编码，utf-8来解码（Qt creator打开VS编写的文件）两种情况，出现中文乱码情况。
+> 如何解决呢？统一编码，将VS的编码改成utf-8或者将Qt creator的编码改成GB2312都可以。
 
 # 2.  字符串
 
@@ -592,15 +616,34 @@ qRegisterMetaType<QVector<int>>("QVector<int>");	//注册QVector<int>类型
 disconnect(sender, signal, receiver, slot);
 ```
 
+## （8）变量被修改怎么发出信号
+
+把变量的修改封装成方法`setter`，在方法内部`emit signal`
+
+```cpp
+bool editMode=false;
+void MainWindow::editModeSetter(bool isEditMode)
+{
+    if (editMode != isEditMode)
+    {
+        editMode = isEditMode;
+        emit modeChanged(editMode);
+    }
+}
+```
+
+
+
 # 8. qt事件处理函数
 
 ---
 
-事件处理函数名称：`xxxEvent`，去`protected virtual`里找
-
-一些内置的信号和对应的处理函数。
-
-要声明为`protected`
+> 声明为`protected virtual`
+>
+> 事件处理函数名称：`xxxEvent`，去`protected virtual`里找
+>
+> 一些内置的信号和对应的处理函数。
+>
 
 **只要事件产生了，对应的事件处理函数handler就会被框架自动调用。若想要自行定义函数的功能。用子类继承然后override。但，override以后，父类的该函数体内的行为将不执行了，所以再调用一下父类的的事件处理函数。**
 
@@ -654,12 +697,17 @@ MainWindow:QMainWindow	//定义类继承自QMainWindow
 * QWidget的事件：
 
 ```cpp
-virtual void mousePressEvent(QMouseEvent* ev) override;
-virtual void mouseMoveEvent(QMouseEvent* ev) override;
+//当鼠标左键、鼠标右键、鼠标中键被按下，该函数被自动调用
+virtual void mousePressEvent(QMouseEvent* ev) override;	
+//当鼠标移动（也可以按住一个或多个鼠标键移动），该函数被自动调用，通过参数可以得到在移动过程中哪些鼠标键被按下了。
+virtual void mouseMoveEvent(QMouseEvent* ev) override;	
+//当鼠标双击该函数被调用，通过参数可以得到是通过哪个鼠标键进行了双击操作
+[virtual protected] void QWidget::mouseDoubleClickEvent(QMouseEvent *event);	
+//当鼠标进入窗口的一瞬间，触发该事件，注意：只在进入的瞬间触发一次该事件
+[virtual protected] void QWidget::enterEvent(QEvent *event);
+//当鼠标离开窗口的一瞬间，触发该事件，注意：只在离开的瞬间触发一次该事件
+[virtual protected] void QWidget::leaveEvent(QEvent *event);
 
-//注意参数是QEvent而不是QMouseEvent
-virtual void enterEvent(QEvent* ev);	//只鼠标触碰到边缘时触发一次。进入内部后不会多次触发。
-virtual void leaveEvent(QEvent* ev);
 ```
 
 ```cpp
@@ -708,6 +756,147 @@ void rei::paintEvent(QPaintEvent *event)
 ```
 
 ## （3）按键事件
+
+* 盘上的按键被按下了，该函数被自动调用，通过参数可以得知按下的是哪个键。
+
+  ```cpp
+  [virtual protected] void QWidget::keyPressEvent(QKeyEvent *event);
+  ```
+
+* 当键盘上的按键被释放了，该函数被自动调用，通过参数可以得知释放的是哪个键。
+
+  ```cpp
+  [virtual protected] void QWidget::keyReleaseEvent(QKeyEvent *event);
+  ```
+
+
+
+## （4）窗口关闭事件
+
+当窗口标题栏的关闭按钮被按下并且在窗口关闭之前该函数被调用，可以通过该函数控制窗口是否被关闭。
+
+```cpp
+[virtual protected] void QWidget::closeEvent(QCloseEvent *event);
+```
+
+当窗口的大小发生变化，该函数被调用。
+
+```cpp
+[virtual protected] void QWidget::resizeEvent(QResizeEvent *event);
+```
+
+## （5）全局事件
+
+>https://www.cnblogs.com/zezhou/p/12861089.html
+>
+>默认事件只是针对于一个区域，比如控件，不是整体所有控件得事件，而全局事件，是所有控件汇总得地方。
+>
+> 实现只要在程序内就可随意点击按键，就会监测到。
+>
+>通过继承QApplication，编写事件过滤器实现。
+
+```cpp
+//GlobalApplication.h
+#include <QApplication>
+#include <QWidget>
+
+class GlobalApplication : public QApplication
+{
+    Q_OBJECT
+public:
+     GlobalApplication(int&argc,char **argv);
+     ~GlobalApplication();
+
+     // bool notify(QObject*, QEvent *);
+     bool eventFilter(QObject *, QEvent *);
+signals:
+     // 自定义信号
+     void start_audio_signal();
+     void stop_audio_signal();
+private:
+     QWidget *widget;
+};
+```
+
+```cpp
+//GlobalApplication.cpp
+#include "GlobalApplication.h"
+#include <QEvent>
+#include <QKeyEvent>
+#include <QDebug>
+
+GlobalApplication::GlobalApplication(int &argc,char **argv):
+QApplication(argc,argv)
+{
+    // 必须要安装过滤器
+    this->installEventFilter(this);
+}
+
+GlobalApplication::~GlobalApplication()
+{
+
+}
+
+// 监测得空格
+bool GlobalApplication::eventFilter(QObject *object, QEvent *event)
+{
+    if (event->type() == QEvent::KeyPress)
+    {
+        QKeyEvent *key_press = static_cast<QKeyEvent *>(event);
+        // key_press->isAutoRepeat() 这点很重要，默认持续长按就返回true，加上这个取反表示一直按着也指表示按了一次
+        if (key_press->key() == Qt::Key_Space && !key_press->isAutoRepeat())
+        {
+            // qDebug() << "start";
+            // 发射自定义信号
+            emit start_audio_signal();
+            //拦截
+            return true;
+        }
+    }
+    else if(event->type() == QEvent::KeyRelease)
+    {
+        QKeyEvent *key_release = static_cast<QKeyEvent *>(event);
+        if (key_release->key() == Qt::Key_Space && !key_release->isAutoRepeat())
+        {
+            // qDebug() << "end";
+            emit stop_audio_signal();
+            //拦截
+            return true;
+        }
+    }
+    //不进行拦截
+    return false;
+}
+```
+
+```cpp
+//main.cpp
+#include "MainWindow.h"
+#include <QApplication>
+#include <QDebug>
+
+int main(int argc, char *argv[])
+{
+	GlobalApplication *app = new GlobalApplication(argc, argv);
+// 需要传app，给app发射的信号绑定handler，需要对MainWindow的构造进行修改
+    MainWindow win(app);
+    win.resize(1280, 900);
+    win.show();
+    return app->exec();
+}
+```
+
+```cpp
+#include "GlobalApplication.h"
+//MainWindow.h
+MainWindow(GlobalApplication* app, QWidget* parent = nullptr);
+GlobalApplication* app;
+//MainWindow.cpp
+MainWindow::MainWindow(GlobalApplication* a, QWidget* parent):app(a), QMainWindow(parent)
+{}
+//绑定handler	
+connect(app, &GlobalApplication::keyIPressed, this, &MainWindow::onKeyIPressed);
+```
 
 
 
@@ -2535,7 +2724,481 @@ void MainWindow::readJson()
 
 
 
-# 22. 程序打包
+# 22. 通用.gitignore
+
+---
+
+**用VS开发Qt时，把（1）（2）都加上。**
+
+## （1）Qt通用
+
+在含有.git文件夹的文件夹下创建.[gitignore](https://so.csdn.net/so/search?q=gitignore&spm=1001.2101.3001.7020)文件，输入以下：
+
+```git
+# swap files (usually generated by vim)
+*.swap
+
+# cppcheck scrips and reports
+*cppcheck*
+*cppchk*
+
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Protobuf generated files
+*.pb.h
+*.pb.cc
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables for windows
+*.exe
+
+# usr configurations
+*.usr
+*.user
+*.pro.user.*
+*.orig
+*.autosave
+
+# build directory
+build*/
+
+# libraries
+deploy/
+
+# protobuf source files
+*.pb.h
+*.pb.cc
+```
+
+## （2）VS通用
+
+```git
+## Ignore Visual Studio temporary files, build results, and
+## files generated by popular Visual Studio add-ons.
+##
+## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
+
+# User-specific files
+*.rsuser
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# User-specific files (MonoDevelop/Xamarin Studio)
+*.userprefs
+
+# Mono auto generated files
+mono_crash.*
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio 2015/2017 cache/options directory
+.vs/
+# Uncomment if you have tasks that create the project's static files in wwwroot
+#wwwroot/
+
+# Visual Studio 2017 auto generated files
+Generated\ Files/
+
+# MSTest test Results
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+
+# NUnit
+*.VisualState.xml
+TestResult.xml
+nunit-*.xml
+
+# Build Results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+dlldata.c
+
+# Benchmark Results
+BenchmarkDotNet.Artifacts/
+
+# .NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# ASP.NET Scaffolding
+ScaffoldingReadMe.txt
+
+# StyleCop
+StyleCopReport.xml
+
+# Files built by Visual Studio
+*_i.c
+*_p.c
+*_h.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# Chutzpah Test files
+_Chutzpah*
+
+# Visual C++ cache files
+ipch/
+*.aps
+*.ncb
+*.opendb
+*.opensdf
+*.sdf
+*.cachefile
+*.VC.db
+*.VC.VC.opendb
+
+# Visual Studio profiler
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Visual Studio Trace Files
+*.e2e
+
+# TFS 2012 Local Workspace
+$tf/
+
+# Guidance Automation Toolkit
+*.gpState
+
+# ReSharper is a .NET coding add-in
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# TeamCity is a build add-in
+_TeamCity*
+
+# DotCover is a Code Coverage Tool
+*.dotCover
+
+# AxoCover is a Code Coverage Tool
+.axoCover/*
+!.axoCover/settings.json
+
+# Coverlet is a free, cross platform Code Coverage Tool
+coverage*.json
+coverage*.xml
+coverage*.info
+
+# Visual Studio code coverage results
+*.coverage
+*.coveragexml
+
+# NCrunch
+_NCrunch_*
+.*crunch*.local.xml
+nCrunchTemp_*
+
+# MightyMoose
+*.mm.*
+AutoTest.Net/
+
+# Web workbench (sass)
+.sass-cache/
+
+# Installshield output folder
+[Ee]xpress/
+
+# DocProject is a documentation generator add-in
+DocProject/buildhelp/
+DocProject/Help/*.HxT
+DocProject/Help/*.HxC
+DocProject/Help/*.hhc
+DocProject/Help/*.hhk
+DocProject/Help/*.hhp
+DocProject/Help/Html2
+DocProject/Help/html
+
+# Click-Once directory
+publish/
+
+# Publish Web Output
+*.[Pp]ublish.xml
+*.azurePubxml
+# Note: Comment the next line if you want to checkin your web deploy settings,
+# but database connection strings (with potential passwords) will be unencrypted
+*.pubxml
+*.publishproj
+
+# Microsoft Azure Web App publish settings. Comment the next line if you want to
+# checkin your Azure Web App publish settings, but sensitive information contained
+# in these scripts will be unencrypted
+PublishScripts/
+
+# NuGet Packages
+*.nupkg
+# NuGet Symbol Packages
+*.snupkg
+# The packages folder can be ignored because of Package Restore
+**/[Pp]ackages/*
+# except build/, which is used as an MSBuild target.
+!**/[Pp]ackages/build/
+# Uncomment if necessary however generally it will be regenerated when needed
+#!**/[Pp]ackages/repositories.config
+# NuGet v3's project.json files produces more ignorable files
+*.nuget.props
+*.nuget.targets
+
+# Microsoft Azure Build Output
+csx/
+*.build.csdef
+
+# Microsoft Azure Emulator
+ecf/
+rcf/
+
+# Windows Store app package directories and files
+AppPackages/
+BundleArtifacts/
+Package.StoreAssociation.xml
+_pkginfo.txt
+*.appx
+*.appxbundle
+*.appxupload
+
+# Visual Studio cache files
+# files ending in .cache can be ignored
+*.[Cc]ache
+# but keep track of directories ending in .cache
+!?*.[Cc]ache/
+
+# Others
+ClientBin/
+~$*
+*~
+*.dbmdl
+*.dbproj.schemaview
+*.jfm
+*.pfx
+*.publishsettings
+orleans.codegen.cs
+
+# Including strong name files can present a security risk
+# (https://github.com/github/gitignore/pull/2483#issue-259490424)
+#*.snk
+
+# Since there are multiple workflows, uncomment next line to ignore bower_components
+# (https://github.com/github/gitignore/pull/1529#issuecomment-104372622)
+#bower_components/
+
+# RIA/Silverlight projects
+Generated_Code/
+
+# Backup & report files from converting an old project file
+# to a newer Visual Studio version. Backup files are not needed,
+# because we have git ;-)
+_UpgradeReport_Files/
+Backup*/
+UpgradeLog*.XML
+UpgradeLog*.htm
+ServiceFabricBackup/
+*.rptproj.bak
+
+# SQL Server files
+*.mdf
+*.ldf
+*.ndf
+
+# Business Intelligence projects
+*.rdl.data
+*.bim.layout
+*.bim_*.settings
+*.rptproj.rsuser
+*- [Bb]ackup.rdl
+*- [Bb]ackup ([0-9]).rdl
+*- [Bb]ackup ([0-9][0-9]).rdl
+
+# Microsoft Fakes
+FakesAssemblies/
+
+# GhostDoc plugin setting file
+*.GhostDoc.xml
+
+# Node.js Tools for Visual Studio
+.ntvs_analysis.dat
+node_modules/
+
+# Visual Studio 6 build log
+*.plg
+
+# Visual Studio 6 workspace options file
+*.opt
+
+# Visual Studio 6 auto-generated workspace file (contains which files were open etc.)
+*.vbw
+
+# Visual Studio 6 auto-generated project file (contains which files were open etc.)
+*.vbp
+
+# Visual Studio 6 workspace and project file (working project files containing files to include in project)
+*.dsw
+*.dsp
+
+# Visual Studio 6 technical files 
+*.ncb
+*.aps
+
+# Visual Studio LightSwitch build output
+**/*.HTMLClient/GeneratedArtifacts
+**/*.DesktopClient/GeneratedArtifacts
+**/*.DesktopClient/ModelManifest.xml
+**/*.Server/GeneratedArtifacts
+**/*.Server/ModelManifest.xml
+_Pvt_Extensions
+
+# Paket dependency manager
+.paket/paket.exe
+paket-files/
+
+# FAKE - F# Make
+.fake/
+
+# CodeRush personal settings
+.cr/personal
+
+# Python Tools for Visual Studio (PTVS)
+__pycache__/
+*.pyc
+
+# Cake - Uncomment if you are using it
+# tools/**
+# !tools/packages.config
+
+# Tabs Studio
+*.tss
+
+# Telerik's JustMock configuration file
+*.jmconfig
+
+# BizTalk build output
+*.btp.cs
+*.btm.cs
+*.odx.cs
+*.xsd.cs
+
+# OpenCover UI analysis results
+OpenCover/
+
+# Azure Stream Analytics local run output
+ASALocalRun/
+
+# MSBuild Binary and Structured Log
+*.binlog
+
+# NVidia Nsight GPU debugger configuration file
+*.nvuser
+
+# MFractors (Xamarin productivity tool) working folder
+.mfractor/
+
+# Local History for Visual Studio
+.localhistory/
+
+# Visual Studio History (VSHistory) files
+.vshistory/
+
+# BeatPulse healthcheck temp database
+healthchecksdb
+
+# Backup folder for Package Reference Convert tool in Visual Studio 2017
+MigrationBackup/
+
+# Ionide (cross platform F# VS Code tools) working folder
+.ionide/
+
+# Fody - auto-generated XML schema
+FodyWeavers.xsd
+
+# VS Code files for those working on multiple tools
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Local History for Visual Studio Code
+.history/
+
+# Windows Installer files from build outputs
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# JetBrains Rider
+*.sln.iml
+```
+
+
+
+
+
+# 23. 程序打包
 
 ## （1）流程
 
@@ -2595,7 +3258,11 @@ https://blog.csdn.net/angiehelen/article/details/120214695
 
 ---
 
+```cpp
+widget_leftLine2->setStyleSheet("background-color:rgb(0,0,0);color:rgb(255,255,255)");
+```
 
+布局时把`widget`容器使用上面样式表，背景黑色更容易观察间距。
 
 
 
@@ -2766,7 +3433,17 @@ widget->show();
 wt.move((this->width() - wt->width())/2,(this->height() - wt->height())/2);
 ```
 
-# 3. 字体、字体色、背景色
+# 3. 自定义控件
+
+---
+
+> 自定义继承自什么类，然后override相关的事件。或自定义一些signal，在override事件时发出自定义signal。
+>
+> 使用自定义控件时，就可以通过自定义的signal，connect响应函数。
+
+
+
+# 4. 字体、字体色、背景色
 
 ---
 
@@ -2807,7 +3484,7 @@ textEdit_synonyms = new QTextEdit(this);
 
 
 
-# 4. QDialog
+# 5. QDialog
 
 https://subingwen.cn/qt/qt-base-window/#3-QDialog%E7%9A%84%E5%AD%90%E7%B1%BB
 
@@ -2838,7 +3515,7 @@ rejected()
 
 
 
-# 3. QMessageBox
+# 6. QMessageBox
 
 ---
 
@@ -2848,7 +3525,7 @@ rejected()
 QMessageBox::information()
 ```
 
-# 4. QFileDialog
+# 7. QFileDialog
 
 ---
 
@@ -2874,7 +3551,7 @@ QString getSaveFileName()
 | filter          | 过滤满足条件的文件：`Images(*.png *.jpg);;TextFiles(*.tet)` |
 | selectedFileter | 默认filter                                                  |
 
-# 5. QFontDialog
+# 8. QFontDialog
 
 ---
 
@@ -2882,13 +3559,13 @@ QString getSaveFileName()
 
 
 
-# 6. QColorDialog
+# 9. QColorDialog
 
 ---
 
 > 选颜色
 
-# 7. QInputDialog
+# 10. QInputDialog
 
 ---
 
@@ -2907,7 +3584,7 @@ QString getSaveFileName()
 
 
 
-# 8. 单行文本显示QLabel
+# 11. 单行文本显示-QLabel
 
 ---
 
@@ -2930,7 +3607,7 @@ ui->label->setStyleSheet("QLabel{background-color:rgb(200,101,102);}");
 
 
 
-# 9. 多行文本显示TextEdit
+# 12. 多行文本显示-TextEdit
 
 ---
 
@@ -2955,13 +3632,13 @@ toHtml()
 clear()	
 ```
 
-# 9. CheckBox
+# 13. CheckBox
 
 ---
 
 
 
-# 10. 进度条
+# 14. 进度条
 
 ---
 
@@ -2971,7 +3648,6 @@ clear()
 
 > 水平或竖直的进度条
 >
-> 
 
 
 
@@ -3023,7 +3699,7 @@ void Operation::cancel()
 
 
 
-# 窗口布局
+# 窗口布局-QBoxLayout
 
 ---
 
@@ -3117,7 +3793,7 @@ int main(int argc, char *argv[])
 
 如果需要控件之间有固定间距，在中间放个弹簧。改sizeType从Expanding（可伸缩）到fixed（固定），然后修改宽度或高度。
 
-# 树状目录
+# 树状目录-treeViewWidget
 
 ---
 
