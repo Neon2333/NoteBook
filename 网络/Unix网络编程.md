@@ -2,20 +2,6 @@
 
 ---
 
-
-
-## 1. vs code编译报错`__imp_WASartup`等的解决办法
-
-![image-20210827231215022](https://i.loli.net/2021/08/27/mElYtpyM84CV2eU.png)
-
-https://blog.csdn.net/qq_20916555/article/details/50938424
-
-https://www.yht7.com/news/127552
-
-## 2. 127.0.0.1——回送地址
-
-127.0.0.1是回送地址（loopback address），替代当前计算机的IP。
-
 ## 3. Unix主进程结束后，fork的子进程也会立即结束吗？
 
 # Part 01——系统编程
@@ -267,8 +253,6 @@ void error_handling(char *message)
 	exit(1);
 }
 ```
-
-
 
 #### （2）client
 

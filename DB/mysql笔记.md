@@ -314,14 +314,14 @@ mysql -h192.168.42.128 -uroot -p
 >   ```mysql
 >   # 查看允许的主机
 >   use mysql
->                 
+>                   
 >   select host from user where user = 'root'; 
 >   ```
 >
 >   ```mysql
 >   #设置用户root可以从任意主机连接到MySQL
 >   update user set host='%' where user='root';	
->                 
+>                   
 >   flush privileges;
 >   ```
 
@@ -1864,15 +1864,15 @@ https://www.cnblogs.com/zhuiluoyu/p/5822481.html
 
 ### （1）子查询作为过滤条件
 
-#### ——子查询的结果是一个值
+#### 子查询的结果是一个值
 
 ​	SELECT 查询字段 FROM 表 **WHERE 字段=（**子查询**）;** 
 
-#### ——子查询结果是多行单列的时候
+#### 子查询结果是多行单列的时候
 
 ​	SELECT 查询字段 FROM 表 **WHERE 字段 IN （子查询）** 
 
-#### ——子查询的结果是多行多列
+#### 子查询的结果是多行多列
 
 ​	**子查询结果是多行多列的临时表**，肯定接在FROM后
 

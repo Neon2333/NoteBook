@@ -84,7 +84,7 @@ int main()
 
 # 2. `__attribute__((packed)`
 
-这个在C语言中，用来配置[struct](https://so.csdn.net/so/search?q=struct&spm=1001.2101.3001.7020)内存的**编译器预处理指令**
+这个在C语言中，用来配置struct内存的**编译器预处理指令**
 
 ```c
 1. struct example1

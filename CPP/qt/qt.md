@@ -2,6 +2,8 @@
 
 ---
 
+> qt是C++的一套GUI框架，实现了诸如socket、数据库、线程池等功能。但使用上和原生C++存在差距，也可看成Q++。
+
 ## 使用Vim
 
 Preference->FakeVim
@@ -520,7 +522,7 @@ class MyMainWindow:MainWindow
 
 ## （3）自定义槽函数
 
-* 用`public slots:`声明
+* 用`public slots:`声明**公有槽**可供类外调用，`private slots:`声明**私有槽**只能类内部调用。
 
   ```cpp
   class B
@@ -768,6 +770,20 @@ void rei::paintEvent(QPaintEvent *event)
   ```cpp
   [virtual protected] void QWidget::keyReleaseEvent(QKeyEvent *event);
   ```
+
+* ctrl-enter事件
+
+  ```cpp
+  if(event->modifiers() & Qt::ControlModifier)
+  {
+      if(event->key() == Qt::Key_Enter)
+      {
+          
+      }
+  }
+  ```
+
+  
 
 
 
@@ -1473,12 +1489,6 @@ void myButton::timerEvent(QTimerEvent *event)
     });
 ```
 
-# 17. MVC架构
-
----
-
-
-
 # 18. 数据库
 
 ---
@@ -1775,6 +1785,40 @@ QString QSqlError::text();
       db.rollback();	//回滚
   }
   ```
+
+# 19. MVD软件架构
+
+---
+
+> MVC是软件工程中基础且常用的软件架构，适用于需要显示、编辑数据库中数据的软件
+>
+> Model、View、Delegate
+>
+> 给View设置Model，数据库中数据变化，View会实时响应数据变化，View上对数据的修改，也会同步到数据库中。（策略可设置）
+>
+> **Model和View对应，Table的、Tree的、List的**
+
+## （1）Model
+
+> 负责与数据库中原始数据进行增删改查
+>
+> 有行、有列
+>
+> 都继承自**QAbstractItemModel**
+
+## （2）View
+
+> 视图(View)是**显示和修改数据**的界面组件
+>
+> 常用的视图组件有**QListView、QTreeView、QTableView**
+>
+> QListWidget、QTreeWidget、QTablewidget 是视图类的简化版，它们不使用数据模型，而是将数据直接存储在组件的每个item里。只显示还行，要显示加编辑对数据进行操作时，就不太好用了，这时还是使用View组件比较好用。
+
+## （3）Control
+
+
+
+
 
 # 19. 多线程
 
@@ -2128,15 +2172,17 @@ int main()
 
   **局部变量不能在析构函数内销毁。析构函数负责销毁成员变量，若写成成员变量则可在析构内delete。**
 
-  ```cpp
-  connect(this, &MainWindow::destroy, this, [=](){
-      thread1->quit();	//等价于thread->exit(0)，退出线程返回0
-      thread1->wait();
-      thread1->deletelater();	//封装了 delete thread1
-      
-      task->deletelater();	//销毁任务类对象
-  });
-  ```
+* `deleteLater()`是一个非常重要的方法，它属于QObject类。当你调用一个QObject派生类的实例的`deleteLater()`方法时，Qt会在当前事件循环结束后自动删除该对象。这样做的好处是可以在不阻塞当前线程的情况下，安全地删除对象，特别是在涉及到多线程编程时。`deleteLater()`只能在QObject的派生类中使用，并且调用这个方法的对象必须已经通过`new`关键字在堆上分配。此外，一旦调用了`deleteLater()`，就不应该再手动删除该对象，否则可能会导致程序崩溃。
+
+```cpp
+connect(this, &MainWindow::destroy, this, [=](){
+    thread1->quit();	//等价于thread->exit(0)，退出线程返回0
+    thread1->wait();
+    thread1->deletelater();	//封装了 delete thread1
+    
+    task->deletelater();	//销毁任务类对象
+});
+```
 
 ### demo
 
@@ -2708,6 +2754,11 @@ void MainWindow::readJson()
     jsonFile.close();
 ```
 
+# 21. 反射
+
+---
+
+> Qt自带简单的反射框架
 
 
 
@@ -2715,8 +2766,7 @@ void MainWindow::readJson()
 
 
 
-
-# 21. Qt网络通信
+# 22. Qt网络通信
 
 ---
 
@@ -2724,7 +2774,15 @@ void MainWindow::readJson()
 
 
 
-# 22. 通用.gitignore
+
+
+
+
+
+
+
+
+# 24. 通用.gitignore
 
 ---
 
@@ -3198,7 +3256,7 @@ FodyWeavers.xsd
 
 
 
-# 23. 程序打包
+# 25. 程序打包
 
 ## （1）流程
 
@@ -3480,6 +3538,47 @@ textEdit_synonyms = new QTextEdit(this);
     textEdit_synonyms->append("distinguish");
 	//样式表
     // textEdit_synonyms->setStyleSheet("background-color:rgb(0,0,0);color:rgb(255,255,255)");
+```
+
+
+
+# 5. 控件重叠设置Visible显示
+
+---
+
+```cpp
+#include <QWidget>
+#include <QLabel>
+#include <QVBoxLayout>
+
+class MyWidget : public QWidget
+{
+    Q_OBJECT
+
+public:
+    MyWidget(QWidget *parent = nullptr) : QWidget(parent)
+    {
+        // 创建两个标签控件
+        QLabel *label1 = new QLabel("Label 1", this);
+        QLabel *label2 = new QLabel("Label 2", this);
+
+        // 设置label2在label1下面
+        label2->stackUnder(label1);
+
+        // 创建一个垂直布局
+        QVBoxLayout *layout = new QVBoxLayout(this);
+        layout->addWidget(label1);
+        layout->addWidget(label2);
+
+        // 默认显示label1
+        label1->setVisible(true);
+        label2->setVisible(false);
+    }
+};
+
+在C++的Qt框架中，可以通过设置控件的stackUnder()函数来将一个控件放在另一个控件下面。然后通过设置控件的setVisible()函数来控制哪个控件显示在上面
+
+在这个示例中，我们创建了一个名为MyWidget的自定义控件类，继承自QWidget。我们创建了两个标签控件label1和label2，并使用stackUnder()函数将label2放在label1下面。然后我们创建了一个垂直布局，并将两个标签控件添加到布局中。最后，我们使用setVisible()函数来控制哪个标签控件显示在上面。
 ```
 
 
@@ -3793,11 +3892,134 @@ int main(int argc, char *argv[])
 
 如果需要控件之间有固定间距，在中间放个弹簧。改sizeType从Expanding（可伸缩）到fixed（固定），然后修改宽度或高度。
 
-# 树状目录-treeViewWidget
+
+
+# QListWidget
 
 ---
 
-## （1）添加
+> https://blog.csdn.net/weixin_43742643/article/details/100187743
+>
+> 列表显示
+
+# QTreeWidget
+
+---
+
+> 树状目录
+>
+> 在treeWdiget下挂着treeWidgetItem
+>
+> 每个item，有以下重要属性：
+>
+> ```cpp
+> text(int column);	//获取item在指定列上的文本
+> data(int column, int role);	//获取item在指定列上的数据
+> parent();	//获取item的父节点
+> child();	//获取item的子节点
+> ```
+>
+
+## （0）关联数据
+
+`QTreeWidgetItem` 提供了多种方式来存储数据。以下是一些常见的方法：
+
+1. **文本内容**：使用 `setText()` 方法设置文本，然后通过 `text()` 方法获取。
+
+   ```
+   QTreeWidgetItem *item = new QTreeWidgetItem(treeWidget, QStringList() << "Item 1");
+   // 设置文本
+   item->setText(0, "New Text");
+   // 获取文本
+   QString text = item->text(0);
+   ```
+
+2. **图标**：使用 `setIcon()` 方法设置图标，然后通过 `icon()` 方法获取。
+
+   ```
+   // 设置图标
+   item->setIcon(0, QIcon(":/path/to/icon.png"));
+   // 获取图标
+   QIcon icon = item->icon(0);
+   ```
+
+3. **状态**：使用 `setCheckState()` 设置复选框状态，然后通过 `checkState()` 获取。
+
+   ```
+   // 设置复选框状态
+   item->setCheckState(0, Qt::Checked);
+   // 获取复选框状态
+   Qt::CheckState state = item->checkState(0);
+   ```
+
+4. **自定义数据**：使用 `setData()` 方法存储自定义数据，然后通过 `data()` 方法获取。这允许你存储任何类型的数据，例如整数、浮点数、对象指针等。
+
+   ```cpp
+   // 存储自定义数据
+   item->setData(0, Qt::UserRole, QVariant::fromValue(yourCustomData));
+   // 获取自定义数据
+   QVariant variant = item->data(0, Qt::UserRole);
+   YourCustomDataType *data = variant.value<YourCustomDataType*>();
+   ```
+
+5. **字体**：使用 `setFont()` 方法设置字体，然后通过 `font()` 方法获取。
+
+   ```
+   // 设置字体
+   QFont font;
+   font.setPointSize(12);
+   item->setFont(0, font);
+   // 获取字体
+   QFont itemFont = item->font(0);
+   ```
+
+6. **背景色和前景色**：使用 `setBackgroundColor()` 和 `setTextColor()` 设置颜色，然后通过 `backgroundColor()` 和 `textColor()` 获取。
+
+   ```
+   // 设置背景色
+   item->setBackgroundColor(0, Qt::red);
+   // 设置前景色
+   item->setTextColor(0, Qt::green);
+   // 获取背景色
+   QColor backgroundColor = item->backgroundColor(0);
+   // 获取前景色
+   QColor textColor = item->textColor(0);
+   ```
+
+7. **工具提示**：使用 `setToolTip()` 设置工具提示，然后通过 `toolTip()` 获取。
+
+   ```
+   // 设置工具提示
+   item->setToolTip(0, "This is a tooltip");
+   // 获取工具提示
+   QString toolTip = item->toolTip(0);
+   ```
+
+8. **状态提示**：使用 `setStatusTip()` 设置状态提示，然后通过 `statusTip()` 获取。
+
+   ```
+   // 设置状态提示
+   item->setStatusTip(0, "This is a status tip");
+   // 获取状态提示
+   QString statusTip = item->statusTip(0);
+   ```
+
+9. **排序**：使用 `setWhatsThis()` 设置排序关键字，然后通过 `whatsThis()` 获取。
+
+   ```
+   // 设置排序关键字
+   item->setWhatsThis(0, "SortKey");
+   // 获取排序关键字
+   QString sortKey = item->whatsThis(0);
+   ```
+
+这些方法允许你以灵活的方式存储和检索与 `QTreeWidgetItem` 相关联的各种数据。记得，当你使用 `setData()` 和 `data()` 方法时，可以指定一个角色（role），这允许你在同一个项中存储不同类型的数据。默认情况下，`Qt::DisplayRole` 和 `Qt::EditRole` 是最常用的角色，但你可以定义自定义角色（如 `Qt::UserRole`）来存储特定的数据。
+
+## （1）初始化添加item
+
+> 不使用多列也可以展现树形。
+>
+> 若使用树形，使用2列，也可以，通过有没有`parent`或者`child`来判断是最父层的还是最子层的item。
 
 ```cpp
  QTreeWidgetItem* wordspellingItem = new QTreeWidgetItem();
@@ -3901,15 +4123,15 @@ int main(int argc, char *argv[])
     anotonymsItem, nearSynonymsItem, similarsItem, nounItem, verbItem, adjItem, advItem, usefulExpressionsItem});
 ```
 
-## （2）删除子项
+## （2）删除某个item下的子项
 
-来清空一个树形控件中的子项
+来清空一个item中的子项
 
 ```cpp
 QTreeWidgetItem.takeChild()
 ```
 
-## （3）清空树
+## （3）清空整个树目录
 
 ```cpp
 #include <QTreeWidget>
@@ -3928,7 +4150,7 @@ void clearTreeWidget(QTreeWidget *treeWidget)
 }
 ```
 
-## （4）展开、折叠
+## （4）展开、折叠某个item
 
 * 折叠
 
@@ -3945,14 +4167,370 @@ void clearTreeWidget(QTreeWidget *treeWidget)
   void QTreeView::expandToDepth(int depth);	//展开所有可展开节点到指定深度
   ```
 
-## （5）选中
+## （4）父子item
 
 ```cpp
-QTreeWidgetItem *item = xxx//先获取要展开的项
-ui->treeWidget->clearSelection();    //清楚之前的 选中状态
-ui->treeWidget->scrollToItem(item);    //展开 并自动调整滚动条 到可以显示的位置
-item->setSelected(true);    //选中 此项
+//获取父节点
+treeWidgetItem::parent();	//没有父节点则返回nullptr
+//子节点个数
+treeWidgetItem::childCount();
+//获取子节点
+treeWidgetItem::child();
 ```
+
+## （5）选中某个item
+
+```cpp
+//获取当前选中的item
+QList<QTreeWidgetItem*> selItems = selectedItems();
+selItems.at(0);
+
+//获取当前选中item所在column
+QTreeWidget::currentColumn();
+//选中item
+item->setSelected(true);   
+setItemSelected(item, true);	//setItemSelected(item, false);
+//清除之前选中
+treeWidget->clearSelection();   
+//展开 并自动调整滚动条 到可以显示的位置
+treeWidget->scrollToItem(item);    
+```
+
+## （7）删、改某个item
+
+* 在选中item同级添加item
+
+```cpp
+
+```
+
+* 删、改选中item
+
+```cpp
+void CustomTree::removeItemRecursion(QTreeWidgetItem* item)
+{
+    int count = item->childCount();
+    if (count == 0) {
+        // 没有子节点，直接删除
+        delete item;
+        return;
+    }
+    for (int i = 0; i < count; i++) {
+        QTreeWidgetItem* childItem = item->child(0); // 删除子节点
+        removeItemRecursion(childItem);
+    }
+    delete item; // 最后将自己删除
+}
+
+ selItems = selectedItems();
+ if (selItems.count() == 0)
+ {
+     return;
+ }
+ if (selItems.at(0))
+ {
+     removeItemRecursion(selItems.at(0));
+     keyDCount = 0;
+ }
+```
+
+```cpp
+selItems = selectedItems();
+if (selItems.count() == 0)
+{
+    return;
+}
+if (selItems.at(0))
+{
+    selItems.at(0)->setFlags(selItems.at(0)->flags() | Qt::ItemIsEditable);
+    selItems.at(0)->setSelected(true);
+    editItem(selItems.at(0), selColumn);
+    keyWCount = 0;
+}
+```
+
+# QTableWidget
+
+---
+
+
+
+# QStringListModel
+
+---
+
+```cpp
+//删除行，beginRow起始删除的行，count删除的行数
+QStringListModel::removeRows(int beginRow, int count);	
+//返回总行数
+QStringListModel::rowCount();	
+//插入行
+QStringListModel::insertRow();
+//设置数据
+setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);	
+//当前选中行
+QModelIndex selIndex = liveView->currentIndex();
+//从行列获取index
+QModelIndex index(int row, int column = 0, const QModelIndex &parent = QModelIndex()) const override;
+```
+
+# QSqlTableModel
+
+---
+
+```cpp
+QSqlRecord record = model->record();	//获取1个空记录
+
+model->insertRecord(int index, record);	//插入记录
+
+//设置model修改策略：手动提交修改（View上修改不会直接提交到数据库，有星号，需确认）
+model->setEditStrategy(QSqlTableModel::OnManualSubmit);
+model->submit();	//提交当前编辑row的修改
+model->submitAll();	//提交所有修改
+model->revertAll();	//撤销所有修改
+
+//在View上修改表头显示
+bool model->setHeaderData(int section, Qt::Orientation orientation, const QVariant& value);	
+//sectoin-起始列数
+//orientation-方向
+//value-修改后
+```
+
+
+
+# QListView
+
+---
+
+* 添加右键菜单，列表增、删、插入、清空
+
+  ```cpp
+  #ifndef MAINWINDOW_H
+  #define MAINWINDOW_H
+  
+  #include <QMainWindow>
+  #include <QStringList>
+  #include <QStringListModel>
+  #include <QModelIndex>
+  
+  QT_BEGIN_NAMESPACE
+  namespace Ui {
+  class MainWindow;
+  }
+  QT_END_NAMESPACE
+  
+  class MainWindow : public QMainWindow
+  {
+      Q_OBJECT
+  
+  public:
+      MainWindow(QWidget *parent = nullptr);
+      ~MainWindow();
+  
+      void initMenu();
+  
+  private:
+      Ui::MainWindow *ui;
+      QMenu* m_pMenu;
+      QStringListModel* m_pStringListModel;
+  };
+  #endif // MAINWINDOW_H
+  ```
+  
+  ```cpp
+  #include "mainwindow.h"
+  #include "ui_mainwindow.h"
+  
+  MainWindow::MainWindow(QWidget *parent)
+      : QMainWindow(parent)
+      , ui(new Ui::MainWindow)
+  {
+      ui->setupUi(this);
+  
+  
+      QStringList strList;
+      strList << u8"北京"<< u8"上海"<< u8"深圳"<< u8"广东"<< u8"南京"<<u8"苏州"<< u8"西安";
+      //创建数据模型
+      m_pStringListModel=new QStringListModel(this);
+      //为模型设置原始数据StringList，会导入StringList的内容
+      m_pStringListModel->setStringList(strList);
+      //为ui->listView设置数据模型
+      ui->listView->setModel(m_pStringListModel);
+  
+      //链接信号，弹出菜单
+      connect(ui->listView, &QListView::customContextMenuRequested, this, [=](const QPoint& pos){
+          if(!(ui->listView->selectionModel()->selectedIndexes()).empty())
+          {
+              m_pMenu->exec(QCursor::pos());	//在当前鼠标所在位置显示
+          }
+      });
+  
+      //设置菜单策略
+      ui->listView->setContextMenuPolicy(Qt::CustomContextMenu);
+      initMenu();
+  }
+  
+  MainWindow::~MainWindow()
+  {
+      delete ui;
+  }
+  
+  void MainWindow::initMenu()
+  {
+      m_pMenu = new QMenu(ui->listView);
+      QAction* pAc1 = new QAction(u8"删除", ui->listView);
+      QAction* pAc2 = new QAction(u8"插入", ui->listView);
+      QAction* pAc3 = new QAction(u8"置顶", ui->listView);
+      QAction* pAc4 = new QAction(u8"排到最后", ui->listView);
+      QAction* pAc5= new QAction(u8"清空", ui->listView);
+      QAction* pAc6 = new QAction(u8"尾部增加一项", ui->listView);
+      QAction* pAc7 = new QAction(u8"显示选中项的行列号", ui->listView);
+      QAction* pAc8 = new QAction(u8"显示全部", ui->listView);
+  
+      m_pMenu->addAction(pAc1);
+      m_pMenu->addAction(pAc2);
+      m_pMenu->addAction(pAc3);
+      m_pMenu->addAction(pAc4);
+      m_pMenu->addAction(pAc5);
+      m_pMenu->addAction(pAc6);
+      m_pMenu->addAction(pAc7);
+      m_pMenu->addAction(pAc8);
+  
+      //删除
+      connect(pAc1, &QAction::triggered, this, [=](){
+          QModelIndex selIndex=ui->listView->currentIndex();	//获取当前index
+          m_pStringListModel->removeRow(selIndex.row());	//QModelIndex包含行列的
+      });
+  
+      //选中行前插入
+      connect(pAc2, &QAction::triggered, this, [=](){
+          QModelIndex selIndex = ui->listView->currentIndex();
+          m_pStringListModel->insertRow(selIndex.row());	//在selIndex前插入一行
+          m_pStringListModel->setData(selIndex, "inserted item", Qt::DisplayRole);	//给新增一行设置文本
+          ui->listView->setCurrentIndex(selIndex);
+      });
+  
+      //置顶
+      connect(pAc3, &QAction::triggered, this, [=](){
+          QModelIndex selIndex = ui->listView->currentIndex();
+          QVariant delData = selIndex.data();
+          m_pStringListModel->removeRow(selIndex.row());
+          m_pStringListModel->insertRow(0);
+          m_pStringListModel->setData(m_pStringListModel->index(0, 0), delData, Qt::DisplayRole);
+  
+      });
+  
+      //排到最后
+      connect(pAc4, &QAction::triggered, this, [=](){
+          QModelIndex selIndex = ui->listView->currentIndex();
+          QVariant delData = selIndex.data();
+          m_pStringListModel->removeRow(selIndex.row());
+          m_pStringListModel->insertRow(m_pStringListModel->rowCount());
+          m_pStringListModel->setData(m_pStringListModel->index(m_pStringListModel->rowCount()-1, 0), delData, Qt::DisplayRole);
+      });
+  
+      //清空
+      connect(pAc5, &QAction::triggered, this, [=](){
+          m_pStringListModel->removeRows(0, m_pStringListModel->rowCount());
+      });
+  
+      //尾部增加一项
+      connect(pAc6, &QAction::triggered, this, [=](){
+          m_pStringListModel->insertRow(m_pStringListModel->rowCount());	//尾部增加一行，否则会把原有最后一行替换掉
+          //获取新增的一行
+          QModelIndex newRowIndex = m_pStringListModel->index(m_pStringListModel->rowCount()-1, 0);
+          m_pStringListModel->setData(newRowIndex, "new item", Qt::DisplayRole);	//给新增一行设置文本
+          ui->listView->setCurrentIndex(newRowIndex);
+      });
+  
+      //显示选中项的行列号
+      connect(pAc7, &QAction::triggered, this, [=](){
+          QModelIndex selIndex = ui->listView->currentIndex();
+          ui->textEdit->clear();
+          //显示选中的selIndex的行列号
+          ui->textEdit->append(QString::asprintf(u8"当前项:row=%d, column=%d", selIndex.row(), selIndex.column()));
+      });
+  
+      //显示全部
+      connect(pAc8, &QAction::triggered, this, [=](){
+          QStringList temp = m_pStringListModel->stringList();
+          ui->textEdit->clear();
+          for(auto item : temp)
+          {
+              ui->textEdit->append(item);
+          }
+      });
+  
+  }
+  ```
+  
+
+# QTableView
+
+---
+
+```cpp
+//设置View不允许修改，只显示
+ui->tableView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+```
+
+```cpp
+//创建实例，设置连接参数
+QSqlDatabase db = QSqlDatabase::addDatabase("QMYSQL");
+db.setHostName("localhost");
+db.setPort(3306);
+db.setUserName("root");
+db.setPassword("root");
+db.setDatabaseName("sys");
+
+//连接
+if(db.open())
+{
+ 	qDebug()<<"succeed..";
+}
+else
+{
+    QMessageBox::warning(this, "错误", db.lastError().text());
+    return;
+}
+
+//设置模型
+QSqlTableModel* model = QSqlTableModel(this);
+model->setTable("table");	//指定使用数据库中的表名
+
+//View显示Model的数据
+ui->tableView->setModel(model);
+
+//model查询，刷新View显示
+model->select();
+
+//添加记录
+QSqlRecord record = model->record();	//获取个空记录
+model->insertRecord(model->rowCount(), record);	//在末尾插入空记录
+
+//修改
+model->setEditStrategy(QSqlTableModel::OnManualSubmit);	
+model->submitAll();	//修改后有星号，button提交所有修改到数据库
+
+//删除
+QItemSelectionModel* selModel = ui->tableView->selectionModel();	//从View获取选中行的model
+QModelIndexList indexList = selModel->selectedRows();	//从选中的model中获取索引
+for(auto item : indexList)
+{
+    model->removeRow(item.row());
+}
+model->submitAll();	//button提交所有修改到数据库
+
+//查找
+QString str = QString("name=%1").arg(ui->lineEdit->text());	//str写简单的查询条件
+model->setFilter(str);	
+```
+
+
+
+
+
+
 
 
 

@@ -593,6 +593,26 @@ awk '{print $1,$4}' test	#以空格作为分隔符。
 
 ### （7）排序—sort
 
+```bash
+如果你想在排序或去重时忽略大小写，可以使用 sort 命令的 -f 选项：
+sort -f filename | uniq
+```
+
+```bash
+如果文件是字段分隔的（例如，由空格或制表符），你可以使用 sort 命令的 -k 选项来指定按照哪个字段排序：
+
+这将按照第二字段排序：
+sort -k 2 filename
+
+按照第二列排序，忽略大小写：
+sort -k2,2 yourfile.csv
+```
+
+```bash
+如果你想反向排序，可以使用 sort 命令的 -r 选项：
+sort -r filename
+```
+
 
 
 ### （8）去重—uniq

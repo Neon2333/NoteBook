@@ -1041,7 +1041,38 @@ while True:
 
 ---
 
-# 
+
+
+
+
+# 22. airodump-ng
+
+---
+
+> https://www.cnblogs.com/micr067/p/12496753.html
+>
+
+
+
+* 注意：扫描得到的csv文件有两个表：SSID表和之前记录过的设备表。表头之前都有个空行，因此第一个表头在第二行。
+* 列的编号从0开始
+
+```bash
+# 扫描
+airodump-ng [wlan0mon]	
+# 扫描，以30s为周期将扫描信息写入path/fileName-01.csv文件
+# 注意：扫描得到的csv文件有两个表：SSID表和之前记录过的设备表。表头之前都有个空行，因此第一个表头在第二行。
+airodump-ng [INTERFACE] -w [path/fileName] --write-interval 30 -o csv	
+```
+
+```bash
+#! /bin/bash
+if[! -d "./SSlDScanResults" ]; thenmkdir -p"./SSlDScanResults"
+current_date_time$(date +"%Y%m%d %H%M%S")
+airodump-ng wlanOmon -w./SSlDScanResults/"${current_date_time}" --write-interval 10 -o csv
+```
+
+
 
 
 

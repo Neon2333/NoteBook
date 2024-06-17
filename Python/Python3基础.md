@@ -783,7 +783,9 @@ for keys, vals in cities.items():
 
 ---
 
-## 8. IO
+## 8. 标准输入输出
+
+---
 
 ### （1）input函数
 
@@ -807,9 +809,24 @@ msg = input(msgHelp)
   	print("this num is bigger than 10")
   ```
 
----
+## （2）print
+
+* 打印时使用了`print`函数，而`print`默认会在每个元素后添加一个换行符。要避免这种情况，你可以传递`end`参数给`print`函数，将其设置为一个空字符串`''`，这样`print`就不会在元素后添加换行符了。
+
+  ```python
+  my_list = ["hello", "world", "foo", "bar"]
+  
+  # 遍历列表并打印每个元素，不添加额外的换行符
+  for item in my_list:
+      print(item, end=' ')
+  print()  # 最后打印一个换行符以结束输出
+  ```
+
+  
 
 ## 9. while循环
+
+---
 
 for循环用于遍历
 
