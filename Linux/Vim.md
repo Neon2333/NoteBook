@@ -44,6 +44,17 @@ ctrl-d 下翻半页
 ctrl-insert 复制
 ctrl-shift 黏贴
 :a,bmc	a-b行代码剪切到m行下一行
+/查找词 按n下一个
+
+#首先使用vim查看文件格式
+vim xxx.sh
+:set ff
+#可以看到文件格式为
+fileformat=dos
+#修改文件格式
+:set ff=unix
+#保存退出
+:wq
 ```
 
 ### 复制词A替换词B

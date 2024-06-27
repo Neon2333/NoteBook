@@ -296,12 +296,14 @@ passwd 用户名
 
 ### 修改所属、所属组
 
+若遇到目录没有权限的时候，将目录属组修改到当前用户。
+
 ```bash
 #改所属、属组
-chown [-R] ownname:groupname filename
+chown [-R] ownname:groupname filename或dir
 
 #只改属组
-sudo chgrp [-R] groupname filename	#-R修改filename下的所有文件的属组为groupname
+sudo chgrp [-R] groupname filename或dir	#-R修改filename下的所有文件的属组为groupname
 ```
 
 #### 修改用户的属组、home目录、shell
@@ -838,10 +840,14 @@ ps -ef | grep 关键字		#查找指定进程
 
 ### （2）终止进程
 
+`killall -sigNum 程序名`
+
 ```bash
 kill PID
 killall 程序名
--9选项表示强行终止		#进程比较顽固终止不了加-9。	kill -9 PID
+-9表示发送信号9强行终止		#进程比较顽固终止不了加-9
+kill -9 PID
+killall -9 程序名
 ```
 
 ---

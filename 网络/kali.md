@@ -79,6 +79,14 @@ apt --fix-broken install
 
 # 2. kali必备安装
 
+## 安装gdb
+
+```bash
+apt install gdb -y
+```
+
+
+
 ## 安装gnome-terminal
 
 ```bash

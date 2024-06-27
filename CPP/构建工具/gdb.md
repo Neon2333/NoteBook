@@ -82,7 +82,14 @@ p——按照变量定义的类型打印
 
 如： p/x i
 
-​                               
+ 
+
+上一条命令：
+
+`ctrl+p` previous
+`ctrl+n` next
+`ctrl+b` back
+`ctrl+f` forward                              
 
  
 

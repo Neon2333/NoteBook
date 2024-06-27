@@ -2545,7 +2545,6 @@ pid_t waitpid(pid_t pid, int* status, int options);
 
 ```c++
 //更换c++代码风格为K&R
-//函数花括号另起一行，其他花括号如if的左花括号紧跟if
 #include<iostream>
 #include<unistd.h>
 #include<sys/wait.h>
@@ -2557,15 +2556,20 @@ int main(int argc, char** argv)
         pid_t pid;
         pid = fork();
         int status;
-        if(pid == 0){
+        if(pid == 0)
+        {
                 sleep(30);
                 return 1;
-        }else{
-                while(waitpid( -1, &status, WNOHANG) == 0 ){
+        }
+    	else
+        {
+                while(waitpid( -1, &status, WNOHANG) == 0 )
+                {
                         sleep(5);
                         cout<<"sleep 5s"<<endl;
                 }
-                if(WIFEXITED(status) == true){
+                if(WIFEXITED(status) == true)
+                {
                         cout<<"child process return value="<<WEXITSTATUS(status)<<endl;
                 }
                 return 0;
@@ -2604,18 +2608,9 @@ int main(int argc, char** argv)
   int func(int a, int b){
       return a + b;
   }
-  typedef functionral<int <int, int>> FP;
-  FP fp = func;
-  ```
-
-  ```c++
-  #include<functional>
-  int func(int a, int b){
-      return a + b;
-  }
   functional<int <int, int>> fp = func;
   ```
-
+  
 * 函数指针作为函数参数
 
   ```c++
@@ -3069,20 +3064,25 @@ int main(int argc, char** argv)
 		exit(0);	
 	}	
 	if(pid == 0){
-		while(1){
+		while(1)
+        {
 			cout<<"please enter your message: "<<endl;
 			cin.getline(buf, 1024, '\n');
-			if(buf == "q" || buf == "Q"){
+			if(buf == "q" || buf == "Q")
+            {
 				shutdown(sock_clnt, SHUT_WR);
 				return 1;	
 			}	
 			write(sock_clnt, buf, strlen(buf));	
 		}
 			
-	}else{
-		while(1){
+	}
+    else{
+		while(1)
+        {
 			int len_r = read(sock_clnt, buf, BUF_SIZE);
-			if(len_r == 0){
+			if(len_r == 0)
+            {
 				break;	
 			}	
 			buf[len_r]='\0';
